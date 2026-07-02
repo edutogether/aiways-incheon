@@ -568,6 +568,8 @@
   }
 
   async function refreshLandfill() {
+    if (window.AIWAYS_FINAL_TUNE_ACTIVE) return;
+
     if (AIWAYS_LANDFILL_ENDPOINT) {
       try {
         const response = await fetch(AIWAYS_LANDFILL_ENDPOINT);
@@ -595,6 +597,8 @@
   }
 
   function renderDashboards() {
+    if (window.AIWAYS_FINAL_TUNE_ACTIVE) return;
+
     renderSchoolCard();
     renderClassCard();
     renderLandfillCard();
@@ -620,6 +624,8 @@
   }
 
   function renderMiniApp() {
+    if (window.AIWAYS_FINAL_TUNE_ACTIVE) return;
+
     const card = findCard("버려지는 순간을 기록하세요", "miniapp");
     if (!card) return;
 
@@ -1150,6 +1156,8 @@
   }
 
   function renderAll() {
+    if (window.AIWAYS_FINAL_TUNE_ACTIVE) return;
+
     patchHeader();
     patchHero();
     renderDashboards();

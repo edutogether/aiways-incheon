@@ -1,6 +1,6 @@
 (() => {
-  const $ = (selector, parent = document) => parent.querySelector(selector);
-  const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector)];
+  const $ = (selector, parent = document) => parent?.querySelector(selector) || null;
+  const $$ = (selector, parent = document) => (parent ? [...parent.querySelectorAll(selector)] : []);
 
   const classData = {
     "5학년 1반": { ai: 37, reconfirm: 18, today: 128, hold: 7, converted: 24, rank: "학년 내 1위 · 학교 내 2위" },

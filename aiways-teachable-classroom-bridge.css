@@ -1,0 +1,315 @@
+/* =========================================================
+   AIWays Classroom Teachable Machine Bridge
+   ========================================================= */
+
+:root {
+  --tm-bg: rgba(5, 14, 29, 0.72);
+  --tm-panel: rgba(9, 23, 43, 0.86);
+  --tm-line: rgba(123, 164, 226, 0.18);
+  --tm-line-strong: rgba(108, 244, 223, 0.42);
+  --tm-text: #f5f9ff;
+  --tm-sub: rgba(220, 234, 252, 0.78);
+  --tm-dim: rgba(188, 207, 232, 0.66);
+  --tm-mint: #6cf4df;
+  --tm-cyan: #6eeef0;
+  --tm-blue: #6bbcff;
+  --tm-yellow: #ffd66b;
+  --tm-red: #ff8c9b;
+}
+
+.aiways-tm-panel {
+  width: 100%;
+  margin: 10px 0 12px;
+  border-radius: 18px;
+  padding: 12px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(108, 244, 223, 0.10), transparent 44%),
+    rgba(5, 14, 29, 0.62);
+  border: 1px solid rgba(108, 244, 223, 0.18);
+}
+
+.aiways-tm-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.aiways-tm-panel-title {
+  color: #ffffff;
+  font-size: 0.92rem;
+  line-height: 1.15;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.aiways-tm-panel-badge {
+  flex: 0 0 auto;
+  min-height: 23px;
+  padding: 0 9px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  color: #061829;
+  background: linear-gradient(90deg, var(--tm-cyan), var(--tm-blue));
+  font-size: 0.68rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.aiways-tm-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 7px;
+}
+
+.aiways-tm-input {
+  min-width: 0;
+  height: 36px;
+  border-radius: 13px;
+  border: 1px solid rgba(123, 164, 226, 0.18);
+  outline: none;
+  padding: 0 11px;
+  color: #edf7ff;
+  background: rgba(4, 12, 25, 0.72);
+  font-size: 0.76rem;
+  font-weight: 760;
+}
+
+.aiways-tm-input::placeholder {
+  color: rgba(220, 234, 252, 0.42);
+}
+
+.aiways-tm-btn {
+  height: 36px;
+  border: 0;
+  border-radius: 13px;
+  padding: 0 11px;
+  cursor: pointer;
+  color: #061829;
+  background: linear-gradient(90deg, var(--tm-cyan), var(--tm-blue));
+  font-size: 0.75rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.aiways-tm-btn.ghost {
+  color: #dff4ff;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.aiways-tm-help,
+.aiways-tm-status {
+  margin-top: 8px;
+  color: var(--tm-sub);
+  font-size: 0.72rem;
+  line-height: 1.38;
+  font-weight: 720;
+  word-break: keep-all;
+}
+
+.aiways-tm-status {
+  color: var(--tm-mint);
+  font-weight: 850;
+}
+
+.aiways-tm-help strong {
+  color: var(--tm-mint);
+  font-weight: 950;
+}
+
+.aiways-tm-open {
+  color: var(--tm-mint);
+  text-decoration: none;
+  font-weight: 950;
+}
+
+.aiways-tm-result-card {
+  min-height: 100%;
+}
+
+.aiways-tm-result-card h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 2rem;
+  line-height: 1.08;
+  font-weight: 950;
+  letter-spacing: 0;
+  word-break: keep-all;
+}
+
+.aiways-tm-result-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.aiways-tm-pill {
+  min-height: 25px;
+  padding: 0 9px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  color: #061829;
+  background: linear-gradient(90deg, var(--tm-cyan), var(--tm-blue));
+  font-size: 0.72rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.aiways-tm-pill.warn {
+  background: linear-gradient(90deg, var(--tm-yellow), #fff1a0);
+}
+
+.aiways-tm-pill.hold {
+  background: linear-gradient(90deg, var(--tm-red), var(--tm-yellow));
+}
+
+.aiways-tm-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.aiways-tm-info {
+  min-width: 0;
+  border-radius: 14px;
+  padding: 9px;
+  background: rgba(4, 12, 25, 0.64);
+  border: 1px solid rgba(130, 163, 220, 0.10);
+}
+
+.aiways-tm-info small {
+  display: block;
+  color: rgba(191, 207, 230, 0.72);
+  font-size: 0.68rem;
+  margin-bottom: 4px;
+  font-weight: 820;
+}
+
+.aiways-tm-info b {
+  display: block;
+  color: #f2f8ff;
+  font-size: 0.82rem;
+  line-height: 1.18;
+  font-weight: 900;
+  word-break: keep-all;
+}
+
+.aiways-tm-guide {
+  margin-top: 12px;
+  border-radius: 16px;
+  padding: 12px;
+  background: rgba(108, 244, 223, 0.075);
+  border: 1px solid rgba(108, 244, 223, 0.18);
+  color: rgba(229, 243, 255, 0.9);
+  font-size: 0.82rem;
+  line-height: 1.42;
+  font-weight: 740;
+  word-break: keep-all;
+}
+
+.aiways-tm-guide strong {
+  color: #ffffff;
+  font-weight: 950;
+}
+
+.aiways-tm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.aiways-tm-action {
+  min-height: 42px;
+  border: 0;
+  border-radius: 14px;
+  padding: 0 12px;
+  cursor: pointer;
+  color: #061829;
+  font-size: 0.82rem;
+  font-weight: 950;
+}
+
+.aiways-tm-action.primary {
+  background: linear-gradient(90deg, var(--tm-cyan), var(--tm-blue));
+}
+
+.aiways-tm-action.secondary {
+  background: linear-gradient(90deg, var(--tm-yellow), #fff2a0);
+}
+
+.aiways-tm-loading-title {
+  display: block;
+  color: #ffffff;
+  font-size: 2.35rem;
+  line-height: 1.04;
+  font-weight: 950;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+.aiways-tm-loading-sub {
+  display: block;
+  margin-top: 10px;
+  color: var(--tm-sub);
+  font-size: 0.95rem;
+  line-height: 1.42;
+  font-weight: 760;
+  text-align: center;
+  word-break: keep-all;
+}
+
+@media (min-width: 2560px) {
+  .aiways-tm-panel {
+    margin: 16px 0 20px;
+    border-radius: 24px;
+    padding: 20px;
+  }
+
+  .aiways-tm-panel-title {
+    font-size: 1.25rem;
+  }
+
+  .aiways-tm-panel-badge,
+  .aiways-tm-input,
+  .aiways-tm-btn,
+  .aiways-tm-help,
+  .aiways-tm-status,
+  .aiways-tm-pill,
+  .aiways-tm-info b,
+  .aiways-tm-guide,
+  .aiways-tm-action {
+    font-size: 1.05rem;
+  }
+
+  .aiways-tm-input,
+  .aiways-tm-btn {
+    height: 52px;
+    border-radius: 17px;
+  }
+
+  .aiways-tm-result-card h3 {
+    font-size: 2.65rem;
+  }
+
+  .aiways-tm-loading-title {
+    font-size: 3.2rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .aiways-tm-row {
+    grid-template-columns: 1fr;
+  }
+
+  .aiways-tm-info-grid,
+  .aiways-tm-actions {
+    grid-template-columns: 1fr;
+  }
+}

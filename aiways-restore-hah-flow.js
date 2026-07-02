@@ -237,6 +237,11 @@
 
     curriculum.insertAdjacentElement("afterend", flow);
     curriculum.insertAdjacentElement("afterend", hah);
+
+    window.dispatchEvent(new CustomEvent("aiways-sections-mutated"));
+    if (typeof window.aiwaysRefreshSectionSnap === "function") {
+      window.aiwaysRefreshSectionSnap();
+    }
   }
 
   function labelForSection(sec, index, list){

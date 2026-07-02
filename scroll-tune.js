@@ -7,6 +7,8 @@
   let sections = [];
   let lock = false;
   let lastWheelAt = 0;
+  let cooldownUntil = 0;
+  let collectTimer = 0;
 
   const easeOutExpoSoft = (t) => {
     if (t >= 1) return 1;
@@ -16,6 +18,10 @@
   function collectSections() {
     const candidates = [
       document.querySelector(".aiw-hero"),
+      ...document.querySelectorAll("main > section"),
+      ...document.querySelectorAll(".aiw-page-section"),
+      document.querySelector("#aiways-restore-hah-page"),
+      document.querySelector("#aiways-restore-flow-page"),
       ...document.querySelectorAll(".story-section"),
       ...document.querySelectorAll(".section-shell"),
       document.querySelector(".ranking-section"),
@@ -27,6 +33,11 @@
 
     candidates.forEach((el) => {
       if (seen.has(el)) return;
+      if (el.classList.contains("aiways-output-removed") || el.classList.contains("aiways-final-removed")) return;
+      const rect = el.getBoundingClientRect();
+      const style = window.getComputedStyle(el);
+      if (style.display === "none" || style.visibility === "hidden") return;
+      if (rect.width < 320 || rect.height < 160) return;
       seen.add(el);
       unique.push(el);
     });
@@ -57,8 +68,14 @@
   function finishScroll() {
     window.setTimeout(() => {
       document.body.classList.remove("is-section-scrolling");
+      cooldownUntil = performance.now() + 320;
       lock = false;
     }, 120);
+  }
+
+  function scheduleCollectSections() {
+    window.clearTimeout(collectTimer);
+    collectTimer = window.setTimeout(collectSections, 80);
   }
 
   function animateTo(targetY, duration = 880) {
@@ -108,6 +125,11 @@
     const now = performance.now();
 
     if (Math.abs(event.deltaY) < 18) return;
+
+    if (now < cooldownUntil) {
+      event.preventDefault();
+      return;
+    }
 
     if (lock) {
       event.preventDefault();
@@ -164,19 +186,33 @@
 
   function init() {
     collectSections();
+    window.aiwaysRefreshSectionSnap = collectSections;
 
     document.addEventListener("click", onAnchorClick, true);
     window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("aiways-sections-mutated", scheduleCollectSections, { passive: true });
     window.addEventListener(
       "resize",
       () => {
-        window.clearTimeout(window.__aiwResizeTimer);
-        window.__aiwResizeTimer = window.setTimeout(collectSections, 180);
+        scheduleCollectSections();
       },
       { passive: true }
     );
 
     window.addEventListener("load", collectSections, { passive: true });
+
+    const main = document.querySelector("main");
+    if (main) {
+      const observer = new MutationObserver(scheduleCollectSections);
+      observer.observe(main, { childList: true, subtree: false });
+    }
+
+    let retry = 0;
+    const retryTimer = window.setInterval(() => {
+      retry += 1;
+      collectSections();
+      if (retry >= 10) window.clearInterval(retryTimer);
+    }, 360);
   }
 
   if (document.readyState === "loading") {

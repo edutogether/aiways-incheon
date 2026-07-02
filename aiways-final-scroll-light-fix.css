@@ -1,0 +1,183 @@
+/* =========================================================
+   AIWays Final Scroll + Light Fix
+   - 현재 멈춘 섹션만 점등
+   - 메뉴 활성 하단바 단일화
+   - 우하단 스크롤 조각 제거
+   ========================================================= */
+
+:root {
+  --fs-mint: #6cf4df;
+  --fs-cyan: #6eeef0;
+  --fs-blue: #6bbcff;
+  --fs-text: #f5f9ff;
+  --fs-dim: rgba(220, 234, 252, 0.62);
+}
+
+html,
+body {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+.aiways-final-scrollbar-ghost {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.aiways-final-scroll-page {
+  position: relative !important;
+  opacity: 0.44 !important;
+  filter: brightness(0.48) saturate(0.72) !important;
+  transform: translateY(18px) scale(0.992) !important;
+  transition:
+    opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.34s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  will-change: opacity, filter, transform !important;
+}
+
+body.aiways-final-is-scrolling .aiways-final-scroll-page {
+  opacity: 0.34 !important;
+  filter: brightness(0.38) saturate(0.64) !important;
+  transform: translateY(20px) scale(0.991) !important;
+}
+
+.aiways-final-scroll-page.aiways-final-scroll-lit,
+.aiways-final-scroll-page.aiways-final-scroll-lit.aiw-page-section,
+.aiways-final-scroll-page.aiways-final-scroll-lit.aiways-restore-page,
+.aiways-final-scroll-page.aiways-final-scroll-lit.aiways-full-app-section {
+  opacity: 1 !important;
+  filter: brightness(1.08) saturate(1.08) !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+.aiways-final-scroll-page.aiways-final-scroll-lit::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 48% 10%, rgba(108, 244, 223, 0.16), transparent 35%),
+    radial-gradient(circle at 88% 34%, rgba(107, 188, 255, 0.10), transparent 38%);
+  animation: aiwaysFinalPageLight 0.54s ease both;
+}
+
+.aiways-final-scroll-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes aiwaysFinalPageLight {
+  0% {
+    opacity: 0;
+    filter: brightness(0.35);
+  }
+
+  34% {
+    opacity: 0.94;
+    filter: brightness(1.45);
+  }
+
+  100% {
+    opacity: 0.42;
+    filter: brightness(1);
+  }
+}
+
+header nav a,
+.site-header nav a,
+.header nav a,
+header nav button,
+.site-header nav button,
+.header nav button,
+header nav span,
+.site-header nav span,
+.header nav span {
+  position: relative !important;
+  color: rgba(225, 236, 250, 0.64) !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+  filter: none !important;
+  white-space: nowrap !important;
+  transition:
+    color 0.22s ease,
+    text-shadow 0.22s ease,
+    transform 0.22s ease !important;
+}
+
+header nav a:not(.aiways-final-nav-lit)::after,
+.site-header nav a:not(.aiways-final-nav-lit)::after,
+.header nav a:not(.aiways-final-nav-lit)::after,
+header nav button:not(.aiways-final-nav-lit)::after,
+.site-header nav button:not(.aiways-final-nav-lit)::after,
+.header nav button:not(.aiways-final-nav-lit)::after,
+header nav span:not(.aiways-final-nav-lit)::after,
+.site-header nav span:not(.aiways-final-nav-lit)::after,
+.header nav span:not(.aiways-final-nav-lit)::after {
+  display: none !important;
+  content: none !important;
+}
+
+header nav a.aiways-final-nav-lit,
+.site-header nav a.aiways-final-nav-lit,
+.header nav a.aiways-final-nav-lit,
+header nav button.aiways-final-nav-lit,
+.site-header nav button.aiways-final-nav-lit,
+.header nav button.aiways-final-nav-lit,
+header nav span.aiways-final-nav-lit,
+.site-header nav span.aiways-final-nav-lit,
+.header nav span.aiways-final-nav-lit {
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  text-shadow:
+    0 0 8px rgba(111, 244, 223, 0.96),
+    0 0 18px rgba(108, 188, 255, 0.58),
+    0 0 34px rgba(111, 244, 223, 0.32) !important;
+}
+
+header nav a.aiways-final-nav-lit::after,
+.site-header nav a.aiways-final-nav-lit::after,
+.header nav a.aiways-final-nav-lit::after,
+header nav button.aiways-final-nav-lit::after,
+.site-header nav button.aiways-final-nav-lit::after,
+.header nav button.aiways-final-nav-lit::after,
+header nav span.aiways-final-nav-lit::after,
+.site-header nav span.aiways-final-nav-lit::after,
+.header nav span.aiways-final-nav-lit::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  bottom: -8px !important;
+  width: 24px !important;
+  height: 2px !important;
+  border-radius: 999px !important;
+  transform: translateX(-50%) !important;
+  background: linear-gradient(90deg, var(--fs-mint), var(--fs-blue)) !important;
+  box-shadow: 0 0 16px rgba(108, 244, 223, 0.82) !important;
+  display: block !important;
+}
+
+@media (max-width: 900px) {
+  .aiways-final-scroll-page,
+  body.aiways-final-is-scrolling .aiways-final-scroll-page,
+  .aiways-final-scroll-page.aiways-final-scroll-lit {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+
+  .aiways-final-scroll-page.aiways-final-scroll-lit::before {
+    display: none !important;
+  }
+}

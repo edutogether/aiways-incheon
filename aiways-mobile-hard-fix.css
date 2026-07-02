@@ -1,0 +1,556 @@
+/* =========================================================
+   AIWays Mobile Hard Fix
+   - 900px 이하에서 세로형 레이아웃으로 전환
+   - 가로 잘림, 카드 씹힘, 그래프 깨짐, 글자 겹침 방지
+   ========================================================= */
+
+:root {
+  --mobile-bg: #050d19;
+  --mobile-card: rgba(8, 20, 38, 0.94);
+  --mobile-line: rgba(123, 164, 226, 0.18);
+  --mobile-mint: #6cf4df;
+  --mobile-blue: #6bbcff;
+  --mobile-text: #f5f9ff;
+  --mobile-sub: rgba(220, 234, 252, 0.78);
+}
+
+@media (max-width: 900px) {
+  html,
+  body {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    background: var(--mobile-bg) !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box !important;
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100% !important;
+  }
+
+  body::before,
+  body::after,
+  .aiways-final-scrollbar-ghost,
+  [class*="scrollbar"],
+  [class*="ScrollBar"],
+  [class*="scroll-thumb"],
+  [class*="scrollThumb"] {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  header,
+  .site-header,
+  .header,
+  .aiw-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 9999 !important;
+    width: 100% !important;
+    min-height: 62px !important;
+    height: auto !important;
+    padding: 8px 12px !important;
+    display: grid !important;
+    grid-template-columns: auto 1fr !important;
+    align-items: center !important;
+    gap: 10px !important;
+    background: rgba(3, 10, 22, 0.96) !important;
+    backdrop-filter: blur(14px) !important;
+    border-bottom: 1px solid rgba(123, 164, 226, 0.14) !important;
+  }
+
+  .aiw-brand {
+    min-width: 0 !important;
+    gap: 10px !important;
+  }
+
+  .aiw-logo-box,
+  header [class*="logo"],
+  .site-header [class*="logo"],
+  .header [class*="logo"] {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    max-width: 42px !important;
+    max-height: 42px !important;
+  }
+
+  .aiw-logo-img,
+  header img,
+  .site-header img,
+  .header img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+
+  .aiw-brand-text,
+  header h1,
+  .site-header h1,
+  .header h1 {
+    font-size: 1.05rem !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+
+  header nav,
+  .site-header nav,
+  .header nav,
+  .aiw-nav,
+  .aiways-master-nav,
+  .aiways-final-nav-wrap {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 14px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding: 2px 2px 4px !important;
+    margin: 0 !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  header nav a,
+  .site-header nav a,
+  .header nav a,
+  header nav button,
+  .site-header nav button,
+  .header nav button,
+  header nav span,
+  .site-header nav span,
+  .header nav span,
+  .aiways-final-nav-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    flex: 0 0 auto !important;
+    font-size: 0.82rem !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    padding: 8px 0 !important;
+  }
+
+  .aiw-nav a.aiways-final-nav-link,
+  .aiw-nav a:not(.aiw-nav-cta).aiways-final-nav-link,
+  header nav a.aiways-final-nav-link,
+  .site-header nav a.aiways-final-nav-link,
+  .header nav a.aiways-final-nav-link {
+    display: inline-flex !important;
+  }
+
+  .aiw-nav-cta,
+  .aiways-final-cta-removed,
+  header [class*="cta"],
+  .site-header [class*="cta"],
+  .header [class*="cta"] {
+    display: none !important;
+  }
+
+  main,
+  body > main {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  section,
+  article,
+  .aiw-page-section,
+  .section-shell,
+  .story-section,
+  .aiways-master-page,
+  .aiways-final-scroll-page,
+  .aiways-restore-page,
+  .aiways-full-app-section,
+  [class*="page-section"],
+  [data-section] {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 82px 16px 42px !important;
+    display: block !important;
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+    scroll-snap-align: none !important;
+  }
+
+  .aiways-final-scroll-page::before,
+  .aiways-master-page::before,
+  .aiways-scroll-light-managed::before,
+  .aiw-page-section::before {
+    display: none !important;
+  }
+
+  .aiw-hero,
+  .hero-story,
+  .aiways-mobile-dashboard-section {
+    display: block !important;
+    padding-top: 96px !important;
+  }
+
+  .aiw-copy,
+  .aiw-dashboard-panel {
+    padding: 0 !important;
+  }
+
+  .aiw-copy,
+  .aiw-dashboard-panel,
+  .aiw-card,
+  .school-card,
+  .landfill-card,
+  .class-card,
+  .upload-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .aiw-copy {
+    margin-bottom: 24px !important;
+  }
+
+  .aiw-title,
+  .aiw-title span,
+  .aiways-mobile-hero-title,
+  .aiways-restore-title {
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+  }
+
+  .aiw-title {
+    font-size: 3.5rem !important;
+    line-height: 0.98 !important;
+    letter-spacing: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .aiw-title-nowrap {
+    white-space: nowrap !important;
+  }
+
+  .aiw-description,
+  .aiw-card-desc,
+  .aiways-restore-subtitle,
+  .aiways-app-desc {
+    font-size: 0.94rem !important;
+    line-height: 1.48 !important;
+    max-width: 100% !important;
+    word-break: keep-all !important;
+  }
+
+  .aiw-description br {
+    display: none !important;
+  }
+
+  .aiw-actions {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .aiw-dashboard-panel {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .aiw-card {
+    min-height: auto !important;
+    height: auto !important;
+    padding: 18px !important;
+    border-radius: 22px !important;
+    overflow: visible !important;
+  }
+
+  .aiw-dashboard-panel > .aiw-card,
+  .aiw-dashboard-panel > .awx-live-card,
+  .aiw-dashboard-panel > .op-card,
+  .aiw-dashboard-panel > .tune-managed,
+  .aiw-card.awx-live-card,
+  .aiw-card.op-card,
+  .aiw-card.tune-managed {
+    min-height: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  .aiw-card.awx-live-card > *,
+  .aiw-card.op-card > *,
+  .aiw-card.tune-managed > * {
+    max-width: 100% !important;
+  }
+
+  .aiw-card-head {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .aiw-card h2 {
+    font-size: 1.5rem !important;
+    line-height: 1.08 !important;
+    letter-spacing: 0 !important;
+  }
+
+  [class*="grid"],
+  [class*="Grid"],
+  .school-card-grid,
+  .school-kpis,
+  .landfill-kpis,
+  .landfill-bottom,
+  .class-main-kpis,
+  .class-mini-kpis,
+  .class-card-bottom,
+  .aiways-hah-grid,
+  .aiways-flow-layout,
+  .aiways-flow-grid,
+  .aiways-app-feature-grid,
+  .aiways-judge-grid,
+  .aiways-stat-grid,
+  .aiways-hold-layout,
+  .gallery-grid,
+  .resource-grid {
+    grid-template-columns: 1fr !important;
+    grid-auto-flow: row !important;
+  }
+
+  [style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  .aiw-kpi-tile,
+  .class-main-kpi,
+  .class-mini-kpis > div {
+    min-height: 82px !important;
+    padding: 14px !important;
+  }
+
+  .aiw-kpi-tile b,
+  .class-main-kpi b,
+  .class-mini-kpis b {
+    font-size: 2rem !important;
+  }
+
+  .grade-row,
+  .confusion-row,
+  .progress-row,
+  .aiways-bar-row {
+    grid-template-columns: 48px 1fr 36px !important;
+    gap: 9px !important;
+  }
+
+  .landfill-line {
+    height: 118px !important;
+  }
+
+  .upload-drop {
+    min-height: 156px !important;
+  }
+
+  .preview-wrap,
+  .upload-drop,
+  .result-card,
+  .aiways-preview-box,
+  .aiways-photo-frame,
+  .aiways-mini-photo {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .aiways-full-app-section {
+    display: block !important;
+    padding: 82px 16px 42px !important;
+  }
+
+  .aiways-full-app-wrap,
+  .aiways-app-panels,
+  .aiways-app-device,
+  .aiways-app-device-inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
+    display: block !important;
+    overflow: visible !important;
+  }
+
+  .aiways-app-title {
+    font-size: 3.25rem !important;
+    line-height: 0.98 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .aiways-app-device {
+    margin-top: 18px !important;
+    border-radius: 24px !important;
+    padding: 12px !important;
+  }
+
+  .aiways-app-device-inner {
+    border-radius: 20px !important;
+    padding: 14px !important;
+  }
+
+  .aiways-app-head,
+  .aiways-tm-panel-head,
+  .aiways-draft-header {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .aiways-app-tabs {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .aiways-capture-grid,
+  .aiways-tm-row,
+  .aiways-tm-info-grid,
+  .aiways-tm-actions,
+  .aiways-draft-main-grid,
+  .aiways-draft-final-grid,
+  .aiways-result-info,
+  .aiways-result-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  .aiways-capture-btn {
+    width: 100% !important;
+    min-height: 126px !important;
+  }
+
+  .aiways-result-column,
+  .aiways-camera-column,
+  .aiways-app-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: visible !important;
+  }
+
+  .aiways-draft-loading strong,
+  .aiways-tm-loading-title,
+  .aiways-result-wait strong {
+    font-size: 1.75rem !important;
+  }
+
+  .aiways-draft-header h3,
+  .aiways-tm-result-card h3,
+  .aiways-result-card h3 {
+    font-size: 1.55rem !important;
+  }
+
+  .aiways-restore-page {
+    padding: 92px 16px 42px !important;
+  }
+
+  .aiways-restore-wrap,
+  .aiways-flow-left {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .aiways-restore-title {
+    font-size: 3rem !important;
+    line-height: 1.02 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .aiways-hah-card,
+  .aiways-flow-card,
+  .aiways-flow-callout {
+    min-height: auto !important;
+    padding: 18px !important;
+    border-radius: 22px !important;
+  }
+
+  .aiways-hah-card h3,
+  .aiways-flow-card h3 {
+    font-size: 1.5rem !important;
+  }
+
+  .aiways-hah-card p,
+  .aiways-flow-card p,
+  .aiways-hah-list div {
+    font-size: 0.82rem !important;
+    line-height: 1.45 !important;
+  }
+
+  button,
+  a[role="button"],
+  [class*="btn"],
+  [class*="button"] {
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 430px) {
+  section,
+  article,
+  .aiw-page-section,
+  .section-shell,
+  .story-section,
+  .aiways-master-page,
+  .aiways-final-scroll-page,
+  .aiways-restore-page,
+  .aiways-full-app-section,
+  [class*="page-section"],
+  [data-section] {
+    padding-left: 13px !important;
+    padding-right: 13px !important;
+  }
+
+  .aiw-title {
+    font-size: 3rem !important;
+  }
+
+  .aiw-card h2,
+  .aiways-hah-card h3,
+  .aiways-flow-card h3 {
+    font-size: 1.38rem !important;
+  }
+
+  .aiways-app-title,
+  .aiways-restore-title {
+    font-size: 2.65rem !important;
+  }
+}

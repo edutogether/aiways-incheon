@@ -537,6 +537,8 @@
   }
 
   async function refreshLandfill(manual = false) {
+    if (window.AIWAYS_DATA_LOCK_ACTIVE) return;
+
     previousLandfill = { ...landfill };
 
     if (AIWAYS_LANDFILL_ENDPOINT) {
@@ -561,12 +563,7 @@
   }
 
   function mutateLandfill() {
-    landfill.ton += 18 + Math.floor(Math.random() * 48);
-    landfill.delta = Number((-3.8 + Math.random() * 0.9).toFixed(1));
-    landfill.inbound = Number(Math.max(58, Math.min(71, landfill.inbound + (Math.random() * 1.0 - 0.35))).toFixed(1));
-    landfill.margin = Number(Math.max(24, Math.min(42, 100 - landfill.inbound - 0.2 + Math.random() * 1.4)).toFixed(1));
-    landfill.trend = landfill.trend.slice(1).concat(Number(Math.max(50, Math.min(72, landfill.inbound + (Math.random() * 4 - 2))).toFixed(1)));
-    landfill.bars = landfill.bars.slice(1).concat(landfill.ton);
+    // Disabled by aiways-data-lock-fix: presentation values should stay stable.
   }
 
   function cameraIcon() {
@@ -781,6 +778,14 @@
   }
 
   async function saveRecord(payload) {
+    if (window.AIWAYS_DATA_LOCK_ACTIVE) {
+      const lockedClass = localStorage.getItem("aiways_selected_class");
+      if (lockedClass && classData[lockedClass]) {
+        selectedClass = lockedClass;
+        selectedGrade = gradeOfClass(selectedClass);
+      }
+    }
+
     const record = buildRecord(payload);
     const list = records();
     list.unshift(record);
@@ -809,8 +814,12 @@
       } catch {}
     }
 
-    renderSchoolCard();
-    renderClassCard();
+    if (!window.AIWAYS_DATA_LOCK_ACTIVE) {
+      renderSchoolCard();
+      renderClassCard();
+    }
+
+    window.dispatchEvent(new CustomEvent("aiways-record-saved"));
   }
 
   function showResult(data) {
@@ -966,7 +975,7 @@
       if (retry >= 14) clearInterval(early);
     }, 350);
 
-    setInterval(() => refreshLandfill(false), 3000);
+    // Disabled by aiways-data-lock-fix: landfill values must not randomly change.
   }
 
   if (document.readyState === "loading") {

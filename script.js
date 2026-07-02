@@ -410,7 +410,7 @@ function runMockAnalysis() {
 }
 
 function bindResultActions() {
-  document.querySelector("#confirmResult").addEventListener("click", () => {
+  document.querySelector("#confirmResult")?.addEventListener("click", () => {
     if (!ensureResultReady()) return;
     if (recordFinalized) {
       setResultStatus("이미 대시보드에 반영된 기록입니다. 새 사진을 올리면 다시 시연할 수 있습니다.");
@@ -423,13 +423,13 @@ function bindResultActions() {
     setResultStatus("대시보드 반영 완료");
   });
 
-  document.querySelector("#reselectItem").addEventListener("click", () => {
+  document.querySelector("#reselectItem")?.addEventListener("click", () => {
     if (!ensureResultReady()) return;
     document.querySelector("#itemChooser").classList.toggle("is-hidden");
     setResultStatus("헷갈리는 물건을 직접 선택해 안내를 다시 확인합니다.");
   });
 
-  document.querySelector("#holdResult").addEventListener("click", () => {
+  document.querySelector("#holdResult")?.addEventListener("click", () => {
     if (!ensureResultReady()) return;
     if (!recordFinalized) {
       updateMetric("class-hold", 1);

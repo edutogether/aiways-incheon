@@ -1,0 +1,593 @@
+/* =========================================================
+   AIWays Mobile Slide Deck Fix
+   목적:
+   - 모바일도 PC처럼 페이지 단위로 슬라이드
+   - 한 화면에 한 페이지씩 보이게 정리
+   - 긴 문장/긴 카드/복잡한 그리드 모바일에서 심플하게 압축
+   - PC/QHD/FHD/4K는 건드리지 않음
+   ========================================================= */
+
+:root {
+  --ms-header-h: 96px;
+  --ms-bg: #050d19;
+  --ms-card: rgba(8, 20, 38, 0.94);
+  --ms-line: rgba(123, 164, 226, 0.18);
+  --ms-mint: #6cf4df;
+  --ms-blue: #6bbcff;
+  --ms-text: #f5f9ff;
+  --ms-sub: rgba(220, 234, 252, 0.78);
+}
+
+@media (max-width: 900px) {
+  html,
+  body {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-x: hidden !important;
+    background: var(--ms-bg) !important;
+    scroll-behavior: smooth !important;
+    scroll-snap-type: y mandatory !important;
+    overscroll-behavior-y: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+  }
+
+  * {
+    box-sizing: border-box !important;
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100% !important;
+  }
+
+  body::before,
+  body::after,
+  .aiways-final-scrollbar-ghost,
+  .aiways-nav-scrollbar-ghost,
+  [class*="scrollbar"],
+  [class*="ScrollBar"],
+  [class*="scroll-thumb"],
+  [class*="scrollThumb"] {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* =========================
+     Header
+     ========================= */
+
+  header,
+  .site-header,
+  .header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 99999 !important;
+    width: 100% !important;
+    min-height: var(--ms-header-h) !important;
+    height: var(--ms-header-h) !important;
+    padding: 8px 14px 7px !important;
+    display: grid !important;
+    grid-template-columns: auto 1fr !important;
+    grid-template-rows: 42px 1fr !important;
+    align-items: center !important;
+    gap: 7px 10px !important;
+    background: rgba(3, 10, 22, 0.97) !important;
+    backdrop-filter: blur(16px) !important;
+    border-bottom: 1px solid rgba(123, 164, 226, 0.14) !important;
+  }
+
+  header img,
+  .site-header img,
+  .header img,
+  header [class*="logo"],
+  .site-header [class*="logo"],
+  .header [class*="logo"] {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    max-width: 42px !important;
+    max-height: 42px !important;
+    object-fit: contain !important;
+  }
+
+  header h1,
+  .site-header h1,
+  .header h1,
+  header [class*="brand"],
+  .site-header [class*="brand"],
+  .header [class*="brand"] {
+    font-size: 18px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+
+  header nav,
+  .site-header nav,
+  .header nav,
+  .aiways-master-nav,
+  .aiways-final-nav-wrap {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 16px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding: 0 2px 5px !important;
+    margin: 0 !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-snap-type: x mandatory !important;
+  }
+
+  header nav a,
+  .site-header nav a,
+  .header nav a,
+  header nav button,
+  .site-header nav button,
+  .header nav button,
+  header nav span,
+  .site-header nav span,
+  .header nav span {
+    flex: 0 0 auto !important;
+    scroll-snap-align: center !important;
+    font-size: 13px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    padding: 8px 0 !important;
+  }
+
+  .aiw-nav a.aiways-nav-managed:not(.aiw-nav-cta),
+  .aiw-nav button.aiways-nav-managed,
+  .aiw-nav span.aiways-nav-managed,
+  header nav a.aiways-nav-managed:not(.aiw-nav-cta),
+  header nav button.aiways-nav-managed,
+  header nav span.aiways-nav-managed {
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  .aiw-nav .aiw-nav-cta,
+  header nav .aiw-nav-cta {
+    display: none !important;
+  }
+
+  /* =========================
+     Mobile page deck
+     ========================= */
+
+  main,
+  body > main {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  .aiways-mobile-slide-page {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: calc(100svh - var(--ms-header-h)) !important;
+    min-height: calc(100svh - var(--ms-header-h)) !important;
+    max-height: calc(100svh - var(--ms-header-h)) !important;
+    scroll-snap-align: start !important;
+    scroll-snap-stop: always !important;
+    overflow: hidden !important;
+    padding: 18px 15px 18px !important;
+    margin: 0 !important;
+    display: grid !important;
+    align-items: center !important;
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+
+  section.aiways-mobile-slide-page,
+  article.aiways-mobile-slide-page,
+  .section-shell.aiways-mobile-slide-page,
+  .story-section.aiways-mobile-slide-page,
+  .aiw-page-section.aiways-mobile-slide-page,
+  .aiways-restore-page.aiways-mobile-slide-page {
+    height: calc(100svh - var(--ms-header-h)) !important;
+    min-height: calc(100svh - var(--ms-header-h)) !important;
+    max-height: calc(100svh - var(--ms-header-h)) !important;
+    overflow: hidden !important;
+  }
+
+  .aiways-mobile-slide-page::before {
+    display: none !important;
+  }
+
+  .aiways-mobile-slide-page > * {
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .aiways-mobile-slide-inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: calc(100svh - var(--ms-header-h) - 36px) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    display: grid !important;
+    align-content: center !important;
+    gap: 14px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-mobile-slide-inner,
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-mobile-slide-inner {
+    align-content: stretch !important;
+  }
+
+  /* 기존 페이지 효과는 모바일에서 끔 */
+  .aiways-one-page,
+  .aiways-final-scroll-page,
+  .aiways-master-page,
+  .aiways-scroll-light-managed,
+  .aiw-page-section,
+  .aiways-restore-page {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+
+  body.aiways-one-is-scrolling .aiways-one-page,
+  body.aiways-one-is-scrolling .aiways-final-scroll-page,
+  body.aiways-one-is-scrolling .aiways-master-page {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+
+  /* =========================
+     Typography compression
+     ========================= */
+
+  .aiways-mobile-slide-page h1,
+  .aiways-mobile-slide-page h2,
+  .aiways-mobile-slide-page h3 {
+    word-break: keep-all !important;
+    text-wrap: balance !important;
+    margin-top: 0 !important;
+  }
+
+  .aiways-mobile-slide-page h1,
+  .aiways-mobile-slide-page [class*="hero"] h1,
+  .aiways-mobile-slide-page [class*="title"],
+  .aiways-mobile-slide-page [class*="Title"] {
+    font-size: 53px!important;
+    line-height: 0.95 !important;
+    letter-spacing: 0;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] h1,
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] [class*="title"],
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] [class*="Title"] {
+    font-size: 61px!important;
+    line-height: 0.92 !important;
+  }
+
+  .aiways-mobile-slide-page p,
+  .aiways-mobile-slide-page li,
+  .aiways-mobile-slide-page [class*="desc"],
+  .aiways-mobile-slide-page [class*="Desc"],
+  .aiways-mobile-slide-page [class*="copy"],
+  .aiways-mobile-slide-page [class*="Copy"] {
+    font-size: 14px !important;
+    line-height: 1.36 !important;
+    word-break: keep-all !important;
+  }
+
+  .aiways-mobile-slide-page p,
+  .aiways-mobile-slide-page [class*="desc"],
+  .aiways-mobile-slide-page [class*="Desc"] {
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 4 !important;
+    overflow: hidden !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] p,
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] [class*="desc"],
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] [class*="Desc"] {
+    -webkit-line-clamp: 3 !important;
+  }
+
+  .aiways-mobile-slide-page br {
+    display: none !important;
+  }
+
+  /* =========================
+     Generic grids/cards
+     ========================= */
+
+  .aiways-mobile-slide-page [class*="grid"],
+  .aiways-mobile-slide-page [class*="Grid"],
+  .aiways-mobile-slide-page [style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  .aiways-mobile-slide-page [class*="card"],
+  .aiways-mobile-slide-page [class*="Card"],
+  .aiways-mobile-slide-page [class*="panel"],
+  .aiways-mobile-slide-page [class*="Panel"] {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+
+  .aiways-mobile-slide-page [class*="card"] p,
+  .aiways-mobile-slide-page [class*="Card"] p,
+  .aiways-mobile-slide-page [class*="panel"] p,
+  .aiways-mobile-slide-page [class*="Panel"] p {
+    -webkit-line-clamp: 2 !important;
+  }
+
+  /* 많은 카드가 있는 소개 페이지는 모바일에서 핵심 4개까지만 */
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-mobile-left-cards > *:nth-child(n+5),
+  .aiways-mobile-slide-page[data-mobile-label="갤러리"] .aiways-mobile-left-cards > *:nth-child(n+5),
+  .aiways-mobile-slide-page[data-mobile-label="플레이북"] .aiways-mobile-left-cards > *:nth-child(n+5) {
+    display: none !important;
+  }
+
+  /* =========================
+     Dashboard first page
+     ========================= */
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-mobile-slide-inner {
+    gap: 10px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-ops-dashboard,
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] [class*="dashboard"],
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] [class*="Dashboard"] {
+    max-height: 44svh !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-ops-inner {
+    padding: 12px !important;
+    gap: 8px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-ops-title {
+    font-size: 22px !important;
+    line-height: 1.05 !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-ops-desc {
+    display: none !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-ops-school-grid,
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-ops-class-grid,
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-ops-landfill-body,
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-opapp-work {
+    grid-template-columns: 1fr !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-ops-metrics {
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-rows: none !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-ops-metric {
+    min-height: 62px !important;
+    padding: 9px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-ops-metric span {
+    font-size: 10px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-ops-metric strong {
+    font-size: 22px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-ops-panel,
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-ops-donut-pair,
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] .aiways-ops-right {
+    display: none !important;
+  }
+
+  /* =========================
+     3-second app mobile page
+     ========================= */
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp,
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-full {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: calc(100svh - var(--ms-header-h) - 36px) !important;
+    overflow: hidden !important;
+    display: grid !important;
+    grid-template-rows: auto auto 1fr !important;
+    gap: 10px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-title {
+    font-size: 25px !important;
+    line-height: 1.06 !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-desc {
+    -webkit-line-clamp: 2 !important;
+    font-size: 12px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-picks {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-pick {
+    min-height: 96px !important;
+    padding: 10px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-icon {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-pick strong {
+    font-size: 12px !important;
+    line-height: 1.16 !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-pick span:last-child {
+    display: none !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-work {
+    grid-template-columns: 1fr !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-preview {
+    min-height: 0 !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-photo,
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-photo img,
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-placeholder {
+    min-height: 142px !important;
+    height: 142px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-result {
+    min-height: 168px !important;
+    max-height: 33svh !important;
+    overflow-y: auto !important;
+    padding: 12px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-result-card {
+    gap: 9px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-result-card h3 {
+    font-size: 22px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-info-grid,
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-final {
+    grid-template-columns: 1fr !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-section {
+    padding: 10px !important;
+    font-size: 12px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-list li {
+    font-size: 12px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-list li:nth-child(n+3) {
+    display: none !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-wait strong {
+    font-size: 24px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-wait span {
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+  }
+
+  /* =========================
+     H-A-H / flow / curriculum
+     ========================= */
+
+  .aiways-mobile-slide-page[data-mobile-label="H-A-H"] [class*="grid"],
+  .aiways-mobile-slide-page[data-mobile-label="차시흐름"] [class*="grid"],
+  .aiways-mobile-slide-page[data-mobile-label="교육과정"] [class*="grid"] {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="H-A-H"] [class*="card"]:nth-of-type(n+4),
+  .aiways-mobile-slide-page[data-mobile-label="차시흐름"] [class*="card"]:nth-of-type(n+5),
+  .aiways-mobile-slide-page[data-mobile-label="교육과정"] [class*="card"]:nth-of-type(n+5) {
+    display: none !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="H-A-H"] [class*="card"],
+  .aiways-mobile-slide-page[data-mobile-label="차시흐름"] [class*="card"],
+  .aiways-mobile-slide-page[data-mobile-label="교육과정"] [class*="card"] {
+    padding: 14px !important;
+    border-radius: 18px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="H-A-H"] [class*="card"] h3,
+  .aiways-mobile-slide-page[data-mobile-label="차시흐름"] [class*="card"] h3,
+  .aiways-mobile-slide-page[data-mobile-label="교육과정"] [class*="card"] h3 {
+    font-size: 20px !important;
+    line-height: 1.12 !important;
+    margin-bottom: 6px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  :root {
+    --ms-header-h: 94px;
+  }
+
+  .aiways-mobile-slide-page {
+    padding-left: 13px !important;
+    padding-right: 13px !important;
+  }
+
+  .aiways-mobile-slide-page h1,
+  .aiways-mobile-slide-page [class*="title"],
+  .aiways-mobile-slide-page [class*="Title"] {
+    font-size: 58px!important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] h1,
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] [class*="title"],
+  .aiways-mobile-slide-page[data-mobile-label="대시보드"] [class*="Title"] {
+    font-size: 53px!important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-photo,
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-photo img,
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-placeholder {
+    min-height: 124px !important;
+    height: 124px !important;
+  }
+
+  .aiways-mobile-slide-page[data-mobile-label="3초판단"] .aiways-opapp-result {
+    max-height: 31svh !important;
+  }
+}

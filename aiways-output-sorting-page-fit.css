@@ -1,0 +1,151 @@
+/* =========================================================
+   AIWays Output Sorting Page Fit
+   목적:
+   - 산출물 > 3초 판단 앱 페이지 우측 앱 카드 하단 잘림 보정
+   - 우측 앱 블록은 살짝 아래로 내리되, 내부 높이를 줄여 화면 안에 들어오게 함
+   - 다른 페이지는 건드리지 않음
+   ========================================================= */
+
+@media (min-width: 901px) {
+  .aiways-output-sorting-page {
+    min-height: 100vh !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding-top: clamp(72px, 5.7vh, 100px) !important;
+    padding-bottom: clamp(54px, 5.2vh, 86px) !important;
+  }
+
+  .aiways-output-sorting-page,
+  .aiways-output-sorting-page * {
+    box-sizing: border-box !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card {
+    transform: translateY(18px) !important;
+    max-height: calc(100vh - 150px) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card > * {
+    max-height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card h1,
+  .aiways-output-sorting-page .aiways-output-sorting-app-card h2,
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="title"],
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="Title"] {
+    line-height: 1.05 !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card h1,
+  .aiways-output-sorting-page .aiways-output-sorting-app-card h2 {
+    margin-top: 0 !important;
+    margin-bottom: clamp(8px, 0.65vw, 12px) !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card p,
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="desc"],
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="Desc"] {
+    line-height: 1.32 !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="tab"],
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="Tab"] {
+    min-height: 0 !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="panel"],
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="Panel"],
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="card"],
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="Card"] {
+    min-height: 0 !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card .aiways-tm-panel,
+  .aiways-output-sorting-page .aiways-output-sorting-app-card #aiways-tm-panel {
+    margin: 7px 0 9px !important;
+    padding: 10px !important;
+    border-radius: 16px !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card .aiways-tm-panel-title {
+    font-size: 13px!important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card .aiways-tm-help,
+  .aiways-output-sorting-page .aiways-output-sorting-app-card .aiways-tm-status {
+    font-size: 10.5px!important;
+    line-height: 1.27 !important;
+    margin-top: 6px !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card .aiways-tm-row {
+    gap: 6px !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card .aiways-tm-input,
+  .aiways-output-sorting-page .aiways-output-sorting-app-card .aiways-tm-btn {
+    height: 32px !important;
+    border-radius: 12px !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="pick"],
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="Pick"],
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="upload"],
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="Upload"] {
+    min-height: 0 !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card button {
+    max-width: 100% !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="result"],
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="Result"],
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="preview"],
+  .aiways-output-sorting-page .aiways-output-sorting-app-card [class*="Preview"] {
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card img,
+  .aiways-output-sorting-page .aiways-output-sorting-app-card canvas,
+  .aiways-output-sorting-page .aiways-output-sorting-app-card svg {
+    max-width: 100% !important;
+  }
+}
+
+@media (min-width: 901px) and (max-height: 880px) {
+  .aiways-output-sorting-page .aiways-output-sorting-app-card {
+    transform: translateY(10px) !important;
+    max-height: calc(100vh - 128px) !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card .aiways-tm-panel,
+  .aiways-output-sorting-page .aiways-output-sorting-app-card #aiways-tm-panel {
+    margin: 5px 0 7px !important;
+    padding: 9px !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card .aiways-tm-help {
+    max-height: 54px !important;
+    overflow: hidden !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .aiways-output-sorting-page {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+
+  .aiways-output-sorting-page .aiways-output-sorting-app-card {
+    transform: none !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+}

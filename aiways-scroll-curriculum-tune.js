@@ -37,7 +37,7 @@
           <div class="aiw-curriculum-grid">
             <article class="aiw-curriculum-card">
               <strong>실과</strong>
-              <p>생활 자원 관리, 합리적 소비, 재활용·재사용 실천을 실제 학교 문제 해결과 연결합니다.</p>
+              <p>생활 자원 관리, 합리적 소비, 재활용·재사용 실천을 실제 문제와 연결합니다.</p>
             </article>
 
             <article class="aiw-curriculum-card">

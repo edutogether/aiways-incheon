@@ -17,6 +17,19 @@
     return $("nav", header) || $('[class*="nav"]', header) || header;
   }
 
+  function navTargetForLabel(label) {
+    const targets = {
+      "대시보드": "#top",
+      "프로젝트": "#project",
+      "교육과정": "#curriculum",
+      "H-A-H": $("#aiways-restore-hah-page") ? "#aiways-restore-hah-page" : "#hah",
+      "차시흐름": $("#aiways-restore-flow-page") ? "#aiways-restore-flow-page" : "#lesson",
+      "산출물": "#outputs"
+    };
+
+    return targets[label] || null;
+  }
+
   function patchNavLabels() {
     const nav = getNavRoot();
     if (!nav) return;
@@ -34,9 +47,18 @@
       const node = document.createElement(["a", "button", "span"].includes(tag) ? tag : "span");
       node.textContent = "대시보드";
       node.className = project.className || "";
-      if (node.tagName.toLowerCase() === "a") node.setAttribute("href", "#");
+      if (node.tagName.toLowerCase() === "a") node.setAttribute("href", "#top");
       project.parentElement.insertBefore(node, project);
     }
+
+    $$("a,button,span", nav).forEach(el => {
+      const label = clean(el.textContent);
+      const target = navTargetForLabel(label);
+      if (!target) return;
+
+      el.dataset.aiwaysFinalScrollTarget = target;
+      if (el.tagName.toLowerCase() === "a") el.setAttribute("href", target);
+    });
   }
 
   function getSections() {
@@ -226,7 +248,15 @@
       if (item.dataset.aiwaysFinalScrollClickBound === "1") return;
 
       item.dataset.aiwaysFinalScrollClickBound = "1";
-      item.addEventListener("click", () => {
+      item.addEventListener("click", event => {
+        const targetSelector = item.dataset.aiwaysFinalScrollTarget;
+        const target = targetSelector ? $(targetSelector) : null;
+
+        if (target) {
+          event.preventDefault();
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
         window.setTimeout(onScrollStop, 760);
       }, true);
     });

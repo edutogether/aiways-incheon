@@ -389,6 +389,8 @@
   }
 
   function rerenderDataIfNeeded(force = false) {
+    if (window.AIWAYS_FINAL_POLISH_ACTIVE) return;
+
     const signature = recordSignature();
     const needsLockedRender = !$("#aiways-school-grade") || !$("#aiways-class-select");
 

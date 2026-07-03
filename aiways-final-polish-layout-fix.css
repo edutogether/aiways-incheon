@@ -1,0 +1,726 @@
+﻿
+/* =========================================================
+   AIWays Final Polish Layout Fix
+   목적:
+   - 대시보드 울컥거림 / 반복 렌더링 느낌 완화
+   - 대시보드 글자·그래프 잘림 보정
+   - 첫 페이지 카피 행간/위치 보정
+   - 우상단 CTA 제거
+   - 프로젝트/교육과정/차시흐름/갤러리/3초판단/플레이북 페이지 문구와 배치 보정
+   ========================================================= */
+
+:root {
+  --fp-bg: #050d19;
+  --fp-panel: rgba(9, 23, 43, 0.94);
+  --fp-card: rgba(5, 14, 29, 0.78);
+  --fp-card-soft: rgba(13, 30, 54, 0.78);
+  --fp-line: rgba(123, 164, 226, 0.18);
+  --fp-strong-line: rgba(108, 244, 223, 0.42);
+  --fp-text: #f5f9ff;
+  --fp-sub: rgba(220, 234, 252, 0.78);
+  --fp-dim: rgba(188, 207, 232, 0.66);
+  --fp-mint: #6cf4df;
+  --fp-cyan: #6eeef0;
+  --fp-blue: #6bbcff;
+  --fp-yellow: #ffd66b;
+}
+
+/* 우상단 CTA 제거 */
+.aiways-hide-header-cta {
+  display: none !important;
+}
+
+/* 대시보드 흔들림 방지: 대시보드 안쪽은 과한 transition/animation 제거 */
+.aiways-stable-dashboard,
+.aiways-stable-dashboard *,
+.aiways-ops-dashboard,
+.aiways-ops-dashboard * {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition-duration: 0.12s !important;
+}
+
+.aiways-stable-dashboard {
+  overflow: hidden !important;
+  align-content: start !important;
+}
+
+/* 첫 페이지 왼쪽 카피 */
+.aiways-hero-copy-fixed {
+  line-height: 1.32 !important;
+  transform: translateY(16px) !important;
+  margin-top: clamp(16px, 2vh, 30px) !important;
+}
+
+.aiways-hero-copy-fixed p,
+.aiways-hero-copy-fixed div,
+.aiways-hero-copy-fixed span {
+  line-height: 1.32 !important;
+}
+
+/* 첫 페이지 오른쪽 카드 전체 상단 정렬 */
+.aiways-dashboard-card-fixed,
+.aiways-dashboard-card-fixed > *,
+.aiways-dashboard-card-fixed .aiways-ops-inner,
+.aiways-dashboard-card-fixed .aiways-opapp {
+  align-content: start !important;
+  align-items: start !important;
+}
+
+/* =========================
+   Stable dashboard components
+   ========================= */
+
+.aiways-final-dashboard {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  border-radius: clamp(20px, 1.35vw, 28px) !important;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(108, 244, 223, 0.08), transparent 42%),
+    linear-gradient(180deg, rgba(18, 35, 58, 0.96), rgba(8, 18, 34, 0.97)) !important;
+  border: 1px solid var(--fp-line) !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.24) !important;
+}
+
+.aiways-final-dash-inner {
+  height: 100%;
+  min-height: 0;
+  padding: clamp(14px, 0.95vw, 20px);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: clamp(9px, 0.62vw, 13px);
+  align-content: start;
+}
+
+.aiways-final-dash-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.aiways-final-kicker {
+  color: var(--fp-mint);
+  font-size: 12px;
+  line-height: 1.1;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.aiways-final-dash-title {
+  margin: 4px 0 0;
+  color: #fff;
+  font-size: 28px;
+  line-height: 1.04;
+  font-weight: 950;
+  letter-spacing: 0;
+  word-break: keep-all;
+}
+
+.aiways-final-dash-desc {
+  margin: 5px 0 0;
+  color: var(--fp-sub);
+  font-size: 12px;
+  line-height: 1.26;
+  font-weight: 740;
+  word-break: keep-all;
+}
+
+.aiways-final-select {
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: clamp(76px, 5.2vw, 116px);
+  height: clamp(30px, 1.75vw, 36px);
+  border-radius: 13px;
+  border: 1px solid rgba(110, 238, 224, 0.34);
+  padding: 0 32px 0 11px;
+  color: #e7fff9;
+  font-size: 11.5px;
+  font-weight: 950;
+  outline: none;
+  cursor: pointer;
+  background:
+    linear-gradient(45deg, transparent 50%, #a8fff1 50%),
+    linear-gradient(135deg, #a8fff1 50%, transparent 50%),
+    linear-gradient(180deg, rgba(25, 67, 84, 0.9), rgba(13, 44, 64, 0.86));
+  background-position:
+    calc(100% - 15px) calc(50% - 3px),
+    calc(100% - 9px) calc(50% - 3px),
+    0 0;
+  background-size: 6px 6px, 6px 6px, 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.aiways-final-select option {
+  color: #061829;
+  background: #fff;
+  font-weight: 850;
+}
+
+.aiways-final-school-grid {
+  display: grid;
+  grid-template-columns: 0.62fr 1.58fr;
+  gap: clamp(7px, 0.5vw, 10px);
+  min-height: 0;
+}
+
+.aiways-final-class-grid {
+  display: grid;
+  grid-template-columns: 0.68fr 1fr;
+  gap: clamp(7px, 0.5vw, 10px);
+  min-height: 0;
+}
+
+.aiways-final-metrics {
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
+  gap: clamp(7px, 0.5vw, 9px);
+  min-height: 0;
+}
+
+.aiways-final-metric {
+  min-height: 0;
+  overflow: hidden;
+  border-radius: clamp(13px, 0.86vw, 17px);
+  padding: clamp(9px, 0.62vw, 12px);
+  background: linear-gradient(180deg, rgba(5, 14, 29, 0.94), rgba(7, 16, 31, 0.84));
+  border: 1px solid rgba(122, 160, 223, 0.13);
+}
+
+.aiways-final-metric span {
+  display: block;
+  color: rgba(210, 229, 255, 0.84);
+  font-size: 12px;
+  line-height: 1.05;
+  font-weight: 860;
+  letter-spacing: 0;
+}
+
+.aiways-final-metric strong {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: clamp(4px, 0.35vw, 7px);
+  color: #f7fbff;
+  font-size: 32px;
+  line-height: 0.95;
+  font-weight: 950;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.aiways-final-metric small {
+  color: var(--fp-sub);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.aiways-final-right {
+  display: grid;
+  grid-template-rows: 1.16fr 0.84fr;
+  gap: clamp(7px, 0.5vw, 9px);
+  min-height: 0;
+}
+
+.aiways-final-side {
+  display: grid;
+  grid-template-rows: 1fr 0.86fr;
+  gap: clamp(7px, 0.5vw, 9px);
+  min-height: 0;
+}
+
+.aiways-final-panel {
+  min-height: 0;
+  overflow: hidden;
+  border-radius: clamp(13px, 0.86vw, 17px);
+  padding: clamp(9px, 0.62vw, 12px);
+  background: rgba(5, 14, 29, 0.58);
+  border: 1px solid rgba(122, 160, 223, 0.12);
+}
+
+.aiways-final-panel-title {
+  color: #e7f2ff;
+  font-size: 12px;
+  line-height: 1.1;
+  font-weight: 950;
+  margin-bottom: 8px;
+}
+
+.aiways-final-bar-row {
+  display: grid;
+  grid-template-columns: clamp(32px, 2.4vw, 46px) 1fr clamp(24px, 1.8vw, 34px);
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.aiways-final-bar-label,
+.aiways-final-bar-value {
+  color: rgba(236, 246, 255, 0.92);
+  font-size: 11.5px;
+  line-height: 1;
+  font-weight: 880;
+}
+
+.aiways-final-bar-value {
+  text-align: right;
+}
+
+.aiways-final-bar-track {
+  height: clamp(8px, 0.58vw, 12px);
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(134, 166, 211, 0.16);
+}
+
+.aiways-final-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--fp-mint), var(--fp-blue));
+}
+
+.aiways-final-donut-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(7px, 0.5vw, 9px);
+  min-height: 0;
+}
+
+.aiways-final-donut-box {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  place-items: center;
+  gap: 3px;
+  border-radius: clamp(13px, 0.86vw, 17px);
+  padding: clamp(7px, 0.5vw, 9px);
+  background: rgba(5, 14, 29, 0.58);
+  border: 1px solid rgba(122, 160, 223, 0.12);
+}
+
+.aiways-final-donut-title {
+  color: #e7f2ff;
+  font-size: 11px;
+  line-height: 1.1;
+  font-weight: 950;
+  text-align: center;
+}
+
+.aiways-final-donut {
+  --value: 50;
+  width: min(76%, clamp(54px, 4.1vw, 82px));
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at center, rgba(8, 18, 34, 0.98) 55%, transparent 56%),
+    conic-gradient(var(--fp-mint) calc(var(--value) * 1%), rgba(134, 166, 211, 0.18) 0);
+}
+
+.aiways-final-donut b {
+  color: #f7fbff;
+  font-size: 17px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.aiways-final-top5 {
+  display: grid;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.aiways-final-top5-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(48px, 4vw, 74px) clamp(16px, 1.1vw, 22px);
+  gap: 7px;
+  align-items: center;
+}
+
+.aiways-final-top5-label {
+  min-width: 0;
+  color: rgba(236, 246, 255, 0.94);
+  font-size: 11.5px;
+  line-height: 1.12;
+  font-weight: 820;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aiways-final-top5-track {
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(134, 166, 211, 0.16);
+}
+
+.aiways-final-top5-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--fp-mint), var(--fp-blue));
+}
+
+.aiways-final-top5-value {
+  color: var(--fp-mint);
+  font-size: 11.5px;
+  font-weight: 950;
+  text-align: right;
+}
+
+.aiways-final-rank {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.aiways-final-rank-medal {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.aiways-final-rank strong {
+  color: #f7fbff;
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.aiways-final-rank span {
+  display: block;
+  margin-top: 4px;
+  color: var(--fp-dim);
+  font-size: 11px;
+  font-weight: 780;
+}
+
+/* 수도권 매립지 */
+.aiways-final-landfill-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+}
+
+.aiways-final-landfill-metric {
+  border-radius: 13px;
+  padding: 9px;
+  background: rgba(5, 14, 29, 0.72);
+  border: 1px solid rgba(122, 160, 223, 0.11);
+  overflow: hidden;
+}
+
+.aiways-final-landfill-metric strong {
+  display: block;
+  color: #fff;
+  font-size: 24px;
+  line-height: 0.98;
+  font-weight: 950;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.aiways-final-landfill-metric span {
+  display: block;
+  margin-top: 5px;
+  color: var(--fp-sub);
+  font-size: 10px;
+  line-height: 1.1;
+  font-weight: 780;
+}
+
+.aiways-final-chart {
+  height: 100%;
+  min-height: 0;
+  border-radius: 14px;
+  padding: 9px;
+  background: rgba(5, 14, 29, 0.58);
+  border: 1px solid rgba(122, 160, 223, 0.12);
+  overflow: hidden;
+}
+
+.aiways-final-svg {
+  width: 100%;
+  height: clamp(88px, 6.4vw, 132px);
+  display: block;
+}
+
+.aiways-final-live-note {
+  margin-top: 3px;
+  color: rgba(220, 234, 252, 0.58);
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 720;
+}
+
+/* 3초 판단 앱 버튼 개선 */
+.aiways-final-app-picks,
+.aiways-opapp-picks {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: clamp(9px, 0.7vw, 13px) !important;
+}
+
+.aiways-final-pick,
+.aiways-opapp-pick {
+  border: 1px dashed rgba(108, 244, 223, 0.48) !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(108, 244, 223, 0.22), transparent 48%),
+    linear-gradient(180deg, rgba(41, 189, 211, 0.32), rgba(8, 22, 42, 0.92)) !important;
+  box-shadow: 0 0 22px rgba(108, 244, 223, 0.12) !important;
+}
+
+.aiways-final-pick strong,
+.aiways-opapp-pick strong {
+  color: #fff !important;
+}
+
+/* 프로젝트 페이지 */
+.aiways-project-polished {
+  align-items: center !important;
+}
+
+.aiways-project-title-fixed {
+  line-height: 0.98 !important;
+  word-break: keep-all !important;
+}
+
+.aiways-project-title-fixed .project-line {
+  display: block !important;
+}
+
+/* 교육과정 페이지 */
+.aiways-curriculum-polished {
+  padding-top: clamp(92px, 11vh, 150px) !important;
+  align-items: center !important;
+}
+
+.aiways-curriculum-polished .aiways-textbook-link,
+.aiways-curriculum-polished a.aiways-textbook-link {
+  display: none !important;
+}
+
+.aiways-curriculum-polished .aiways-achievement-link,
+.aiways-curriculum-polished [data-aiways-achievement-link],
+.aiways-curriculum-polished a[href*="m-teacher"],
+.aiways-curriculum-polished a[href*="i-scream"],
+.aiways-curriculum-polished a[href*="tsherpa"] {
+  display: none !important;
+}
+
+.aiways-subject-card-clickable {
+  cursor: pointer !important;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease !important;
+}
+
+.aiways-subject-card-clickable:hover {
+  transform: translateY(-4px) !important;
+  border-color: rgba(108, 244, 223, 0.58) !important;
+  box-shadow: 0 0 26px rgba(108, 244, 223, 0.16) !important;
+}
+
+.aiways-subject-card-clickable::after {
+  content: "E-book 열기";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 31px;
+  margin-top: 12px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: #061829;
+  background: linear-gradient(90deg, var(--fp-cyan), var(--fp-blue));
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.aiways-achievement-hover-only {
+  cursor: default !important;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease !important;
+}
+
+.aiways-achievement-hover-only:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(108, 244, 223, 0.45) !important;
+  box-shadow: 0 0 22px rgba(108, 244, 223, 0.12) !important;
+}
+
+/* 차시흐름 */
+.aiways-flow-polished {
+  padding-top: clamp(92px, 10.5vh, 148px) !important;
+}
+
+.aiways-flow-polished .aiways-fast-flow-title {
+  margin-top: clamp(10px, 2vh, 26px) !important;
+}
+
+.aiways-flow-polished .aiways-fast-flow-sub {
+  max-width: none !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  margin-top: clamp(16px, 2vh, 28px) !important;
+}
+
+/* 갤러리 */
+.aiways-gallery-polished {
+  padding-top: clamp(90px, 10vh, 146px) !important;
+}
+
+.aiways-gallery-hero {
+  width: min(1500px, 92vw);
+  margin: 0 auto clamp(28px, 3.2vh, 48px);
+}
+
+.aiways-gallery-kicker {
+  width: fit-content;
+  padding: 10px 16px;
+  border-radius: 999px;
+  color: var(--fp-mint);
+  background: rgba(108, 244, 223, 0.10);
+  border: 1px solid rgba(108, 244, 223, 0.22);
+  font-size: 16px;
+  font-weight: 950;
+}
+
+.aiways-gallery-title {
+  margin: 20px 0 0;
+  color: #fff;
+  font-size: 120px;
+  line-height: 0.94;
+  letter-spacing: 0;
+  font-weight: 950;
+  word-break: keep-all;
+}
+
+.aiways-gallery-sub {
+  max-width: 980px;
+  margin-top: 20px;
+  color: var(--fp-sub);
+  font-size: 22px;
+  line-height: 1.45;
+  font-weight: 760;
+  word-break: keep-all;
+}
+
+/* 3초판단 페이지 */
+.aiways-sorting-polished {
+  padding-top: clamp(88px, 9.5vh, 132px) !important;
+  padding-bottom: clamp(48px, 5vh, 80px) !important;
+}
+
+.aiways-sorting-polished .aiways-opapp,
+.aiways-sorting-polished .aiways-opapp-full {
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: calc(100vh - 145px) !important;
+  overflow: hidden !important;
+}
+
+.aiways-sorting-polished .aiways-opapp-work {
+  min-height: 0 !important;
+}
+
+.aiways-sorting-polished .aiways-opapp-result {
+  min-height: 0 !important;
+  overflow: auto !important;
+}
+
+.aiways-teachable-learn-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  margin-top: 10px;
+  padding: 0 13px;
+  border-radius: 999px;
+  color: #061829 !important;
+  text-decoration: none !important;
+  background: linear-gradient(90deg, var(--fp-cyan), var(--fp-blue));
+  font-size: 13px;
+  font-weight: 950;
+}
+
+/* 플레이북 */
+.aiways-playbook-polished {
+  padding-top: clamp(90px, 10vh, 146px) !important;
+}
+
+.aiways-playbook-polished .end-mark,
+.aiways-playbook-polished [class*="end"],
+.aiways-playbook-polished [class*="End"] {
+  display: none !important;
+}
+
+/* 모바일 */
+@media (max-width: 900px) {
+  .aiways-final-dashboard,
+  .aiways-stable-dashboard {
+    height: auto !important;
+    max-height: none !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+
+  .aiways-final-dash-inner {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .aiways-final-school-grid,
+  .aiways-final-class-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .aiways-final-metrics {
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-rows: none !important;
+  }
+
+  .aiways-final-right,
+  .aiways-final-side,
+  .aiways-final-panel,
+  .aiways-final-donut-pair {
+    display: none !important;
+  }
+
+  .aiways-final-app-picks,
+  .aiways-opapp-picks {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .aiways-flow-polished .aiways-fast-flow-sub {
+    white-space: normal !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+  }
+
+  .aiways-gallery-title {
+    font-size: 68px !important;
+  }
+
+  .aiways-gallery-sub {
+    font-size: 14px !important;
+    line-height: 1.35 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+}
+

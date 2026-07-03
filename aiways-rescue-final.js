@@ -36,7 +36,7 @@
 
   function sectionByLabel(label) {
     if (label === "대시보드") return bigBoxContaining("버리는 순간", "데이터가 되다") || bigBoxContaining("우리학교 자원순환 대시보드");
-    if (label === "프로젝트") return document.querySelector("[data-rescue-label='프로젝트']") || bigBoxContaining("환경 보호", "포스터");
+    if (label === "프로젝트") return document.querySelector("#project") || document.querySelector("[data-rescue-label='프로젝트']");
     if (label === "교육과정") return bigBoxContaining("교육과정 기반 수업설계") || bigBoxContaining("Curriculum-Based");
     if (label === "H-A-H") return bigBoxContaining("H-A-H Learning Loop") || bigBoxContaining("사람이 발견하고");
     if (label === "차시흐름") return document.querySelector("[data-rescue-label='차시흐름']") || bigBoxContaining("차시흐름") || bigBoxContaining("6차시 여정");
@@ -160,7 +160,7 @@
     page.classList.add("aiways-rescue-page");
     page.dataset.rescueLabel = "대시보드";
 
-    const copy = $$("p,div", page).find(el => {
+    const copy = $(".aiw-description", page) || $$("p", page).find(el => {
       const t = clean(el.textContent);
       return t.includes("AIWays Incheon은 환경 보호 포스터를 만드는 수업이 아닙니다") &&
         t.includes("H-A-H 기반 수업 프로젝트입니다");

@@ -318,6 +318,11 @@ body > span[style*="position:fixed"][style*="right"][style*="bottom"],
   margin-bottom: 8px;
 }
 
+.aiways-mf-side .aiways-mf-panel:first-child .aiways-mf-panel-title {
+  font-size: clamp(13px, 0.78vw, 16px);
+  margin-bottom: clamp(9px, 0.62vw, 13px);
+}
+
 .aiways-mf-bar-row {
   display: grid;
   grid-template-columns: clamp(31px, 2.2vw, 44px) 1fr clamp(24px, 1.8vw, 34px);
@@ -416,12 +421,16 @@ body > span[style*="position:fixed"][style*="right"][style*="bottom"],
 .aiways-mf-top-label {
   min-width: 0;
   color: rgba(236, 246, 255, 0.94);
-  font-size: 11px;
-  line-height: 1.08;
-  font-weight: 820;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: clamp(12px, 0.72vw, 15px);
+  line-height: 1.16;
+  font-weight: 880;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.aiways-mf-chart-grid > .aiways-mf-donuts .aiways-mf-donut {
+  width: min(82%, clamp(70px, 4.7vw, 104px));
 }
 
 .aiways-mf-top-track {
@@ -440,7 +449,7 @@ body > span[style*="position:fixed"][style*="right"][style*="bottom"],
 
 .aiways-mf-top-val {
   color: var(--mf-mint);
-  font-size: 11px;
+  font-size: clamp(12px, 0.7vw, 14px);
   font-weight: 950;
   text-align: right;
 }
@@ -475,7 +484,7 @@ body > span[style*="position:fixed"][style*="right"][style*="bottom"],
 .aiways-mf-landfill-body {
   display: grid;
   grid-template-rows: auto 1fr;
-  gap: 9px;
+  gap: clamp(10px, 0.72vw, 16px);
   min-height: 0;
 }
 
@@ -513,23 +522,26 @@ body > span[style*="position:fixed"][style*="right"][style*="bottom"],
 
 .aiways-mf-chart-grid {
   display: grid;
-  grid-template-columns: 1.28fr 0.72fr;
-  gap: 9px;
+  grid-template-columns: minmax(0, 1.52fr) minmax(108px, 0.48fr);
+  gap: clamp(10px, 0.72vw, 16px);
   min-height: 0;
 }
 
 .aiways-mf-chart {
   min-height: 0;
   border-radius: 14px;
-  padding: 9px;
+  padding: clamp(10px, 0.78vw, 16px);
   background: rgba(5, 14, 29, 0.58);
   border: 1px solid rgba(122, 160, 223, 0.12);
   overflow: hidden;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .aiways-mf-svg {
   width: 100%;
-  height: clamp(112px, 7.6vw, 160px);
+  height: 100%;
+  min-height: clamp(148px, 9.2vw, 220px);
   display: block;
 }
 
@@ -538,10 +550,10 @@ body > span[style*="position:fixed"][style*="right"][style*="bottom"],
   height: 100%;
   min-height: 0;
   display: grid;
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: clamp(10px, 0.72vw, 14px);
   padding: clamp(14px, 0.92vw, 20px);
-  align-content: start;
+  align-content: stretch;
 }
 
 .aiways-mf-mini-head {
@@ -569,10 +581,11 @@ body > span[style*="position:fixed"][style*="right"][style*="bottom"],
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: clamp(10px, 0.76vw, 14px);
+  min-height: 0;
 }
 
 .aiways-mf-pick {
-  min-height: clamp(96px, 6.3vw, 128px);
+  min-height: clamp(128px, 8.4vw, 190px);
   border-radius: clamp(16px, 0.95vw, 20px);
   border: 1px dashed rgba(108, 244, 223, 0.58);
   background:
@@ -609,7 +622,7 @@ body > span[style*="position:fixed"][style*="right"][style*="bottom"],
 .aiways-mf-pick strong {
   display: block;
   color: #fff;
-  font-size: 13px;
+  font-size: clamp(16px, 0.95vw, 22px);
   line-height: 1.1;
   font-weight: 950;
 }
@@ -617,7 +630,7 @@ body > span[style*="position:fixed"][style*="right"][style*="bottom"],
 .aiways-mf-pick span {
   display: block;
   color: var(--mf-sub);
-  font-size: 10px;
+  font-size: clamp(11px, 0.68vw, 14px);
   line-height: 1.1;
   font-weight: 750;
 }

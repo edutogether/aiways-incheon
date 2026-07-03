@@ -23,12 +23,14 @@
   ];
 
   const SHEET_CACHE_KEY = "aiways_sheet_records";
+  const BASE_RECORD_KEY = "aiways_base_records";
   const SESSION_RECORD_KEY = "aiways_session_records";
   const LEGACY_RECORD_KEY = "aiways_records";
   const SENT_KEY = "aiways_sheet_sent_keys";
   const PRIVACY_KEY = "aiways_session_id";
   const GROUP_KEY = "aiways_group_id";
   const SELECTED_CLASS_KEY = "aiways_selected_class";
+  const STUDENT_INPUT_TYPES = new Set(["image", "search"]);
 
   let loadStarted = false;
   const sentThisPage = new Set();
@@ -48,7 +50,7 @@
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
-      console.warn("AIWays ?? ?? ??:", key, error);
+      console.warn("AIWays localStorage 저장 실패:", key, error);
     }
   }
 
@@ -106,12 +108,12 @@
   }
 
   function gradeFromClass(name) {
-    const match = String(name || "").match(/[3-6]??/);
-    return match ? match[0] : "5??";
+    const match = String(name || "").match(/[3-6]학년/);
+    return match ? match[0] : "5학년";
   }
 
   function selectedClass() {
-    return localStorage.getItem(SELECTED_CLASS_KEY) || "5?? 1?";
+    return localStorage.getItem(SELECTED_CLASS_KEY) || "5학년 1반";
   }
 
   function enrich(row) {
@@ -120,14 +122,14 @@
     const now = new Date();
     normalized.timestamp = normalized.timestamp || now.toISOString();
     normalized.local_time = normalized.local_time || now.toLocaleString("ko-KR");
-    normalized.school = normalized.school || "????";
+    normalized.school = normalized.school || "우리학교";
     normalized.class_name = normalized.class_name || selected;
     normalized.grade = normalized.grade || gradeFromClass(normalized.class_name);
     normalized.group_id = normalized.group_id || localStorage.getItem(GROUP_KEY) || "";
     normalized.privacy_id = normalized.privacy_id || sessionId();
     normalized.input_type = normalized.input_type || "image";
-    normalized.ai_engine = normalized.ai_engine || "MobileNet + ??? ???? ??";
-    normalized.action = normalized.action || (normalized.hold_flag ? "?? ??? ??" : "?? ?? ??");
+    normalized.ai_engine = normalized.ai_engine || "MobileNet + 수업용 분리배출 규칙";
+    normalized.action = normalized.action || (normalized.hold_flag ? "판단 보류함 등록" : "학생 판단 완료");
     normalized.app_version = "aiways-google-sheets-v1";
     normalized.image_saved = false;
     return normalized;
@@ -143,15 +145,35 @@
     return data;
   }
 
+  function inputType(row) {
+    return String(row?.input_type || "").toLowerCase();
+  }
+
+  function isBaseRecord(row) {
+    return inputType(row) === "base";
+  }
+
+  function isStudentRecord(row) {
+    const type = inputType(row) || "image";
+    return STUDENT_INPUT_TYPES.has(type);
+  }
+
   function mergeIntoLocal(records) {
-    const merged = dedupe([
-      ...records,
-      ...readJson(LEGACY_RECORD_KEY, []),
-      ...readJson(SESSION_RECORD_KEY, [])
+    const incoming = records.map(normalize);
+    const baseRows = dedupe([
+      ...incoming.filter(isBaseRecord),
+      ...readJson(BASE_RECORD_KEY, [])
     ]);
-    writeJson(LEGACY_RECORD_KEY, merged);
-    writeJson(SESSION_RECORD_KEY, merged);
-    return merged;
+    const studentRows = dedupe([
+      ...incoming.filter(isStudentRecord),
+      ...readJson(LEGACY_RECORD_KEY, []).filter(row => !isBaseRecord(row)),
+      ...readJson(SESSION_RECORD_KEY, []).filter(row => !isBaseRecord(row))
+    ]);
+
+    writeJson(BASE_RECORD_KEY, baseRows);
+    writeJson(LEGACY_RECORD_KEY, studentRows);
+    writeJson(SESSION_RECORD_KEY, studentRows);
+    return studentRows;
   }
 
   function saveLocal(record) {
@@ -185,7 +207,7 @@
       },
       body: JSON.stringify(data)
     }).catch(error => {
-      console.warn("Google Sheets ?? ??. localStorage?? ???? ????.", error);
+      console.warn("Google Sheets 전송 실패. localStorage에 임시 저장했습니다.", error);
     });
   }
 
@@ -193,7 +215,7 @@
     const records = dedupe([
       ...readJson(LEGACY_RECORD_KEY, []),
       ...readJson(SESSION_RECORD_KEY, [])
-    ]);
+    ].filter(row => !isBaseRecord(row)));
     const now = Date.now();
     return records.find(row => {
       if (finalChoice && row.final_decision !== finalChoice) return false;
@@ -208,28 +230,28 @@
     const selected = selectedClass();
     const item = result.querySelector("h3")?.textContent.trim() || "";
     const badges = Array.from(result.querySelectorAll(".aiways-mf-badge")).map(el => el.textContent.trim());
-    const confidenceText = badges.find(text => text.includes("???")) || "";
+    const confidenceText = badges.find(text => text.includes("신뢰도")) || "";
     const confidence = Number((confidenceText.match(/\d+/) || [""])[0]);
-    const category = badges.find(text => !text.includes("AI") && !text.includes("???")) || finalChoice;
+    const category = badges.find(text => !text.includes("AI") && !text.includes("신뢰도")) || finalChoice;
 
     return {
       timestamp: new Date().toISOString(),
       local_time: new Date().toLocaleString("ko-KR"),
-      school: "????",
+      school: "우리학교",
       grade: gradeFromClass(selected),
       class_name: selected,
       group_id: localStorage.getItem(GROUP_KEY) || "",
       privacy_id: sessionId(),
       input_type: "image",
-      ai_engine: "MobileNet + ??? ???? ??",
+      ai_engine: "MobileNet + 수업용 분리배출 규칙",
       ai_raw_label: "",
       ai_confidence: Number.isFinite(confidence) ? confidence : "",
       mapped_item: item,
       suggested_category: category,
       final_decision: finalChoice,
-      hold_flag: finalChoice === "?? ??",
+      hold_flag: finalChoice === "판단 보류",
       hold_score: "",
-      action: finalChoice === "?? ??" ? "?? ??? ??" : "?? ?? ??",
+      action: finalChoice === "판단 보류" ? "판단 보류함 등록" : "학생 판단 완료",
       image_saved: false,
       app_version: "aiways-google-sheets-v1"
     };
@@ -278,7 +300,7 @@
 
     script.onerror = () => {
       finished = true;
-      console.warn("Google Sheets ?? ???? ??. localStorage ???? ?? ?????.");
+      console.warn("Google Sheets 기록을 불러오지 못했습니다. localStorage 기록으로 계속 표시합니다.");
       cleanup();
     };
 
@@ -287,7 +309,7 @@
 
     setTimeout(() => {
       if (!finished) {
-        console.warn("Google Sheets ?? ???? ?? ??. localStorage ???? ?? ?????.");
+        console.warn("Google Sheets 기록 응답이 지연되어 localStorage 기록으로 계속 표시합니다.");
         cleanup();
       }
     }, 9000);

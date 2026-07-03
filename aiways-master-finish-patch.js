@@ -1,6 +1,18 @@
 
 (() => {
   const NAV_ORDER = ["대시보드", "프로젝트", "교육과정", "H-A-H", "차시흐름", "갤러리", "3초판단", "자료실"];
+  const NAV_ITEMS = [
+    { label: "대시보드", href: "#top", selector: ".aiw-hero" },
+    { label: "프로젝트", href: "#project", selector: "#project" },
+    { label: "교육과정", href: "#curriculum", selector: "#curriculum" },
+    { label: "H-A-H", href: "#hah", selector: "#hah" },
+    { label: "차시흐름", href: "#lesson", selector: "#lesson" },
+    { label: "갤러리", href: "#outputs", selector: "#outputs" },
+    { label: "3초판단", href: "#quick-app", selector: "#quick-app" },
+    { label: "자료실", href: "#playbook", selector: "#playbook" }
+  ];
+  const BASE_RECORD_KEY = "aiways_base_records";
+  const STUDENT_INPUT_TYPES = new Set(["image", "search"]);
 
   const DEFAULT_CLASSES = {
     "3학년 1반": { grade: "3학년", observed: 17, hold: 1, converted: 14, rank: 9 },
@@ -89,17 +101,33 @@
   let selectedGrade = DEFAULT_CLASSES[selectedClass].grade;
   let modelPromise = null;
   let lastLightLabel = "";
+  let booted = false;
+  let lightFrame = 0;
 
   function getRecords() {
     try {
-      return JSON.parse(localStorage.getItem("aiways_records")) || [];
+      const records = JSON.parse(localStorage.getItem("aiways_records")) || [];
+      return records.filter(record => {
+        const type = String(record.input_type || "image").toLowerCase();
+        return type !== "base" && (STUDENT_INPUT_TYPES.has(type) || !record.input_type);
+      });
     } catch {
       return [];
     }
   }
 
   function setRecords(list) {
-    localStorage.setItem("aiways_records", JSON.stringify(list));
+    const records = list.filter(record => String(record.input_type || "image").toLowerCase() !== "base");
+    localStorage.setItem("aiways_records", JSON.stringify(records));
+  }
+
+  function getBaseRecords() {
+    try {
+      return (JSON.parse(localStorage.getItem(BASE_RECORD_KEY)) || [])
+        .filter(record => String(record.input_type || "").toLowerCase() === "base");
+    } catch {
+      return [];
+    }
   }
 
   function getSessionId() {
@@ -119,8 +147,108 @@
     return getRecords().filter(r => r.grade === grade);
   }
 
+  function numberFrom(value) {
+    if (typeof value === "number" && Number.isFinite(value)) return value;
+    const match = String(value ?? "").replace(/,/g, "").match(/-?\d+(\.\d+)?/);
+    return match ? Number(match[0]) : null;
+  }
+
+  function metricValue(row) {
+    const keys = [
+      "value",
+      "count",
+      "metric_value",
+      "observed",
+      "observed_count",
+      "hold",
+      "hold_count",
+      "converted",
+      "converted_count",
+      "rank",
+      "ai_confidence",
+      "hold_score",
+      "final_decision",
+      "action",
+      "mapped_item",
+      "suggested_category"
+    ];
+    for (const key of keys) {
+      const value = numberFrom(row[key]);
+      if (value !== null) return value;
+    }
+    return null;
+  }
+
+  function metricLabel(row) {
+    return clean([
+      row.metric,
+      row.metric_name,
+      row.mapped_item,
+      row.suggested_category,
+      row.final_decision,
+      row.action,
+      row.ai_raw_label
+    ].filter(Boolean).join(" "));
+  }
+
+  function baseRowsForClass(name) {
+    return getBaseRecords().filter(row => row.class_name === name);
+  }
+
+  function baseStatsForClass(name) {
+    const fallback = DEFAULT_CLASSES[name] || DEFAULT_CLASSES["5학년 1반"];
+    const rows = baseRowsForClass(name);
+    if (!rows.length) return { ...fallback };
+
+    const stats = { grade: fallback.grade, observed: 0, hold: 0, converted: 0, rank: fallback.rank };
+    let matchedMetric = false;
+
+    rows.forEach(row => {
+      const label = metricLabel(row);
+      const value = metricValue(row);
+
+      if (label.includes("순위") || label.toLowerCase().includes("rank")) {
+        if (value !== null) stats.rank = value;
+        matchedMetric = true;
+        return;
+      }
+
+      if (label.includes("보류")) {
+        stats.hold += value ?? 1;
+        matchedMetric = true;
+        return;
+      }
+
+      if (label.includes("전환") || label.includes("완료") || label.includes("확인") || label.toLowerCase().includes("converted")) {
+        stats.converted += value ?? 1;
+        matchedMetric = true;
+        return;
+      }
+
+      if (label.includes("관찰") || label.includes("배출") || label.toLowerCase().includes("observed")) {
+        stats.observed += value ?? 1;
+        matchedMetric = true;
+        return;
+      }
+
+      stats.observed += 1;
+    });
+
+    if (!matchedMetric) {
+      stats.hold = rows.filter(row => row.hold_flag || row.final_decision === "판단 보류").length;
+      stats.converted = rows.filter(row => row.action === "학생 판단 완료").length;
+    }
+
+    if (stats.observed <= 0) stats.observed = fallback.observed;
+    if (stats.converted <= 0 && !rows.some(row => metricLabel(row).includes("전환") || metricLabel(row).includes("완료"))) {
+      stats.converted = fallback.converted;
+    }
+
+    return stats;
+  }
+
   function classStats(name) {
-    const base = DEFAULT_CLASSES[name] || DEFAULT_CLASSES["5학년 1반"];
+    const base = baseStatsForClass(name);
     const rec = classRecords(name);
     return {
       observed: base.observed + rec.length,
@@ -133,11 +261,12 @@
   function gradeStats(grade) {
     const entries = Object.entries(DEFAULT_CLASSES).filter(([, v]) => v.grade === grade);
     const rec = gradeRecords(grade);
+    const base = entries.map(([name]) => baseStatsForClass(name));
     return {
       classes: entries.length,
-      observed: entries.reduce((s, [, v]) => s + v.observed, 0) + rec.length,
-      hold: entries.reduce((s, [, v]) => s + v.hold, 0) + rec.filter(r => r.hold_flag).length,
-      converted: entries.reduce((s, [, v]) => s + v.converted, 0) + rec.filter(r => r.action === "학생 판단 완료").length
+      observed: base.reduce((s, v) => s + v.observed, 0) + rec.length,
+      hold: base.reduce((s, v) => s + v.hold, 0) + rec.filter(r => r.hold_flag).length,
+      converted: base.reduce((s, v) => s + v.converted, 0) + rec.filter(r => r.action === "학생 판단 완료").length
     };
   }
 
@@ -162,34 +291,16 @@
   }
 
   function pageCandidates() {
-    const nodes = $$("main > section, main > article, main > div, body > section, body > article, section, article, div")
-      .filter(el => {
-        const rect = el.getBoundingClientRect();
-        if (rect.width < 420 || rect.height < 260) return false;
-        const label = labelForText(clean(el.textContent));
-        if (!label) return false;
+    return NAV_ITEMS
+      .map(item => {
+        const el = $(item.selector);
+        if (!el) return null;
         el.classList.add("aiways-mf-page");
-        el.dataset.aiwaysLabel = label;
-        return true;
-      });
-
-    const grouped = [];
-    nodes.sort((a, b) => a.offsetTop - b.offsetTop);
-
-    nodes.forEach(el => {
-      const label = el.dataset.aiwaysLabel;
-      const top = el.offsetTop;
-      const same = grouped.find(item => Math.abs(item.el.offsetTop - top) < 20 || item.label === label && Math.abs(item.el.offsetTop - top) < window.innerHeight * 0.65);
-      if (!same) {
-        grouped.push({ el, label });
-      } else {
-        const a = el.getBoundingClientRect();
-        const b = same.el.getBoundingClientRect();
-        if (a.width * a.height > b.width * b.height) same.el = el;
-      }
-    });
-
-    return grouped.sort((a, b) => a.el.offsetTop - b.el.offsetTop);
+        el.dataset.aiwaysLabel = item.label;
+        return { el, label: item.label, href: item.href };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.el.offsetTop - b.el.offsetTop);
   }
 
   function currentPage() {
@@ -221,41 +332,21 @@
     const header = $("header") || $(".site-header") || $(".header");
     if (!header) return;
 
-    const nav = $("nav", header) || $('[class*="nav"]', header) || header;
+    const nav = $("nav", header) || $('[class*="nav"]', header);
     if (!nav) return;
 
-    $$("a,button,span", nav).forEach(el => {
-      const t = clean(el.textContent);
-      if (t.includes("지금") && (t.includes("찰칵") || t.includes("분류") || t.includes("버려지는"))) {
-        el.classList.add("aiways-mf-hide");
-      }
-    });
+    nav.innerHTML = NAV_ITEMS.map(item => `<a class="aiways-mf-nav" href="${item.href}">${item.label}</a>`).join("");
 
-    NAV_ORDER.forEach(label => {
-      let item = $$("a,button,span", nav).find(el => clean(el.textContent) === label);
-      if (!item) {
-        item = document.createElement("button");
-        item.type = "button";
-        item.textContent = label;
-        item.style.background = "transparent";
-        item.style.border = "0";
-        item.style.font = "inherit";
-        item.style.cursor = "pointer";
-        nav.appendChild(item);
-      }
-
-      item.classList.add("aiways-mf-nav");
-      if (item.dataset.mfBound === "1") return;
-      item.dataset.mfBound = "1";
-
+    $$("a", nav).forEach(item => {
       item.addEventListener("click", e => {
-        e.preventDefault();
+        const label = clean(item.textContent);
         const target = pageCandidates().find(p => p.label === label);
         if (!target) return;
+        e.preventDefault();
         const headerH = header.getBoundingClientRect().height || 68;
         window.scrollTo({ top: Math.max(0, target.el.offsetTop - headerH + 2), behavior: "smooth" });
         setNav(label);
-      }, true);
+      });
     });
   }
 
@@ -266,9 +357,14 @@
 
     $$("a,button,span", nav).forEach(el => {
       const t = clean(el.textContent);
-      if (!NAV_ORDER.includes(t)) return;
-      el.classList.toggle("aiways-mf-active", t === label);
-      el.setAttribute("aria-current", t === label ? "page" : "false");
+      const active = NAV_ORDER.includes(t) && t === label;
+      el.classList.toggle("aiways-mf-active", active);
+      el.classList.toggle("aiways-rescue-active", false);
+      el.classList.toggle("is-active", false);
+      if (NAV_ORDER.includes(t)) {
+        if (active) el.setAttribute("aria-current", "page");
+        else el.removeAttribute("aria-current");
+      }
     });
   }
 
@@ -522,10 +618,10 @@
         </div>
         <div class="aiways-mf-landfill-body">
           <div class="aiways-mf-landfill-metrics">
-            <div class="aiways-mf-landfill-metric"><strong>19,507t</strong><span>오늘 반입 총량</span></div>
-            <div class="aiways-mf-landfill-metric"><strong>-3.2%</strong><span>전일 대비</span></div>
-            <div class="aiways-mf-landfill-metric"><strong>68.3%</strong><span>총량 대비 반입률</span></div>
-            <div class="aiways-mf-landfill-metric"><strong>32.7%</strong><span>잔여 관리 여력</span></div>
+            <div class="aiways-mf-landfill-metric"><strong>18,420t</strong><span>생활폐기물 반입량</span></div>
+            <div class="aiways-mf-landfill-metric"><strong>-2.8%</strong><span>전일 대비</span></div>
+            <div class="aiways-mf-landfill-metric"><strong>63.4%</strong><span>총량 대비 반입률</span></div>
+            <div class="aiways-mf-landfill-metric"><strong>36.6%</strong><span>잔여 관리 여력</span></div>
           </div>
           <div class="aiways-mf-chart-grid">
             <div class="aiways-mf-chart">
@@ -533,8 +629,8 @@
               ${chartSvg()}
             </div>
             <div class="aiways-mf-donuts" style="grid-template-columns:1fr;grid-template-rows:1fr 1fr;">
-              ${donut("총량 대비 반입률", 68)}
-              ${donut("잔여 관리 여력", 33)}
+              ${donut("총량 대비 반입률", 63)}
+              ${donut("잔여 관리 여력", 37)}
             </div>
           </div>
         </div>
@@ -591,15 +687,6 @@
 
         <input type="file" accept="image/*" capture="environment" data-mf-camera-input hidden>
         <input type="file" accept="image/*" data-mf-upload-input hidden>
-
-        <div class="aiways-mf-mini-status">
-          <div class="aiways-mf-mini-box">
-            <div><span>사진이 들어오면</span><strong>중앙 분석창</strong><span>으로 크게 열립니다.</span></div>
-          </div>
-          <div class="aiways-mf-mini-box">
-            <div><strong>AI분류 대기 중</strong><span>업로드 후 스캔선과 판단 카드가 표시됩니다.</span></div>
-          </div>
-        </div>
       </div>
     `;
 
@@ -658,6 +745,7 @@
         material,
         rawLabel: best.className,
         confidence: Math.max(36, Math.round(best.probability * 100)),
+        inputType: "image",
         predictions: predictions.slice(0, 4).map(p => `${p.className} ${Math.round(p.probability * 100)}%`)
       };
     } catch {
@@ -666,6 +754,7 @@
         material,
         rawLabel: "기본 이미지 모델 대기",
         confidence: 44,
+        inputType: "image",
         predictions: []
       };
     }
@@ -781,6 +870,11 @@
 
     result.querySelectorAll("[data-mf-final]").forEach(btn => {
       btn.addEventListener("click", () => {
+        if (btn.dataset.mfSaved === "1") return;
+        result.querySelectorAll("[data-mf-final]").forEach(item => {
+          item.dataset.mfSaved = "1";
+          item.disabled = true;
+        });
         saveFinal(draft, btn.dataset.mfFinal);
         result.insertAdjacentHTML("beforeend", `<div class="aiways-mf-saved">최종 판단 ${btn.dataset.mfFinal} · 대시보드에 기록했습니다.</div>`);
       });
@@ -797,7 +891,7 @@
       school: "우리학교",
       grade: DEFAULT_CLASSES[selectedClass].grade,
       class_name: selectedClass,
-      input_type: "image",
+      input_type: draft.inputType || "image",
       ai_engine: "MobileNet + 수업용 분리배출 규칙",
       ai_raw_label: draft.rawLabel,
       ai_confidence: draft.confidence,
@@ -1141,6 +1235,7 @@
       material,
       rawLabel: value || "직접 검색",
       confidence: material === MATERIALS.hold ? 48 : 88,
+      inputType: "search",
       predictions: []
     };
 
@@ -1179,32 +1274,31 @@
   }
 
   function boot() {
+    if (booted) return;
+    booted = true;
     document.body.classList.add("aiways-mf-ready");
 
     normalizeText();
     ensureNav();
 
-    fixHeroCopy();
     renderSchool();
     renderClass();
     renderLandfill();
     renderMiniApp();
-
-    restoreProjectPage();
-    fixCurriculum();
-    fixFlow();
-    renderGallery();
     renderSortingPage();
-    renderPlaybook();
 
     pageCandidates();
+    cleanupFloatingBoxes();
     lightCurrent();
   }
 
-  let scrollTimer = null;
-  function onScroll() {
-    clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(lightCurrent, 36);
+  function requestLightCurrent() {
+    if (lightFrame) return;
+    lightFrame = requestAnimationFrame(() => {
+      lightFrame = 0;
+      lightCurrent();
+      cleanupFloatingBoxes();
+    });
   }
 
   function cleanupFloatingBoxes() {
@@ -1230,27 +1324,8 @@
     boot();
   }
 
-  window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", () => setTimeout(() => {
-    boot();
-    lightCurrent();
-  }, 120), { passive: true });
-
-  setTimeout(() => {
-    boot();
-    cleanupFloatingBoxes();
-  }, 250);
-
-  setTimeout(() => {
-    boot();
-    cleanupFloatingBoxes();
-  }, 900);
-
-  let retryCount = 0;
-  const retryTimer = setInterval(() => {
-    retryCount += 1;
-    boot();
-    cleanupFloatingBoxes();
-    if (retryCount >= 14) clearInterval(retryTimer);
-  }, 550);
+  window.addEventListener("scroll", requestLightCurrent, { passive: true });
+  window.addEventListener("resize", requestLightCurrent, { passive: true });
+  window.addEventListener("aiways:records-loaded", () => rerenderDashboards());
+  window.addEventListener("aiways:record-saved", () => rerenderDashboards());
 })();

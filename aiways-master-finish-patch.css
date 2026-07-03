@@ -22,8 +22,6 @@
 /* 전체 안정화 */
 html {
   scroll-behavior: smooth !important;
-  scroll-padding-top: var(--header-height, 72px) !important;
-  scroll-snap-type: y proximity !important;
   overflow-x: hidden !important;
 }
 
@@ -31,14 +29,6 @@ body {
   overflow-x: hidden !important;
   -webkit-font-smoothing: antialiased !important;
   text-rendering: optimizeLegibility !important;
-}
-
-main > section,
-.section-shell,
-.aiw-hero {
-  scroll-snap-align: start !important;
-  scroll-snap-stop: normal !important;
-  scroll-margin-top: var(--header-height, 72px) !important;
 }
 
 body.aiways-mf-ready * {
@@ -73,19 +63,20 @@ body > span[style*="position:fixed"][style*="right"][style*="bottom"],
 
 /* 페이지 점등 */
 .aiways-mf-page {
-  opacity: 0.74 !important;
-  filter: brightness(0.78) saturate(0.88) !important;
-  transform: translateY(6px) scale(0.999) !important;
+  opacity: 0.62 !important;
+  filter: brightness(0.62) saturate(0.78) !important;
+  transform: translateY(8px) scale(0.998) !important;
   transition:
-    opacity 0.18s cubic-bezier(.22, 1, .36, 1),
-    filter 0.18s cubic-bezier(.22, 1, .36, 1),
-    transform 0.18s cubic-bezier(.22, 1, .36, 1) !important;
+    opacity 0.22s cubic-bezier(.22, 1, .36, 1),
+    filter 0.22s cubic-bezier(.22, 1, .36, 1),
+    transform 0.22s cubic-bezier(.22, 1, .36, 1) !important;
   will-change: opacity, filter, transform !important;
+  scroll-margin-top: 74px !important;
 }
 
 .aiways-mf-page.aiways-mf-lit {
   opacity: 1 !important;
-  filter: brightness(1.05) saturate(1.04) !important;
+  filter: brightness(1.08) saturate(1.05) !important;
   transform: translateY(0) scale(1) !important;
 }
 
@@ -887,13 +878,12 @@ body > span[style*="position:fixed"][style*="right"][style*="bottom"],
 .aiways-mf-project {
   width: min(1500px, 92vw);
   margin: 0 auto;
-  min-height: calc(100dvh - var(--header-height, 72px));
+  min-height: calc(100vh - 88px);
   display: grid;
   grid-template-columns: 0.95fr 1.05fr;
   gap: clamp(40px, 5vw, 96px);
   align-items: center;
-  padding-top: clamp(22px, 3vh, 48px);
-  padding-bottom: clamp(22px, 3vh, 48px);
+  padding-top: 74px;
 }
 
 .aiways-mf-project-kicker,
@@ -914,8 +904,8 @@ body > span[style*="position:fixed"][style*="right"][style*="bottom"],
 .aiways-mf-project h1 {
   margin: 22px 0 0;
   color: #fff;
-  font-size: clamp(48px, 3.15vw, 72px);
-  line-height: 1.02;
+  font-size: 132px;
+  line-height: 0.94;
   letter-spacing: 0;
   font-weight: 950;
   word-break: keep-all;
@@ -952,7 +942,7 @@ body > span[style*="position:fixed"][style*="right"][style*="bottom"],
 .aiways-mf-project-card strong {
   display: block;
   color: #fff;
-  font-size: clamp(24px, 1.55vw, 34px);
+  font-size: 34px;
   line-height: 1.12;
   font-weight: 950;
   letter-spacing: 0;
@@ -962,38 +952,9 @@ body > span[style*="position:fixed"][style*="right"][style*="bottom"],
   display: block;
   margin-top: 10px;
   color: var(--mf-sub);
-  font-size: clamp(15px, 0.9vw, 18px);
+  font-size: 16px;
   line-height: 1.4;
   font-weight: 720;
-}
-
-@media (min-width: 2560px) {
-  .aiways-mf-project {
-    width: min(2600px, 88vw);
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(72px, 4vw, 140px);
-  }
-
-  .aiways-mf-project h1 {
-    font-size: clamp(92px, 3.4vw, 132px);
-  }
-
-  .aiways-mf-project p {
-    font-size: clamp(26px, 1.05vw, 34px);
-    max-width: 980px;
-  }
-
-  .aiways-mf-project-card {
-    padding: clamp(30px, 1.25vw, 46px);
-  }
-
-  .aiways-mf-project-card strong {
-    font-size: clamp(36px, 1.35vw, 50px);
-  }
-
-  .aiways-mf-project-card span {
-    font-size: clamp(20px, 0.8vw, 28px);
-  }
 }
 
 /* 교육과정 */

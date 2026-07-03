@@ -663,4 +663,7 @@
 
   setTimeout(runOnce, 150);
   setTimeout(runOnce, 700);
+  setTimeout(runOnce, 1600);
+  setTimeout(runOnce, 3000);
+  setTimeout(runOnce, 5200);
 })();

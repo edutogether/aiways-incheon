@@ -2,14 +2,14 @@
 (() => {
   const NAV_ORDER = ["대시보드", "프로젝트", "교육과정", "H-A-H", "차시흐름", "갤러리", "3초판단", "자료실"];
   const NAV_ITEMS = [
-    { label: "대시보드", href: "#top", selector: ".aiw-hero" },
-    { label: "프로젝트", href: "#project", selector: "#project" },
-    { label: "교육과정", href: "#curriculum", selector: "#curriculum" },
-    { label: "H-A-H", href: "#hah", selector: "#hah" },
-    { label: "차시흐름", href: "#lesson", selector: "#lesson" },
-    { label: "갤러리", href: "#outputs", selector: "#outputs" },
-    { label: "3초판단", href: "#quick-app", selector: "#quick-app" },
-    { label: "자료실", href: "#playbook", selector: "#playbook" }
+    { label: "대시보드", href: "#top", selector: ".aiw-hero", observe: ".aiw-dashboard-panel" },
+    { label: "프로젝트", href: "#project", selector: "#project", observe: ".aiways-mf-project" },
+    { label: "교육과정", href: "#curriculum", selector: "#curriculum", observe: ".curriculum-grid" },
+    { label: "H-A-H", href: "#hah", selector: "#hah", observe: ".model-grid" },
+    { label: "차시흐름", href: "#lesson", selector: "#lesson", observe: ".journey-grid" },
+    { label: "갤러리", href: "#outputs", selector: "#outputs", observe: ".gallery-grid" },
+    { label: "3초판단", href: "#quick-app", selector: "#quick-app", observe: ".aiways-mf-sort-wrap" },
+    { label: "자료실", href: "#playbook", selector: "#playbook", observe: ".resource-grid" }
   ];
   const BASE_RECORD_KEY = "aiways_base_records";
   const STUDENT_INPUT_TYPES = new Set(["image", "search"]);
@@ -100,9 +100,11 @@
   if (!DEFAULT_CLASSES[selectedClass]) selectedClass = "5학년 1반";
   let selectedGrade = DEFAULT_CLASSES[selectedClass].grade;
   let modelPromise = null;
-  let lastLightLabel = "";
   let booted = false;
-  let lightFrame = 0;
+  let activePageLabel = "";
+  let sectionObserver = null;
+  const observedPages = new Map();
+  const observedTargets = new Map();
 
   function getRecords() {
     try {
@@ -295,9 +297,11 @@
       .map(item => {
         const el = $(item.selector);
         if (!el) return null;
+        const observeEl = item.observe ? $(item.observe, el) || el : el;
         el.classList.add("aiways-mf-page");
         el.dataset.aiwaysLabel = item.label;
-        return { el, label: item.label, href: item.href };
+        observeEl.dataset.aiwaysLabel = item.label;
+        return { el, observeEl, label: item.label, href: item.href };
       })
       .filter(Boolean)
       .sort((a, b) => a.el.offsetTop - b.el.offsetTop);
@@ -336,18 +340,6 @@
     if (!nav) return;
 
     nav.innerHTML = NAV_ITEMS.map(item => `<a class="aiways-mf-nav" href="${item.href}">${item.label}</a>`).join("");
-
-    $$("a", nav).forEach(item => {
-      item.addEventListener("click", e => {
-        const label = clean(item.textContent);
-        const target = pageCandidates().find(p => p.label === label);
-        if (!target) return;
-        e.preventDefault();
-        const headerH = header.getBoundingClientRect().height || 68;
-        window.scrollTo({ top: Math.max(0, target.el.offsetTop - headerH + 2), behavior: "smooth" });
-        setNav(label);
-      });
-    });
   }
 
   function setNav(label) {
@@ -368,17 +360,61 @@
     });
   }
 
-  function lightCurrent() {
-    const page = currentPage();
+  function setActivePage(label, el) {
+    if (!label || !el) return;
+    setNav(label);
+    if (activePageLabel === label && el.classList.contains("aiways-mf-lit")) return;
+    activePageLabel = label;
+    $$(".aiways-mf-page").forEach(page => page.classList.toggle("aiways-mf-lit", page === el));
+  }
+
+  function selectObservedPage() {
+    const candidates = Array.from(observedPages.values())
+      .filter(entry => entry.isIntersecting && entry.intersectionRatio >= 0.65)
+      .sort((a, b) => {
+        const ac = Math.abs(a.boundingClientRect.top + a.boundingClientRect.height / 2 - window.innerHeight / 2);
+        const bc = Math.abs(b.boundingClientRect.top + b.boundingClientRect.height / 2 - window.innerHeight / 2);
+        if (ac !== bc) return ac - bc;
+        return b.intersectionRatio - a.intersectionRatio;
+      });
+
+    const entry = candidates[0];
+    if (!entry) return;
+    const page = observedTargets.get(entry.target);
     if (!page) return;
+    setActivePage(page.label, page.el);
+  }
 
-    setNav(page.label);
+  function initSectionObserver() {
+    const pages = pageCandidates();
+    if (!pages.length) return;
 
-    if (lastLightLabel === page.label && page.el.classList.contains("aiways-mf-lit")) return;
-    lastLightLabel = page.label;
+    if (sectionObserver) sectionObserver.disconnect();
+    observedPages.clear();
+    observedTargets.clear();
 
-    $$(".aiways-mf-page").forEach(el => el.classList.remove("aiways-mf-lit"));
-    requestAnimationFrame(() => page.el.classList.add("aiways-mf-lit"));
+    if (!("IntersectionObserver" in window)) {
+      const page = currentPage();
+      if (page) setActivePage(page.label, page.el);
+      return;
+    }
+
+    sectionObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => observedPages.set(entry.target, entry));
+      selectObservedPage();
+    }, {
+      threshold: [0.65, 0.7, 0.75]
+    });
+
+    pages.forEach(page => {
+      observedTargets.set(page.observeEl, page);
+      sectionObserver.observe(page.observeEl);
+    });
+
+    requestAnimationFrame(() => {
+      const page = currentPage();
+      if (page) setActivePage(page.label, page.el);
+    });
   }
 
   function smallestContainer(...texts) {
@@ -1289,16 +1325,7 @@
 
     pageCandidates();
     cleanupFloatingBoxes();
-    lightCurrent();
-  }
-
-  function requestLightCurrent() {
-    if (lightFrame) return;
-    lightFrame = requestAnimationFrame(() => {
-      lightFrame = 0;
-      lightCurrent();
-      cleanupFloatingBoxes();
-    });
+    initSectionObserver();
   }
 
   function cleanupFloatingBoxes() {
@@ -1324,8 +1351,7 @@
     boot();
   }
 
-  window.addEventListener("scroll", requestLightCurrent, { passive: true });
-  window.addEventListener("resize", requestLightCurrent, { passive: true });
+  window.addEventListener("resize", initSectionObserver, { passive: true });
   window.addEventListener("aiways:records-loaded", () => rerenderDashboards());
   window.addEventListener("aiways:record-saved", () => rerenderDashboards());
 })();

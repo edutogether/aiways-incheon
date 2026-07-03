@@ -1,0 +1,644 @@
+
+/* =========================================================
+   AIWays Rescue Final Patch
+   목적:
+   - 기존 패치의 울컥임/깜빡임/다중 메뉴/페이지 어두움 제거
+   - 메뉴 1:1 점등
+   - 2/5/6/7/8페이지 요청 레이아웃 복구
+   ========================================================= */
+
+:root {
+  --rf-bg: #050d19;
+  --rf-panel: rgba(10, 24, 43, 0.94);
+  --rf-card: rgba(7, 17, 33, 0.78);
+  --rf-line: rgba(123, 164, 226, 0.22);
+  --rf-line-strong: rgba(108, 244, 223, 0.48);
+  --rf-text: #f6f9ff;
+  --rf-sub: rgba(220, 234, 252, 0.78);
+  --rf-dim: rgba(184, 203, 230, 0.66);
+  --rf-mint: #6cf4df;
+  --rf-cyan: #6eeef0;
+  --rf-blue: #6bbcff;
+  --rf-dark: #061829;
+}
+
+/* 울컥임/어두움 제거 */
+html {
+  scroll-behavior: smooth !important;
+  overflow-x: hidden !important;
+}
+
+body {
+  overflow-x: hidden !important;
+  -webkit-font-smoothing: antialiased !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+.aiways-mf-page,
+.aiways-mf-page.aiways-mf-lit,
+.aiways-rescue-page {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+.aiways-mf-page::before,
+.aiways-mf-page.aiways-mf-lit::before,
+.aiways-rescue-page::before {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+body.aiways-rescue-ready * {
+  scroll-behavior: smooth !important;
+}
+
+body.aiways-rescue-ready .aiways-mf-allow-motion,
+body.aiways-rescue-ready .aiways-mf-allow-motion * {
+  animation-duration: revert !important;
+}
+
+/* 우하단 투명 스크롤 박스 제거 */
+body > div[style*="position: fixed"][style*="right"][style*="bottom"],
+body > div[style*="position:fixed"][style*="right"][style*="bottom"],
+body > span[style*="position: fixed"][style*="right"][style*="bottom"],
+body > span[style*="position:fixed"][style*="right"][style*="bottom"],
+.aiways-floating-scroll,
+.aiways-scroll-debug,
+.scroll-indicator,
+[class*="scroll-indicator"],
+[class*="floating-scroll"] {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 기존 중복 메뉴 숨김 + 새 메뉴 */
+.aiways-rescue-old-nav-hidden {
+  display: none !important;
+}
+
+.aiways-rescue-header {
+  position: fixed !important;
+  inset: 0 0 auto 0 !important;
+  z-index: 9990 !important;
+}
+
+.aiways-rescue-clean-nav {
+  position: absolute !important;
+  right: clamp(28px, 3vw, 56px) !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: clamp(18px, 1.35vw, 30px) !important;
+  white-space: nowrap !important;
+  z-index: 9995 !important;
+}
+
+.aiways-rescue-clean-nav button {
+  appearance: none !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: rgba(226, 236, 250, 0.64) !important;
+  font: inherit !important;
+  font-size: 16px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  padding: 10px 0 !important;
+  cursor: pointer !important;
+  position: relative !important;
+  transition:
+    color 0.13s ease,
+    text-shadow 0.13s ease,
+    transform 0.13s ease !important;
+}
+
+.aiways-rescue-clean-nav button.aiways-rescue-active {
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+  text-shadow:
+    0 0 8px rgba(111, 244, 223, 0.96),
+    0 0 18px rgba(108, 188, 255, 0.58) !important;
+}
+
+.aiways-rescue-clean-nav button.aiways-rescue-active::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  bottom: -6px !important;
+  width: 28px !important;
+  height: 2px !important;
+  transform: translateX(-50%) !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, var(--rf-mint), var(--rf-blue)) !important;
+  box-shadow: 0 0 14px rgba(108, 244, 223, 0.82) !important;
+}
+
+@media (max-width: 1180px) {
+  .aiways-rescue-clean-nav {
+    gap: 13px !important;
+    right: 18px !important;
+  }
+
+  .aiways-rescue-clean-nav button {
+    font-size: 12px !important;
+  }
+}
+
+/* 1페이지 */
+.aiways-rescue-hero-copy {
+  margin-top: clamp(28px, 3.5vh, 54px) !important;
+  transform: translateY(34px) !important;
+  line-height: 1.36 !important;
+}
+
+.aiways-rescue-hero-copy,
+.aiways-rescue-hero-copy * {
+  line-height: 1.36 !important;
+}
+
+.aiways-rescue-hero-buttons {
+  transform: translateY(26px) !important;
+}
+
+/* 2페이지 복구 */
+.aiways-rescue-project {
+  width: min(1500px, 92vw);
+  min-height: calc(100vh - 76px);
+  margin: 0 auto;
+  padding-top: clamp(86px, 9vh, 126px);
+  display: grid;
+  grid-template-columns: 0.96fr 1.04fr;
+  gap: clamp(42px, 5vw, 92px);
+  align-items: center;
+}
+
+.aiways-rescue-pill {
+  width: fit-content;
+  min-height: 36px;
+  padding: 0 15px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--rf-mint);
+  background: rgba(108, 244, 223, 0.10);
+  border: 1px solid rgba(108, 244, 223, 0.24);
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.aiways-rescue-project h1 {
+  margin: 24px 0 0;
+  color: #fff;
+  font-size: 124px;
+  line-height: 0.95;
+  letter-spacing: 0;
+  font-weight: 950;
+  word-break: keep-all;
+}
+
+.aiways-rescue-project h1 span {
+  display: block;
+}
+
+.aiways-rescue-project p {
+  margin: 26px 0 0;
+  max-width: 760px;
+  color: var(--rf-sub);
+  font-size: 23px;
+  line-height: 1.48;
+  font-weight: 760;
+  word-break: keep-all;
+}
+
+.aiways-rescue-project-cards {
+  display: grid;
+  gap: 14px;
+}
+
+.aiways-rescue-project-card {
+  border-radius: 24px;
+  border: 1px solid rgba(123, 164, 226, 0.18);
+  background:
+    radial-gradient(circle at 0 0, rgba(108, 244, 223, 0.10), transparent 40%),
+    rgba(5, 14, 29, 0.62);
+  padding: clamp(20px, 1.45vw, 30px);
+}
+
+.aiways-rescue-project-card strong {
+  display: block;
+  color: #fff;
+  font-size: 34px;
+  line-height: 1.12;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.aiways-rescue-project-card span {
+  display: block;
+  margin-top: 10px;
+  color: var(--rf-sub);
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 720;
+}
+
+/* 3페이지 */
+.aiways-rescue-curriculum {
+  transform: translateY(18px) !important;
+}
+
+/* 5페이지 차시흐름 */
+.aiways-rescue-flow {
+  width: min(1540px, 92vw);
+  margin: 0 auto;
+  min-height: calc(100vh - 76px);
+  padding-top: clamp(86px, 8vh, 116px);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: clamp(24px, 2.6vh, 42px);
+}
+
+.aiways-rescue-flow h1 {
+  margin: 18px 0 0;
+  color: #fff;
+  font-size: 128px;
+  line-height: 0.94;
+  letter-spacing: 0;
+  font-weight: 950;
+}
+
+.aiways-rescue-flow p {
+  margin: 16px 0 0;
+  color: var(--rf-sub);
+  font-size: 21px;
+  line-height: 1.36;
+  font-weight: 780;
+}
+
+.aiways-rescue-flow-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(12px, 0.95vw, 20px);
+  align-content: start;
+}
+
+.aiways-rescue-flow-card {
+  min-height: clamp(206px, 16vw, 276px);
+  border-radius: 25px;
+  border: 1px solid rgba(123, 164, 226, 0.20);
+  background:
+    radial-gradient(circle at 0 0, rgba(108, 244, 223, 0.09), transparent 42%),
+    linear-gradient(180deg, rgba(13, 30, 54, 0.86), rgba(5, 14, 29, 0.76));
+  padding: clamp(18px, 1.2vw, 26px);
+  cursor: pointer;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.aiways-rescue-flow-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(108, 244, 223, 0.52);
+  box-shadow: 0 0 28px rgba(108, 244, 223, 0.13);
+}
+
+.aiways-rescue-flow-card small {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: #061829;
+  background: linear-gradient(90deg, var(--rf-cyan), var(--rf-blue));
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.aiways-rescue-flow-card strong {
+  display: block;
+  margin-top: 16px;
+  color: #fff;
+  font-size: 34px;
+  line-height: 1.08;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.aiways-rescue-flow-card span {
+  display: block;
+  margin-top: 11px;
+  color: var(--rf-sub);
+  font-size: 15px;
+  line-height: 1.38;
+  font-weight: 730;
+}
+
+.aiways-rescue-flow-card ul {
+  margin: 12px 0 0;
+  padding-left: 1.15em;
+  color: var(--rf-sub);
+  font-size: 14px;
+  line-height: 1.55;
+  font-weight: 760;
+}
+
+/* 6페이지 갤러리 */
+.aiways-rescue-gallery {
+  width: min(1540px, 92vw);
+  margin: 0 auto;
+  min-height: calc(100vh - 76px);
+  padding-top: clamp(78px, 7vh, 104px);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: clamp(20px, 2.4vh, 36px);
+}
+
+.aiways-rescue-gallery h1 {
+  margin: 16px 0 0;
+  color: #fff;
+  font-size: 124px;
+  line-height: 0.94;
+  letter-spacing: 0;
+  font-weight: 950;
+}
+
+.aiways-rescue-gallery p {
+  margin: 15px 0 0;
+  max-width: 940px;
+  color: var(--rf-sub);
+  font-size: 20px;
+  line-height: 1.42;
+  font-weight: 760;
+}
+
+.aiways-rescue-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(12px, 0.9vw, 18px);
+  align-content: start;
+}
+
+.aiways-rescue-gallery-card {
+  min-height: clamp(150px, 12vw, 210px);
+  border-radius: 24px;
+  border: 1px solid rgba(123, 164, 226, 0.18);
+  background:
+    radial-gradient(circle at 0 0, rgba(108, 244, 223, 0.10), transparent 42%),
+    linear-gradient(180deg, rgba(13, 30, 54, 0.86), rgba(5, 14, 29, 0.78));
+  padding: clamp(16px, 1.1vw, 24px);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.aiways-rescue-gallery-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(108, 244, 223, 0.54);
+  box-shadow: 0 0 28px rgba(108, 244, 223, 0.14);
+}
+
+.aiways-rescue-gallery-card small {
+  color: var(--rf-mint);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.aiways-rescue-gallery-card strong {
+  display: block;
+  margin-top: 10px;
+  color: #fff;
+  font-size: 32px;
+  line-height: 1.08;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.aiways-rescue-gallery-card span {
+  display: block;
+  margin-top: 9px;
+  color: var(--rf-sub);
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 720;
+}
+
+.aiways-rescue-gallery-detail {
+  display: none;
+  width: min(1540px, 92vw);
+  margin: 0 auto;
+  min-height: calc(100vh - 76px);
+  padding-top: clamp(78px, 7vh, 104px);
+  grid-template-rows: auto 1fr;
+  gap: 24px;
+}
+
+.aiways-rescue-gallery-detail.active {
+  display: grid;
+}
+
+.aiways-rescue-gallery-detail-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 18px;
+}
+
+.aiways-rescue-gallery-detail h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 94px;
+  line-height: 0.96;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.aiways-rescue-back {
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(108, 244, 223, 0.36);
+  background: linear-gradient(90deg, var(--rf-cyan), var(--rf-blue));
+  color: #061829;
+  font-size: 14px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.aiways-rescue-gallery-slots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(18px, 1.4vw, 28px);
+  min-height: 0;
+}
+
+.aiways-rescue-gallery-slot {
+  min-height: clamp(390px, 43vh, 560px);
+  border-radius: 30px;
+  border: 1px dashed rgba(108, 244, 223, 0.42);
+  background:
+    radial-gradient(circle at 50% 0, rgba(108, 244, 223, 0.10), transparent 46%),
+    rgba(5, 14, 29, 0.58);
+  display: grid;
+  place-items: center;
+  color: var(--rf-sub);
+  text-align: center;
+  font-weight: 850;
+}
+
+/* 7페이지 3초판단 크기 복구 */
+.aiways-rescue-sort-fix .aiways-mf-sort-wrap {
+  width: min(1540px, 94vw) !important;
+  grid-template-columns: 0.9fr 1.1fr !important;
+  gap: clamp(36px, 4vw, 88px) !important;
+  transform: scale(1.06);
+  transform-origin: center center;
+}
+
+.aiways-rescue-sort-fix .aiways-mf-sort-left h1 {
+  font-size: 132px !important;
+}
+
+.aiways-rescue-sort-fix .aiways-mf-app {
+  min-height: clamp(560px, 58vh, 720px) !important;
+}
+
+.aiways-rescue-sort-fix .aiways-mf-app-body {
+  min-height: clamp(440px, 48vh, 620px) !important;
+}
+
+/* 8페이지 자료실 */
+.aiways-rescue-playbook {
+  width: min(1540px, 92vw);
+  margin: 0 auto;
+  min-height: calc(100vh - 76px);
+  padding-top: clamp(82px, 8vh, 112px);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: clamp(24px, 2.6vh, 40px);
+}
+
+.aiways-rescue-playbook h1 {
+  margin: 18px 0 0;
+  color: #fff;
+  font-size: 126px;
+  line-height: 0.95;
+  letter-spacing: 0;
+  font-weight: 950;
+}
+
+.aiways-rescue-resource-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(14px, 1.1vw, 22px);
+  align-content: start;
+  transform: translateY(-12px);
+}
+
+.aiways-rescue-resource-btn {
+  min-height: clamp(140px, 10vw, 198px);
+  border-radius: 22px;
+  border: 1px solid rgba(123, 164, 226, 0.20);
+  background:
+    radial-gradient(circle at 50% 0, rgba(108, 244, 223, 0.10), transparent 44%),
+    rgba(13, 30, 54, 0.76);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  text-decoration: none;
+  font-size: 28px;
+  font-weight: 950;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.aiways-rescue-resource-btn:hover {
+  transform: translateY(-5px);
+  border-color: rgba(108, 244, 223, 0.54);
+  box-shadow: 0 0 28px rgba(108, 244, 223, 0.14);
+}
+
+.aiways-rescue-credit {
+  border-top: 1px solid rgba(123, 164, 226, 0.20);
+  padding-top: 18px;
+  color: var(--rf-sub);
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 15px;
+  font-weight: 750;
+}
+
+/* 모바일 기본 정리 */
+@media (max-width: 900px) {
+  .aiways-rescue-clean-nav {
+    max-width: calc(100vw - 94px);
+    overflow-x: auto;
+    gap: 14px !important;
+    right: 12px !important;
+    scrollbar-width: none;
+  }
+
+  .aiways-rescue-clean-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .aiways-rescue-project,
+  .aiways-rescue-flow,
+  .aiways-rescue-gallery,
+  .aiways-rescue-playbook {
+    width: min(92vw, 760px);
+    min-height: auto;
+    padding-top: 96px;
+  }
+
+  .aiways-rescue-project {
+    grid-template-columns: 1fr;
+  }
+
+  .aiways-rescue-flow-grid,
+  .aiways-rescue-gallery-grid,
+  .aiways-rescue-resource-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aiways-rescue-gallery-slots {
+    grid-template-columns: 1fr;
+  }
+
+  .aiways-rescue-sort-fix .aiways-mf-sort-wrap {
+    transform: none;
+    grid-template-columns: 1fr !important;
+  }
+
+  .aiways-rescue-credit {
+    flex-direction: column;
+  }
+}
+
+
+@media (max-width: 900px) {
+  .aiways-rescue-project h1,
+  .aiways-rescue-flow h1,
+  .aiways-rescue-gallery h1,
+  .aiways-rescue-playbook h1 {
+    font-size: 44px !important;
+  }
+
+  .aiways-rescue-gallery-detail h2 {
+    font-size: 38px !important;
+  }
+
+  .aiways-rescue-project p,
+  .aiways-rescue-flow p,
+  .aiways-rescue-gallery p {
+    font-size: 16px !important;
+  }
+
+  .aiways-rescue-project-card strong,
+  .aiways-rescue-flow-card strong,
+  .aiways-rescue-gallery-card strong,
+  .aiways-rescue-resource-btn {
+    font-size: 22px !important;
+  }
+}

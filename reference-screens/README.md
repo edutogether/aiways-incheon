@@ -1,1 +1,0 @@
-AIWays reference screenshots

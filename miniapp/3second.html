@@ -338,6 +338,30 @@
 
     <!-- 자바스크립트 로직 -->
     <script>
+        const AIWAYS_SYNC_CONFIG = {
+            appsScriptUrl: ""
+        };
+
+        function sendDecisionLog(payload) {
+            if (!AIWAYS_SYNC_CONFIG.appsScriptUrl) return;
+
+            const safePayload = {
+                school: "AIWays초",
+                grade: "5",
+                className: "5-1",
+                imageName: "",
+                ...payload,
+                image_saved: false
+            };
+
+            fetch(AIWAYS_SYNC_CONFIG.appsScriptUrl, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(safePayload)
+            }).catch(function() {});
+        }
+
         // -----------------------------------------
         // 1. 공용 데이터베이스 (인천광역시 교육청 및 환경부 지침 표준화)
         // -----------------------------------------
@@ -719,6 +743,18 @@
                 localStorage.setItem('ai_ways_incheon_stats_v1', JSON.stringify(practiceStats));
             } catch(e) {}
 
+            sendDecisionLog({
+                itemName: item.name,
+                predictedLabel: item.category,
+                finalLabel: item.category,
+                confidence: "",
+                decision: "recycle",
+                source: "miniapp",
+                input_type: "search",
+                hold_flag: false,
+                note: `CO2 ${item.carbonSaved}g 절감`
+            });
+
             updateStatsUI();
             showVisualAlert(`🌳 지구를 지키는 올바른 실천! CO2 ${item.carbonSaved}g이 절감되었습니다.`, "emerald");
         }
@@ -799,6 +835,18 @@
             try {
                 localStorage.setItem('ai_ways_incheon_hold_v1', JSON.stringify(holdBoxList));
             } catch(e) {}
+
+            sendDecisionLog({
+                itemName: itemName,
+                predictedLabel: "판단 보류",
+                finalLabel: "판단 보류",
+                confidence: "",
+                decision: "hold",
+                source: "miniapp",
+                input_type: "search",
+                hold_flag: true,
+                note: "학교 판단 보류함 등록"
+            });
 
             updateHoldUI();
             showVisualAlert(`🟨 "${itemName}" 이 학교 회의 예정 리스트에 탑재되었습니다.`, "amber");

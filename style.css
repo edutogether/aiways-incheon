@@ -2952,6 +2952,123 @@ li {
   background: linear-gradient(90deg, rgba(94, 247, 205, 0.15), rgba(100, 169, 255, 0.12), rgba(173, 140, 255, 0.1));
 }
 
+.rank-note {
+  cursor: pointer;
+}
+
+.rank-note:focus-visible {
+  outline: 2px solid rgba(94, 247, 205, 0.76);
+  outline-offset: 4px;
+}
+
+body.ranking-modal-open {
+  overflow: hidden;
+}
+
+.ranking-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 4vw, 56px);
+  background: rgba(2, 8, 20, 0.72);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+  backdrop-filter: blur(18px);
+}
+
+.ranking-modal.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ranking-dialog {
+  position: relative;
+  width: min(1020px, 94vw);
+  max-height: min(760px, 86vh);
+  overflow: hidden;
+  padding: clamp(24px, 3vw, 42px);
+  border: 1px solid rgba(94, 247, 205, 0.24);
+  border-radius: 28px;
+  background: linear-gradient(150deg, rgba(12, 28, 56, 0.94), rgba(3, 10, 24, 0.92));
+  box-shadow: 0 34px 100px rgba(0, 0, 0, 0.48), 0 0 52px rgba(94, 247, 205, 0.12);
+  transform: translateY(18px) scale(0.985);
+  transition: transform 160ms ease;
+}
+
+.ranking-modal.is-open .ranking-dialog {
+  transform: translateY(0) scale(1);
+}
+
+.ranking-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 1.35rem;
+  cursor: pointer;
+}
+
+.ranking-dialog h2 {
+  margin: 6px 48px 8px 0;
+  font-size: clamp(1.9rem, 3vw, 3rem);
+}
+
+.ranking-help {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.ranking-table-wrap {
+  overflow-x: auto;
+  max-height: 52vh;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+}
+
+.ranking-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.ranking-table th,
+.ranking-table td {
+  padding: 13px 14px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.075);
+}
+
+.ranking-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  color: rgba(189, 219, 238, 0.82);
+  background: rgba(5, 16, 34, 0.96);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ranking-table tr.is-current {
+  background: linear-gradient(90deg, rgba(94, 247, 205, 0.18), rgba(100, 169, 255, 0.1));
+  box-shadow: inset 3px 0 0 rgba(94, 247, 205, 0.72);
+}
+
+.ranking-table tr:last-child td {
+  border-bottom: 0;
+}
+
 .chart-wrap .combo-chart {
   height: 202px;
   min-height: 202px;

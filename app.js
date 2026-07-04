@@ -1,7 +1,14 @@
 (() => {
   "use strict";
 
-  const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxU_zhG_U6pIz_hnEkzxJFX-19nyDPdzUe-PwmNzIORxJ5x8t7HoSuC4d8QwchoqHgcZg/exec";
+  const DATA_CONFIG = {
+    appsScriptUrl: "",
+    seedUrl: "./base-data-seed.tsv",
+    currentSchool: "AIWays초",
+    currentGrade: "5학년",
+    currentClassName: "5학년 1반"
+  };
+
   const STORAGE_RECORDS = "aiways_clean_records";
   const STORAGE_PENDING = "aiways_clean_pending_records";
   const STORAGE_PRIVACY = "aiways_clean_privacy_id";
@@ -17,24 +24,30 @@
   };
 
   const BASE_CLASS_DATA = {
-    "3학년 1반": { today: 94, hold: 6, converted: 18, rank: "학년 내 2위 · 학교 내 8위" },
-    "3학년 2반": { today: 88, hold: 5, converted: 17, rank: "학년 내 3위 · 학교 내 9위" },
-    "3학년 3반": { today: 102, hold: 7, converted: 21, rank: "학년 내 1위 · 학교 내 7위" },
-    "4학년 1반": { today: 97, hold: 5, converted: 19, rank: "학년 내 3위 · 학교 내 10위" },
-    "4학년 2반": { today: 108, hold: 6, converted: 22, rank: "학년 내 2위 · 학교 내 6위" },
-    "4학년 3반": { today: 91, hold: 7, converted: 16, rank: "학년 내 4위 · 학교 내 12위" },
-    "4학년 4반": { today: 116, hold: 5, converted: 23, rank: "학년 내 1위 · 학교 내 5위" },
-    "5학년 1반": { today: 24, hold: 3, converted: 20, rank: "3위 · 전체 14개 학급 중" },
-    "5학년 2반": { today: 119, hold: 8, converted: 21, rank: "학년 내 3위 · 학교 내 4위" },
-    "5학년 3반": { today: 126, hold: 6, converted: 25, rank: "학년 내 2위 · 학교 내 3위" },
-    "5학년 4반": { today: 113, hold: 8, converted: 20, rank: "학년 내 4위 · 학교 내 7위" },
-    "6학년 1반": { today: 121, hold: 6, converted: 23, rank: "학년 내 2위 · 학교 내 5위" },
-    "6학년 2반": { today: 117, hold: 5, converted: 22, rank: "학년 내 3위 · 학교 내 6위" },
-    "6학년 3반": { today: 132, hold: 7, converted: 27, rank: "학년 내 1위 · 학교 내 1위" }
+    "3학년 1반": { today: 94, hold: 6, converted: 18, correct: 78, recycle: 43, reuse: 15, contamination: 7 },
+    "3학년 2반": { today: 88, hold: 5, converted: 17, correct: 73, recycle: 39, reuse: 14, contamination: 6 },
+    "3학년 3반": { today: 102, hold: 7, converted: 21, correct: 84, recycle: 48, reuse: 16, contamination: 8 },
+    "4학년 1반": { today: 97, hold: 5, converted: 19, correct: 81, recycle: 45, reuse: 15, contamination: 7 },
+    "4학년 2반": { today: 108, hold: 6, converted: 22, correct: 91, recycle: 52, reuse: 18, contamination: 7 },
+    "4학년 3반": { today: 91, hold: 7, converted: 16, correct: 75, recycle: 40, reuse: 13, contamination: 9 },
+    "4학년 4반": { today: 116, hold: 5, converted: 23, correct: 99, recycle: 56, reuse: 19, contamination: 6 },
+    "5학년 1반": { today: 128, hold: 18, converted: 63, correct: 106, recycle: 63, reuse: 22, contamination: 7 },
+    "5학년 2반": { today: 301, hold: 24, converted: 148, correct: 251, recycle: 148, reuse: 51, contamination: 19 },
+    "5학년 3반": { today: 284, hold: 29, converted: 137, correct: 235, recycle: 137, reuse: 46, contamination: 20 },
+    "5학년 4반": { today: 267, hold: 34, converted: 129, correct: 218, recycle: 129, reuse: 41, contamination: 23 },
+    "6학년 1반": { today: 346, hold: 26, converted: 169, correct: 292, recycle: 169, reuse: 64, contamination: 15 },
+    "6학년 2반": { today: 332, hold: 28, converted: 160, correct: 276, recycle: 160, reuse: 61, contamination: 17 },
+    "6학년 3반": { today: 318, hold: 27, converted: 153, correct: 262, recycle: 153, reuse: 58, contamination: 18 }
   };
 
-  const fallbackRecords = [
-    { input_type: "base", mapped_item: "school-baseline", suggested_category: "base", final_decision: "base", hold_flag: false, image_saved: false }
+  const BASE_LANDFILL_DAYS = [
+    { date: "2026-07-01", weekday: "월", landfillTons: 19100 },
+    { date: "2026-07-02", weekday: "화", landfillTons: 18760 },
+    { date: "2026-07-03", weekday: "수", landfillTons: 18940 },
+    { date: "2026-07-04", weekday: "목", landfillTons: 18300 },
+    { date: "2026-07-05", weekday: "금", landfillTons: 18420 },
+    { date: "2026-07-06", weekday: "토", landfillTons: 17880 },
+    { date: "2026-07-07", weekday: "일", landfillTons: 17540 }
   ];
 
   const quickItems = {
@@ -85,6 +98,9 @@
   let pendingDecision = null;
   let previewUrl = "";
   let countUpNextDashboard = false;
+  let seedRecords = [];
+  let remoteRecords = [];
+  let latestRanking = [];
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -167,7 +183,41 @@
   }
 
   function classifyRecordType(record) {
-    return cleanText(record.input_type).toLowerCase();
+    const type = cleanText(record.input_type).toLowerCase();
+    if (type) return type;
+    if (record.totalScans !== undefined || record.landfillTons !== undefined) return "base";
+    return "";
+  }
+
+  function normalizeGrade(value) {
+    const text = cleanText(value);
+    const match = text.match(/([1-6])\s*학?년?/);
+    return match ? `${match[1]}학년` : DATA_CONFIG.currentGrade;
+  }
+
+  function normalizeClassOnly(value) {
+    const text = cleanText(value);
+    const dash = text.match(/[1-6]\s*[-반]\s*([1-9])\s*반?/);
+    if (dash) return `${dash[1]}반`;
+    const match = text.match(/([1-9])\s*반/);
+    return match ? `${match[1]}반` : "1반";
+  }
+
+  function normalizeFullClassName(grade, className) {
+    const classText = cleanText(className);
+    const full = classText.match(/([1-6])\s*학년\s*([1-9])\s*반/);
+    if (full) return `${full[1]}학년 ${full[2]}반`;
+
+    const compact = classText.match(/([1-6])\s*[-반]\s*([1-9])\s*반?/);
+    if (compact) return `${compact[1]}학년 ${compact[2]}반`;
+
+    return `${normalizeGrade(grade)} ${normalizeClassOnly(classText)}`;
+  }
+
+  function toNumber(value, fallback = 0) {
+    if (value === undefined || value === null || cleanText(value) === "") return fallback;
+    const number = Number(String(value).replace(/,/g, ""));
+    return Number.isFinite(number) ? number : fallback;
   }
 
   function normalizeRecords(records) {
@@ -175,54 +225,90 @@
       .filter(record => record && typeof record === "object")
       .map(record => ({
         timestamp: record.timestamp || record.created_at || "",
-        local_time: record.local_time || "",
-        grade: record.grade || "",
-        class_name: record.class_name || "",
+        local_time: record.local_time || record.date || "",
+        date: record.date || "",
+        weekday: record.weekday || "",
+        school: record.school || DATA_CONFIG.currentSchool,
+        grade: record.grade ? normalizeGrade(record.grade) : "",
+        class_name: (record.class_name || record.className) ? normalizeClassOnly(record.class_name || record.className) : "",
         input_type: classifyRecordType(record),
-        final_decision: record.final_decision || record.action || "",
+        final_decision: record.final_decision || record.finalLabel || record.action || "",
         hold_flag: String(record.hold_flag || "").toLowerCase() === "true" || record.hold_flag === true,
-        mapped_item: record.mapped_item || record.item || "",
-        suggested_category: record.suggested_category || record.category || "",
-        image_saved: false
+        mapped_item: record.mapped_item || record.itemName || record.item || "",
+        suggested_category: record.suggested_category || record.predictedLabel || record.category || "",
+        ai_raw_label: record.ai_raw_label || record.predictedLabel || "",
+        ai_confidence: record.ai_confidence ?? record.confidence ?? "",
+        image_saved: false,
+        totalScans: toNumber(record.totalScans, NaN),
+        correctScans: toNumber(record.correctScans, NaN),
+        holdCount: toNumber(record.holdCount, NaN),
+        recycleCount: toNumber(record.recycleCount, NaN),
+        reuseCount: toNumber(record.reuseCount, NaN),
+        contaminationCount: toNumber(record.contaminationCount, NaN),
+        landfillTons: toNumber(record.landfillTons, NaN)
       }));
   }
 
   function selectedClassName() {
     const select = $("#classSelect");
-    return select ? select.value : "5학년 1반";
+    return select ? select.value : DATA_CONFIG.currentClassName;
   }
 
   function classParts(className) {
-    const match = String(className || "5학년 1반").match(/(\d학년)\s*(\d반)/);
+    const match = String(className || DATA_CONFIG.currentClassName).match(/(\d학년)\s*(\d반)/);
     return {
-      grade: match ? match[1] : "5학년",
+      grade: match ? match[1] : DATA_CONFIG.currentGrade,
       className: match ? match[2] : "1반"
     };
   }
 
-  function formatClassRanking(className, classes) {
-    const { grade } = classParts(className);
-    const classEntries = Object.entries(classes)
-      .filter(([, data]) => data && Number.isFinite(Number(data.today)))
-      .map(([name, data]) => ({ name, today: Number(data.today) }));
-    const gradeEntries = classEntries
-      .filter(item => item.name.startsWith(grade))
-      .sort((a, b) => b.today - a.today || a.name.localeCompare(b.name, "ko"));
-    const allEntries = [...classEntries].sort((a, b) => b.today - a.today || a.name.localeCompare(b.name, "ko"));
+  function parseTsv(text) {
+    const lines = String(text || "").replace(/^\uFEFF/, "").split(/\r?\n/).filter(Boolean);
+    const headers = (lines.shift() || "").split("\t").map(header => header.trim());
+    if (!headers.length) return [];
 
-    const gradeRank = Math.max(1, gradeEntries.findIndex(item => item.name === className) + 1);
-    const totalRank = Math.max(1, allEntries.findIndex(item => item.name === className) + 1);
-    const allTotal = Math.max(allEntries.length, 1);
+    return lines.map(line => {
+      const cells = line.split("\t");
+      return headers.reduce((row, header, index) => {
+        row[header] = cells[index] === undefined ? "" : cells[index];
+        return row;
+      }, {});
+    });
+  }
 
-    return `RANKING 🥇 ${grade} 중 ${gradeRank}위 · 🥉 전체 ${allTotal}개 학급 중 ${totalRank}위`;
+  async function loadSeedData() {
+    try {
+      const response = await fetch(DATA_CONFIG.seedUrl, { cache: "no-store" });
+      if (!response.ok) throw new Error("seed response " + response.status);
+      const text = await response.text();
+      seedRecords = normalizeRecords(parseTsv(text));
+      return seedRecords;
+    } catch {
+      seedRecords = [];
+      return [];
+    }
   }
 
   function localRecords() {
     return normalizeRecords(readJson(STORAGE_RECORDS, []));
   }
 
+  function baseRecordsForDashboard() {
+    const remoteBase = remoteRecords.filter(record => record.input_type === "base");
+    if (remoteBase.length) return remoteBase;
+    if (seedRecords.length) return seedRecords.filter(record => record.input_type === "base");
+    return [];
+  }
+
+  function actualRecordsForDashboard() {
+    return normalizeRecords([
+      ...remoteRecords.filter(record => record.input_type === "image" || record.input_type === "search"),
+      ...localRecords()
+    ]);
+  }
+
   function allStoredRecords(extra = []) {
-    return normalizeRecords([...fallbackRecords, ...localRecords(), ...extra]);
+    return normalizeRecords([...baseRecordsForDashboard(), ...actualRecordsForDashboard(), ...extra]);
   }
 
   function splitRecords(records) {
@@ -233,41 +319,310 @@
     };
   }
 
-  function baseDataFromRecords(baseRecords) {
-    const dashboard = { ...BASE_DASHBOARD };
-    const classes = Object.fromEntries(
+  function cloneBaseClasses() {
+    return Object.fromEntries(
       Object.entries(BASE_CLASS_DATA).map(([name, data]) => [name, { ...data }])
     );
+  }
+
+  function setClassMetric(classes, className, field, value) {
+    if (!className || !Number.isFinite(value)) return;
+    if (!classes[className]) return;
+    classes[className] = classes[className] || { today: 0, hold: 0, converted: 0, correct: 0, recycle: 0, reuse: 0, contamination: 0 };
+    classes[className][field] = value;
+  }
+
+  function baseDataFromRecords(baseRecords) {
+    const dashboard = { ...BASE_DASHBOARD };
+    const classes = cloneBaseClasses();
+    const landfillDays = [];
 
     baseRecords.forEach(record => {
       const key = cleanText(record.mapped_item || record.ai_raw_label);
       const valueText = cleanText(record.final_decision || record.suggested_category);
-      const value = Number(valueText);
+      const value = toNumber(valueText, NaN);
 
       if (Object.prototype.hasOwnProperty.call(dashboard, key) && Number.isFinite(value)) {
         dashboard[key] = value;
         return;
       }
 
-      const classMatch = key.match(/^class:(.+):(today|hold|converted|rank)$/);
-      if (!classMatch) return;
+      const classFromColumns = record.class_name
+        ? normalizeFullClassName(record.grade || DATA_CONFIG.currentGrade, record.class_name)
+        : "";
+      if (classFromColumns && Number.isFinite(record.totalScans)) {
+        setClassMetric(classes, classFromColumns, "today", record.totalScans);
+        setClassMetric(classes, classFromColumns, "correct", record.correctScans);
+        setClassMetric(classes, classFromColumns, "hold", record.holdCount);
+        setClassMetric(classes, classFromColumns, "converted", record.recycleCount);
+        setClassMetric(classes, classFromColumns, "recycle", record.recycleCount);
+        setClassMetric(classes, classFromColumns, "reuse", record.reuseCount);
+        setClassMetric(classes, classFromColumns, "contamination", record.contaminationCount);
+      }
+
+      if (Number.isFinite(record.landfillTons)) {
+        landfillDays.push({
+          date: record.date || record.timestamp || "",
+          weekday: record.weekday || "",
+          landfillTons: record.landfillTons
+        });
+      }
+
+      const landfillMatch = key.match(/^landfill:(.+)$/);
+      if (landfillMatch && Number.isFinite(value)) {
+        landfillDays.push({ date: "", weekday: landfillMatch[1], landfillTons: value });
+        return;
+      }
+
+      const classMatch = key.match(/^class:(.+):(today|hold|converted|correct|recycle|reuse|contamination)$/);
+      if (!classMatch || !Number.isFinite(value)) return;
 
       const [, className, field] = classMatch;
-      classes[className] = classes[className] || { today: 0, hold: 0, converted: 0, rank: "" };
-      classes[className][field] = field === "rank" ? valueText : Number.isFinite(value) ? value : classes[className][field];
+      setClassMetric(classes, className, field, value);
     });
 
-    return { dashboard, classes };
+    return { dashboard, classes, landfillDays };
+  }
+
+  function mergeActualIntoClasses(classes, actualRecords) {
+    const merged = Object.fromEntries(Object.entries(classes).map(([name, data]) => [name, { ...data }]));
+
+    actualRecords.forEach(record => {
+      const className = record.class_name ? normalizeFullClassName(record.grade || DATA_CONFIG.currentGrade, record.class_name) : selectedClassName();
+      const profile = merged[className] || { today: 0, hold: 0, converted: 0, correct: 0, recycle: 0, reuse: 0, contamination: 0 };
+      const decision = cleanText(record.final_decision || record.suggested_category);
+      const isHold = record.hold_flag || decision.includes("보류");
+
+      profile.today += 1;
+      if (isHold) profile.hold += 1;
+      else {
+        profile.correct += 1;
+        profile.converted += 1;
+      }
+
+      if (decision.includes("재사용")) profile.reuse += 1;
+      else if (decision.includes("일반") || decision.includes("오염")) profile.contamination += 1;
+      else if (decision) profile.recycle += 1;
+
+      merged[className] = profile;
+    });
+
+    return merged;
+  }
+
+  function calculateClassScore(row) {
+    return Math.round((
+      toNumber(row.correct, row.converted || 0) * 2 +
+      toNumber(row.recycle, 0) +
+      toNumber(row.reuse, 0) * 2 +
+      toNumber(row.hold, 0) * 0.5 -
+      toNumber(row.contamination, 0) * 1.5
+    ) * 10) / 10;
+  }
+
+  function buildClassRanking(classes) {
+    return Object.entries(classes)
+      .map(([name, row]) => {
+        const { grade, className } = classParts(name);
+        return {
+          name,
+          grade,
+          classOnly: className,
+          score: calculateClassScore(row),
+          scans: toNumber(row.today, 0),
+          correct: toNumber(row.correct, row.converted || 0),
+          hold: toNumber(row.hold, 0),
+          contamination: toNumber(row.contamination, 0)
+        };
+      })
+      .filter(item => item.scans > 0)
+      .sort((a, b) => b.score - a.score || b.scans - a.scans || a.name.localeCompare(b.name, "ko"))
+      .map((item, index) => ({ ...item, rank: index + 1 }));
+  }
+
+  function getCurrentClassRank(ranking, currentClassName) {
+    const { grade } = classParts(currentClassName);
+    const totalRank = ranking.find(item => item.name === currentClassName) || ranking[0];
+    const gradeEntries = ranking.filter(item => item.grade === grade);
+    const gradeRank = Math.max(1, gradeEntries.findIndex(item => item.name === currentClassName) + 1);
+
+    return {
+      grade,
+      gradeRank,
+      gradeTotal: Math.max(gradeEntries.length, 1),
+      totalRank: totalRank ? totalRank.rank : 1,
+      total: Math.max(ranking.length, 1)
+    };
+  }
+
+  function formatClassRanking(className, ranking) {
+    const rank = getCurrentClassRank(ranking, className);
+    return `RANKING 🥇 ${rank.grade} 중 ${rank.gradeRank}위 · 🏫 전체 ${rank.total}개 학급 중 ${rank.totalRank}위`;
+  }
+
+  function landfillDaysForChart(days) {
+    const byDate = new Map();
+    [...BASE_LANDFILL_DAYS, ...days].forEach(item => {
+      const key = item.date || item.weekday;
+      if (!key || !Number.isFinite(item.landfillTons)) return;
+      byDate.set(key, {
+        date: item.date || key,
+        weekday: item.weekday || key,
+        landfillTons: item.landfillTons
+      });
+    });
+    return Array.from(byDate.values()).slice(-7);
+  }
+
+  function yForChart(value, min, max, top, baseline) {
+    if (max <= min) return baseline;
+    return top + ((max - value) / (max - min)) * (baseline - top);
+  }
+
+  function renderLandfillChart(days) {
+    const svg = $(".combo-chart");
+    if (!svg) return;
+
+    const chartDays = landfillDaysForChart(days);
+    const values = chartDays.map(day => day.landfillTons);
+    const max = Math.max(...values);
+    const min = Math.min(...values);
+    const top = 26;
+    const baseline = 166;
+    const xs = [61, 110, 159, 208, 257, 306, 355];
+    const spread = Math.max(1200, max - min);
+    const chartMin = min - spread * 0.12;
+    const chartMax = max + spread * 0.12;
+    const points = chartDays.map((day, index) => ({
+      ...day,
+      x: xs[index] || xs[xs.length - 1],
+      y: yForChart(day.landfillTons, chartMin, chartMax, top, baseline)
+    }));
+
+    const linePath = points.map((point, index) => `${index ? "L" : "M"}${point.x} ${Math.round(point.y)}`).join(" ");
+    const first = points[0];
+    const last = points[points.length - 1];
+    const areaPath = first && last ? `${linePath} L${last.x} ${baseline} L${first.x} ${baseline} Z` : "";
+    const area = $(".chart-area", svg);
+    const line = $(".chart-line", svg);
+    const bars = $$(".chart-bars rect", svg);
+    const labels = $$(".chart-axis .x-label", svg);
+
+    if (area && areaPath) {
+      area.setAttribute("d", areaPath);
+      area.setAttribute("opacity", "0.16");
+    }
+    if (line && linePath) line.setAttribute("d", linePath);
+
+    points.forEach((point, index) => {
+      const bar = bars[index];
+      if (bar) {
+        const barY = Math.round(point.y);
+        bar.setAttribute("y", String(barY));
+        bar.setAttribute("height", String(Math.max(16, Math.round(baseline - point.y))));
+      }
+
+      const label = labels[index];
+      if (label) label.textContent = point.weekday || ["월", "화", "수", "목", "금", "토", "일"][index];
+    });
+
+    const totalNode = $(".landfill-metrics strong");
+    if (totalNode && last) totalNode.textContent = Math.round(last.landfillTons).toLocaleString("ko-KR") + "t";
+  }
+
+  function escapeHtml(value) {
+    return cleanText(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function ensureRankingModal() {
+    let modal = $("#rankingModal");
+    if (modal) return modal;
+
+    modal = document.createElement("div");
+    modal.id = "rankingModal";
+    modal.className = "ranking-modal";
+    modal.hidden = true;
+    modal.innerHTML = `
+      <section class="ranking-dialog" role="dialog" aria-modal="true" aria-labelledby="rankingModalTitle">
+        <button class="ranking-close" type="button" aria-label="랭킹 닫기">×</button>
+        <p class="eyebrow">Class Resource Ranking</p>
+        <h2 id="rankingModalTitle">우리 학급 자원순환 랭킹</h2>
+        <p class="ranking-help">기록 데이터를 기준으로 실천 점수를 계산합니다.</p>
+        <div class="ranking-table-wrap">
+          <table class="ranking-table">
+            <thead>
+              <tr>
+                <th>순위</th>
+                <th>학년</th>
+                <th>학급</th>
+                <th>실천점수</th>
+                <th>판독</th>
+                <th>정확</th>
+                <th>보류</th>
+                <th>오염</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    `;
+    document.body.appendChild(modal);
+    return modal;
+  }
+
+  function renderRankingModalRows(modal) {
+    const tbody = $(".ranking-table tbody", modal);
+    if (!tbody) return;
+    const current = selectedClassName();
+    const rows = latestRanking.length ? latestRanking : buildClassRanking(cloneBaseClasses());
+
+    tbody.innerHTML = rows.map(item => `
+      <tr class="${item.name === current ? "is-current" : ""}">
+        <td>${item.rank}</td>
+        <td>${escapeHtml(item.grade)}</td>
+        <td>${escapeHtml(item.classOnly)}</td>
+        <td>${item.score.toLocaleString("ko-KR")}</td>
+        <td>${item.scans.toLocaleString("ko-KR")}</td>
+        <td>${item.correct.toLocaleString("ko-KR")}</td>
+        <td>${item.hold.toLocaleString("ko-KR")}</td>
+        <td>${item.contamination.toLocaleString("ko-KR")}</td>
+      </tr>
+    `).join("");
+  }
+
+  function openRankingModal() {
+    const modal = ensureRankingModal();
+    renderRankingModalRows(modal);
+    modal.hidden = false;
+    document.body.classList.add("ranking-modal-open");
+    requestAnimationFrame(() => modal.classList.add("is-open"));
+    $(".ranking-close", modal)?.focus();
+  }
+
+  function closeRankingModal() {
+    const modal = $("#rankingModal");
+    if (!modal) return;
+    modal.classList.remove("is-open");
+    document.body.classList.remove("ranking-modal-open");
+    window.setTimeout(() => {
+      modal.hidden = true;
+    }, 160);
   }
 
   function applyDashboard(records) {
     const { base, actual } = splitRecords(records.length ? records : allStoredRecords());
-    const { dashboard, classes } = baseDataFromRecords(base);
+    const { dashboard, classes, landfillDays } = baseDataFromRecords(base);
     const baseImage = base.filter(record => record.input_type === "base");
     const imageRecords = actual.filter(record => record.input_type === "image");
     const holdRecords = actual.filter(record => record.hold_flag || cleanText(record.final_decision).includes("보류"));
     const className = selectedClassName();
-    const profile = classes[className] || classes["5학년 1반"];
+    const mergedClasses = mergeActualIntoClasses(classes, actual);
+    const profile = mergedClasses[className] || mergedClasses[DATA_CONFIG.currentClassName];
     const classActual = actual.filter(record => {
       const label = [record.grade, record.class_name].filter(Boolean).join(" ");
       return !label || label === className;
@@ -294,13 +649,28 @@
       document.body.dataset.hasSheetBase = "true";
     }
 
+    latestRanking = buildClassRanking(mergedClasses);
+
     const rankNote = $(".rank-note");
-    if (rankNote) rankNote.textContent = formatClassRanking(className, classes);
+    if (rankNote) {
+      rankNote.textContent = formatClassRanking(className, latestRanking);
+      rankNote.setAttribute("role", "button");
+      rankNote.setAttribute("tabindex", "0");
+      rankNote.setAttribute("aria-label", "우리 학급 자원순환 랭킹 상세 보기");
+    }
+    renderLandfillChart(landfillDays);
     renderHoldList(holdRecords);
   }
 
   function loadRemoteRecords() {
     return new Promise(resolve => {
+      if (!DATA_CONFIG.appsScriptUrl) {
+        remoteRecords = [];
+        applyDashboard(allStoredRecords());
+        resolve([]);
+        return;
+      }
+
       const callbackName = "aiwaysCleanCallback_" + Date.now().toString(36);
       const script = document.createElement("script");
       let settled = false;
@@ -308,9 +678,9 @@
       window[callbackName] = data => {
         if (settled) return;
         settled = true;
-        const records = Array.isArray(data) ? data : data.records || data.data || [];
+        const records = Array.isArray(data) ? data : data.rows || data.records || data.data || [];
         const normalized = normalizeRecords(records);
-        writeJson(STORAGE_RECORDS, normalized);
+        remoteRecords = normalized;
         applyDashboard(allStoredRecords());
         cleanup();
         resolve(normalized);
@@ -324,22 +694,31 @@
       script.onerror = () => {
         if (settled) return;
         settled = true;
+        remoteRecords = [];
         applyDashboard(allStoredRecords());
         cleanup();
         resolve([]);
       };
 
-      script.src = SHEETS_URL + "?action=list&callback=" + encodeURIComponent(callbackName);
+      script.src = DATA_CONFIG.appsScriptUrl + "?action=list&callback=" + encodeURIComponent(callbackName);
       document.body.appendChild(script);
 
       window.setTimeout(() => {
         if (settled) return;
         settled = true;
+        remoteRecords = [];
         applyDashboard(allStoredRecords());
         cleanup();
         resolve([]);
       }, 6500);
     });
+  }
+
+  async function loadDashboardRows() {
+    await loadSeedData();
+    applyDashboard(allStoredRecords());
+    await loadRemoteRecords();
+    return allStoredRecords();
   }
 
   async function appendRecord(record) {
@@ -372,13 +751,16 @@
     applyDashboard(allStoredRecords());
 
     try {
-      await fetch(SHEETS_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(safeRecord)
-      });
-      return true;
+      if (DATA_CONFIG.appsScriptUrl) {
+        await fetch(DATA_CONFIG.appsScriptUrl, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(safeRecord)
+        });
+        return true;
+      }
+      return "local";
     } catch {
       const pending = readJson(STORAGE_PENDING, []);
       pending.push(safeRecord);
@@ -827,13 +1209,35 @@
       refresh.setAttribute("aria-busy", "true");
       countUpNextDashboard = true;
       document.body.classList.add("is-refreshing-dashboard");
-      await loadRemoteRecords();
+      await loadDashboardRows();
       window.setTimeout(() => {
         countUpNextDashboard = false;
         document.body.classList.remove("is-refreshing-dashboard");
       }, 680);
       refresh.classList.remove("is-loading");
       refresh.removeAttribute("aria-busy");
+    });
+  }
+
+  function initRankingModal() {
+    const note = $(".rank-note");
+    if (!note) return;
+
+    note.addEventListener("click", openRankingModal);
+    note.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      openRankingModal();
+    });
+
+    document.addEventListener("click", event => {
+      const modal = $("#rankingModal");
+      if (!modal || modal.hidden) return;
+      if (event.target === modal || event.target.closest(".ranking-close")) closeRankingModal();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeRankingModal();
     });
   }
 
@@ -903,7 +1307,7 @@
       pendingDecision = null;
       setDecisionConfirm(false);
       $$("[data-final-category]").forEach(item => item.classList.remove("is-selected"));
-      setSaveState(saved ? "Google Sheets로 전송했습니다." : "네트워크 문제로 localStorage에 임시 저장했습니다.");
+      setSaveState(saved === true ? "Google Sheets로 전송했습니다." : saved === "local" ? "localStorage에 판단 기록을 저장했습니다." : "네트워크 문제로 localStorage에 임시 저장했습니다.");
     });
 
     $("#cancelDecision")?.addEventListener("click", () => {
@@ -940,9 +1344,10 @@
     initSelectors();
     initUpload();
     initRefreshControls();
+    initRankingModal();
     initLandfillSourceLink();
     applyDashboard(allStoredRecords());
-    loadRemoteRecords();
+    loadDashboardRows();
   }
 
   if (document.readyState === "loading") {

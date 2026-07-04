@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Ways Incheon Dashboard</title>
+    <meta
+      name="description"
+      content="AI와 데이터로 실천하는 학교 자원순환 UX 개선 프로젝트 대시보드"
+    />
+    <link rel="icon" type="image/png" href="./aiways-logo.png" />
+    <link rel="stylesheet" href="./style.css?v=aiw-hero-final" />
+    <link rel="stylesheet" href="./rescue.css?v=1" />
+    <link rel="stylesheet" href="./final-tune.css?v=1" />
+    <link rel="stylesheet" href="./page-polish.css?v=2" />
+    <link rel="stylesheet" href="./awx-hotfix.css?v=1" />
+    <link rel="stylesheet" href="./aiways-operational.css?v=20260703-final" />
+    <link rel="stylesheet" href="./aiways-final-tune.css?v=20260703-quiz-landfill-tune" />
+    <link rel="stylesheet" href="./aiways-scroll-curriculum-tune.css?v=20260703-scroll-curriculum" />
+    <link rel="stylesheet" href="./aiways-data-lock-fix.css?v=20260703-final-lock" />
+    <link rel="stylesheet" href="./aiways-curriculum-units-ebook.css?v=20260703-curriculum-units" />
+    <link rel="stylesheet" href="./aiways-outputs-app-flow.css?v=20260703-final-output-app" />
+    <link rel="stylesheet" href="./aiways-final-ui-tune.css?v=20260703-final-ui-tune" />
+    <link rel="stylesheet" href="./aiways-restore-hah-flow.css?v=20260703-restore-hah-flow" />
+    <link rel="stylesheet" href="./aiways-teachable-classroom-bridge.css?v=20260703-classroom-tm" />
+    <link rel="stylesheet" href="./aiways-ai-draft-judgment.css?v=20260703-ai-draft" />
+    <link rel="stylesheet" href="./aiways-operational-dashboard-app-sync.css?v=20260703-operational-sync" />
+    <link rel="stylesheet" href="./aiways-output-sorting-page-fit.css?v=20260703-output-fit" />
+    <link rel="stylesheet" href="./aiways-fast-light-flow-textbook-fix.css?v=20260703-fast-light-flow" />
+    <link rel="stylesheet" href="./aiways-mobile-slide-deck-fix.css?v=20260703-mobile-slide-deck" />
+    <link rel="stylesheet" href="./aiways-final-polish-layout-fix.css?v=20260703-final-polish-stable" />
+    <script defer src="./script.js?v=aiw-hero-final"></script>
+    <script defer src="./scroll-tune.js?v=1"></script>
+    <script defer src="./page-polish.js?v=2"></script>
+    <script defer src="./awx-hotfix.js?v=2"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+    <script defer src="./aiways-operational.js?v=20260703-final"></script>
+    <script defer src="./aiways-final-tune.js?v=20260703-quiz-landfill-tune"></script>
+    <script defer src="./aiways-scroll-curriculum-tune.js?v=20260703-scroll-curriculum"></script>
+    <script defer src="./aiways-outputs-app-flow.js?v=20260703-final-output-app"></script>
+    <script defer src="./aiways-restore-hah-flow.js?v=20260703-restore-hah-flow"></script>
+    <link rel="stylesheet" href="./aiways-master-finish-patch.css?v=20260704-local-hero-fix" />
+    <link rel="stylesheet" href="./aiways-rescue-final.css?v=20260704-rescue-final-2" />
+  </head>
+  <body class="page">
+    <a class="skip-link" href="#top">본문 바로가기</a>
+
+    <header class="aiw-header">
+      <a class="aiw-brand" href="#top" aria-label="AIWays Incheon home">
+        <span class="aiw-logo-box">
+          <img src="./aiways-logo.png" alt="AIWays Incheon" class="aiw-logo-img" decoding="async" />
+        </span>
+        <span class="aiw-brand-text">AIWays Incheon</span>
+      </a>
+
+      <nav class="aiw-nav" aria-label="주요 메뉴">
+        <a href="#project">프로젝트</a>
+        <a href="#curriculum">교육과정</a>
+        <a href="#hah">H-A-H</a>
+        <a href="#lesson">6차시</a>
+        <a href="#outputs">산출물</a>
+        <a href="#classify" class="aiw-nav-cta">지금 분류하기</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="aiw-hero story-section hero-story" aria-label="AIWays Incheon dashboard hero">
+        <section class="aiw-copy">
+          <p class="aiw-eyebrow">학생의 버리는 순간을 읽는 자원순환 분석 엔진</p>
+
+          <h1 class="aiw-title">
+            <span>버리는 순간,</span>
+            <span class="aiw-title-nowrap">데이터가 되다</span>
+          </h1>
+
+          <p class="aiw-description">
+            AIWays Incheon은 환경 포스터를 만드는 수업이 아닙니다.<br />
+            우리가 실제로 쓰레기를 버리는 순간을 관찰하고,<br />
+            AI를 통해 데이터를 1차 판단한 뒤 사람이 중심이 되어 다시 확인하는,<br />
+            우리 학교의 자원순환 UX를 개선하는 H-A-H 기반 수업 프로젝트입니다.
+          </p>
+
+          <div class="aiw-actions">
+            <a href="#classify" class="aiw-primary-btn">지금 분류하기</a>
+            <a href="#curriculum" class="aiw-secondary-btn">수업 설계 보기</a>
+          </div>
+        </section>
+
+        <section class="aiw-dashboard-panel" aria-label="AIWays Incheon dashboard preview">
+          <article class="aiw-card school-card">
+            <div class="aiw-card-head">
+              <div>
+                <p class="aiw-card-kicker">School Resource Dashboard</p>
+                <h2>우리학교 자원순환<br />대시보드</h2>
+              </div>
+              <span class="aiw-demo-badge">DEMO · 수업용 데이터</span>
+            </div>
+
+            <div class="school-card-grid">
+              <div class="school-kpis">
+                <div class="aiw-kpi-tile">
+                  <b data-kpi="school-observed">312</b>
+                  <span>배출 관찰</span>
+                </div>
+                <div class="aiw-kpi-tile">
+                  <b data-kpi="school-classes">14</b>
+                  <span>참여 학급</span>
+                </div>
+                <div class="aiw-kpi-tile">
+                  <b data-kpi="school-hold">21</b>
+                  <span>판단 보류</span>
+                </div>
+              </div>
+
+              <div class="grade-bars">
+                <h3>학년별 참여</h3>
+                <div class="grade-row">
+                  <span>3학년</span>
+                  <i style="--bar: 41%"></i>
+                  <b>46</b>
+                </div>
+                <div class="grade-row">
+                  <span>4학년</span>
+                  <i style="--bar: 52%"></i>
+                  <b>58</b>
+                </div>
+                <div class="grade-row">
+                  <span>5학년</span>
+                  <i style="--bar: 100%"></i>
+                  <b>112</b>
+                </div>
+                <div class="grade-row">
+                  <span>6학년</span>
+                  <i style="--bar: 86%"></i>
+                  <b>96</b>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="aiw-card landfill-card">
+            <div class="aiw-card-head">
+              <div>
+                <p class="aiw-card-kicker">DEMO · 공식 관리 지표 구조 참고</p>
+                <h2>수도권매립지 모니터</h2>
+              </div>
+              <span class="live-dot" aria-hidden="true"></span>
+            </div>
+
+            <p class="aiw-card-desc">공식 반입량 관리 구조에서 착안한 수업용 프로토타입</p>
+
+            <div class="landfill-kpis">
+              <div class="aiw-kpi-tile">
+                <b>18,420t</b>
+                <span>생활폐기물 반입량</span>
+              </div>
+              <div class="aiw-kpi-tile">
+                <b>-2.8%</b>
+                <span>전일 대비</span>
+              </div>
+              <div class="aiw-kpi-tile">
+                <b>63.4%</b>
+                <span>총량 대비 반입률</span>
+              </div>
+              <div class="aiw-kpi-tile">
+                <b>36.6%</b>
+                <span>잔여 관리 여력</span>
+              </div>
+            </div>
+
+            <div class="landfill-bottom">
+              <svg class="landfill-line" viewBox="0 0 320 112" role="img" aria-label="최근 7일 반입량 추이">
+                <defs>
+                  <linearGradient id="lineFill" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#60f5dc" stop-opacity=".32" />
+                    <stop offset="100%" stop-color="#57a8ff" stop-opacity=".04" />
+                  </linearGradient>
+                </defs>
+                <path d="M10 28 L58 48 L106 38 L154 68 L202 56 L250 82 L310 94" fill="none" stroke="#62f5df" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M10 28 L58 48 L106 38 L154 68 L202 56 L250 82 L310 94 L310 108 L10 108 Z" fill="url(#lineFill)" />
+              </svg>
+
+              <div class="landfill-progress">
+                <div class="progress-row">
+                  <span>총량 대비 반입률</span>
+                  <b>63.4%</b>
+                  <i><em style="width: 63.4%"></em></i>
+                </div>
+                <div class="progress-row">
+                  <span>잔여 관리 여력</span>
+                  <b>36.6%</b>
+                  <i><em style="width: 36.6%"></em></i>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="aiw-card class-card">
+            <div class="aiw-card-head">
+              <div>
+                <p class="aiw-card-kicker">Class Resource Dashboard</p>
+                <h2>우리반 자원순환<br />대시보드</h2>
+              </div>
+              <span class="aiw-demo-badge">5학년 1반</span>
+            </div>
+
+            <p class="aiw-card-desc">우리반의 버리는 순간을 AI와 함께 분류하고, 다시 확인한 기록입니다.</p>
+
+            <div class="class-main-kpis">
+              <div class="class-main-kpi" data-kpi-card="ai-classified">
+                <span>AI 1차 분류</span>
+                <b data-counter data-kpi="ai-classified" data-target="37">0</b>
+              </div>
+              <div class="class-main-kpi" data-kpi-card="human-confirmed">
+                <span>학생 재확인</span>
+                <b data-counter data-kpi="human-confirmed" data-target="31">0</b>
+              </div>
+            </div>
+
+            <div class="class-mini-kpis">
+              <div data-kpi-card="today-observed">
+                <b data-counter data-kpi="today-observed" data-target="42">0</b>
+                <span>오늘 관찰</span>
+              </div>
+              <div data-kpi-card="class-hold">
+                <b data-counter data-kpi="class-hold" data-target="7">0</b>
+                <span>판단 보류</span>
+              </div>
+              <div data-kpi-card="converted">
+                <b data-counter data-kpi="converted" data-target="24">0</b>
+                <span>전환 사례</span>
+              </div>
+            </div>
+
+            <div class="class-card-bottom">
+              <div class="confusion-box">
+                <h3>헷갈린 물건 TOP 5</h3>
+                <div class="confusion-row">
+                  <span>우유갑</span>
+                  <i style="--bar: 100%"></i>
+                  <b>12</b>
+                </div>
+                <div class="confusion-row">
+                  <span>구겨진 종이</span>
+                  <i style="--bar: 75%"></i>
+                  <b>9</b>
+                </div>
+                <div class="confusion-row">
+                  <span>과자봉지</span>
+                  <i style="--bar: 66%"></i>
+                  <b>8</b>
+                </div>
+              </div>
+
+              <a class="ranking-box" href="#ranking" aria-label="전체 랭킹 보기">
+                <span>우리반 참여 랭킹</span>
+                <strong>학년 내 1위<br />학교 내 2위</strong>
+                <small>랭킹 보기</small>
+              </a>
+            </div>
+          </article>
+
+          <article id="classify" class="aiw-card upload-card">
+            <div class="aiw-card-head">
+              <div>
+                <p class="aiw-card-kicker">H-A-H Demo Module</p>
+                <h2>버려지는 순간을 기록하세요</h2>
+              </div>
+            </div>
+
+            <p class="aiw-card-desc">사진을 올리면 AI가 1차 분류를 제안하고, 학생이 다시 확인합니다.</p>
+
+            <label class="upload-drop" id="dropZone" for="wasteImageInput">
+              <input id="wasteImageInput" type="file" accept="image/*" hidden />
+              <span class="upload-plus" aria-hidden="true">+</span>
+              <span>
+                <strong>사진 업로드</strong>
+                <small>큐시트 종이를 구겨 올리는 발표 시연</small>
+              </span>
+            </label>
+
+            <button id="startAiGuess" class="ai-guess-btn" type="button">AI 1차 추정 시작</button>
+
+            <div class="preview-wrap is-hidden" id="previewWrap">
+              <img id="previewImage" alt="업로드한 사진 미리보기" />
+            </div>
+
+            <p class="upload-note" id="demoMessage" aria-live="polite">
+              발표 중 업로드한 사진은 이 브라우저 안에서만 미리보기로 사용됩니다.
+            </p>
+
+            <div class="loading-state is-hidden" id="loadingState" aria-live="polite">
+              <span class="spinner" aria-hidden="true"></span>
+              <span>AI가 1차 추정 중입니다...</span>
+            </div>
+
+            <article class="result-card is-hidden" id="resultCard" aria-live="polite">
+              <div class="result-head">
+                <span class="result-tag">AI 1차 분류 제안</span>
+                <span class="confidence-pill" id="confidencePill">신뢰도 86%</span>
+              </div>
+
+              <dl class="result-list">
+                <div>
+                  <dt>감지된 물건</dt>
+                  <dd id="detectedItem">구겨진 종이</dd>
+                </div>
+                <div>
+                  <dt>AI 분류 제안</dt>
+                  <dd id="categorySuggestion">종이류</dd>
+                </div>
+              </dl>
+
+              <p class="guidance" id="resultGuidance">
+                오염되지 않은 종이는 종이류로 분리배출할 수 있습니다. 단,
+                물기·음식물·테이프·코팅 여부는 다시 확인해야 합니다.
+              </p>
+
+              <div class="result-actions" aria-label="판단 결과 처리">
+                <button class="primary-action small" type="button" id="confirmResult">
+                  맞아요, 계속하기
+                </button>
+                <button class="secondary-action small" type="button" id="reselectItem">
+                  다시 선택할게요
+                </button>
+                <button class="ghost-action small" type="button" id="holdResult">
+                  판단 보류하기
+                </button>
+              </div>
+
+              <div class="item-chooser is-hidden" id="itemChooser" aria-label="물건 다시 선택">
+                <button type="button" data-result-item="paper">구겨진 종이</button>
+                <button type="button" data-result-item="milk">우유갑</button>
+                <button type="button" data-result-item="cup">플라스틱컵</button>
+                <button type="button" data-result-item="snack">과자봉지</button>
+                <button type="button" data-result-item="straw">빨대</button>
+              </div>
+
+              <p class="result-status" id="resultStatus" aria-live="polite"></p>
+            </article>
+          </article>
+        </section>
+      </section>
+
+      <section class="section-shell project-frame story-section" id="project">
+        <div class="project-frame-inner">
+          <p class="eyebrow">Project Frame</p>
+          <h2>
+            포스터를 만드는 수업이 아니라,<br />
+            학교의 버리는 순간을 바꾸는 수업입니다.
+          </h2>
+          <p class="project-title">내가 버린 쓰레기는 어디로 사라질까?</p>
+          <p class="project-subtitle">AI와 데이터로 실천하는 자원순환 UX 개선 프로젝트</p>
+        </div>
+      </section>
+
+      <section class="section-shell story-section" id="curriculum">
+        <div class="section-header">
+          <p class="eyebrow">Curriculum Design</p>
+          <h2>교육과정 기반 수업 설계</h2>
+          <p>
+            본 프로젝트는 실과의 생활 자원 관리, 사회의 지속 가능한 미래와 지역사회
+            문제 탐구, 국어의 토의·조정 역량을 연결하여 학생이 생활 속 배출 문제를
+            발견하고 AI와 데이터를 활용해 학교 자원순환 UX를 개선하도록 설계한 6차시
+            융합 수업입니다.
+          </p>
+        </div>
+
+        <div class="curriculum-grid">
+          <article class="info-card">
+            <h3>수업 개요</h3>
+            <dl class="info-list">
+              <div><dt>학교급</dt><dd>초등학교</dd></div>
+              <div><dt>학년군</dt><dd>5~6학년군</dd></div>
+              <div><dt>운영 차시</dt><dd>6차시</dd></div>
+              <div><dt>중심 교과</dt><dd>실과, 사회</dd></div>
+              <div><dt>연계 교과</dt><dd>국어, 창의적 체험활동</dd></div>
+              <div><dt>제출 단원</dt><dd>사회 Ⅱ. 우리나라 지리탐구 / 01. 우리나라의 기후</dd></div>
+            </dl>
+          </article>
+
+          <div class="standard-list" aria-label="성취기준">
+            <article class="standard-card">
+              <strong>[6실02-03]</strong>
+              <p>
+                생활 자원의 올바른 사용이 가정과 환경에 도움이 됨을 이해하고,
+                재활용·재사용 등 환경을 고려한 관리 방법을 실천한다.
+              </p>
+            </article>
+            <article class="standard-card">
+              <strong>[6사12-02]</strong>
+              <p>
+                지구촌을 위협하는 다양한 문제들을 파악하고, 지속 가능한 미래를 위한
+                해결 방안을 탐색한다.
+              </p>
+            </article>
+            <article class="standard-card">
+              <strong>[6국01-06]</strong>
+              <p>토의에 협력적으로 참여하며 서로의 의견을 비교하고 조정한다.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-shell story-section" id="hah">
+        <div class="section-header">
+          <p class="eyebrow">Human-AI-Human</p>
+          <h2>Human-AI-Human 수업 모델</h2>
+        </div>
+
+        <div class="model-grid">
+          <article class="model-card">
+            <span class="model-code">H1</span>
+            <h3>관찰</h3>
+            <p>학생 VOC와 생활 관찰로 배출 혼선 발견</p>
+            <ul>
+              <li>생활 속 반복 문제 수집</li>
+              <li>쓰레기·낭비·생활자원 키워드 도출</li>
+              <li>쓰레기 이동 경로 탐색</li>
+            </ul>
+          </article>
+
+          <article class="model-card accent">
+            <span class="model-code">A</span>
+            <h3>공학</h3>
+            <p>AI 1차 추정, 해결 후보 확장, UX 프로토타입 구현</p>
+            <ul>
+              <li>생성형 AI로 해결 후보 확장</li>
+              <li>사진 기반 1차 분류 제안</li>
+              <li>3초 판단 앱, 판단 보류 QR, 대시보드 설계</li>
+            </ul>
+          </article>
+
+          <article class="model-card">
+            <span class="model-code">H2</span>
+            <h3>실천</h3>
+            <p>학생 확인, 5대 기준 판단, 학교 적용</p>
+            <ul>
+              <li>AI 제안을 그대로 수용하지 않기</li>
+              <li>실천성·지속성·효과성·공동체 부담·학교 적합성 검토</li>
+              <li>사용자 테스트와 수정·보완</li>
+            </ul>
+          </article>
+        </div>
+
+        <p class="callout">
+          AI는 최종 정답을 확정하지 않습니다. AI는 1차 판단을 제안하고, 학생은 학교
+          기준과 오염 여부를 다시 확인합니다.
+        </p>
+      </section>
+
+      <section class="section-shell story-section" id="lesson">
+        <div class="section-header">
+          <p class="eyebrow">6 Lessons</p>
+          <h2>6차시 수업 여정</h2>
+        </div>
+
+        <div class="journey-grid">
+          <article class="journey-card">
+            <span>1차시</span>
+            <h3>우리 생활 속 ‘버리는 순간’ 찾기</h3>
+            <ul>
+              <li>학생 VOC 수집</li>
+              <li>생활 문제 분류</li>
+              <li>자원순환 키워드 도출</li>
+            </ul>
+          </article>
+          <article class="journey-card">
+            <span>2차시</span>
+            <h3>내가 버린 물건의 이동 경로 탐색하기</h3>
+            <ul>
+              <li>교실 쓰레기통에서 학교 밖 처리 과정까지 추적</li>
+              <li>인천 자원순환 문제와 연결</li>
+            </ul>
+          </article>
+          <article class="journey-card">
+            <span>3차시</span>
+            <h3>AI로 해결 후보 확장하기</h3>
+            <ul>
+              <li>생성형 AI로 다양한 실천 방안 탐색</li>
+              <li>학교 상황과 비교</li>
+            </ul>
+          </article>
+          <article class="journey-card">
+            <span>4차시</span>
+            <h3>AI 제안을 5대 기준으로 다시 판단하기</h3>
+            <ul>
+              <li>실천성</li>
+              <li>지속성</li>
+              <li>효과성</li>
+              <li>공동체 부담</li>
+              <li>학교 적합성</li>
+            </ul>
+          </article>
+          <article class="journey-card">
+            <span>5차시</span>
+            <h3>자원순환 UX와 시뮬레이션 설계하기</h3>
+            <ul>
+              <li>3초 판단 앱</li>
+              <li>판단 보류 QR</li>
+              <li>자원순환 대시보드</li>
+              <li>엔트리 시뮬레이션 아이디어</li>
+            </ul>
+          </article>
+          <article class="journey-card">
+            <span>6차시</span>
+            <h3>프로토타입 구현, 사용자 테스트, PLAY BOOK 확산하기</h3>
+            <ul>
+              <li>바이브 코딩 기반 UX 프로토타입 구현</li>
+              <li>친구 사용자 테스트</li>
+              <li>수정 전후 비교</li>
+              <li>교사용 PLAY BOOK 정리</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-shell story-section" id="quick-app">
+        <div class="tool-grid">
+          <div class="section-header compact-header">
+            <p class="eyebrow">3-Second Check</p>
+            <h2>3초 판단 앱</h2>
+            <p>
+              학생들이 실제로 헷갈리는 물건을 빠르게 확인하되, AI 결과를 그대로 믿지
+              않고 오염 여부와 학교 기준을 다시 확인하도록 설계했습니다.
+            </p>
+          </div>
+
+          <article class="quick-tool" aria-labelledby="quick-title">
+            <h3 id="quick-title">물건 선택</h3>
+            <div class="quick-buttons" aria-label="3초 판단 물건 선택">
+              <button class="is-active" type="button" data-quick-item="paper">구겨진 종이</button>
+              <button type="button" data-quick-item="milk">우유갑</button>
+              <button type="button" data-quick-item="cup">플라스틱컵</button>
+              <button type="button" data-quick-item="snack">과자봉지</button>
+              <button type="button" data-quick-item="straw">빨대</button>
+            </div>
+            <div class="quick-result">
+              <span id="quickCategory">AI 1차 제안: 종이류</span>
+              <p id="quickGuidance">
+                오염되지 않은 종이는 종이류로 분리배출할 수 있습니다. 물기, 음식물,
+                테이프, 코팅이 있으면 다시 확인합니다.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-shell story-section" id="hold">
+        <div class="qr-grid">
+          <div class="section-header compact-header">
+            <p class="eyebrow">Deferred Judgment</p>
+            <h2>판단 보류 QR</h2>
+            <p class="quote-line">모르는 물건을 아무 데나 버리지 않는 것도 자원순환 역량입니다.</p>
+            <p>
+              학생은 헷갈리는 물건을 바로 버리지 않고 판단 보류 QR에 기록합니다.
+              이후 학생 자원순환팀과 교사가 함께 확인하여 학교 안내 문구와 3초 판단
+              앱을 업데이트합니다.
+            </p>
+            <a class="resource-link" href="#">판단 보류 폼 열기</a>
+          </div>
+
+          <div class="qr-placeholder" aria-label="판단 보류 QR 자리">
+            <div class="qr-canvas" aria-hidden="true">
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <p>QR PLACEHOLDER</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-shell story-section" id="outputs">
+        <div class="section-header">
+          <p class="eyebrow">Student Outputs</p>
+          <h2>학생 산출물 갤러리</h2>
+          <p>내일 수업 후 학생들의 실제 산출물을 이곳에 추가합니다.</p>
+        </div>
+
+        <div class="gallery-grid">
+          <article class="gallery-card"><span>업로드 예정</span><h3>VOC 활동지</h3></article>
+          <article class="gallery-card"><span>업로드 예정</span><h3>쓰레기 이동 경로 지도</h3></article>
+          <article class="gallery-card"><span>업로드 예정</span><h3>AI 제안 검증표</h3></article>
+          <article class="gallery-card"><span>업로드 예정</span><h3>딜레마 토론지</h3></article>
+          <article class="gallery-card"><span>업로드 예정</span><h3>사용자 테스트 기록</h3></article>
+          <article class="gallery-card"><span>업로드 예정</span><h3>수정 전후 비교</h3></article>
+        </div>
+      </section>
+
+      <section class="section-shell story-section ranking-section" id="ranking">
+        <div class="section-header">
+          <p class="eyebrow">Class Ranking</p>
+          <h2>5학년 1반 자원순환 랭킹</h2>
+          <p>우리반의 배출 관찰과 AI 분류 실천을 학교·지역 단위로 비교합니다.</p>
+        </div>
+
+        <div class="ranking-board">
+          <div class="ranking-tabs" role="tablist" aria-label="랭킹 범위 선택">
+            <button class="is-active" type="button" role="tab" aria-selected="true" data-ranking-tab="class">우리반</button>
+            <button type="button" role="tab" aria-selected="false" data-ranking-tab="grade">우리학년</button>
+            <button type="button" role="tab" aria-selected="false" data-ranking-tab="school">우리학교</button>
+            <button type="button" role="tab" aria-selected="false" data-ranking-tab="dong">우리동</button>
+            <button type="button" role="tab" aria-selected="false" data-ranking-tab="gu">우리구</button>
+            <button type="button" role="tab" aria-selected="false" data-ranking-tab="incheon">인천</button>
+          </div>
+
+          <div class="ranking-list" id="rankingList" aria-live="polite"></div>
+          <p class="ranking-note">수업용 더미데이터이며 실제 데이터 연결 전까지 시뮬레이션으로 표시됩니다.</p>
+        </div>
+      </section>
+
+      <section class="section-shell story-section" id="playbook">
+        <div class="section-header">
+          <p class="eyebrow">Resources</p>
+          <h2>PLAY BOOK &amp; 자료실</h2>
+        </div>
+
+        <div class="resource-grid" aria-label="자료실 링크">
+          <a href="#">발표자료 PDF</a>
+          <a href="#">교사용 PLAY BOOK</a>
+          <a href="#">학생 활동지</a>
+          <a href="#">GitHub 코드 보기</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      AI Ways Incheon | 강서희 · 원나연 | 내가 버린 쓰레기는 어디로 사라질까?
+    </footer>
+    <script defer src="./aiways-mobile-slide-deck-fix.js?v=20260703-mobile-slide-deck"></script>
+    <script defer src="./aiways-master-finish-patch.js?v=20260704-local-hero-fix"></script>
+    <script defer src="./aiways-google-sheets-records.js?v=20260704-google-sheets"></script>
+    <script defer src="./aiways-rescue-final.js?v=20260704-local-hero-fix"></script>
+  </body>
+</html>

@@ -1,0 +1,151 @@
+<section class="scene dashboard-scene" id="dashboard" data-nav="대시보드">
+        <div class="hero-copy">
+          <p class="eyebrow">학생의 버리는 순간을 읽는 자원순환 분석 엔진</p>
+          <h1>
+            <span>버리는 순간,</span>
+            <span>데이터가 되다</span>
+          </h1>
+          <p class="hero-description">
+            AIWays Incheon은 환경 보호 포스터를 만드는 수업이 아닙니다.<br />
+            우리가 실제로 쓰레기를 버리는 순간을 관찰하고,<br />
+            <span class="hero-fixed-line">AI를 통해 데이터를 1차 판단한 뒤 사람이 중심이 되어 다시 확인하는,</span>
+            <span class="hero-fixed-line">우리 학교의 자원순환 UX를 개선하는 H-A-H 기반 수업 프로젝트입니다.</span>
+          </p>
+          <div class="hero-actions">
+            <a class="primary-btn" href="#sorting">지금 분류하기</a>
+            <a class="secondary-btn" href="#curriculum">수업 설계 보기</a>
+          </div>
+        </div>
+
+        <div class="dashboard-grid" aria-label="실시간 자원순환 대시보드">
+          <article class="panel school-panel">
+            <div class="panel-head">
+              <div>
+                <p>School Resource Dashboard</p>
+                <h2>우리학교 자원순환 대시보드</h2>
+              </div>
+              <span>DEMO · 수업용 데이터</span>
+            </div>
+            <label class="select-line">
+              <span>학년 선택</span>
+              <select id="gradeSelect" aria-label="학년 선택">
+                <option>3학년</option>
+                <option>4학년</option>
+                <option selected>5학년</option>
+                <option>6학년</option>
+              </select>
+            </label>
+            <div class="kpi-row">
+              <div><strong data-school-classes>4</strong><span>참여 학급</span></div>
+              <div><strong data-school-observed>115</strong><span>배출 관찰</span></div>
+              <div><strong data-school-hold>9</strong><span>판단 보류</span></div>
+            </div>
+            <div class="school-visuals">
+              <div class="bar-list" aria-label="학년별 참여" data-grade-bars>
+                <div><span>3학년</span><i style="--value:46%"></i><b>53</b></div>
+                <div><span>4학년</span><i style="--value:53%"></i><b>61</b></div>
+                <div><span>5학년</span><i style="--value:100%"></i><b>115</b></div>
+                <div><span>6학년</span><i style="--value:77%"></i><b>89</b></div>
+              </div>
+              <div class="donut-pair">
+                <div class="donut" style="--pct:36.7"><span>36.7%</span><small>배출 성공률</small></div>
+                <div class="donut violet" style="--pct:8"><span>8%</span><small>판단 보류 비율</small></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel landfill-panel">
+            <div class="panel-head">
+              <div>
+                <p>DEMO · 공식 관리 지표 구조 참고</p>
+                <h2>수도권매립지 모니터</h2>
+              </div>
+              <span class="pulse-dot" aria-hidden="true"></span>
+            </div>
+            <div class="landfill-metrics">
+              <div><strong>19,507t</strong><span>오늘 반입 총량</span></div>
+              <div><strong>-3.2%</strong><span>전일 대비</span></div>
+              <div><strong>68.3%</strong><span>총량 대비 반입률</span></div>
+              <div><strong>32.7%</strong><span>잔여 관리 여력</span></div>
+            </div>
+            <div class="chart-wrap">
+              <svg viewBox="0 0 360 130" role="img" aria-label="최근 7일 반입량 추이">
+                <defs>
+                  <linearGradient id="cleanLineFill" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#61f5d5" stop-opacity=".34" />
+                    <stop offset="100%" stop-color="#64a9ff" stop-opacity=".03" />
+                  </linearGradient>
+                </defs>
+                <path d="M12 42 L68 58 L124 50 L180 74 L236 61 L292 91 L348 102" fill="none" stroke="#65f4dc" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M12 42 L68 58 L124 50 L180 74 L236 61 L292 91 L348 102 L348 124 L12 124 Z" fill="url(#cleanLineFill)" />
+              </svg>
+              <div class="progress-stack">
+                <label><span>총량 대비 반입률</span><b>68.3%</b><i><em style="width:68.3%"></em></i></label>
+                <label><span>잔여 관리 여력</span><b>32.7%</b><i><em style="width:32.7%"></em></i></label>
+              </div>
+              <div class="donut-pair landfill-donuts">
+                <div class="donut" style="--pct:68.3"><span>68%</span><small>총량 대비 반입률</small></div>
+                <div class="donut violet" style="--pct:32.7"><span>33%</span><small>잔여 관리 여력</small></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel class-panel">
+            <div class="panel-head">
+              <div>
+                <p>Class Resource Dashboard</p>
+                <h2>우리반 자원순환 대시보드</h2>
+              </div>
+              <span>5학년 1반</span>
+            </div>
+            <label class="select-line">
+              <span>학급 선택</span>
+              <select id="classSelect" aria-label="학급 선택">
+                <option>3학년 1반</option>
+                <option>3학년 2반</option>
+                <option>3학년 3반</option>
+                <option>4학년 1반</option>
+                <option>4학년 2반</option>
+                <option>4학년 3반</option>
+                <option>4학년 4반</option>
+                <option selected>5학년 1반</option>
+                <option>5학년 2반</option>
+                <option>5학년 3반</option>
+                <option>5학년 4반</option>
+                <option>6학년 1반</option>
+                <option>6학년 2반</option>
+                <option>6학년 3반</option>
+              </select>
+            </label>
+            <div class="class-kpis">
+              <div><strong data-today-observed>24</strong><span>오늘 관찰</span></div>
+              <div><strong data-ai-classified>3</strong><span>판단 보류</span></div>
+              <div><strong data-human-confirmed>20</strong><span>전환 사례</span></div>
+            </div>
+            <div class="confusion">
+              <h3>헷갈린 물건 TOP 3</h3>
+              <div><span>비닐 코팅 종이컵</span><i style="--value:100%"></i><b>4</b></div>
+              <div><span>과자 포장지</span><i style="--value:75%"></i><b>3</b></div>
+              <div><span>영수증</span><i style="--value:75%"></i><b>3</b></div>
+            </div>
+            <p class="rank-note">3위 · 전체 14개 학급 중 · DEMO RANKING</p>
+          </article>
+
+          <article class="panel upload-panel">
+            <div class="panel-head">
+              <div>
+                <p>H-A-H Demo Module</p>
+                <h2>버려지는 순간을 기록하세요</h2>
+              </div>
+            </div>
+            <p>사진을 찍어 AI와 함께 분류하며 판단합니다.</p>
+            <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden />
+            <input id="uploadInput" type="file" accept="image/*" hidden />
+            <div class="upload-actions upload-card-actions">
+              <button type="button" data-upload="camera"><span class="upload-icon camera-icon" aria-hidden="true"></span>카메라로 지금 찍기</button>
+              <button type="button" data-upload="file"><span class="upload-icon gallery-icon" aria-hidden="true"></span>찍은 사진 올리기</button>
+            </div>
+            <small>사진은 저장하지 않고, 판단 기록만 남깁니다.</small>
+          </article>
+        </div>
+      </section>

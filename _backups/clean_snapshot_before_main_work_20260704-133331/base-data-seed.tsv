@@ -1,0 +1,20 @@
+timestamp	local_time	school	grade	class_name	group_id	privacy_id	input_type	ai_engine	ai_raw_label	ai_confidence	mapped_item	suggested_category	final_decision	hold_flag	hold_score	action	image_saved	app_version
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교			seed	base-seed	base	seed			schoolObserved	base	115	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교			seed	base-seed	base	seed			schoolClasses	base	4	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교			seed	base-seed	base	seed			schoolHold	base	9	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	3학년	1반	seed	base-seed	base	seed			class:3학년 1반:today	base	94	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	3학년	1반	seed	base-seed	base	seed			class:3학년 1반:hold	base	6	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	3학년	1반	seed	base-seed	base	seed			class:3학년 1반:converted	base	18	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	3학년	1반	seed	base-seed	base	seed			class:3학년 1반:rank	base	학년 내 2위 · 학교 내 8위	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	4학년	1반	seed	base-seed	base	seed			class:4학년 1반:today	base	97	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	4학년	1반	seed	base-seed	base	seed			class:4학년 1반:hold	base	5	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	4학년	1반	seed	base-seed	base	seed			class:4학년 1반:converted	base	19	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	4학년	1반	seed	base-seed	base	seed			class:4학년 1반:rank	base	학년 내 3위 · 학교 내 10위	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:today	base	24	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:hold	base	3	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:converted	base	20	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:rank	base	3위 · 전체 14개 학급 중	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	6학년	3반	seed	base-seed	base	seed			class:6학년 3반:today	base	132	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	6학년	3반	seed	base-seed	base	seed			class:6학년 3반:hold	base	7	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	6학년	3반	seed	base-seed	base	seed			class:6학년 3반:converted	base	27	false	0	seed	false	clean-2026-07
+2026-07-04T00:00:00.000Z	2026. 7. 4.	우리학교	6학년	3반	seed	base-seed	base	seed			class:6학년 3반:rank	base	학년 내 1위 · 학교 내 1위	false	0	seed	false	clean-2026-07

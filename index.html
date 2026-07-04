@@ -92,20 +92,23 @@
             </div>
           </article>
 
-          <article class="panel landfill-panel">
+          <article class="panel landfill-panel" data-source-url="https://www.data.go.kr/tcs/dss/selectDataSetList.do?dType=API&amp;keyword=%EC%88%98%EB%8F%84%EA%B6%8C%EB%A7%A4%EB%A6%BD%EC%A7%80%20%EB%B0%98%EC%9E%85">
             <div class="panel-head">
               <div>
                 <p>공식 관리 지표 구조 참고</p>
                 <h2>수도권매립지 모니터</h2>
               </div>
-              <button class="data-refresh-btn" type="button" data-refresh-records aria-label="대시보드 데이터 새로고침">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M20 6v5h-5" />
-                  <path d="M4 18v-5h5" />
-                  <path d="M18.2 9.2A7 7 0 0 0 6.1 7.1L4 9" />
-                  <path d="M5.8 14.8a7 7 0 0 0 12.1 2.1L20 15" />
-                </svg>
-              </button>
+              <div class="landfill-actions">
+                <a class="source-link" href="https://www.data.go.kr/tcs/dss/selectDataSetList.do?dType=API&amp;keyword=%EC%88%98%EB%8F%84%EA%B6%8C%EB%A7%A4%EB%A6%BD%EC%A7%80%20%EB%B0%98%EC%9E%85" target="_blank" rel="noopener noreferrer">원문</a>
+                <button class="data-refresh-btn" type="button" data-refresh-records aria-label="대시보드 데이터 새로고침">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M20 6v5h-5" />
+                    <path d="M4 18v-5h5" />
+                    <path d="M18.2 9.2A7 7 0 0 0 6.1 7.1L4 9" />
+                    <path d="M5.8 14.8a7 7 0 0 0 12.1 2.1L20 15" />
+                  </svg>
+                </button>
+              </div>
             </div>
             <div class="landfill-metrics">
               <div><strong>19,507t</strong><span>오늘 반입 총량</span></div>
@@ -115,37 +118,42 @@
             </div>
             <div class="chart-wrap">
               <h3 class="chart-title">최근 7일 반입량 추이</h3>
-              <svg class="combo-chart" viewBox="0 0 380 170" role="img" aria-label="최근 7일 반입량 막대와 선 그래프">
+              <svg class="combo-chart" viewBox="0 0 380 190" role="img" aria-label="최근 7일 반입량 막대와 선 그래프">
                 <defs>
                   <linearGradient id="cleanLineFill" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stop-color="#61f5d5" stop-opacity=".34" />
-                    <stop offset="100%" stop-color="#64a9ff" stop-opacity=".03" />
+                    <stop offset="0%" stop-color="#61f5d5" stop-opacity=".16" />
+                    <stop offset="100%" stop-color="#64a9ff" stop-opacity="0" />
+                  </linearGradient>
+                  <linearGradient id="cleanBarFill" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#61f5d5" stop-opacity=".92" />
+                    <stop offset="100%" stop-color="#64a9ff" stop-opacity=".38" />
                   </linearGradient>
                 </defs>
                 <g class="chart-grid" stroke="rgba(220,245,255,.18)" stroke-width="1">
-                  <path d="M44 24 H360" />
+                  <path d="M44 22 H360" />
                   <path d="M44 62 H360" />
-                  <path d="M44 100 H360" />
-                  <path d="M44 138 H360" />
-                  <path d="M44 20 V142 H366" />
+                  <path d="M44 102 H360" />
+                  <path d="M44 142 H360" />
+                  <path d="M44 18 V162 H366" />
                 </g>
                 <g class="chart-axis" fill="rgba(220,245,255,.58)" font-size="10" font-weight="700">
-                  <text x="9" y="27">20k</text>
+                  <text x="9" y="25">20k</text>
                   <text x="9" y="65">19k</text>
-                  <text x="9" y="103">18k</text>
-                  <text x="9" y="141">17k</text>
-                  <text x="50" y="162">월</text><text x="99" y="162">화</text><text x="148" y="162">수</text><text x="197" y="162">목</text><text x="246" y="162">금</text><text x="295" y="162">토</text><text x="344" y="162">일</text>
+                  <text x="9" y="105">18k</text>
+                  <text x="9" y="145">17k</text>
+                  <text x="50" y="184">월</text><text x="99" y="184">화</text><text x="148" y="184">수</text><text x="197" y="184">목</text><text x="246" y="184">금</text><text x="295" y="184">토</text><text x="344" y="184">일</text>
                 </g>
-                <g class="chart-bars" fill="url(#cleanLineFill)">
-                  <rect x="50" y="48" width="22" height="90" rx="6" />
-                  <rect x="99" y="56" width="22" height="82" rx="6" />
-                  <rect x="148" y="52" width="22" height="86" rx="6" />
-                  <rect x="197" y="70" width="22" height="68" rx="6" />
-                  <rect x="246" y="66" width="22" height="72" rx="6" />
-                  <rect x="295" y="82" width="22" height="56" rx="6" />
-                  <rect x="344" y="90" width="22" height="48" rx="6" />
+                <path class="chart-area" d="M61 38 L110 48 L159 44 L208 66 L257 60 L306 80 L355 88 L355 166 L61 166 Z" fill="url(#cleanLineFill)" opacity=".16" />
+                <g class="chart-bars" fill="url(#cleanBarFill)">
+                  <rect x="50" y="38" width="22" height="128" rx="6" />
+                  <rect x="99" y="48" width="22" height="118" rx="6" />
+                  <rect x="148" y="44" width="22" height="122" rx="6" />
+                  <rect x="197" y="66" width="22" height="100" rx="6" />
+                  <rect x="246" y="60" width="22" height="106" rx="6" />
+                  <rect x="295" y="80" width="22" height="86" rx="6" />
+                  <rect x="344" y="88" width="22" height="78" rx="6" />
                 </g>
-                <path d="M61 48 L110 56 L159 52 L208 70 L257 66 L306 82 L355 90" fill="none" stroke="#65f4dc" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                <path class="chart-line" d="M61 38 L110 48 L159 44 L208 66 L257 60 L306 80 L355 88" fill="none" stroke="#65f4dc" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
               <div class="progress-stack">
                 <label><span>총량 대비<br />반입량</span><b>68.3%</b><i><em style="width:68.3%"></em></i></label>
@@ -195,7 +203,7 @@
               <div><span>과자 포장지</span><i style="--value:75%"></i><b>3</b></div>
               <div><span>영수증</span><i style="--value:75%"></i><b>3</b></div>
             </div>
-            <p class="rank-note">3위 · 전체 14개 학급 중 · RANKING</p>
+            <p class="rank-note">RANKING 🥇 5학년 중 4위 · 🥉 전체 14개 학급 중 14위</p>
           </article>
 
           <article class="panel upload-panel">
@@ -234,12 +242,12 @@
           <p class="eyebrow">Project Frame</p>
           <p class="project-origin">내가 버린 쓰레기는 어디로 사라질까?</p>
           <p class="project-subtitle">AI와 데이터로 실천하는 자원순환 UX 개선 프로젝트</p>
-        </div>
-        <div class="project-statement" aria-label="프로젝트 핵심 문장">
-          <h2>
-            <span>환경 보호 포스터를 만드는 수업이 아니라,</span>
-            <span>교실 속 버리는 순간을 바꾸는 수업입니다.</span>
-          </h2>
+          <div class="project-statement" aria-label="프로젝트 핵심 문장">
+            <h2>
+              <span>환경 보호 포스터를 만드는 수업이 아니라,</span>
+              <span>교실 속 버리는 순간을 바꾸는 수업입니다.</span>
+            </h2>
+          </div>
         </div>
         <div class="project-cards">
           <article><span>01</span><h3>버리는 순간을 데이터로 바꾸다</h3><p>교실과 복도의 배출 장면을 관찰 가능한 학습 데이터로 전환합니다.</p></article>
@@ -253,11 +261,11 @@
       <section class="scene curriculum-scene" id="curriculum" data-nav="교육과정">
         <div class="scene-copy">
           <p class="eyebrow">Curriculum-based Learning Design</p>
-          <h2>교육과정 기반<br />수업 설계</h2>
-          <p>
-            본 프로젝트는 실과의 생활 자원 관리와 사회의 지속 가능한 미래·지역사회 문제 탐구,<br />
-            국어의 토의·조정 역량을 연결하여 학생이 생활 속 배출 문제를 발견하고,<br />
-            AI와 데이터를 활용해 학교 자원순환 UX를 개선하도록 설계한 융합 수업입니다.
+          <h2 class="curriculum-title"><span>2022</span><span>교육과정 기반</span><span>수업 설계</span></h2>
+          <p class="curriculum-description">
+            <span>본 프로젝트는 실과의 생활 자원 관리와 사회의 지속 가능한 미래·지역사회 문제 탐구,</span>
+            <span>국어의 토의·조정 역량을 연결하여 학생이 생활 속 배출 문제를 발견하고,</span>
+            <span>AI와 데이터를 활용해 학교 자원순환 UX를 개선하도록 설계한 융합 수업입니다.</span>
           </p>
         </div>
         <div class="curriculum-layout">
@@ -289,7 +297,7 @@
       <section class="scene hah-scene" id="hah" data-nav="H-A-H">
         <div class="scene-copy center-copy">
           <p class="eyebrow">H-A-H Learning Loop</p>
-          <h2>사람이 발견하고, AI로 확장하고,<br />다시 사람이 결정합니다.</h2>
+          <h2 class="hah-title"><span>사람이 발견하고, AI로 확장하고,</span><span>다시 사람이 결정합니다.</span></h2>
           <p class="hah-description">AIWays Incheon의 핵심은 AI에게 판단을 맡기는 것이 아니라, 학생이 자기 삶의 문제를 발견하고 AI를 조력자로 활용한 뒤 사람의 기준으로 다시 검증하는 Human → AI → Human의 학습 루프입니다.</p>
         </div>
         <div class="hah-grid">
@@ -304,19 +312,19 @@
       <!-- PAGE_FINAL_FIX_05_FLOW_START -->
       <section class="scene flow-scene" id="flow" data-nav="차시흐름">
         <div class="scene-copy">
-          <p class="eyebrow">6-Lesson Journey + Experience + Diffusion</p>
-          <h2>6시간의<br />수업 여정</h2>
+          <p class="eyebrow">7-Lesson Journey + Experience + Diffusion</p>
+          <h2>7시간의<br />수업 여정</h2>
           <p>문제 발견에서 AI 활용, 인간 검증, 블록코딩·티처블머신·바이브코딩까지 이어지고,<br />대시보드 활용으로 실천 데이터를 아카이빙하고 실시간으로 확인합니다.</p>
         </div>
         <div class="flow-grid">
-          <a class="flow-card" href="https://drive.google.com/file/d/1hBE3AOAu4RqxsBDvEHamkUD2uEv6EbAs/view?usp=sharing" target="_blank" rel="noopener noreferrer"><span>1차시·문제 발견</span><h3>학생의 목소리에서 출발하는<br />문제 발견</h3><p>학생 VOC와 교실 관찰로 버리는 순간의 혼선을 찾습니다.</p><em>수업자료</em></a>
-          <a class="flow-card" href="https://padlet.com/ssam_kang/padlet-zvqohi1e8wbips6v" target="_blank" rel="noopener noreferrer"><span>2차시·Flipped Learning</span><h3>내가 버린 쓰레기는 어디로 가는가</h3><p>거꾸로 학습을 통해 쓰레기의 문제가 우리 고장 속 살아있는 문제라는 현실에 직면합니다.</p><em>수업자료</em></a>
-          <a class="flow-card ai-badge" href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g" target="_blank" rel="noopener noreferrer"><span>3차시·Brainstorming</span><h3>생성형 AI와 아이디어 보드로<br />생각 확장</h3><p>AI와 함께 학교 쓰레기 문제를 해결할 UX 후보를 탐색합니다.</p><em>수업자료</em></a>
-          <a class="flow-card h2-badge" href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g" target="_blank" rel="noopener noreferrer"><span>4차시·Dilemma Discussion</span><h3>토의·토론을 통한 인간 검증</h3><p>AI 제안을 그대로 믿지 않고 기준으로 다시 판단합니다.</p><em>수업자료</em></a>
-          <a class="flow-card" href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g" target="_blank" rel="noopener noreferrer"><span>5차시·Block Coding</span><h3>블록코딩으로 알아보는<br />AI 이미지 분류 원리</h3><p>이미지 분류 개념과 AI가 헷갈리는 이유를 체험합니다.</p><em>수업자료</em></a>
-          <a class="flow-card" href="https://padlet.com/ssam_kang/padlet-9vcpfg8gtpv008md" target="_blank" rel="noopener noreferrer"><span>6차시·Teachable Machine</span><h3>우리 반 AI 모델 학습</h3><p>우리반 물건 사진으로 분리배출 모델을 학습시킵니다.</p><em>수업자료</em></a>
-          <article class="flow-card is-disabled" data-miniapp-missing="true"><span>7차시·Vibe Coding</span><h3>자연어로 설계하는 프로토타입</h3><p>자연어로 앱 기능을 설계하고 UX 프로토타입을 개선합니다.</p></article>
-          <a class="flow-card" href="#dashboard"><span>Experience·Diffusion</span><h3>데이터 아카이빙과 확산</h3><p>대시보드 활용으로 실천 데이터를 아카이빙하고 실시간으로 확인합니다.</p><em>체험하기</em></a>
+          <a class="flow-card" href="https://drive.google.com/file/d/1hBE3AOAu4RqxsBDvEHamkUD2uEv6EbAs/view?usp=sharing" target="_blank" rel="noopener noreferrer"><span>1차시 · 문제 발견</span><h3>학생의 목소리에서 출발하는<br />문제 발견</h3><p>학생 VOC와 교실 관찰로 버리는 순간의 혼선을 찾습니다.</p><em>수업자료</em></a>
+          <a class="flow-card" href="https://padlet.com/ssam_kang/padlet-zvqohi1e8wbips6v" target="_blank" rel="noopener noreferrer"><span>2차시 · Flipped Learning</span><h3>내가 버린 쓰레기는 어디로 가는가</h3><p>거꾸로 학습을 통해 쓰레기의 문제가 우리 고장 속 살아있는 문제라는 현실에 직면합니다.</p><em>수업자료</em></a>
+          <a class="flow-card ai-badge" href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g" target="_blank" rel="noopener noreferrer"><span>3차시 · Brainstorming</span><h3>생성형 AI와 아이디어 보드로<br />생각 확장</h3><p>AI와 함께 학교 쓰레기 문제를 해결할 UX 후보를 탐색합니다.</p><em>수업자료</em></a>
+          <a class="flow-card h2-badge" href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g" target="_blank" rel="noopener noreferrer"><span>4차시 · Dilemma Discussion</span><h3>토의·토론을 통한 인간 검증</h3><p>AI 제안을 그대로 믿지 않고 기준으로 다시 판단합니다.</p><em>수업자료</em></a>
+          <a class="flow-card" href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g" target="_blank" rel="noopener noreferrer"><span>5차시 · Block Coding</span><h3>블록코딩으로 알아보는<br />AI 이미지 분류 원리</h3><p>이미지 분류 개념과 AI가 헷갈리는 이유를 체험합니다.</p><em>수업자료</em></a>
+          <a class="flow-card" href="https://padlet.com/ssam_kang/padlet-9vcpfg8gtpv008md" target="_blank" rel="noopener noreferrer"><span>6차시 · Teachable Machine</span><h3>우리 반 AI 모델 학습</h3><p>우리반 물건 사진으로 분리배출 모델을 학습시킵니다.</p><em>수업자료</em></a>
+          <a class="flow-card" href="./miniapp/3second.html" target="_blank" rel="noopener noreferrer"><span>7차시 · Vibe Coding</span><h3>자연어로 설계하는 프로토타입</h3><p>자연어로 앱 기능을 설계하고 UX 프로토타입을 개선합니다.</p><em>체험하기</em></a>
+          <a class="flow-card" href="#dashboard"><span>Experience · Diffusion</span><h3>데이터 아카이빙과 확산</h3><p>대시보드 활용으로 실천 데이터를 아카이빙하고 실시간으로 확인합니다.</p><em>체험하기</em></a>
         </div>
       </section>
       <!-- PAGE_FINAL_FIX_05_FLOW_END -->
@@ -339,11 +347,14 @@
             <article data-gallery="3초판단 앱 프로토타입"><span>07</span><h3>3초판단 앱 프로토타입</h3><button type="button">바로가기</button></article>
             <article data-gallery="H-A-H 토의하기"><span>08</span><h3>H-A-H 토의하기</h3><button type="button">바로가기</button></article>
           </div>
-          <aside class="gallery-detail" id="galleryDetail">
+          <aside class="gallery-detail" id="galleryDetail" aria-live="polite">
             <button type="button" id="galleryBack">← 갤러리로 돌아가기</button>
-            <strong>학생 VOC 활동지</strong>
-            <p>사진 업로드 예정 슬롯</p>
-            <div><span></span><span></span></div>
+            <div class="gallery-detail-head">
+              <span id="galleryDetailNumber">01</span>
+              <strong id="galleryDetailTitle">학생 VOC 활동지</strong>
+              <p id="galleryDetailCaption">학생들이 발견한 불편함을 실제 활동지 이미지로 확인합니다.</p>
+            </div>
+            <div class="gallery-detail-grid" id="galleryDetailGrid" aria-label="갤러리 상세 이미지"></div>
           </aside>
         </div>
       </section>

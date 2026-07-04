@@ -200,6 +200,23 @@
     };
   }
 
+  function formatClassRanking(className, classes) {
+    const { grade } = classParts(className);
+    const classEntries = Object.entries(classes)
+      .filter(([, data]) => data && Number.isFinite(Number(data.today)))
+      .map(([name, data]) => ({ name, today: Number(data.today) }));
+    const gradeEntries = classEntries
+      .filter(item => item.name.startsWith(grade))
+      .sort((a, b) => b.today - a.today || a.name.localeCompare(b.name, "ko"));
+    const allEntries = [...classEntries].sort((a, b) => b.today - a.today || a.name.localeCompare(b.name, "ko"));
+
+    const gradeRank = Math.max(1, gradeEntries.findIndex(item => item.name === className) + 1);
+    const totalRank = Math.max(1, allEntries.findIndex(item => item.name === className) + 1);
+    const allTotal = Math.max(allEntries.length, 1);
+
+    return `RANKING 🥇 ${grade} 중 ${gradeRank}위 · 🥉 전체 ${allTotal}개 학급 중 ${totalRank}위`;
+  }
+
   function localRecords() {
     return normalizeRecords(readJson(STORAGE_RECORDS, []));
   }
@@ -278,7 +295,7 @@
     }
 
     const rankNote = $(".rank-note");
-    if (rankNote) rankNote.textContent = profile.rank + " · RANKING";
+    if (rankNote) rankNote.textContent = formatClassRanking(className, classes);
     renderHoldList(holdRecords);
   }
 
@@ -700,30 +717,101 @@
     const stage = $("#galleryStage");
     const detail = $("#galleryDetail");
     const back = $("#galleryBack");
-    if (!stage || !detail) return;
+    const grid = $("#galleryDetailGrid", detail);
+    if (!stage || !detail || !grid) return;
 
-    const titleNode = detail.querySelector("strong");
-    const textNode = detail.querySelector("p");
+    const titleNode = $("#galleryDetailTitle", detail);
+    const numberNode = $("#galleryDetailNumber", detail);
+    const captionNode = $("#galleryDetailCaption", detail);
+    const galleryItems = {
+      "학생 VOC 활동지": {
+        number: "01",
+        caption: "학생들이 발견한 불편함을 실제 활동지 이미지로 확인합니다.",
+        images: ["assets/gallery/01-1.png", "assets/gallery/01-2.png"]
+      },
+      "쓰레기매립지 알아보기": {
+        number: "02",
+        caption: "우리 지역의 쓰레기 흐름과 매립지 문제를 탐구한 기록입니다.",
+        images: ["assets/gallery/02-1.png", "assets/gallery/02-2.png"]
+      },
+      "아이디어 확장하기": {
+        number: "03",
+        caption: "AI와 함께 확장한 자원순환 UX 아이디어 산출물입니다.",
+        images: ["assets/gallery/03-1.jpg", "assets/gallery/03-2.jpg"]
+      },
+      "딜레마 토론": {
+        number: "04",
+        caption: "AI 제안을 사람이 다시 판단한 토론 기록입니다.",
+        images: ["assets/gallery/04-1.jpg", "assets/gallery/04-2.jpg"]
+      },
+      "블록코딩": {
+        number: "05",
+        caption: "AI 이미지 분류 원리를 블록코딩으로 이해한 활동입니다.",
+        images: ["assets/gallery/05-1.jpg", "assets/gallery/05-2.jpg"]
+      },
+      "이미지 모델 학습 자료": {
+        number: "06",
+        caption: "Teachable Machine을 위한 이미지 모델 학습 자료입니다.",
+        images: ["assets/gallery/06-1.png", "assets/gallery/06-2.png"]
+      },
+      "3초판단 앱 프로토타입": {
+        number: "07",
+        caption: "학생 확인을 중심에 둔 3초판단 앱 프로토타입입니다.",
+        images: ["assets/gallery/07-1.png", "assets/gallery/07-2.png"]
+      },
+      "H-A-H 토의하기": {
+        number: "08",
+        caption: "Human → AI → Human 흐름으로 판단을 조정한 토의 기록입니다.",
+        images: ["assets/gallery/08-1.jpg", "assets/gallery/08-2.jpg"]
+      }
+    };
+
+    function showMissingSlot() {
+      return '<figure class="gallery-detail-photo is-missing"><span>이미지 준비 중</span></figure>';
+    }
 
     function openDetail(card) {
       const title = card.dataset.gallery || cleanText(card.textContent) || "학생 산출물";
+      const item = galleryItems[title] || {
+        number: "--",
+        caption: "이미지 준비 중",
+        images: []
+      };
+
+      if (numberNode) numberNode.textContent = item.number;
       if (titleNode) titleNode.textContent = title;
-      if (textNode) textNode.textContent = title + " 사진 업로드 예정 슬롯";
-      detail.querySelectorAll("div span").forEach((slot, index) => {
-        slot.textContent = `사진 ${index + 1}`;
-        slot.setAttribute("aria-label", `${title} 사진 슬롯 ${index + 1}`);
+      if (captionNode) captionNode.textContent = item.caption;
+      grid.innerHTML = item.images.length
+        ? item.images.map((src, index) => `
+            <figure class="gallery-detail-photo">
+              <img src="${src}" alt="${title} ${index + 1}" loading="lazy" />
+              <figcaption>${item.number}-${index + 1}</figcaption>
+            </figure>
+          `).join("")
+        : showMissingSlot() + showMissingSlot();
+
+      $$("img", grid).forEach(img => {
+        img.addEventListener("error", () => {
+          const photo = img.closest(".gallery-detail-photo");
+          if (!photo) return;
+          photo.classList.add("is-missing");
+          photo.innerHTML = "<span>이미지 준비 중</span>";
+        }, { once: true });
       });
+
       stage.classList.add("is-detail");
     }
 
     stage.addEventListener("click", event => {
       const card = event.target.closest("[data-gallery]");
       if (!card || !stage.contains(card)) return;
+      event.preventDefault();
       openDetail(card);
     });
 
     back?.addEventListener("click", () => {
       stage.classList.remove("is-detail");
+      grid.innerHTML = "";
     });
   }
   // PAGE_FINAL_FIX_06_GALLERY_END
@@ -733,7 +821,8 @@
     const refresh = $("[data-refresh-records]");
     if (!refresh) return;
 
-    refresh.addEventListener("click", async () => {
+    refresh.addEventListener("click", async event => {
+      event.stopPropagation();
       refresh.classList.add("is-loading");
       refresh.setAttribute("aria-busy", "true");
       countUpNextDashboard = true;
@@ -745,6 +834,17 @@
       }, 680);
       refresh.classList.remove("is-loading");
       refresh.removeAttribute("aria-busy");
+    });
+  }
+
+  function initLandfillSourceLink() {
+    const panel = $(".landfill-panel[data-source-url]");
+    if (!panel) return;
+
+    panel.addEventListener("click", event => {
+      if (event.target.closest("a, button, input, select, label")) return;
+      const url = panel.dataset.sourceUrl;
+      if (url) window.open(url, "_blank", "noopener,noreferrer");
     });
   }
   // PAGE_FINAL_FIX_01_DASHBOARD_END
@@ -840,6 +940,7 @@
     initSelectors();
     initUpload();
     initRefreshControls();
+    initLandfillSourceLink();
     applyDashboard(allStoredRecords());
     loadRemoteRecords();
   }

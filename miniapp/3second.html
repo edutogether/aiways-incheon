@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Ways 인천 - 3초 판단 도우미</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #f1f5f9;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom smooth scrollbar for suggestions & lists */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-3 sm:p-6 text-slate-800">
+
+    <!-- 상단 헤더 -->
+    <header class="text-center max-w-lg w-full my-4">
+        <div class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 px-3.5 py-1 rounded-full text-[11px] font-bold mb-3 shadow-sm border border-blue-100">
+            <span class="inline-block w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
+            AI Ways 인천 - 학교 자원순환 캠페인
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 flex justify-center items-center gap-2">
+            ♻️ <span class="text-blue-600">3초 판단</span> 도우미
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium">행동 경험을 바꾸는 학교 전용 자원순환 가이드</p>
+    </header>
+
+    <!-- 메인 앱 컨테이너 -->
+    <main class="max-w-lg w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-4 sm:p-6 space-y-6">
+        
+        <!-- 탭 메뉴 (4가지 탭으로 반응형 확장) -->
+        <nav class="grid grid-cols-4 gap-1 bg-slate-100 p-1.5 rounded-2xl text-[11px] sm:text-xs font-bold">
+            <button onclick="switchTab('tab-judge')" id="btn-tab-judge" class="text-center py-2.5 rounded-xl transition-all duration-300 bg-white text-slate-900 shadow-sm">
+                🔍 판단
+            </button>
+            <button onclick="switchTab('tab-quiz')" id="btn-tab-quiz" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">
+                🎮 퀴즈
+            </button>
+            <button onclick="switchTab('tab-stats')" id="btn-tab-stats" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">
+                🌱 통계
+            </button>
+            <button onclick="switchTab('tab-hold')" id="btn-tab-hold" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">
+                🟨 보류함
+            </button>
+        </nav>
+
+        <!-- 1. 3초 판단 탭 -->
+        <div id="tab-judge" class="tab-content space-y-5">
+            <!-- 검색 영역 -->
+            <div class="relative">
+                <label for="searchInput" class="block text-xs sm:text-sm font-bold text-slate-700 mb-2 flex items-center gap-1">
+                    🎯 무엇을 버리시나요?
+                </label>
+                <div class="relative">
+                    <input type="text" id="searchInput" onkeyup="handleSearch(event)" placeholder="예: 영수증, 볼펜, 컵라면, 캔, 생수병..." 
+                           class="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 pl-4 pr-12 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-300" />
+                    <button onclick="triggerSearch()" class="absolute right-3.5 top-3.5 text-slate-400 hover:text-blue-600 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </button>
+                </div>
+                <!-- 자동완성 추천창 -->
+                <div id="search-suggestions" class="hidden absolute left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-2xl shadow-xl z-20 max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs custom-scrollbar"></div>
+            </div>
+
+            <!-- 신속 도우미 버튼 그리드 -->
+            <div>
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">자주 찾는 학교 쓰레기 (3초 클릭)</span>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" onclick="checkTrash('🥛 우유갑')">
+                        <span class="text-2xl">🥛</span>
+                        <span class="text-xs font-bold text-slate-700">우유갑</span>
+                    </button>
+                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" onclick="checkTrash('📄 종이류')">
+                        <span class="text-2xl">📄</span>
+                        <span class="text-xs font-bold text-slate-700">종이류</span>
+                    </button>
+                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" onclick="checkTrash('🥤 플라스틱 컵')">
+                        <span class="text-2xl">🥤</span>
+                        <span class="text-xs font-bold text-slate-700">플라스틱 컵</span>
+                    </button>
+                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" onclick="checkTrash('🍜 컵라면 용기')">
+                        <span class="text-2xl">🍜</span>
+                        <span class="text-xs font-bold text-slate-700">컵라면 용기</span>
+                    </button>
+                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" onclick="checkTrash('🍿 과자 봉지')">
+                        <span class="text-2xl">🍿</span>
+                        <span class="text-xs font-bold text-slate-700">과자 봉지</span>
+                    </button>
+                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" onclick="checkTrash('🥫 캔류')">
+                        <span class="text-2xl">🥫</span>
+                        <span class="text-xs font-bold text-slate-700">캔류</span>
+                    </button>
+                    <button class="col-span-2 flex items-center justify-center gap-2.5 p-3 bg-amber-50 hover:bg-amber-100/50 border border-amber-100 hover:border-amber-300 rounded-2xl transition-all duration-200 text-amber-800 active:scale-95" onclick="checkTrash('🤔 판단 보류 물건')">
+                        <span class="text-xl">🟨</span>
+                        <span class="text-xs font-bold">잘 모르겠어요 (판단 보류함 기록)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 결과 표시창 -->
+            <div class="border-2 border-dashed border-slate-200 rounded-3xl p-5 bg-slate-50/30 flex flex-col justify-center min-h-[160px] relative transition-all duration-300" id="displayScreen">
+                <!-- 기본 상태 -->
+                <div id="placeholder" class="text-center py-6">
+                    <p class="text-3xl mb-2">🔍</p>
+                    <p class="text-xs sm:text-sm font-semibold text-slate-600">위의 물건을 선택하거나 직접 검색해 보세요!</p>
+                    <p class="text-[11px] text-slate-400 mt-1">인천광역시 분리배출 가이드라인 기준 판단 결과를 제공합니다.</p>
+                </div>
+                
+                <!-- 결과 상태 -->
+                <div id="resultContent" class="hidden space-y-4">
+                    <div class="flex justify-between items-start gap-2">
+                        <div>
+                            <span id="resCategory" class="inline-block bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase mb-1">카테고리</span>
+                            <h3 id="resTitle" class="text-lg sm:text-xl font-bold text-slate-900">물건 이름</h3>
+                        </div>
+                        <span id="resActionTag" class="text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0">판단 대기</span>
+                    </div>
+                    
+                    <p id="resBody" class="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">안내 가이드라인 문장</p>
+                    
+                    <div class="bg-white rounded-2xl p-3 border border-slate-100 flex items-start gap-2 shadow-sm">
+                        <span class="text-base shrink-0">💡</span>
+                        <div>
+                            <p class="text-xs font-bold text-slate-700 mb-0.5">핵심 팁</p>
+                            <p id="resTip" class="text-[11px] text-slate-500 leading-relaxed">추가 꿀팁이나 세부 사항이 표시됩니다.</p>
+                        </div>
+                    </div>
+
+                    <!-- 판단 유예 등록 서브폼 (이름이 없는 복합재질/오분류 의심 쓰레기 저장용) -->
+                    <div id="hold-registration-form" class="hidden mt-2 p-3.5 bg-amber-50 border border-amber-200 rounded-2xl space-y-2.5">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-amber-900">
+                            <span>🟨</span>
+                            <span>학교 판단 보류함에 실물 기록하기</span>
+                        </div>
+                        <p class="text-[10px] text-slate-500 leading-snug">
+                            애매한 복합 쓰레기를 무단 투기하지 않고 보류함에 모아 금요일 자원순환 회의에 안건으로 제출해 보세요.
+                        </p>
+                        <div class="flex gap-2">
+                            <input type="text" id="holdItemName" placeholder="예: 스프링 공책, 부러진 자" class="flex-1 bg-white border border-amber-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500" />
+                            <button onclick="registerHoldItem()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shrink-0">보류함 기록</button>
+                        </div>
+                    </div>
+
+                    <!-- 실천 확인 버튼 -->
+                    <div class="pt-1 flex justify-end" id="practiceActionRow">
+                        <button id="btnLogPractice" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm hover:shadow transition-all flex items-center gap-1.5 active:scale-95">
+                            ✅ 가이드 확인 및 실천 기록하기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 3초 퀴즈 탭 -->
+        <div id="tab-quiz" class="tab-content hidden space-y-5">
+            <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 text-center">
+                <span class="text-xs font-bold text-blue-600">3초 블리츠! 분리배출 O/X 챌린지</span>
+                <p class="text-[11px] text-slate-500 mt-1">학교에서 흔히 발생하는 알쏭달쏭 퀴즈를 맞히고 우수 대원이 되어보세요.</p>
+            </div>
+
+            <!-- 퀴즈 박스 -->
+            <div id="quiz-box" class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4 relative min-h-[220px] flex flex-col justify-between">
+                <!-- 문제 진행바 및 스코어 -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-[10px] sm:text-xs font-bold text-slate-400">
+                        <span id="quiz-progress">질문 1 / 5</span>
+                        <span id="quiz-score" class="text-blue-600">현재 점수: 0점</span>
+                    </div>
+                    <!-- 프로그레스 바 추가 -->
+                    <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                        <div id="quiz-progress-bar" class="bg-blue-500 h-full transition-all duration-300" style="width: 20%"></div>
+                    </div>
+                </div>
+
+                <!-- 문제 지문 -->
+                <div class="text-center py-4 space-y-2">
+                    <span id="quiz-emoji" class="text-4xl block">📦</span>
+                    <h4 id="quiz-question" class="text-sm sm:text-base font-extrabold text-slate-800 leading-snug">질문 텍스트가 여기에 나옵니다.</h4>
+                </div>
+
+                <!-- O/X 선택 버튼 -->
+                <div class="grid grid-cols-2 gap-4" id="quiz-buttons">
+                    <button onclick="submitQuizAnswer(true)" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 rounded-2xl shadow-md transition-all active:scale-[0.97] text-xl">O</button>
+                    <button onclick="submitQuizAnswer(false)" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3.5 rounded-2xl shadow-md transition-all active:scale-[0.97] text-xl">X</button>
+                </div>
+
+                <!-- 정답 풀이 패널 -->
+                <div id="quiz-explanation-panel" class="hidden space-y-3 pt-2">
+                    <div class="p-3.5 rounded-xl border flex items-start gap-2.5" id="explanation-box-color">
+                        <span id="explanation-emoji" class="text-lg">🎉</span>
+                        <div>
+                            <p id="explanation-title" class="text-xs font-extrabold"></p>
+                            <p id="explanation-desc" class="text-[11px] leading-relaxed mt-0.5 text-slate-600"></p>
+                        </div>
+                    </div>
+                    <button onclick="nextQuiz()" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-3 rounded-xl transition-all">다음 문제 풀기 ➔</button>
+                </div>
+            </div>
+
+            <!-- 결과 요약 박스 (종료 시 노출) -->
+            <div id="quiz-result-summary" class="hidden text-center p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
+                <span class="text-4xl">🏆</span>
+                <h3 class="text-lg font-extrabold text-slate-800">퀴즈 완료!</h3>
+                <p id="quiz-result-score-text" class="text-sm font-semibold text-slate-600">5문제 중 4문제를 맞췄습니다.</p>
+                <div class="bg-white p-3.5 rounded-xl border text-left text-[11px] space-y-1.5 text-slate-500">
+                    <p class="font-bold text-slate-700">💡 잊지 말아야 할 분리배출 규칙:</p>
+                    <p>• 화학 코팅 처리된 영수증과 감열지는 일반쓰레기로 배출하세요.</p>
+                    <p>• 빨간 국물이 씻기지 않는 컵라면 스티로폼 용기는 일반쓰레기입니다.</p>
+                    <p>• 택배 상자는 플라스틱 테이프와 운송장 비닐 스티커를 깨끗하게 제거해야 종이류로 재활용할 수 있습니다.</p>
+                </div>
+                <button onclick="startQuiz()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-3 rounded-xl transition-all">다시 도전하기 🔄</button>
+            </div>
+        </div>
+
+        <!-- 3. 실천 통계 탭 -->
+        <div id="tab-stats" class="tab-content hidden space-y-5">
+            <div class="bg-teal-50 border border-teal-100 rounded-2xl p-4 flex items-center gap-3">
+                <span class="text-3xl">🌳</span>
+                <div>
+                    <h4 class="text-xs sm:text-sm font-bold text-teal-800">나의 분리배출 작은 실천 효과</h4>
+                    <p class="text-[11px] text-teal-600 mt-0.5">올바른 3초 분리배출 실천이 모여 깨끗한 지구를 만듭니다.</p>
+                </div>
+            </div>
+
+            <!-- 대시보드 스탯 -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-center space-y-1">
+                    <span class="text-[10px] font-semibold text-slate-400">누적 올바른 배출</span>
+                    <h5 id="stat-count" class="text-2xl sm:text-3xl font-extrabold text-blue-600">0회</h5>
+                </div>
+                <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-center space-y-1">
+                    <span class="text-[10px] font-semibold text-slate-400">이산화탄소 저감량</span>
+                    <h5 id="stat-carbon" class="text-2xl sm:text-3xl font-extrabold text-teal-600">0.0g</h5>
+                </div>
+            </div>
+
+            <!-- 누적 내역 리스트 -->
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-400">오늘의 실천 타임라인</span>
+                    <button onclick="promptResetStats()" class="text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors">기록 초기화 🗑️</button>
+                </div>
+                <div id="practice-logs-container" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+                    <!-- 로그가 없을 때의 기본 상태 -->
+                    <div id="no-logs-msg" class="text-center py-8 border border-dashed border-slate-200 rounded-2xl">
+                        <p class="text-[11px] text-slate-400">아직 기록된 실천이 없습니다.<br>'3초 판단'에서 가이드라인을 확인하고 실천해보세요!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 판단 보류함 탭 -->
+        <div id="tab-hold" class="tab-content hidden space-y-5">
+            <div class="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex items-center gap-3">
+                <span class="text-3xl">🟨</span>
+                <div>
+                    <h4 class="text-xs sm:text-sm font-bold text-amber-800">학교 판단 보류함 대기 목록</h4>
+                    <p class="text-[11px] text-amber-600 mt-0.5">애매한 물건을 무단 투기하지 않고 매주 자원순환 자치 회의를 통해 올바른 해결법을 결정하는 보류함입니다.</p>
+                </div>
+            </div>
+
+            <!-- 보류함 수동 등록 폼 -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
+                <label for="directHoldInput" class="block text-[11px] font-extrabold text-slate-600">✍️ 회의 안건 수동 등록</label>
+                <div class="flex gap-2">
+                    <input type="text" id="directHoldInput" placeholder="예: 코팅 박막 책 표지, 실리콘 케이스" 
+                           class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all" />
+                    <button onclick="addHoldItemDirect()" class="bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs px-4 py-2 rounded-xl transition-all shadow-sm shrink-0">
+                        등록
+                    </button>
+                </div>
+            </div>
+
+            <!-- 보류 목록 목록판 -->
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-400">보류 및 유예 처리 물건 (<span id="hold-count-badge">0</span>개)</span>
+                    <button onclick="promptResetHold()" class="text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors">목록 비우기 🗑️</button>
+                </div>
+                <div id="hold-list-container" class="space-y-2 max-h-52 overflow-y-auto custom-scrollbar">
+                    <!-- 기본 비어있음 상태 -->
+                    <div id="no-hold-items-msg" class="text-center py-8 border border-dashed border-slate-200 rounded-2xl">
+                        <p class="text-[11px] text-slate-400">기록된 판단 보류 물건이 없습니다.<br>'3초 판단'에서 애매한 쓰레기를 등록하거나, 직접 기재해 보세요!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 실시간 작동 모드 배너 -->
+        <div class="flex justify-between items-center text-[10px] sm:text-[11px] font-bold bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-slate-500">
+            <span class="flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                인천 공식 환경 기준 가이드 적용
+            </span>
+            <span class="text-slate-400">Ver 1.6.0</span>
+        </div>
+    </main>
+
+    <!-- 하단 푸터 고지 -->
+    <footer class="max-w-lg w-full text-center mt-6 text-[10px] sm:text-[11px] text-slate-400 leading-relaxed space-y-1">
+        <p>본 플랫폼은 인천광역시 교육청 자원순환 지침 및 환경부 공식 분리수거 지침을 바탕으로 엄격히 제작되었습니다.</p>
+        <p>수집 데이터는 브라우저 내부(Local Storage)에만 보존되므로 외부 유출 우려 없이 안심하고 사용하실 수 있습니다.</p>
+    </footer>
+
+    <!-- 자체 디자인 커스텀 확인용 모달 (Browser alert/confirm 완전 대체) -->
+    <div id="customModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl border border-slate-100 transform scale-95 opacity-0 transition-all duration-300" id="modalBox">
+            <div class="text-center space-y-2">
+                <span id="modalIcon" class="text-3xl block">⚠️</span>
+                <h4 id="modalTitle" class="text-base font-extrabold text-slate-800">모달 제목</h4>
+                <p id="modalDesc" class="text-xs text-slate-500 leading-relaxed">상세 내용 설명이 표시되는 구간입니다.</p>
+            </div>
+            <div class="flex gap-2.5">
+                <button id="modalCancelBtn" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs py-2.5 rounded-xl transition-all">취소</button>
+                <button id="modalConfirmBtn" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs py-2.5 rounded-xl transition-all">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 자바스크립트 로직 -->
+    <script>
+        // -----------------------------------------
+        // 1. 공용 데이터베이스 (인천광역시 교육청 및 환경부 지침 표준화)
+        // -----------------------------------------
+        const trashDb = {
+            "우유갑": {
+                name: "🥛 우유갑 (종이팩류)",
+                category: "종이팩",
+                guide: "종이팩은 내부를 물로 깨끗이 비우고 완전히 건조한 뒤 펼쳐서 납작하게 눌러 <b>[우유갑/종이팩 전용 수거함]</b>에 별도로 배출해 주세요.",
+                tip: "플라스틱 뚜껑이나 스트로우는 제거해야 합니다. 일반 일반용지 폐지와 종이팩은 재활용 공정(화장지 재생산)이 전혀 다르므로 섞어서 종이에 버리면 폐기됩니다.",
+                isHold: false,
+                carbonSaved: 25.0
+            },
+            "종이류": {
+                name: "📄 깨끗한 종이류",
+                category: "종이류",
+                guide: "인쇄용지, 노트, 신문, 책자 등 오염되지 않은 종이는 흐트러지지 않게 잘 모아서 종이 수거함에 배출합니다.",
+                tip: "스프링노트의 철스프링 및 플라스틱 가이드라인, 책 표지의 비닐 코팅 필름, 배송 상자의 박스 테이프 등 종이가 아닌 이물질은 완벽하게 뜯어서 배출해야 합니다.",
+                isHold: false,
+                carbonSaved: 15.0
+            },
+            "플라스틱 컵": {
+                name: "🥤 일회용 플라스틱 컵",
+                category: "플라스틱",
+                guide: "남은 음료와 잔여물을 깨끗이 비우고 물로 완전히 헹군 뒤, 플라스틱 배출함에 넣습니다.",
+                tip: "컵 겉면에 가열 부착되어 떼기 힘든 비닐 패킹 라벨이나 빨대, 실링 테두리가 깔끔하게 떨어지지 않으면 재활용 효율이 낮아집니다. 제거가 안 될 경우 부득이 종량제로 폐기해야 할 수도 있습니다.",
+                isHold: false,
+                carbonSaved: 32.5
+            },
+            "컵라면 용기": {
+                name: "🍜 컵라면 용기",
+                category: "일반쓰레기 (종량제)",
+                guide: "내부의 빨간 기름때나 자국이 씻기지 않고 변색된 스티로폼 용기는 재활용 선별 과정에서 오염원 및 폐기물로 분류되므로 <b>일반쓰레기(종량제 봉투)</b>로 버려주세요.",
+                tip: "외부 비닐 포장과 라벨은 분리하여 비닐로 배출합니다. 내부 오염이 전혀 없이 깨끗하게 세척되고 하얀 스티로폼만 남은 용기는 스티로폼 전용함에 배출 가능합니다.",
+                isHold: false,
+                carbonSaved: 5.0
+            },
+            "과자 봉지": {
+                name: "🍿 과자 봉지 (비닐류)",
+                category: "비닐류",
+                guide: "라벨이나 표면에 비닐 마크가 표시된 과자 봉지, 라면 포장지 등은 내부 이물질을 말끔히 털어낸 후 고르게 펴거나 모아 비닐류 수거함으로 배출합니다.",
+                tip: "봉지 내부에 스며든 양념이나 액체, 부스러기가 너무 많이 묻어 세척이 어려운 경우에는 주저 없이 일반 쓰레기(종량제 봉투)로 투입해야 비닐 분리 배출함이 오염되는 것을 막습니다.",
+                isHold: false,
+                carbonSaved: 12.0
+            },
+            "판단 보류 물건": {
+                name: "🤔 판단 보류 물건 (애매한 자재)",
+                category: "유예 상태",
+                guide: "두 개 이상의 재질이 복합적으로 결합되어 있고, 손으로 도저히 쉽게 분리할 수 없어 배출이 난해한 쓰레기는 임의 배출하지 마시고 학교 <b>[판단 보류함]</b>에 모아주세요.",
+                tip: "수작업으로 처리되지 못해 선별장에서 결국 폐기 처리되는 비효율을 방지하기 위해 매주 자원순환팀 자치 회의를 열어 해당 품목의 최선의 배출 기준을 설정해 나갑니다.",
+                isHold: true,
+                carbonSaved: 0
+            },
+            "영수증": {
+                name: "🧾 영수증 (감열지)",
+                category: "일반쓰레기",
+                guide: "마트나 매장에서 발급받은 영수증, 대기 번호표 등은 열에 노출되면 색이 올라오는 특수 염료 화학 코팅(감열지)이 적용된 자재이므로 <b>일반 쓰레기(종량제 봉투)</b>로 버려야 합니다.",
+                tip: "일반 종이 폐지로 함께 배출하면 재수출 가공 과정에서 종이 결합을 방해하고 약품 결함을 초래하므로 종이함에 절대 혼입해선 안 됩니다.",
+                isHold: false,
+                carbonSaved: 4.5
+            },
+            "볼펜": {
+                name: "🖋️ 볼펜 및 필기구류",
+                category: "일반쓰레기",
+                guide: "일반 볼펜, 형광펜, 샤프 등 학교에서 자주 쓰이는 필기구는 플라스틱 외관, 내장 철 스프링, 잔류 잉크 심 등 상이한 구성품이 단단히 결속된 구조물로서 <b>일반쓰레기</b>로 배출합니다.",
+                tip: "모양새가 플라스틱으로 구성되었다 하더라도 개별적 분해 및 세척 선별이 불가능한 구조의 소형 가공물은 선별장 분배 과정에서 폐기되므로 일반 종량제 배출이 기준입니다.",
+                isHold: false,
+                carbonSaved: 3.0
+            },
+            "지우개": {
+                name: "🧼 지우개 및 수정테이프",
+                category: "일반쓰레기",
+                guide: "PVC 계열 고무나 합성 가공수지로 제작된 지우개 가루, 파편, 혹은 수정테이프의 기어 플라스틱 케이스는 재활용 대상 자원이 아니므로 전부 <b>일반 쓰레기</b>로 배출합니다.",
+                tip: "지우개를 보호하고 있는 외곽 종이 슬리브는 분리가 가능하다면 개별 종이류로 폐기 배출 가능합니다.",
+                isHold: false,
+                carbonSaved: 2.0
+            },
+            "피자박스": {
+                name: "🍕 피자 박스",
+                category: "일반쓰레기",
+                guide: "기름진 피자 치즈나 양념, 기름막이 깊게 침투하고 오염 물질이 들러붙은 종이 박스는 재활용 종이 원료로 사용할 수 없으므로 잘게 찢어 <b>일반 쓰레기</b>로 폐기합니다.",
+                tip: "박스의 상부면 등 오염이 전혀 진행되지 않고 깨끗한 순수 도화지로 보존된 종이 구획은 칼로 도려내어 깨끗한 골판지 종이류로 정상 배출하셔도 좋습니다.",
+                isHold: false,
+                carbonSaved: 10.0
+            },
+            "페트병": {
+                name: "🍾 투명 페트병",
+                category: "투명페트병",
+                guide: "생수 및 음료수 등 색상이 전혀 없는 투명 페트병은 내용물을 비우고 라벨지를 완전히 박리하여 찌그러트린 후 <b>[투명페트병 전용 수거함]</b>에 전용 투입합니다.",
+                tip: "유색 페트병(탄산음료수, 맥주병 등)이나 불투명 바디(세제 용기, 샴푸 통)는 가공 공정의 차이가 존재하여 일반 공용 플라스틱 수거함에 분류해서 넣어주셔야 고품질의 재활용 의류 원사 원료가 탄생합니다.",
+                isHold: false,
+                carbonSaved: 48.0
+            },
+            "칫솔": {
+                name: "🪥 칫솔",
+                category: "일반쓰레기",
+                guide: "칫솔 몸체의 손잡이 플라스틱과 나일론 섬유 칫솔모가 다른 극성 재질로 단단히 식모되어 있는 고복합 소형 품목이므로 <b>일반쓰레기</b>로 분류하여 버립니다.",
+                tip: "친환경 생분해 수지나 나무 대나무 칫솔의 상황에도 수작업 분류선에서 재활용되지 못하고 전량 소각로로 이동되므로 일반 종량제 쓰레기 처리가 안전한 기준입니다.",
+                isHold: false,
+                carbonSaved: 2.5
+            },
+            "캔류": {
+                name: "🥫 캔류 (음료/통조림)",
+                category: "캔류",
+                guide: "탄산음료, 커피 캔, 알루미늄 및 철캔 등은 내부 내용물을 완전히 비우고 흐르는 물로 세척 후 찌그러트려 <b>캔 고철 배출함</b>에 폐기합니다.",
+                tip: "플라스틱 주입구나 외부 라벨지가 결합한 포장재는 반드시 탈착 과정을 거쳐야 제련 수거용 고순도 메탈 공정 원료로 원활히 쓰이게 됩니다.",
+                isHold: false,
+                carbonSaved: 38.0
+            },
+            "폐건전지": {
+                name: "🔋 폐건전지",
+                category: "폐형광등/폐건전지",
+                guide: "소모된 모든 종류의 망간, 알칼라인 건전지는 유해 중금속 물질을 누출할 수 있어 절대 일반 쓰레기로 버려서는 안 되며, <b>[동주민센터/학교 내 폐건전지 전용 수거함]</b>에 넣어야 합니다.",
+                tip: "전용 수거시설에 배출하면 연, 아연, 철 등의 금속 성분을 완벽히 정제 수거하여 자원으로 재사용하게 됩니다.",
+                isHold: false,
+                carbonSaved: 50.0
+            },
+            "택배박스": {
+                name: "📦 택배 상자 (골판지)",
+                category: "종이류 (골판지)",
+                guide: "상자 외부를 견고하게 덮은 투명 플라스틱 테이프, 고정 철핀, 부착된 종이 및 비닐 송장 스티커를 완전히 제거한 뒤, 부피를 줄여서 종이 배출함에 버립니다.",
+                tip: "이물질이 덕지덕지 붙은 상자는 선별장 효율을 치명적으로 떨어트리며, 빗물이나 습기로 오염된 골판지 역시 무조건 제외해야 고품질 지류 원자재가 될 수 있습니다.",
+                isHold: false,
+                carbonSaved: 18.0
+            },
+            "바나나 껍질": {
+                name: "🍌 과일 껍질 (음식물쓰레기)",
+                category: "음식물쓰레기",
+                guide: "바나나, 사과, 오렌지 껍질과 같이 동물이 분쇄하여 사료나 비료로 활용 가능한 연질 과일의 부산물은 <b>음식물 쓰레기 수거통</b>에 올바르게 버립니다.",
+                tip: "견과류 껍데기, 코코넛 하드쉘, 달걀 껍데기, 육류 뼈, 어패류 단단한 등껍질은 파쇄 장비를 마모시키는 요인이기 때문에 반드시 일반쓰레기(종량제 봉투)로 배출해야 합니다.",
+                isHold: false,
+                carbonSaved: 14.5
+            }
+        };
+
+        // -----------------------------------------
+        // 2. 실천 통계 및 판단 보류함 데이터 구조 (메모리 및 로컬 스토리지 연동)
+        // -----------------------------------------
+        let practiceStats = {
+            totalCount: 0,
+            carbonReduction: 0.0,
+            logs: []
+        };
+
+        let holdBoxList = []; // 판단 보류 목록 [{id, name, date}]
+
+        // -----------------------------------------
+        // 3. 3초 퀴즈 데이터 정의 (인천 지침 및 다빈도 오분류 항목)
+        // -----------------------------------------
+        const quizData = [
+            {
+                emoji: "🧾",
+                question: "물건을 사고 받은 종이 영수증은 가공 가치가 높기 때문에 깨끗한 종량제 종이류 수거함에 섞어 배출해도 된다.",
+                answer: false,
+                explanation: "영수증은 열에 반응하는 특수 약품 코팅이 되어 있는 감열지입니다. 일반 폐지와 섞이면 가공 품질이 훼손되므로 일반쓰레기로 전량 폐기해야 정답입니다!"
+            },
+            {
+                emoji: "🍜",
+                question: "빨갛게 라면 국물이 얼룩 배어 주방 세제로 아무리 씻어도 지워지지 않는 스티로폼 라면 용기는 재활용이 불가능하다.",
+                answer: true,
+                explanation: "얼룩이나 국물이 깊이 배어 오염을 지울 수 없는 상태의 스티로폼 용기는 폐기로 분류됩니다. 반드시 일반쓰레기(종량제 봉투)에 담아 주셔야 선별장에서 혼선이 없습니다."
+            },
+            {
+                emoji: "🥛",
+                question: "우유갑과 주스 종이팩은 일반 책이나 폐지와 분리해 종이팩 전용함(혹은 우유갑 수거함)에 배출해야 고급 화장지로 승격된다.",
+                answer: true,
+                explanation: "종이팩은 최고급 목재 펄프를 수입하여 가공하는 우수 자원입니다. 분해 시 일반 신문지나 재생용지와 융합 가공 속도가 완전히 달라 전용 분리가 원칙입니다."
+            },
+            {
+                emoji: "📦",
+                question: "택배 골판지 상자는 외부 테이프와 운송장 비닐 스티커가 조금 부착되어 있는 상태여도 그냥 상자째 종이류로 함께 버리면 된다.",
+                answer: false,
+                explanation: "택배 박스의 투명 비닐 테이프와 종이 및 비닐 송장은 가공 전 과정에서 완전히 타지 않거나 물에 엉겨 녹지 않는 불순물을 형성하므로, 무조건 완전 제립 후 종이판만 접어서 내놓으셔야 합니다."
+            },
+            {
+                emoji: "🍾",
+                question: "내용물을 세척하고 압착한 투명 생수병은 브랜드 인쇄용 비닐 라벨을 뜯지 않은 채로 그대로 수거함에 배출해도 자원으로 잘 분류된다.",
+                answer: false,
+                explanation: "투명 페트병 수거 공정의 완벽한 재자원화를 위해서는 인쇄용 수축 라벨 비닐은 꼭 뜯어서 별도 비닐류에, 순수 페트병 바디만 납작하게 찌그러트려 전용 투명 수거함에 배출해야 고품질 업사이클 가치를 가집니다."
+            }
+        ];
+
+        let currentQuizIndex = 0;
+        let userQuizScore = 0;
+
+        // -----------------------------------------
+        // 4. 화면 전환 및 초기화
+        // -----------------------------------------
+        window.onload = function() {
+            // 로컬 스토리지 데이터 안전 복구
+            try {
+                const savedStats = localStorage.getItem('ai_ways_incheon_stats_v1');
+                if (savedStats) {
+                    practiceStats = JSON.parse(savedStats);
+                    updateStatsUI();
+                }
+
+                const savedHold = localStorage.getItem('ai_ways_incheon_hold_v1');
+                if (savedHold) {
+                    holdBoxList = JSON.parse(savedHold);
+                    updateHoldUI();
+                }
+            } catch (e) {
+                console.warn("Storage 복구 과정 도중 경고가 감지되었습니다: ", e);
+            }
+            initSearchAutocomplete();
+            startQuiz();
+        };
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.className = "text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800";
+            });
+
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            activeBtn.className = "text-center py-2.5 rounded-xl transition-all duration-300 bg-white text-slate-900 shadow-sm";
+        }
+
+        // -----------------------------------------
+        // 5. 3초 판단 검색 & 배출 규격 매칭 가이드라인
+        // -----------------------------------------
+        let activeSelectedKey = null;
+
+        function checkTrash(key) {
+            // 특수문자 및 유니코드 이모지, 괄호 등 불필요 수식어 일괄 정제
+            let refinedKey = key.replace(/[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD00-\uDFFF]/g, '').trim();
+            refinedKey = refinedKey.split('(')[0].trim(); 
+
+            let data = null;
+            // 로컬 DB 상에 존재하는지 매칭 검색
+            for (const dbKey in trashDb) {
+                if (refinedKey.includes(dbKey) || dbKey.includes(refinedKey)) {
+                    data = trashDb[dbKey];
+                    activeSelectedKey = dbKey;
+                    break;
+                }
+            }
+
+            const holdForm = document.getElementById('hold-registration-form');
+            const holdInput = document.getElementById('holdItemName');
+            const practiceRow = document.getElementById('practiceActionRow');
+
+            if (!data) {
+                // 판단 보류 데이터 템플릿 임의 가동
+                data = trashDb["판단 보류 물건"];
+                activeSelectedKey = "판단 보류 물건";
+                
+                // 검색된 비규격 텍스트명을 수동 작성용 인풋에 선제 투입
+                holdInput.value = refinedKey;
+                holdForm.classList.remove('hidden');
+                practiceRow.classList.add('hidden'); // 실천 체크 로그 대신 보류 등록 행위 유도
+            } else {
+                if (data.isHold) {
+                    holdInput.value = refinedKey !== "판단 보류 물건" ? refinedKey : "";
+                    holdForm.classList.remove('hidden');
+                    practiceRow.classList.add('hidden');
+                } else {
+                    holdForm.classList.add('hidden');
+                    practiceRow.classList.remove('hidden');
+                }
+            }
+
+            const placeholder = document.getElementById('placeholder');
+            const resultContent = document.getElementById('resultContent');
+            const displayScreen = document.getElementById('displayScreen');
+
+            placeholder.classList.add('hidden');
+            resultContent.classList.remove('hidden');
+
+            // 화면 표시 필드 바인딩
+            document.getElementById('resCategory').innerText = data.category;
+            document.getElementById('resTitle').innerHTML = data.isHold && refinedKey !== "판단 보류 물건" ? `🤔 ${refinedKey} (기준 불투명)` : data.name;
+            document.getElementById('resBody').innerHTML = data.guide;
+            document.getElementById('resTip').innerText = data.tip;
+
+            const tag = document.getElementById('resActionTag');
+            if (data.isHold) {
+                tag.innerText = "🛑 보류함 보관 권장";
+                tag.className = "text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200 shrink-0";
+                displayScreen.className = "border-2 border-dashed border-amber-300 rounded-3xl p-5 bg-amber-50/20 flex flex-col justify-center min-h-[160px] relative transition-all duration-300";
+            } else {
+                tag.innerText = "🔍 배출 가이드 확인";
+                tag.className = "text-[10px] font-bold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 border border-blue-200 shrink-0";
+                displayScreen.className = "border-2 border-dashed border-blue-200 rounded-3xl p-5 bg-blue-50/20 flex flex-col justify-center min-h-[160px] relative transition-all duration-300";
+            }
+
+            // 실천 통계 기록 반영을 위한 버튼 활성화
+            const btnLog = document.getElementById('btnLogPractice');
+            btnLog.onclick = function() {
+                logPractice(data);
+            };
+        }
+
+        // 검색어 자동완성 시스템 데이터 적재
+        function initSearchAutocomplete() {
+            const container = document.getElementById('search-suggestions');
+            container.innerHTML = "";
+            for (const key in trashDb) {
+                const item = trashDb[key];
+                const div = document.createElement('div');
+                div.className = "px-4 py-3 hover:bg-slate-50 cursor-pointer flex justify-between items-center transition-colors";
+                div.innerHTML = `<span class="font-semibold text-slate-700">${item.name}</span><span class="text-[9px] text-slate-400 font-bold bg-slate-100 px-1.5 py-0.5 rounded-md">${item.category}</span>`;
+                div.onclick = function() {
+                    document.getElementById('searchInput').value = key;
+                    checkTrash(key);
+                    container.classList.add('hidden');
+                };
+                container.appendChild(div);
+            }
+        }
+
+        function handleSearch(event) {
+            const inputVal = event.target.value.trim();
+            const suggestions = document.getElementById('search-suggestions');
+            if (!inputVal) {
+                suggestions.classList.add('hidden');
+                return;
+            }
+
+            let matches = 0;
+            Array.from(suggestions.children).forEach(child => {
+                const text = child.textContent;
+                if (text.toLowerCase().includes(inputVal.toLowerCase())) {
+                    child.classList.remove('hidden');
+                    matches++;
+                } else {
+                    child.classList.add('hidden');
+                }
+            });
+
+            if (matches > 0) {
+                suggestions.classList.remove('hidden');
+            } else {
+                suggestions.classList.add('hidden');
+            }
+
+            if (event.key === 'Enter') {
+                triggerSearch();
+            }
+        }
+
+        function triggerSearch() {
+            const val = document.getElementById('searchInput').value.trim();
+            if (val) {
+                checkTrash(val);
+                document.getElementById('search-suggestions').classList.add('hidden');
+            }
+        }
+
+        // -----------------------------------------
+        // 6. 실천 이력 로깅 처리
+        // -----------------------------------------
+        function logPractice(item) {
+            if (item.isHold) {
+                showVisualAlert("🛑 판단 유예 항목입니다. 학교 전용 보류 보관함에 보관해 주세요.", "amber");
+                return;
+            }
+
+            practiceStats.totalCount += 1;
+            practiceStats.carbonReduction += item.carbonSaved;
+            
+            const timestamp = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            practiceStats.logs.unshift({
+                name: item.name,
+                category: item.category,
+                carbon: item.carbonSaved,
+                time: timestamp
+            });
+
+            // 누적 리스트 제한 (브라우저 메모리 보존용 최대 30개)
+            if (practiceStats.logs.length > 30) {
+                practiceStats.logs.pop();
+            }
+
+            try {
+                localStorage.setItem('ai_ways_incheon_stats_v1', JSON.stringify(practiceStats));
+            } catch(e) {}
+
+            updateStatsUI();
+            showVisualAlert(`🌳 지구를 지키는 올바른 실천! CO2 ${item.carbonSaved}g이 절감되었습니다.`, "emerald");
+        }
+
+        function updateStatsUI() {
+            document.getElementById('stat-count').innerText = `${practiceStats.totalCount}회`;
+            document.getElementById('stat-carbon').innerText = `${practiceStats.carbonReduction.toFixed(1)}g`;
+
+            const container = document.getElementById('practice-logs-container');
+            const noLogs = document.getElementById('no-logs-msg');
+
+            // 동적 생성 로그 초기화 후 순차 렌더링
+            const existingItems = container.querySelectorAll('.practice-item');
+            existingItems.forEach(el => el.remove());
+
+            if (practiceStats.logs.length === 0) {
+                noLogs.classList.remove('hidden');
+            } else {
+                noLogs.classList.add('hidden');
+                practiceStats.logs.forEach(log => {
+                    const div = document.createElement('div');
+                    div.className = "practice-item flex justify-between items-center bg-white p-3 border border-slate-100 rounded-xl shadow-sm text-xs transition-all duration-300";
+                    div.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <span class="bg-blue-50 text-blue-600 font-extrabold px-1.5 py-0.5 rounded text-[9px] shrink-0">${log.category}</span>
+                            <span class="font-bold text-slate-700 truncate max-w-[150px] sm:max-w-xs">${log.name}</span>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <span class="font-extrabold text-emerald-600 block">-${log.carbon}g CO₂</span>
+                            <span class="text-[9px] text-slate-400 block">${log.time}</span>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+        }
+
+        // -----------------------------------------
+        // 7. 학교 판단 보류함 비즈니스 모듈
+        // -----------------------------------------
+        function registerHoldItem() {
+            const inputField = document.getElementById('holdItemName');
+            const nameValue = inputField.value.trim();
+            if (!nameValue) {
+                showVisualAlert("⚠️ 안건으로 올릴 물건의 상세 명칭을 기재해 주세요.", "amber");
+                return;
+            }
+
+            addHoldItem(nameValue);
+            inputField.value = "";
+            document.getElementById('hold-registration-form').classList.add('hidden');
+        }
+
+        function addHoldItemDirect() {
+            const inputField = document.getElementById('directHoldInput');
+            const nameValue = inputField.value.trim();
+            if (!nameValue) {
+                showVisualAlert("⚠️ 안건 이름을 적합하게 입력해 주세요.", "amber");
+                return;
+            }
+
+            addHoldItem(nameValue);
+            inputField.value = "";
+        }
+
+        function addHoldItem(itemName) {
+            const today = new Date();
+            const dateStr = `${today.getMonth() + 1}월 ${today.getDate()}일`;
+            
+            const newItem = {
+                id: crypto.randomUUID(),
+                name: itemName,
+                date: dateStr
+            };
+
+            holdBoxList.unshift(newItem);
+
+            try {
+                localStorage.setItem('ai_ways_incheon_hold_v1', JSON.stringify(holdBoxList));
+            } catch(e) {}
+
+            updateHoldUI();
+            showVisualAlert(`🟨 "${itemName}" 이 학교 회의 예정 리스트에 탑재되었습니다.`, "amber");
+        }
+
+        function updateHoldUI() {
+            const container = document.getElementById('hold-list-container');
+            const noHoldMsg = document.getElementById('no-hold-items-msg');
+            const countBadge = document.getElementById('hold-count-badge');
+
+            countBadge.innerText = holdBoxList.length;
+
+            const existingHold = container.querySelectorAll('.hold-item-card');
+            existingHold.forEach(el => el.remove());
+
+            if (holdBoxList.length === 0) {
+                noHoldMsg.classList.remove('hidden');
+            } else {
+                noHoldMsg.classList.add('hidden');
+                holdBoxList.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = "hold-item-card flex justify-between items-center bg-white p-3.5 border border-slate-100 rounded-2xl shadow-sm text-xs hover:border-amber-200 transition-all";
+                    div.innerHTML = `
+                        <div class="flex items-center gap-2.5 min-w-0 mr-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
+                            <span class="font-extrabold text-slate-800 truncate">${item.name}</span>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="text-[9px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded-md">${item.date}</span>
+                            <button onclick="resolveHoldItem('${item.id}', '${item.name}')" 
+                                    class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-xl font-bold text-[10px] transition-colors">
+                                해결 완료
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+        }
+
+        function resolveHoldItem(id, name) {
+            openCustomModal(
+                "분류 기준 수립 및 보류 해결",
+                `"${name}" 품목의 세부 분리 배출 매뉴얼이 확정되었나요? 확인을 누르면 보류 리스트에서 정리됩니다.`,
+                "🎉",
+                "bg-emerald-600 hover:bg-emerald-700",
+                function() {
+                    holdBoxList = holdBoxList.filter(item => item.id !== id);
+                    try {
+                        localStorage.setItem('ai_ways_incheon_hold_v1', JSON.stringify(holdBoxList));
+                    } catch(e) {}
+                    updateHoldUI();
+                    showVisualAlert(`💡 "${name}" 품목의 해결 기준이 등록되어 보류함에서 정리되었습니다.`, "emerald");
+                }
+            );
+        }
+
+        // -----------------------------------------
+        // 8. 팝업 / 알림창 모달 설계 대체 모듈
+        // -----------------------------------------
+        let modalActionCallback = null;
+
+        function openCustomModal(title, desc, icon, confirmBtnColorClass, onConfirm) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalDesc').innerText = desc;
+            document.getElementById('modalIcon').innerText = icon;
+
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+            confirmBtn.className = `flex-1 ${confirmBtnColorClass} text-white font-bold text-xs py-2.5 rounded-xl transition-all`;
+
+            modalActionCallback = onConfirm;
+
+            const modal = document.getElementById('customModal');
+            const box = document.getElementById('modalBox');
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                box.classList.remove('scale-95', 'opacity-0');
+            }, 50);
+        }
+
+        function closeCustomModal() {
+            const modal = document.getElementById('customModal');
+            const box = document.getElementById('modalBox');
+
+            box.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        document.getElementById('modalCancelBtn').onclick = closeCustomModal;
+        document.getElementById('modalConfirmBtn').onclick = function() {
+            if (modalActionCallback) {
+                modalActionCallback();
+            }
+            closeCustomModal();
+        };
+
+        function promptResetStats() {
+            openCustomModal(
+                "실천 타임라인 비우기",
+                "지금까지 달성한 실천 횟수 및 감축 이력이 영구 소멸됩니다. 정말 리셋을 진행하시겠습니까?",
+                "🗑️",
+                "bg-rose-500 hover:bg-rose-600",
+                function() {
+                    practiceStats = {
+                        totalCount: 0,
+                        carbonReduction: 0.0,
+                        logs: []
+                    };
+                    try {
+                        localStorage.removeItem('ai_ways_incheon_stats_v1');
+                    } catch(e) {}
+                    updateStatsUI();
+                    showVisualAlert("🗑️ 누적 실천 내역 정보가 정상적으로 초기화되었습니다.", "slate");
+                }
+            );
+        }
+
+        function promptResetHold() {
+            openCustomModal(
+                "보류함 목록 완전 초기화",
+                "보류 안건 목록에 등록된 모든 대기 쓰레기 내역을 깔끔히 비우시겠습니까?",
+                "🗑️",
+                "bg-rose-500 hover:bg-rose-600",
+                function() {
+                    holdBoxList = [];
+                    try {
+                        localStorage.removeItem('ai_ways_incheon_hold_v1');
+                    } catch(e) {}
+                    updateHoldUI();
+                    showVisualAlert("🗑️ 보류함 전체 대기열이 비워졌습니다.", "slate");
+                }
+            );
+        }
+
+        // 토스트 팝업 모듈화
+        function showVisualAlert(msg, colorType) {
+            const toast = document.createElement('div');
+            let bgClass = "bg-slate-800 text-white";
+            if (colorType === "emerald") bgClass = "bg-emerald-600 text-white";
+            if (colorType === "amber") bgClass = "bg-amber-600 text-white";
+
+            toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3.5 rounded-2xl shadow-xl font-bold text-xs ${bgClass} transition-all duration-300 transform translate-y-10 opacity-0 z-50 text-center min-w-[280px] max-w-sm`;
+            toast.innerText = msg;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3200);
+        }
+
+        // -----------------------------------------
+        // 9. 3초 블리츠 퀴즈 알고리즘 제어
+        // -----------------------------------------
+        function startQuiz() {
+            currentQuizIndex = 0;
+            userQuizScore = 0;
+            
+            document.getElementById('quiz-box').classList.remove('hidden');
+            document.getElementById('quiz-result-summary').classList.add('hidden');
+            
+            showCurrentQuizQuestion();
+        }
+
+        function showCurrentQuizQuestion() {
+            const data = quizData[currentQuizIndex];
+            document.getElementById('quiz-progress').innerText = `질문 ${currentQuizIndex + 1} / ${quizData.length}`;
+            document.getElementById('quiz-score').innerText = `현재 점수: ${userQuizScore}점`;
+            
+            // 프로그레스 바 너비 갱신
+            const progressPct = ((currentQuizIndex + 1) / quizData.length) * 100;
+            document.getElementById('quiz-progress-bar').style.width = `${progressPct}%`;
+            
+            document.getElementById('quiz-emoji').innerText = data.emoji;
+            document.getElementById('quiz-question').innerText = data.question;
+
+            document.getElementById('quiz-buttons').classList.remove('hidden');
+            document.getElementById('quiz-explanation-panel').classList.add('hidden');
+        }
+
+        function submitQuizAnswer(userAns) {
+            const data = quizData[currentQuizIndex];
+            const isCorrect = (userAns === data.answer);
+
+            if (isCorrect) {
+                userQuizScore += 20; 
+            }
+
+            document.getElementById('quiz-score').innerText = `현재 점수: ${userQuizScore}점`;
+
+            const expTitle = document.getElementById('explanation-title');
+            const expDesc = document.getElementById('explanation-desc');
+            const expEmoji = document.getElementById('explanation-emoji');
+            const expBox = document.getElementById('explanation-box-color');
+
+            if (isCorrect) {
+                expEmoji.innerText = "🎉";
+                expTitle.innerText = "정답입니다! 훌륭한 실력이에요.";
+                expTitle.className = "text-xs font-extrabold text-emerald-800";
+                expBox.className = "p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/70 flex items-start gap-2.5";
+            } else {
+                expEmoji.innerText = "💡";
+                expTitle.innerText = "아쉽네요! 자원수칙 가이드를 배워봐요.";
+                expTitle.className = "text-xs font-extrabold text-rose-800";
+                expBox.className = "p-3.5 rounded-xl border border-rose-200 bg-rose-50/70 flex items-start gap-2.5";
+            }
+
+            expDesc.innerText = data.explanation;
+
+            document.getElementById('quiz-buttons').classList.add('hidden');
+            document.getElementById('quiz-explanation-panel').classList.remove('hidden');
+        }
+
+        function nextQuiz() {
+            currentQuizIndex += 1;
+            if (currentQuizIndex < quizData.length) {
+                showCurrentQuizQuestion();
+            } else {
+                document.getElementById('quiz-box').classList.add('hidden');
+                
+                const summary = document.getElementById('quiz-result-summary');
+                summary.classList.remove('hidden');
+
+                document.getElementById('quiz-result-score-text').innerText = `${quizData.length}문제 중 최종 점수: ${userQuizScore}점 달성!`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -9213,3 +9213,36 @@ body,
   display: none !important;
 }
 /* AIWAYS_SORTING_APP_BALANCE_20260705_END */
+
+/* DASHBOARD_INTRO_PREP_20260705_START */
+.is-dashboard-preparing .dashboard-grid .donut {
+  --pct: 0 !important;
+  transition: none !important;
+}
+
+.is-dashboard-preparing .bar-list i::before,
+.is-dashboard-preparing .confusion i::before,
+.is-dashboard-preparing .progress-stack em {
+  transform: scaleX(0) !important;
+  transform-origin: left center !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+.is-dashboard-preparing .combo-chart .chart-area,
+.is-dashboard-preparing .combo-chart .chart-line,
+.is-dashboard-preparing .combo-chart .chart-points,
+.is-dashboard-preparing .combo-chart .chart-average {
+  opacity: 0 !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+.is-dashboard-preparing .combo-chart .chart-bars rect {
+  transform: scaleY(0) !important;
+  transform-box: fill-box !important;
+  transform-origin: center bottom !important;
+  animation: none !important;
+  transition: none !important;
+}
+/* DASHBOARD_INTRO_PREP_20260705_END */

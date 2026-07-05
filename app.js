@@ -340,8 +340,11 @@
   let dashboardIntroActive = false;
   let dashboardAnimationScope = "";
   let dashboardRepaintTimer = 0;
+  let dashboardIntroResetTimer = 0;
   let dashboardIntroPlayed = false;
   let dashboardIntroRenderConsumed = false;
+  let dashboardDataReady = false;
+  let dashboardIntroPendingOnSettle = false;
   let lastLandfillDays = [];
   let landfillClockTimer = null;
   let holdEmojiCycleTimer = null;
@@ -431,6 +434,7 @@
 
     const duration = 540;
     const startTime = performance.now();
+    node.textContent = "0";
 
     function tick(now) {
       const progress = Math.min(1, (now - startTime) / duration);
@@ -473,6 +477,7 @@
     const suffix = finalText.slice(match.index + match[0].length);
     const decimals = match[0].includes(".") ? 1 : 0;
     const startTime = performance.now();
+    node.textContent = `${prefix}${decimals ? "0.0" : "0"}${suffix}`;
 
     function tick(now) {
       const progress = Math.min(1, (now - startTime) / duration);
@@ -498,16 +503,23 @@
   function animateDonutFill(donut, percent, duration = 720, delay = 0) {
     if (!donut) return;
     const target = Math.max(0, Math.min(100, Number(percent) || 0));
+    const span = $("span", donut);
+    donut.style.setProperty("--pct", "0");
+    if (span) span.textContent = "0%";
     const start = () => {
       const startTime = performance.now();
-      donut.style.setProperty("--pct", "0");
 
       function tick(now) {
         const progress = Math.min(1, (now - startTime) / duration);
         const eased = 1 - Math.pow(1 - progress, 3);
-        donut.style.setProperty("--pct", (target * eased).toFixed(2));
+        const value = target * eased;
+        donut.style.setProperty("--pct", value.toFixed(2));
+        if (span) span.textContent = `${formatPercent(value)}%`;
         if (progress < 1) requestAnimationFrame(tick);
-        else donut.style.setProperty("--pct", String(target));
+        else {
+          donut.style.setProperty("--pct", String(target));
+          if (span) span.textContent = `${formatPercent(target)}%`;
+        }
       }
 
       requestAnimationFrame(tick);
@@ -523,19 +535,75 @@
     const span = $("span", donut);
     const label = $("small", donut);
     donut.dataset.percent = String(safe);
-    if (span) span.textContent = `${formatPercent(safe)}%`;
     if (label && options.label) label.innerHTML = options.label;
 
     if (options.animate && !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
       animateDonutFill(donut, safe, options.duration || 720, options.delay || 0);
     } else {
+      if (span) span.textContent = `${formatPercent(safe)}%`;
       donut.style.setProperty("--pct", String(safe));
     }
+  }
+
+  function prepareDashboardIntroState(options = {}) {
+    if (!options.force && dashboardIntroPlayed) return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    document.body.classList.add("is-dashboard-preparing");
+    document.body.classList.remove("is-dashboard-intro");
+    [
+      "[data-school-classes]",
+      "[data-school-observed]",
+      "[data-school-hold]",
+      "[data-real-count]",
+      "[data-hold-count]",
+      "[data-pending-count]",
+      "[data-today-observed]",
+      "[data-ai-classified]",
+      "[data-human-confirmed]"
+    ].forEach(selector => {
+      const node = $(selector);
+      if (node) node.textContent = "0";
+    });
+    $$(".landfill-metrics strong").forEach((node, index) => {
+      node.textContent = index === 0 ? "0t" : "0%";
+    });
+    $$(".bar-list b, .confusion b, .progress-stack b").forEach(node => {
+      node.textContent = "0";
+    });
+    $$(".donut").forEach(donut => {
+      donut.style.setProperty("--pct", "0");
+      const span = $("span", donut);
+      if (span) span.textContent = "0%";
+    });
+  }
+
+  function resetDashboardIntroCycleForNextEntry() {
+    window.clearTimeout(dashboardRepaintTimer);
+    dashboardAnimationScope = "";
+    countUpNextDashboard = false;
+    dashboardIntroActive = false;
+    dashboardIntroPlayed = false;
+    dashboardIntroRenderConsumed = false;
+    dashboardIntroPendingOnSettle = false;
+    document.body.classList.remove("is-dashboard-intro");
+    $$(".school-panel, .class-panel, .landfill-panel").forEach(item => item.classList.remove("is-dashboard-repaint"));
+    prepareDashboardIntroState({ force: true });
+  }
+
+  function scheduleDashboardIntroResetForNextEntry() {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    window.clearTimeout(dashboardIntroResetTimer);
+    dashboardIntroResetTimer = window.setTimeout(() => {
+      if (!document.getElementById("dashboard")?.classList.contains("is-active")) {
+        resetDashboardIntroCycleForNextEntry();
+      }
+    }, 900);
   }
 
   function beginDashboardRepaint(scope, duration = 1050) {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     window.clearTimeout(dashboardRepaintTimer);
+    window.clearTimeout(dashboardIntroResetTimer);
     dashboardAnimationScope = scope;
     countUpNextDashboard = scope !== "landfill";
     dashboardIntroActive = scope === "all";
@@ -567,9 +635,20 @@
 
   function beginDashboardIntro() {
     if (dashboardIntroPlayed || dashboardIntroActive) return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      dashboardIntroPlayed = true;
+      document.body.classList.remove("is-dashboard-preparing", "is-dashboard-intro");
+      return;
+    }
     dashboardIntroPlayed = true;
     dashboardIntroRenderConsumed = false;
     beginDashboardRepaint("all", 1050);
+  }
+
+  function playDashboardIntroForCurrentData() {
+    if (!dashboardDataReady || dashboardIntroPlayed || dashboardIntroActive) return;
+    beginDashboardIntro();
+    applyDashboard(allStoredRecords());
   }
 
   function consumeDashboardIntroRender() {
@@ -578,6 +657,9 @@
     dashboardAnimationScope = "";
     countUpNextDashboard = false;
     dashboardIntroActive = false;
+    if (document.body.classList.contains("is-dashboard-preparing")) {
+      requestAnimationFrame(() => document.body.classList.remove("is-dashboard-preparing"));
+    }
   }
   // COMMON_FINAL_FIX_END
 
@@ -1329,6 +1411,7 @@
     const weeklyAverage = points.reduce((sum, point) => sum + point.landfillTons, 0) / Math.max(1, points.length);
     const averageY = Math.round(yScale(weeklyAverage));
     const area = appendSvg(svg, "path", { class: "chart-area", d: areaPath, fill: "url(#cleanLineFill)", opacity: shouldAnimate ? "0" : "0.16" });
+    if (shouldAnimate) area.style.setProperty("opacity", "0", "important");
     const barsGroup = appendSvg(svg, "g", { class: "chart-bars", fill: "url(#cleanBarFill)" });
     const bars = [];
 
@@ -1395,7 +1478,7 @@
         line.style.transition = "none";
       }
 
-      requestAnimationFrame(() => {
+      const startChartAnimation = () => {
         bars.forEach(bar => {
           bar.setAttribute("y", bar.dataset.finalY);
           bar.setAttribute("height", bar.dataset.finalHeight);
@@ -1408,9 +1491,18 @@
             line.style.strokeDashoffset = "0";
           }
           area.style.transition = "opacity 560ms cubic-bezier(0.22, 1, 0.36, 1)";
-          area.setAttribute("opacity", "0.16");
+          area.style.setProperty("opacity", "0.16", "important");
         }, 720);
-      });
+      };
+
+      if (document.body.classList.contains("is-dashboard-preparing")) {
+        requestAnimationFrame(() => {
+          document.body.classList.remove("is-dashboard-preparing");
+          requestAnimationFrame(startChartAnimation);
+        });
+      } else {
+        requestAnimationFrame(startChartAnimation);
+      }
     }
 
     const totalNode = $(".landfill-metrics strong");
@@ -1692,11 +1784,11 @@
     consumeDashboardIntroRender();
   }
 
-  function loadRemoteRecords() {
+  function loadRemoteRecords(options = {}) {
     return new Promise(resolve => {
       if (!DATA_CONFIG.appsScriptUrl) {
         remoteRecords = [];
-        applyDashboard(allStoredRecords());
+        if (!options.skipApplyWhenUnavailable) applyDashboard(allStoredRecords());
         resolve([]);
         return;
       }
@@ -1744,10 +1836,12 @@
     });
   }
 
-  async function loadDashboardRows() {
+  async function loadDashboardRows(options = {}) {
     await loadSeedData();
-    applyDashboard(allStoredRecords());
-    await loadRemoteRecords();
+    dashboardDataReady = true;
+    if (options.animateIntro) playDashboardIntroForCurrentData();
+    else applyDashboard(allStoredRecords());
+    await loadRemoteRecords({ skipApplyWhenUnavailable: options.animateIntro });
     return allStoredRecords();
   }
 
@@ -1846,8 +1940,15 @@
       const previousSection = previousId ? document.getElementById(previousId) : null;
       if (previousId && previousId !== id) resetTransientUiState(previousSection);
       if (previousId !== id) resetSectionEntryState(section);
+      if (previousId === "dashboard" && id !== "dashboard") scheduleDashboardIntroResetForNextEntry();
+      const enteringDashboard = id === "dashboard" && previousId && previousId !== "dashboard";
+      if (enteringDashboard && !sectionLight) dashboardIntroPendingOnSettle = true;
       const label = navPairs.find(([, sectionId]) => sectionId === id)?.[0] || section.dataset.nav;
       currentId = id;
+      if (id === "dashboard" && sectionLight && (enteringDashboard || dashboardIntroPendingOnSettle)) {
+        dashboardIntroPendingOnSettle = false;
+        playDashboardIntroForCurrentData();
+      }
 
       if (sectionLight) {
         sections.forEach(item => item.classList.toggle("is-active", item === section));
@@ -3165,9 +3266,9 @@
     initRankingModal();
     initLandfillSourceLink();
     initCurriculumCardFocusReset();
+    prepareDashboardIntroState();
     renderLandfillTimeNow();
-    beginDashboardIntro();
-    loadDashboardRows();
+    loadDashboardRows({ animateIntro: true });
   }
 
   if (document.readyState === "loading") {

@@ -4464,11 +4464,27 @@ body.modal-open {
   pointer-events: none !important;
 }
 
-.subject-card:hover em,
-.subject-card:focus-within em {
+.subject-card:focus {
+  outline: none;
+}
+
+.subject-card:focus-visible {
+  outline: 2px solid rgba(94, 247, 205, 0.72);
+  outline-offset: 5px;
+}
+
+.subject-card:hover:not(.is-hover-suppressed) em,
+.subject-card:focus-visible em {
   opacity: 1 !important;
   transform: translateY(0) !important;
   pointer-events: auto !important;
+}
+
+.subject-card.is-hover-suppressed:hover:not(:focus-visible) em,
+.subject-card.is-hover-suppressed:focus-within:not(:focus-visible) em {
+  opacity: 0 !important;
+  transform: translateY(8px) !important;
+  pointer-events: none !important;
 }
 
 .standards-grid article {

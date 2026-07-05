@@ -339,6 +339,9 @@
   let countUpNextDashboard = false;
   let dashboardIntroActive = false;
   let dashboardAnimationScope = "";
+  let dashboardRepaintTimer = 0;
+  let dashboardIntroPlayed = false;
+  let dashboardIntroRenderConsumed = false;
   let lastLandfillDays = [];
   let landfillClockTimer = null;
   let holdEmojiCycleTimer = null;
@@ -532,6 +535,7 @@
 
   function beginDashboardRepaint(scope, duration = 1050) {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    window.clearTimeout(dashboardRepaintTimer);
     dashboardAnimationScope = scope;
     countUpNextDashboard = scope !== "landfill";
     dashboardIntroActive = scope === "all";
@@ -545,7 +549,7 @@
     $$(".school-panel, .class-panel, .landfill-panel").forEach(item => item.classList.remove("is-dashboard-repaint"));
     document.body.classList.toggle("is-dashboard-intro", scope === "all");
     panel?.classList.add("is-dashboard-repaint");
-    window.setTimeout(() => {
+    dashboardRepaintTimer = window.setTimeout(() => {
       if (dashboardAnimationScope === scope) {
         dashboardAnimationScope = "";
         countUpNextDashboard = false;
@@ -562,7 +566,18 @@
   }
 
   function beginDashboardIntro() {
+    if (dashboardIntroPlayed || dashboardIntroActive) return;
+    dashboardIntroPlayed = true;
+    dashboardIntroRenderConsumed = false;
     beginDashboardRepaint("all", 1050);
+  }
+
+  function consumeDashboardIntroRender() {
+    if (dashboardAnimationScope !== "all" || dashboardIntroRenderConsumed) return;
+    dashboardIntroRenderConsumed = true;
+    dashboardAnimationScope = "";
+    countUpNextDashboard = false;
+    dashboardIntroActive = false;
   }
   // COMMON_FINAL_FIX_END
 
@@ -1674,6 +1689,7 @@
     lastLandfillDays = landfillDays;
     renderLandfillChart(landfillDays);
     renderHoldList(holdRecords);
+    consumeDashboardIntroRender();
   }
 
   function loadRemoteRecords() {
@@ -1966,24 +1982,38 @@
 
     if (!sections.length) return;
 
+    function navigateToSection(id) {
+      const section = document.getElementById(id);
+      if (!section) return false;
+      clickLockUntil = Date.now() + 760;
+      history.replaceState(null, "", "#" + id);
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+      activate(section, true, { sectionLight: false });
+      activateAfterSettle(section, 105);
+      window.setTimeout(() => {
+        clickLockUntil = 0;
+        activateAfterSettle(section, 65);
+      }, 700);
+      return true;
+    }
+
     links.forEach(link => {
       const label = cleanText(link.textContent);
       const id = navPairs.find(([navLabel]) => navLabel === label)?.[1];
       if (!id) return;
       link.setAttribute("href", "#" + id);
       link.addEventListener("click", event => {
-        const section = document.getElementById(id);
-        if (!section) return;
+        if (!navigateToSection(id)) return;
         event.preventDefault();
-        clickLockUntil = Date.now() + 760;
-        history.replaceState(null, "", "#" + id);
-        section.scrollIntoView({ behavior: "smooth", block: "start" });
-        activate(section, true, { sectionLight: false });
-        activateAfterSettle(section, 105);
-        window.setTimeout(() => {
-          clickLockUntil = 0;
-          activateAfterSettle(section, 65);
-        }, 700);
+      });
+    });
+
+    $$(".flow-card[href^='#']").forEach(link => {
+      link.addEventListener("click", event => {
+        const targetId = link.getAttribute("href")?.slice(1);
+        if (!targetId || !navPairs.some(([, id]) => id === targetId)) return;
+        if (!navigateToSection(targetId)) return;
+        event.preventDefault();
       });
     });
 
@@ -2991,6 +3021,46 @@
       if (url) window.open(url, "_blank", "noopener,noreferrer");
     });
   }
+
+  function resetCurriculumCardInteractionState(suppressHover = false) {
+    const active = document.activeElement;
+    if (active instanceof HTMLElement && active.closest(".subject-card")) active.blur();
+
+    $$(".subject-card").forEach(card => {
+      card.classList.remove("active", "is-active", "selected", "is-selected", "is-focused", "focus");
+      if (suppressHover) card.classList.add("is-hover-suppressed");
+      if (card instanceof HTMLElement && card.matches(":focus")) card.blur();
+    });
+  }
+
+  function initCurriculumCardFocusReset() {
+    if (window.__AIWAYS_CURRICULUM_CARD_FOCUS_RESET__) return;
+    window.__AIWAYS_CURRICULUM_CARD_FOCUS_RESET__ = true;
+    const cards = $$(".subject-card");
+    if (!cards.length) return;
+
+    cards.forEach(card => {
+      card.addEventListener("click", () => {
+        card.classList.add("is-hover-suppressed");
+        window.setTimeout(() => resetCurriculumCardInteractionState(true), 0);
+      });
+      card.addEventListener("pointerenter", () => card.classList.remove("is-hover-suppressed"));
+      card.addEventListener("pointerleave", () => {
+        card.classList.remove("is-hover-suppressed");
+        if (card instanceof HTMLElement && !card.matches(":focus-visible")) card.blur();
+      });
+      card.addEventListener("focus", () => {
+        if (card.matches(":focus-visible")) card.classList.remove("is-hover-suppressed");
+      });
+    });
+
+    const resetAfterReturn = () => window.setTimeout(() => resetCurriculumCardInteractionState(true), 0);
+    window.addEventListener("focus", resetAfterReturn);
+    window.addEventListener("pageshow", resetAfterReturn);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) resetAfterReturn();
+    });
+  }
   // PAGE_FINAL_FIX_01_DASHBOARD_END
 
   function initSelectors() {
@@ -3094,9 +3164,9 @@
     initRefreshControls();
     initRankingModal();
     initLandfillSourceLink();
+    initCurriculumCardFocusReset();
     renderLandfillTimeNow();
     beginDashboardIntro();
-    applyDashboard(allStoredRecords());
     loadDashboardRows();
   }
 

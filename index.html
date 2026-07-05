@@ -45,7 +45,7 @@
             <span>데이터가 되다</span>
           </h1>
           <p class="hero-description">
-            AIWays Incheon은 환경 보호 포스터를 만드는 수업이 아닙니다.<br />
+            AI Ways Incheon은 환경 보호 포스터를 만드는 수업이 아닙니다.<br />
             우리가 실제로 쓰레기를 버리는 순간을 관찰하고,<br />
             <span class="hero-fixed-line">AI를 통해 데이터를 1차 판단한 뒤 사람이 중심이 되어 다시 확인하는,</span>
             <span class="hero-fixed-line">우리 학교의 자원순환 UX를 개선하는 H-A-H 기반 수업 프로젝트입니다.</span>
@@ -241,7 +241,7 @@
                 <span>찍은 사진<br />올리기</span>
               </button>
             </div>
-            <small>본 플랫폼은 인천광역시교육청 자원순환 및 환경부 공식 분리수거 지침을 바탕으로 제작되었습니다.</small>
+            <small>※ 본 플랫폼은 인천광역시교육청 자원순환 및 환경부 공식 분리수거 지침을 바탕으로 제작되었습니다.</small>
           </article>
         </div>
       </section>
@@ -395,13 +395,13 @@
             <div class="tab-panel is-active" data-panel="classify">
               <h3>사진 또는 검색으로 분류 초안 만들기</h3>
               <div class="upload-actions sorting-upload">
-                <button type="button" data-upload="camera"><span class="sorting-upload-icon">📷</span><strong>카메라로 지금 찍기</strong><em>교실에서 바로 촬영</em></button>
-                <button type="button" data-upload="file"><span class="sorting-upload-icon">🖼️</span><strong>찍은 사진 올리기</strong><em>저장된 사진 선택</em></button>
+                <button type="button" data-upload="camera"><span class="sorting-upload-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8.5h4.2L10 6h4l1.8 2.5H20v10H4z" /><circle cx="12" cy="13.5" r="3.3" /></svg></span><strong>카메라로 지금 찍기</strong><em>교실에서 바로 촬영</em></button>
+                <button type="button" data-upload="file"><span class="sorting-upload-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2.4" /><path d="M7 16l3.2-3.2 2.6 2.6 2-2L20 18" /><circle cx="15.7" cy="9.4" r="1.3" /></svg></span><strong>찍은 사진 올리기</strong><em>저장된 사진 선택</em></button>
               </div>
               <label class="search-line">
                 <span>검색 입력</span>
                 <input id="searchInput" type="search" placeholder="예: 우유갑, 과자 봉지" />
-                <button type="button" id="searchButton" aria-label="검색 분류">⌕</button>
+                <button type="button" id="searchButton" aria-label="검색 분류"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="5.8" /><path d="M15.2 15.2L20 20" /></svg></button>
               </label>
               <div class="quick-buttons" aria-label="3초 판단 물건 선택">
                 <button type="button" data-quick-item="milk">🥛 우유갑</button>
@@ -433,19 +433,18 @@
             </div>
             <div class="tab-panel" data-panel="quiz">
               <h3>3초 판단 OX 퀴즈</h3>
-              <p>학교 쓰레기 맥락의 50문제 중 10문제를 무작위로 풀어봅니다.</p>
+              <p>학교 쓰레기 맥락의 500문제 풀에서 10문제를 균형 있게 무작위로 풀어봅니다.</p>
               <div class="quiz-card">
                 <div class="quiz-status"><span id="quizProgress">대기 중</span><b id="quizScore">0점</b></div>
                 <i><em id="quizBar" style="width:0%"></em></i>
                 <strong id="quizEmoji">🎮</strong>
-                <p id="quizQuestion">시작 버튼을 누르면 10문제가 자동으로 진행됩니다.</p>
+                <p id="quizQuestion">퀴즈 탭을 열면 10문제가 바로 시작됩니다.</p>
                 <div class="quiz-choice-row">
                   <button type="button" data-quiz-choice="true">O</button>
                   <button type="button" data-quiz-choice="false">X</button>
                 </div>
                 <p class="quiz-result" id="quizResult" aria-live="polite"></p>
               </div>
-              <button class="quiz-start-btn" type="button" id="quizStartButton">퀴즈 시작</button>
             </div>
             <div class="tab-panel" data-panel="stats">
               <h3>실천 통계</h3>
@@ -458,16 +457,24 @@
                 <strong>오늘의 실천 타임라인</strong>
                 <ul id="sortingTimeline"><li>아직 실천 기록이 없습니다.</li></ul>
               </div>
-              <button class="quiet-reset" type="button" id="resetSortingStats">기록 초기화</button>
             </div>
             <div class="tab-panel" data-panel="holds">
               <h3>판단 보류함</h3>
-              <p>애매한 물건은 무단 투기하지 않고 회의 안건으로 모읍니다.</p>
-              <label class="hold-input-line">
-                <input id="manualHoldInput" type="text" placeholder="예: 코팅 공책, 부러진 자" />
-                <button type="button" id="manualHoldButton">보류 등록</button>
-              </label>
-              <div class="hold-list-head"><span>대기 목록 <b id="sortingHoldCount">0</b>개</span><button type="button" id="clearHoldButton">목록 비우기</button></div>
+              <p>애매한 물건은 바로 버리지 않고, 우리 반 회의 안건으로 남겨 기준을 함께 정합니다.</p>
+              <div class="hold-board-shell">
+                <section class="hold-entry-card" aria-label="판단 보류 등록">
+                  <span class="hold-entry-emoji" id="manualHoldEmojiPreview" aria-hidden="true">🟨</span>
+                  <label class="hold-input-line">
+                    <input id="manualHoldInput" type="text" autocomplete="off" placeholder="예: 코팅 공책, 부러진 자, 우유팩 빨대 포함" />
+                    <button type="button" id="manualHoldButton">보류 등록</button>
+                  </label>
+                </section>
+                <aside class="hold-guide-card">
+                  <strong>보류 기준</strong>
+                  <span>복합 재질 · 오염 상태 · 학교 수거 기준이 애매하면 회의 안건으로 남깁니다.</span>
+                </aside>
+              </div>
+              <div class="hold-list-head"><span>분류 판단 대기 <b id="sortingHoldCount">0</b>건</span></div>
               <ul id="holdList"><li class="empty-state">기록된 판단 보류 물건이 없습니다.</li></ul>
             </div>
           </article>

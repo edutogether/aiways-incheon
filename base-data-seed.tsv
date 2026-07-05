@@ -2,13 +2,13 @@ timestamp	local_time	date	weekday	school	grade	class_name	group_id	privacy_id	in
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초			seed	base-seed	base	seed			schoolObserved	base	887	false	0	seed	false	clean-2026-07
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초			seed	base-seed	base	seed			schoolClasses	base	14	false	0	seed	false	clean-2026-07
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초			seed	base-seed	base	seed			schoolHold	base	130	false	0	seed	false	clean-2026-07
-2026-07-01T00:00:00.000Z	2026. 7. 1.	2026-07-01	월	AIWays초			seed	base-seed	base	seed			landfill:월	base	19100	false	0	seed	false	clean-2026-07	19100
-2026-07-02T00:00:00.000Z	2026. 7. 2.	2026-07-02	화	AIWays초			seed	base-seed	base	seed			landfill:화	base	18760	false	0	seed	false	clean-2026-07	18760
-2026-07-03T00:00:00.000Z	2026. 7. 3.	2026-07-03	수	AIWays초			seed	base-seed	base	seed			landfill:수	base	18940	false	0	seed	false	clean-2026-07	18940
-2026-07-04T00:00:00.000Z	2026. 7. 4.	2026-07-04	목	AIWays초			seed	base-seed	base	seed			landfill:목	base	18300	false	0	seed	false	clean-2026-07	18300
-2026-07-05T00:00:00.000Z	2026. 7. 5.	2026-07-05	금	AIWays초			seed	base-seed	base	seed			landfill:금	base	18420	false	0	seed	false	clean-2026-07	18420
-2026-07-06T00:00:00.000Z	2026. 7. 6.	2026-07-06	토	AIWays초			seed	base-seed	base	seed			landfill:토	base	17880	false	0	seed	false	clean-2026-07	17880
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초			seed	base-seed	base	seed			landfill:일	base	17540	false	0	seed	false	clean-2026-07	17540
+2026-07-01T00:00:00.000Z	2026. 7. 1.	2026-07-01	월	AIWays초			seed	base-seed	base	seed			landfill:월	base	22800	false	0	seed	false	clean-2026-07	22800
+2026-07-02T00:00:00.000Z	2026. 7. 2.	2026-07-02	화	AIWays초			seed	base-seed	base	seed			landfill:화	base	18900	false	0	seed	false	clean-2026-07	18900
+2026-07-03T00:00:00.000Z	2026. 7. 3.	2026-07-03	수	AIWays초			seed	base-seed	base	seed			landfill:수	base	20600	false	0	seed	false	clean-2026-07	20600
+2026-07-04T00:00:00.000Z	2026. 7. 4.	2026-07-04	목	AIWays초			seed	base-seed	base	seed			landfill:목	base	17200	false	0	seed	false	clean-2026-07	17200
+2026-07-05T00:00:00.000Z	2026. 7. 5.	2026-07-05	금	AIWays초			seed	base-seed	base	seed			landfill:금	base	21900	false	0	seed	false	clean-2026-07	21900
+2026-07-06T00:00:00.000Z	2026. 7. 6.	2026-07-06	토	AIWays초			seed	base-seed	base	seed			landfill:토	base	18100	false	0	seed	false	clean-2026-07	18100
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초			seed	base-seed	base	seed			landfill:일	base	16400	false	0	seed	false	clean-2026-07	16400
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	3학년	1반	seed	base-seed	base	seed			class:3학년 1반:today	base	13	false	0	seed	false	clean-2026-07
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	3학년	1반	seed	base-seed	base	seed			class:3학년 1반:weekly	base	72	false	0	seed	false	clean-2026-07
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	3학년	1반	seed	base-seed	base	seed			class:3학년 1반:hold	base	8	false	0	seed	false	clean-2026-07
@@ -57,22 +57,22 @@ timestamp	local_time	date	weekday	school	grade	class_name	group_id	privacy_id	in
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	3반	seed	base-seed	base	seed			class:4학년 3반:recycle	base	29	false	0	seed	false	clean-2026-07
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	3반	seed	base-seed	base	seed			class:4학년 3반:reuse	base	5	false	0	seed	false	clean-2026-07
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	3반	seed	base-seed	base	seed			class:4학년 3반:contamination	base	9	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:today	base	18	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:weekly	base	92	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:hold	base	7	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:converted	base	36	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:correct	base	74	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:recycle	base	42	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:reuse	base	11	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:contamination	base	5	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:today	base	16	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:weekly	base	86	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:hold	base	3	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:converted	base	7	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:correct	base	62	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:recycle	base	31	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:reuse	base	5	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:contamination	base	8	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:today	base	22	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:weekly	base	116	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:hold	base	6	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:converted	base	44	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:correct	base	92	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:recycle	base	54	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:reuse	base	15	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	4학년	4반	seed	base-seed	base	seed			class:4학년 4반:contamination	base	4	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:today	base	24	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:weekly	base	128	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:hold	base	4	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:converted	base	52	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:correct	base	104	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:recycle	base	62	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:reuse	base	18	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	1반	seed	base-seed	base	seed			class:5학년 1반:contamination	base	3	false	0	seed	false	clean-2026-07
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	2반	seed	base-seed	base	seed			class:5학년 2반:today	base	21	false	0	seed	false	clean-2026-07
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	2반	seed	base-seed	base	seed			class:5학년 2반:weekly	base	103	false	0	seed	false	clean-2026-07
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	2반	seed	base-seed	base	seed			class:5학년 2반:hold	base	8	false	0	seed	false	clean-2026-07
@@ -97,14 +97,14 @@ timestamp	local_time	date	weekday	school	grade	class_name	group_id	privacy_id	in
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	4반	seed	base-seed	base	seed			class:5학년 4반:recycle	base	30	false	0	seed	false	clean-2026-07
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	4반	seed	base-seed	base	seed			class:5학년 4반:reuse	base	6	false	0	seed	false	clean-2026-07
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	5학년	4반	seed	base-seed	base	seed			class:5학년 4반:contamination	base	11	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:today	base	22	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:weekly	base	108	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:hold	base	7	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:converted	base	44	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:correct	base	90	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:recycle	base	52	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:reuse	base	14	false	0	seed	false	clean-2026-07
-2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:contamination	base	5	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:today	base	29	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:weekly	base	142	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:hold	base	3	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:converted	base	60	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:correct	base	118	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:recycle	base	72	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:reuse	base	20	false	0	seed	false	clean-2026-07
+2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	1반	seed	base-seed	base	seed			class:6학년 1반:contamination	base	2	false	0	seed	false	clean-2026-07
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	2반	seed	base-seed	base	seed			class:6학년 2반:today	base	20	false	0	seed	false	clean-2026-07
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	2반	seed	base-seed	base	seed			class:6학년 2반:weekly	base	101	false	0	seed	false	clean-2026-07
 2026-07-07T00:00:00.000Z	2026. 7. 7.	2026-07-07	일	AIWays초	6학년	2반	seed	base-seed	base	seed			class:6학년 2반:hold	base	9	false	0	seed	false	clean-2026-07

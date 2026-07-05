@@ -38,24 +38,24 @@
     "4학년 1반": { today: 14, weekly: 74, hold: 8, converted: 27, correct: 58, recycle: 32, reuse: 8, contamination: 6 },
     "4학년 2반": { today: 17, weekly: 88, hold: 9, converted: 34, correct: 70, recycle: 40, reuse: 10, contamination: 6 },
     "4학년 3반": { today: 12, weekly: 67, hold: 10, converted: 22, correct: 50, recycle: 29, reuse: 5, contamination: 9 },
-    "4학년 4반": { today: 18, weekly: 92, hold: 7, converted: 36, correct: 74, recycle: 42, reuse: 11, contamination: 5 },
-    "5학년 1반": { today: 16, weekly: 86, hold: 3, converted: 7, correct: 62, recycle: 31, reuse: 5, contamination: 8 },
+    "4학년 4반": { today: 22, weekly: 116, hold: 6, converted: 44, correct: 92, recycle: 54, reuse: 15, contamination: 4 },
+    "5학년 1반": { today: 24, weekly: 128, hold: 4, converted: 52, correct: 104, recycle: 62, reuse: 18, contamination: 3 },
     "5학년 2반": { today: 21, weekly: 103, hold: 8, converted: 41, correct: 84, recycle: 48, reuse: 13, contamination: 5 },
     "5학년 3반": { today: 19, weekly: 97, hold: 10, converted: 37, correct: 76, recycle: 44, reuse: 11, contamination: 7 },
     "5학년 4반": { today: 14, weekly: 78, hold: 14, converted: 24, correct: 55, recycle: 30, reuse: 6, contamination: 11 },
-    "6학년 1반": { today: 22, weekly: 108, hold: 7, converted: 44, correct: 90, recycle: 52, reuse: 14, contamination: 5 },
+    "6학년 1반": { today: 29, weekly: 142, hold: 3, converted: 60, correct: 118, recycle: 72, reuse: 20, contamination: 2 },
     "6학년 2반": { today: 20, weekly: 101, hold: 9, converted: 40, correct: 82, recycle: 49, reuse: 12, contamination: 6 },
     "6학년 3반": { today: 18, weekly: 95, hold: 11, converted: 34, correct: 74, recycle: 43, reuse: 10, contamination: 8 }
   };
 
   const BASE_LANDFILL_DAYS = [
-    { date: "2026-07-01", weekday: "월", landfillTons: 19100 },
-    { date: "2026-07-02", weekday: "화", landfillTons: 18760 },
-    { date: "2026-07-03", weekday: "수", landfillTons: 18940 },
-    { date: "2026-07-04", weekday: "목", landfillTons: 18300 },
-    { date: "2026-07-05", weekday: "금", landfillTons: 18420 },
-    { date: "2026-07-06", weekday: "토", landfillTons: 17880 },
-    { date: "2026-07-07", weekday: "일", landfillTons: 17540 }
+    { date: "2026-07-01", weekday: "월", landfillTons: 22800 },
+    { date: "2026-07-02", weekday: "화", landfillTons: 18900 },
+    { date: "2026-07-03", weekday: "수", landfillTons: 20600 },
+    { date: "2026-07-04", weekday: "목", landfillTons: 17200 },
+    { date: "2026-07-05", weekday: "금", landfillTons: 21900 },
+    { date: "2026-07-06", weekday: "토", landfillTons: 18100 },
+    { date: "2026-07-07", weekday: "일", landfillTons: 16400 }
   ];
   const LANDFILL_INCOMING_PERCENT = 68.3;
   const LANDFILL_REMAINING_PERCENT = 32.7;
@@ -179,7 +179,101 @@
     }
   };
 
-  const sortingQuizData = [
+  function buildExpandedSortingQuizData(seedQuestions) {
+    const quizItems = [
+      ["🥛", "우유갑", "종이팩류", "내용물을 비우고 헹군 뒤 펼쳐 말린"],
+      ["🧃", "멸균팩", "종이팩류", "빨대를 분리하고 헹군 뒤 말린"],
+      ["📄", "깨끗한 종이", "종이류", "물기와 테이프를 제거한"],
+      ["📘", "코팅 공책", "판단 보류", "코팅 여부를 확인한"],
+      ["📦", "택배상자", "종이류", "송장과 테이프를 제거한"],
+      ["🥤", "플라스틱컵", "플라스틱류", "남은 음료를 비우고 헹군"],
+      ["🧴", "페트병", "플라스틱류", "라벨을 제거하고 찌그러뜨린"],
+      ["🧴", "샴푸통", "플라스틱류", "내용물을 비우고 헹군"],
+      ["🛍️", "깨끗한 비닐봉투", "비닐류", "이물질을 털어낸"],
+      ["🍿", "과자봉지", "비닐류", "부스러기와 기름기를 확인한"],
+      ["🍜", "컵라면 용기", "일반쓰레기 검토", "국물 자국과 기름때를 확인한"],
+      ["🥫", "알루미늄 캔", "캔류", "내용물을 비우고 헹군"],
+      ["🍾", "유리병", "유리류", "뚜껑을 분리하고 깨지지 않게 정리한"],
+      ["🔋", "폐건전지", "전용 수거함", "전용 수거함 위치를 확인한"],
+      ["🧾", "영수증", "일반쓰레기", "감열지 여부를 확인한"],
+      ["🧻", "사용한 휴지", "일반쓰레기", "오염 상태를 확인한"],
+      ["☕", "코팅 종이컵", "판단 보류", "오염과 코팅 상태를 확인한"],
+      ["🥢", "나무젓가락", "일반쓰레기 검토", "음식물 오염 여부를 확인한"],
+      ["🍕", "피자박스", "일반쓰레기 검토", "기름 묻은 부분을 분리한"],
+      ["🧸", "고장난 장난감", "판단 보류", "복합 재질 여부를 확인한"],
+      ["📏", "부러진 자", "판단 보류", "재질과 파손 상태를 확인한"],
+      ["🧲", "자석 홍보물", "판단 보류", "자석과 종이를 분리 가능한지 확인한"],
+      ["🧷", "클립이 붙은 종이", "종이류", "금속 클립을 분리한"],
+      ["🧽", "수세미", "일반쓰레기", "여러 재질이 섞였는지 확인한"],
+      ["🧼", "세제 리필 파우치", "판단 보류", "재질 표시와 오염 상태를 확인한"],
+      ["🥡", "검은색 플라스틱 용기", "판단 보류", "선별 가능 여부를 확인한"],
+      ["🍱", "배달 용기", "판단 보류", "음식물 오염을 확인한"],
+      ["🪥", "칫솔", "일반쓰레기 검토", "복합 재질 여부를 확인한"],
+      ["🖊️", "볼펜", "일반쓰레기 검토", "분리 가능한 부품을 확인한"],
+      ["📚", "스프링 노트", "종이류", "스프링과 종이를 분리한"],
+      ["🧪", "깨진 유리", "별도 배출", "안전하게 감싼 뒤 학교 기준을 확인한"],
+      ["🧂", "양념 묻은 비닐", "일반쓰레기 검토", "오염 정도를 확인한"],
+      ["🥚", "달걀 껍데기", "일반쓰레기", "지역 음식물 기준을 확인한"],
+      ["🍗", "닭뼈", "일반쓰레기", "음식물쓰레기 예외 기준을 확인한"],
+      ["🐚", "조개껍데기", "일반쓰레기", "음식물쓰레기 예외 기준을 확인한"],
+      ["🧊", "스티로폼", "스티로폼류", "테이프와 이물질을 제거한"],
+      ["🧴", "펌프형 용기", "판단 보류", "스프링과 몸체를 분리 가능한지 확인한"],
+      ["📎", "복합 재질 물건", "판단 보류", "재질이 섞인 부분을 확인한"],
+      ["🧃", "빨대", "판단 보류", "작은 플라스틱 선별 기준을 확인한"],
+      ["🟨", "이름 모를 물건", "판단 보류", "아무 데나 버리지 않고 기록한"]
+    ];
+    const trueTemplates = [
+      item => `${item.name}은 ${item.action} 뒤 ${item.category} 기준으로 검토하는 것이 좋다.`,
+      item => `${item.name}은 배출 전 오염 상태와 학교 수거 기준을 함께 확인해야 한다.`,
+      item => `${item.name}처럼 헷갈리는 물건은 AI 제안 후 학생이 다시 확인하는 과정이 필요하다.`,
+      item => `${item.name}은 분리 가능한 부품을 떼어내면 자원순환 품질을 높일 수 있다.`,
+      item => `${item.name}을 판단 보류함에 남기는 것도 아무 데나 버리지 않는 실천이다.`,
+      item => `${item.name}은 같은 이름이어도 오염 상태에 따라 최종 판단이 달라질 수 있다.`,
+      item => `${item.name} 배출 기준은 우리 학교 수거함 안내와 지역 기준을 같이 살펴야 한다.`,
+      item => `${item.name}을 기록하면 우리 반 자원순환 데이터가 더 정확해진다.`
+    ];
+    const falseTemplates = [
+      item => `${item.name}은 오염 상태와 상관없이 무조건 ${item.category}로 버리면 된다.`,
+      item => `${item.name}은 AI가 한 번 제안하면 학생 확인 없이 바로 최종 판단해도 된다.`,
+      item => `${item.name}은 학교 기준을 보지 않아도 전국 어디서나 항상 같은 수거함에 넣는다.`,
+      item => `${item.name}은 음식물이나 액체가 묻어도 재활용 품질에 영향을 주지 않는다.`,
+      item => `${item.name}은 작거나 가벼우면 아무 일반 수거함에 섞어도 괜찮다.`,
+      item => `${item.name}은 분리 가능한 부품이 있어도 그대로 버리는 것이 항상 더 좋다.`,
+      item => `${item.name}을 헷갈릴 때 보류함에 기록하는 것은 자원순환 실천이 아니다.`,
+      item => `${item.name}은 친구 의견이나 학교 안내보다 색깔만 보고 분류하면 충분하다.`
+    ];
+    const trueQuestions = seedQuestions.filter(item => item.answer);
+    const falseQuestions = seedQuestions.filter(item => !item.answer);
+
+    quizItems.forEach(([emoji, name, category, action]) => {
+      const item = { emoji, name, category, action };
+      trueTemplates.forEach(template => {
+        trueQuestions.push({
+          emoji,
+          question: template(item),
+          answer: true,
+          explanation: "맞는 판단입니다. 오염 상태, 재질, 학교 기준을 함께 확인하는 습관이 중요합니다."
+        });
+      });
+      falseTemplates.forEach(template => {
+        falseQuestions.push({
+          emoji,
+          question: template(item),
+          answer: false,
+          explanation: "아쉬워요. 분리배출은 물건 이름만이 아니라 오염 상태와 학교 기준까지 함께 봐야 합니다."
+        });
+      });
+    });
+
+    const balanced = [];
+    for (let index = 0; index < 250; index += 1) {
+      balanced.push(trueQuestions[index % trueQuestions.length]);
+      balanced.push(falseQuestions[index % falseQuestions.length]);
+    }
+    return balanced;
+  }
+
+  const sortingQuizData = buildExpandedSortingQuizData([
     ["🧾", "영수증은 깨끗해 보여도 감열지라 일반쓰레기로 배출하는 것이 맞다.", true],
     ["🥛", "우유갑은 일반 종이와 같은 수거함에 섞어도 항상 괜찮다.", false],
     ["📦", "택배상자는 테이프와 송장을 최대한 제거하고 종이류로 배출한다.", true],
@@ -235,7 +329,7 @@
     question,
     answer,
     explanation: answer ? "맞는 기준입니다. 실제 배출 전 오염 상태와 학교 기준을 한 번 더 확인해요." : "헷갈리기 쉬운 기준입니다. 재질과 오염 상태를 다시 살펴봐요."
-  }));
+  })));
 
   let modelPromise = null;
   let currentDraft = null;
@@ -247,6 +341,8 @@
   let dashboardAnimationScope = "";
   let lastLandfillDays = [];
   let landfillClockTimer = null;
+  let holdEmojiCycleTimer = null;
+  let holdEmojiSettleTimer = 0;
   let seedRecords = [];
   let remoteRecords = [];
   let latestRanking = [];
@@ -257,6 +353,36 @@
   let quizIndex = 0;
   let quizScore = 0;
   let quizLocked = false;
+
+  const DEMO_SORTING_LOGS = [
+    { label: "우유갑", emoji: "🥛", category: "종이팩류", carbon: 25, time: "09:12", synced: true },
+    { label: "플라스틱컵", emoji: "🥤", category: "플라스틱류", carbon: 32.5, time: "10:26", synced: true },
+    { label: "영수증", emoji: "🧾", category: "일반쓰레기", carbon: 4.5, time: "11:08", synced: true },
+    { label: "캔류", emoji: "🥫", category: "캔류", carbon: 28, time: "12:41", synced: true },
+    { label: "과자 봉지", emoji: "🍪", category: "비닐류", carbon: 12, time: "13:37", synced: true },
+    { label: "택배상자", emoji: "📦", category: "종이류", carbon: 18, time: "13:58", synced: true },
+    { label: "라면용기", emoji: "🍜", category: "일반쓰레기 검토", carbon: 5, time: "14:16", synced: true },
+    { label: "폐건전지", emoji: "🔋", category: "전용 수거함", carbon: 9, time: "14:31", synced: true },
+    { label: "유리병", emoji: "🍾", category: "유리류", carbon: 22, time: "14:44", synced: true },
+    { label: "코팅 종이컵", emoji: "☕", category: "판단 보류", carbon: 3.5, time: "15:02", synced: true },
+    { label: "스티커 붙은 종이상자", emoji: "📦", category: "종이류 검토", carbon: 11, time: "15:17", synced: true },
+    { label: "플라스틱 뚜껑", emoji: "🧴", category: "플라스틱류", carbon: 7, time: "15:35", synced: true }
+  ];
+
+  const DEMO_HOLD_ITEMS = [
+    { id: "demo-coated-note", name: "코팅 공책", reason: "종이류 / 코팅 여부 논의 필요", status: "회의 안건 대기", time: "07.05 09:24", synced: true },
+    { id: "demo-broken-ruler", name: "부러진 자", reason: "플라스틱류 / 일반쓰레기 기준 확인", status: "기준 확인 필요", time: "07.05 10:18", synced: true },
+    { id: "demo-milk-straw", name: "우유팩 빨대 포함", reason: "종이팩 / 빨대 분리 여부 논의", status: "분류 논의 필요", time: "07.05 11:32", synced: true },
+    { id: "demo-dirty-vinyl", name: "오염된 비닐봉투", reason: "비닐류 / 오염도 확인 필요", status: "회의 안건 대기", time: "07.05 12:46", synced: true },
+    { id: "demo-sticker-box", name: "스티커 붙은 종이상자", reason: "종이류 / 이물질 제거 기준 확인", status: "기준 확인 필요", time: "07.05 13:05", synced: true },
+    { id: "demo-black-tray", name: "검은색 배달 용기", reason: "플라스틱류 / 선별 가능 여부 확인", status: "기준 확인 필요", time: "07.05 13:34", synced: true },
+    { id: "demo-wet-paper", name: "젖은 종이", reason: "종이류 / 물기와 오염도 확인", status: "분류 논의 필요", time: "07.05 14:02", synced: true },
+    { id: "demo-pump-bottle", name: "펌프형 샴푸통", reason: "플라스틱류 / 금속 스프링 분리 여부", status: "회의 안건 대기", time: "07.05 14:28", synced: true },
+    { id: "demo-broken-glass", name: "깨진 유리 조각", reason: "유리류 / 안전 포장과 별도 배출 기준", status: "안전 기준 확인", time: "07.05 14:51", synced: true },
+    { id: "demo-coated-cup", name: "코팅 종이컵", reason: "종이류 / 코팅과 오염 상태 확인", status: "기준 확인 필요", time: "07.05 15:10", synced: true }
+  ];
+
+  const HOLD_EMOJI_CYCLE = ["🥛", "🥤", "🧃", "🧴", "🥫", "📦", "🧾", "📄", "🛍️", "🔋", "💡", "🧻", "🪥", "👕", "🧦", "🍌", "🥚", "🍜", "🏷️", "🫙", "☕"];
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -443,6 +569,7 @@
   function renderHoldList(records) {
     const list = $("#holdList");
     if (!list) return;
+    if (list.closest(".sorting-app")) return;
 
     const holdRecords = records.filter(record => record.hold_flag || cleanText(record.final_decision).includes("보류"));
     if (!holdRecords.length) {
@@ -824,12 +951,15 @@
   }
 
   function confusionItemsForClass(profile, classActual) {
+    const baseHold = toNumber(profile.hold, 0);
+    const baseToday = toNumber(profile.today, 0);
+    const balancedTop = Math.max(10, Math.round(baseToday * 0.42 + baseHold * 0.9));
     const counts = new Map([
-      ["종이컵", Math.max(1, Math.round(toNumber(profile.hold, 0) * 0.48 + toNumber(profile.contamination, 0) * 0.42))],
-      ["우유갑", Math.max(1, Math.round(toNumber(profile.converted, 0) * 0.32 + toNumber(profile.hold, 0) * 0.32))],
-      ["과자 포장지", Math.max(1, Math.round(toNumber(profile.contamination, 0) * 0.55 + 1))],
-      ["컵라면 용기", Math.max(1, Math.round(toNumber(profile.hold, 0) * 0.38 + 1))],
-      ["영수증", Math.max(1, Math.round(toNumber(profile.today, 0) * 0.12 + 1))]
+      ["우유갑", balancedTop],
+      ["종이컵", Math.max(8, balancedTop - 1)],
+      ["과자 포장지", Math.max(7, balancedTop - 3)],
+      ["컵라면 용기", Math.max(6, balancedTop - 4)],
+      ["영수증", Math.max(5, balancedTop - 6)]
     ]);
 
     classActual.forEach(record => {
@@ -849,6 +979,20 @@
       .slice(0, 5);
   }
 
+  function itemEmoji(label) {
+    const text = cleanText(label);
+    if (text.includes("우유")) return "🥛";
+    if (text.includes("종이컵") || text.includes("컵")) return "🥤";
+    if (text.includes("과자") || text.includes("비닐")) return "🍪";
+    if (text.includes("라면")) return "🍜";
+    if (text.includes("영수")) return "🧾";
+    if (text.includes("캔")) return "🥫";
+    if (text.includes("플라스틱") || text.includes("페트") || text.includes("뚜껑")) return "🧴";
+    if (text.includes("택배") || text.includes("상자")) return "📦";
+    if (text.includes("건전지") || text.includes("배터리")) return "🔋";
+    return "🟨";
+  }
+
   function renderClassDashboard(profile, classActual, className, ranking) {
     const today = profile.today + classActual.length;
     const classHold = profile.hold + classActual.filter(record => record.hold_flag || cleanText(record.final_decision).includes("보류")).length;
@@ -865,7 +1009,7 @@
       const max = Math.max(...items.map(item => item.value), 1);
       confusion.innerHTML = heading + items.map(item => {
         const pct = Math.max(12, Math.round((item.value / max) * 100));
-        return `<div><span>${escapeHtml(item.label)}</span><i style="--value:${pct}%"></i><b>${item.value}</b></div>`;
+        return `<div><span><em aria-hidden="true">${itemEmoji(item.label)}</em>${escapeHtml(item.label)}</span><i style="--value:${pct}%"></i><b>${item.value}</b></div>`;
       }).join("");
     }
 
@@ -929,20 +1073,29 @@
     });
   }
 
+  function formatNowCompact(now = new Date()) {
+    const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+    const yy = padDatePart(now.getFullYear() % 100);
+    const mm = padDatePart(now.getMonth() + 1);
+    const dd = padDatePart(now.getDate());
+    const hh = padDatePart(now.getHours());
+    const mi = padDatePart(now.getMinutes());
+    const ss = padDatePart(now.getSeconds());
+    return `${yy}.${mm}.${dd}(${weekdays[now.getDay()]}) ${hh}:${mi}:${ss}`;
+  }
+
   function renderLandfillTimeNow() {
     const box = $(".landfill-time-now");
     if (!box) return;
 
     const update = () => {
       const now = new Date();
-      const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
-      const yy = padDatePart(now.getFullYear() % 100);
       const mm = padDatePart(now.getMonth() + 1);
       const dd = padDatePart(now.getDate());
       const hh = padDatePart(now.getHours());
       const mi = padDatePart(now.getMinutes());
       const ss = padDatePart(now.getSeconds());
-      box.textContent = `${yy}.${mm}.${dd}(${weekdays[now.getDay()]}) ${hh}:${mi}:${ss}`;
+      box.textContent = formatNowCompact(now);
       if ("dateTime" in box) box.dateTime = `${now.getFullYear()}-${mm}-${dd}T${hh}:${mi}:${ss}`;
     };
 
@@ -1064,19 +1217,36 @@
     if (!svg) return;
 
     const chartDays = landfillDaysForChart(days);
-    const top = 22;
-    const baseline = 186;
-    const left = 64;
-    const right = 384;
-    const xs = chartDays.map((_, index) => left + ((right - left) / Math.max(1, chartDays.length - 1)) * index);
-    const ticks = [25000, 20000, 15000, 10000, 5000, 0];
-    const chartMin = 0;
-    const chartMax = 25000;
+    const ns = "http://www.w3.org/2000/svg";
+    const chartTop = 2;
+    const chartBottom = 204;
+    const chartLeft = 58;
+    const chartRight = 426;
+    const chartHeight = chartBottom - chartTop;
+    const yMin = 15000;
+    const yMax = 23000;
+    const ticks = Array.from({ length: 9 }, (_, index) => yMin + index * 1000);
+    const minorTicks = Array.from({ length: 8 }, (_, index) => yMin + 500 + index * 1000);
+    const xs = chartDays.map((_, index) => chartLeft + ((chartRight - chartLeft) / Math.max(1, chartDays.length - 1)) * index);
+    const yScale = value => chartBottom - ((Math.min(yMax, Math.max(yMin, value)) - yMin) / (yMax - yMin)) * chartHeight;
     const points = chartDays.map((day, index) => ({
       ...day,
       x: Math.round(xs[index] || xs[xs.length - 1]),
-      y: yForChart(day.landfillTons, chartMin, chartMax, top, baseline)
+      y: yScale(day.landfillTons)
     }));
+    const animateLandfill = dashboardAnimationScope === "landfill" || dashboardAnimationScope === "all";
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const shouldAnimate = animateLandfill && !reducedMotion;
+
+    function appendSvg(parent, tagName, attrs = {}, text = "") {
+      const node = document.createElementNS(ns, tagName);
+      Object.entries(attrs).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) node.setAttribute(key, String(value));
+      });
+      if (text) node.textContent = text;
+      parent.appendChild(node);
+      return node;
+    }
 
     function linePathFor(items) {
       if (!items.length) return "";
@@ -1085,77 +1255,149 @@
         .join(" ");
     }
 
-    svg.setAttribute("aria-label", "최근 일주일 반입량 막대와 선 그래프");
+    function smoothPathFor(items) {
+      if (items.length < 2) return linePathFor(items);
+      return items.reduce((path, point, index) => {
+        if (index === 0) return `M${point.x} ${Math.round(point.y)}`;
+        const previous = items[index - 1];
+        const beforePrevious = items[index - 2] || previous;
+        const next = items[index + 1] || point;
+        const cp1x = previous.x + (point.x - beforePrevious.x) / 6;
+        const cp1y = previous.y + (point.y - beforePrevious.y) / 6;
+        const cp2x = point.x - (next.x - previous.x) / 6;
+        const cp2y = point.y - (next.y - previous.y) / 6;
+        return `${path} C${Math.round(cp1x)} ${Math.round(cp1y)} ${Math.round(cp2x)} ${Math.round(cp2y)} ${point.x} ${Math.round(point.y)}`;
+      }, "");
+    }
 
-    const linePath = linePathFor(points);
+    function tickLabel(tick) {
+      return tick >= 1000 ? `${Math.round(tick / 1000)}K` : String(tick);
+    }
+
+    svg.setAttribute("aria-label", "최근 일주일 반입량 막대와 선 그래프");
+    svg.setAttribute("viewBox", "0 0 460 252");
+    svg.innerHTML = "";
+
+    const defs = appendSvg(svg, "defs");
+    const areaGradient = appendSvg(defs, "linearGradient", { id: "cleanLineFill", x1: "0", x2: "0", y1: "0", y2: "1" });
+    appendSvg(areaGradient, "stop", { offset: "0%", "stop-color": "#52ffe1", "stop-opacity": "0.16" });
+    appendSvg(areaGradient, "stop", { offset: "58%", "stop-color": "#55c7ff", "stop-opacity": "0.075" });
+    appendSvg(areaGradient, "stop", { offset: "100%", "stop-color": "#55c7ff", "stop-opacity": "0.02" });
+
+    const barGradient = appendSvg(defs, "linearGradient", { id: "cleanBarFill", x1: "0", x2: "0", y1: "0", y2: "1" });
+    appendSvg(barGradient, "stop", { offset: "0%", "stop-color": "#8cffeb", "stop-opacity": "0.98" });
+    appendSvg(barGradient, "stop", { offset: "55%", "stop-color": "#59e8ff", "stop-opacity": "0.74" });
+    appendSvg(barGradient, "stop", { offset: "100%", "stop-color": "#5d99ff", "stop-opacity": "0.45" });
+
+    const glow = appendSvg(defs, "filter", { id: "landfillLineGlow", x: "-30%", y: "-30%", width: "160%", height: "160%" });
+    appendSvg(glow, "feDropShadow", { dx: "0", dy: "0", stdDeviation: "2.4", "flood-color": "#65f4dc", "flood-opacity": "0.34" });
+
+    const minorGrid = appendSvg(svg, "g", { class: "chart-minor-grid", stroke: "rgba(220,245,255,.075)", "stroke-width": "1" });
+    minorTicks.forEach(tick => {
+      const y = Math.round(yScale(tick));
+      appendSvg(minorGrid, "path", { d: `M${chartLeft - 8} ${y} H${chartRight + 12}` });
+    });
+
+    const grid = appendSvg(svg, "g", { class: "chart-grid", stroke: "rgba(220,245,255,.15)", "stroke-width": "1" });
+    const yAxis = appendSvg(svg, "g", { class: "chart-axis chart-y-axis", fill: "rgba(220,245,255,.62)", "font-size": "10.6", "font-weight": "760" });
+    ticks.slice().reverse().forEach(tick => {
+      const y = Math.round(yScale(tick));
+      appendSvg(grid, "path", { d: `M${chartLeft - 8} ${y} H${chartRight + 12}` });
+      appendSvg(yAxis, "text", { class: "y-label", x: "10", y: String(y + 4) }, tickLabel(tick));
+    });
+    appendSvg(yAxis, "text", { class: "y-zero", x: "18", y: String(chartBottom + 22), "text-anchor": "middle" }, "0");
+
+    const linePath = smoothPathFor(points);
     const first = points[0];
     const last = points[points.length - 1];
-    const areaPath = first && last ? `${linePath} L${last.x} ${baseline} L${first.x} ${baseline} Z` : "";
-    const area = $(".chart-area", svg);
-    const line = $(".chart-line", svg);
-    const bars = ensureSvgItems($(".chart-bars", svg), "rect", "rect", points.length);
-    const gridLines = ensureSvgItems($(".chart-grid", svg), "path", "path", ticks.length);
-    const axis = $(".chart-axis", svg);
-    const yLabels = ensureSvgItems(axis, "text:not(.x-label)", "text", ticks.length, "y-label");
-    const labels = ensureSvgItems(axis, ".x-label", "text", points.length, "x-label");
-
-    ticks.forEach((tick, index) => {
-      const y = Math.round(yForChart(tick, chartMin, chartMax, top, baseline));
-      const grid = gridLines[index];
-      const label = yLabels[index];
-      if (grid) grid.setAttribute("d", `M48 ${y} H402`);
-      if (label) {
-        label.setAttribute("x", "9");
-        label.setAttribute("y", String(y + 4));
-        label.textContent = tick >= 1000 ? `${Math.round(tick / 1000)}K` : String(tick);
-      }
-    });
-
-    if (area && areaPath) {
-      area.setAttribute("d", areaPath);
-      area.setAttribute("opacity", "0.16");
-    }
-    if (line && linePath) line.setAttribute("d", linePath);
+    const areaPath = first && last ? `${linePath} L${last.x} ${chartBottom} L${first.x} ${chartBottom} Z` : "";
+    const weeklyAverage = points.reduce((sum, point) => sum + point.landfillTons, 0) / Math.max(1, points.length);
+    const averageY = Math.round(yScale(weeklyAverage));
+    const area = appendSvg(svg, "path", { class: "chart-area", d: areaPath, fill: "url(#cleanLineFill)", opacity: shouldAnimate ? "0" : "0.16" });
+    const barsGroup = appendSvg(svg, "g", { class: "chart-bars", fill: "url(#cleanBarFill)" });
+    const bars = [];
 
     points.forEach((point, index) => {
-      const bar = bars[index];
-      if (bar) {
-        const barY = Math.round(point.y);
-        bar.setAttribute("x", String(point.x - 10));
-        bar.setAttribute("width", "20");
-        bar.setAttribute("y", String(barY));
-        bar.setAttribute("height", String(Math.max(6, Math.round(baseline - point.y))));
-        bar.setAttribute("rx", "6");
-        bar.dataset.finalY = String(barY);
-        bar.dataset.finalHeight = String(Math.max(6, Math.round(baseline - point.y)));
+      const barY = Math.round(point.y);
+      const barHeight = Math.max(6, Math.round(chartBottom - point.y));
+      const bar = appendSvg(barsGroup, "rect", {
+        x: String(point.x - 15),
+        y: shouldAnimate ? String(chartBottom) : String(barY),
+        width: "30",
+        height: shouldAnimate ? "0" : String(barHeight),
+        rx: "8",
+        "aria-label": `${point.displayDate} ${point.weekday} ${Math.round(point.landfillTons).toLocaleString("ko-KR")}t`
+      });
+      bar.dataset.finalY = String(barY);
+      bar.dataset.finalHeight = String(barHeight);
+      bar.style.transformBox = "fill-box";
+      bar.style.transformOrigin = "center bottom";
+      bar.style.transform = shouldAnimate ? "scaleY(0)" : "scaleY(1)";
+      if (shouldAnimate) {
+        bar.style.transition = `transform 700ms cubic-bezier(0.22, 1, 0.36, 1) ${index * 36}ms`;
       }
-
-      const label = labels[index];
-      if (label) {
-        label.textContent = "";
-        label.setAttribute("x", String(point.x));
-        label.setAttribute("y", "216");
-        label.setAttribute("text-anchor", "middle");
-
-        const dateLine = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
-        dateLine.setAttribute("class", "date-label");
-        dateLine.setAttribute("x", String(point.x));
-        dateLine.setAttribute("dy", "0");
-        dateLine.textContent = point.displayDate;
-
-        const weekdayLine = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
-        weekdayLine.setAttribute("class", "weekday-label");
-        weekdayLine.setAttribute("x", String(point.x));
-        weekdayLine.setAttribute("dy", "15");
-        weekdayLine.textContent = point.weekday;
-
-        label.append(dateLine, weekdayLine);
-      }
+      bars.push(bar);
     });
 
-    $(".chart-markers", svg)?.remove();
+    const line = appendSvg(svg, "path", {
+      class: "chart-line",
+      d: linePath,
+      fill: "none",
+      stroke: "#65f4dc",
+      "stroke-width": "3.2",
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round",
+      filter: "url(#landfillLineGlow)"
+    });
 
-    const animateLandfill = dashboardAnimationScope === "landfill" || dashboardAnimationScope === "all";
+    const pointsGroup = appendSvg(svg, "g", { class: "chart-points" });
+    points.forEach(point => {
+      appendSvg(pointsGroup, "circle", { cx: String(point.x), cy: String(Math.round(point.y)), r: "3.7" });
+    });
+
+    const averageGroup = appendSvg(svg, "g", { class: "chart-average" });
+    appendSvg(averageGroup, "path", {
+      d: `M${chartLeft - 8} ${averageY} H${chartRight + 12}`,
+      stroke: "rgba(255,232,128,.96)",
+      "stroke-width": "3.8",
+      "stroke-dasharray": "7 6",
+      "stroke-linecap": "round"
+    });
+    appendSvg(averageGroup, "text", { x: String(chartRight + 8), y: String(averageY - 9), "text-anchor": "end" }, "주간 평균");
+
+    const xAxis = appendSvg(svg, "g", { class: "chart-axis chart-x-axis", fill: "rgba(220,245,255,.7)", "font-size": "10.4", "font-weight": "760" });
+    points.forEach(point => {
+      const label = appendSvg(xAxis, "text", { class: "x-label", x: String(point.x), y: "213", "text-anchor": "middle" });
+      appendSvg(label, "tspan", { class: "date-label", x: String(point.x), dy: "0" }, point.displayDate);
+      appendSvg(label, "tspan", { class: "weekday-label", x: String(point.x), dy: "16" }, point.weekday);
+    });
+
+    if (shouldAnimate) {
+      if (line?.getTotalLength) {
+        const length = line.getTotalLength();
+        line.style.strokeDasharray = String(length);
+        line.style.strokeDashoffset = String(length);
+        line.style.transition = "none";
+      }
+
+      requestAnimationFrame(() => {
+        bars.forEach(bar => {
+          bar.setAttribute("y", bar.dataset.finalY);
+          bar.setAttribute("height", bar.dataset.finalHeight);
+          bar.style.transform = "scaleY(1)";
+        });
+
+        window.setTimeout(() => {
+          if (line?.getTotalLength) {
+            line.style.transition = "stroke-dashoffset 620ms cubic-bezier(0.22, 1, 0.36, 1), filter 620ms ease";
+            line.style.strokeDashoffset = "0";
+          }
+          area.style.transition = "opacity 560ms cubic-bezier(0.22, 1, 0.36, 1)";
+          area.setAttribute("opacity", "0.16");
+        }, 720);
+      });
+    }
+
     const totalNode = $(".landfill-metrics strong");
     if (totalNode && last) {
       const totalText = Math.round(last.landfillTons).toLocaleString("ko-KR") + "t";
@@ -1165,7 +1407,6 @@
     updateLandfillDonuts(animateLandfill);
     if (animateLandfill) {
       $$(".landfill-metrics strong").slice(1).forEach(node => animateMetricText(node, cleanText(node.textContent), 620));
-      requestAnimationFrame(() => animateLandfillChartSequence());
     }
   }
 
@@ -1189,49 +1430,97 @@
       <section class="ranking-dialog" role="dialog" aria-modal="true" aria-labelledby="rankingModalTitle">
         <button class="ranking-close" type="button" aria-label="랭킹 닫기">×</button>
         <p class="eyebrow">Class Resource Ranking</p>
-        <h2 id="rankingModalTitle">우리 학급 자원순환 랭킹</h2>
-        <p class="ranking-help">기록 데이터를 기준으로 실천 점수를 계산합니다.</p>
-        <div class="ranking-table-wrap">
-          <table class="ranking-table">
-            <thead>
-              <tr>
-                <th>순위</th>
-                <th>학년</th>
-                <th>학급</th>
-                <th>실천점수</th>
-                <th>판독</th>
-                <th>정확</th>
-                <th>보류</th>
-                <th>오염</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+        <h2 id="rankingModalTitle">우리반 자원순환 레이스</h2>
+        <div class="ranking-tabs" role="tablist" aria-label="랭킹 범위">
+          <button class="ranking-tab is-active" type="button" data-ranking-scope="all">전체</button>
+          <button class="ranking-tab" type="button" data-ranking-scope="3학년">3학년</button>
+          <button class="ranking-tab" type="button" data-ranking-scope="4학년">4학년</button>
+          <button class="ranking-tab" type="button" data-ranking-scope="5학년">5학년</button>
+          <button class="ranking-tab" type="button" data-ranking-scope="6학년">6학년</button>
+        </div>
+        <div class="ranking-podium" aria-label="상위 3개 학급"></div>
+        <div class="ranking-race-wrap">
+          <div class="ranking-race-head"><span>학급 레이스</span></div>
+          <div class="ranking-race-list"></div>
         </div>
       </section>
     `;
     document.body.appendChild(modal);
+    modal.addEventListener("click", event => {
+      const tab = event.target.closest("[data-ranking-scope]");
+      if (!tab || !modal.contains(tab)) return;
+      $$(".ranking-tab", modal).forEach(button => button.classList.toggle("is-active", button === tab));
+      renderRankingModalRows(modal);
+    });
     return modal;
   }
 
   function renderRankingModalRows(modal) {
-    const tbody = $(".ranking-table tbody", modal);
-    if (!tbody) return;
+    const podium = $(".ranking-podium", modal);
+    const list = $(".ranking-race-list", modal);
+    if (!podium || !list) return;
     const current = selectedClassName();
     const rows = latestRanking.length ? latestRanking : buildClassRanking(cloneBaseClasses());
+    const scope = $(".ranking-tab.is-active", modal)?.dataset.rankingScope || "all";
+    const scopedRows = (scope === "all" ? rows : rows.filter(item => item.grade === scope))
+      .map((item, index) => ({ ...item, rank: index + 1 }));
+    const maxScore = Math.max(...scopedRows.map(item => item.score), 1);
+    const mascotsByClass = {
+      "3학년 1반": "🐰",
+      "3학년 2반": "🐼",
+      "3학년 3반": "🦊",
+      "4학년 1반": "🐻",
+      "4학년 2반": "🐸",
+      "4학년 3반": "🐬",
+      "4학년 4반": "🐿️",
+      "5학년 1반": "🐱",
+      "5학년 2반": "🐧",
+      "5학년 3반": "🦁",
+      "5학년 4반": "🐨",
+      "6학년 1반": "🐯",
+      "6학년 2반": "🐹",
+      "6학년 3반": "🦄"
+    };
+    const fallbackMascots = ["🦝", "🦉", "🦭", "🦋", "🐢", "🦔", "🐳"];
+    const medal = ["🥇", "🥈", "🥉"];
 
-    tbody.innerHTML = rows.map(item => `
-      <tr class="${item.name === current ? "is-current" : ""}">
-        <td>${item.rank}</td>
-        <td>${escapeHtml(item.grade)}</td>
-        <td>${escapeHtml(item.classOnly)}</td>
-        <td>${item.score.toLocaleString("ko-KR")}</td>
-        <td>${item.scans.toLocaleString("ko-KR")}</td>
-        <td>${item.correct.toLocaleString("ko-KR")}</td>
-        <td>${item.hold.toLocaleString("ko-KR")}</td>
-        <td>${item.contamination.toLocaleString("ko-KR")}</td>
-      </tr>
+    function mascotFor(item, index) {
+      const key = cleanText(item.name || item.classOnly);
+      if (mascotsByClass[key]) return mascotsByClass[key];
+      const sum = Array.from(key).reduce((acc, char) => acc + char.charCodeAt(0), index);
+      return fallbackMascots[sum % fallbackMascots.length];
+    }
+
+    function statsLine(item) {
+      return `판독 ${item.scans.toLocaleString("ko-KR")} · 정확 ${item.correct.toLocaleString("ko-KR")} · 보류 ${item.hold.toLocaleString("ko-KR")} · 오염 ${item.contamination.toLocaleString("ko-KR")}`;
+    }
+
+    podium.innerHTML = scopedRows.slice(0, 3).map((item, index) => `
+      <article class="podium-card podium-${index + 1} ${item.name === current ? "is-current" : ""}">
+        <span class="podium-medal">${medal[index]}</span>
+        <b>${mascotFor(item, index)}</b>
+        <strong>${escapeHtml(item.grade)} ${escapeHtml(item.classOnly)}</strong>
+        <em>${item.score.toLocaleString("ko-KR")}점</em>
+      </article>
     `).join("");
+
+    list.innerHTML = scopedRows.map((item, index) => {
+      const pct = Math.max(8, Math.round((item.score / maxScore) * 100));
+      return `
+        <article class="race-row ${item.name === current ? "is-current" : ""}">
+          <span class="race-rank">${item.rank}</span>
+          <span class="race-mascot" aria-hidden="true">${mascotFor(item, index)}</span>
+          <div class="race-body">
+            <div class="race-title">
+              <strong>${escapeHtml(item.grade)} ${escapeHtml(item.classOnly)}</strong>
+              <small>${statsLine(item)}</small>
+              <b>${item.score.toLocaleString("ko-KR")}점</b>
+            </div>
+            <i><em style="width:${pct}%"></em></i>
+          </div>
+        </article>
+      `;
+    }).join("");
   }
 
   function openRankingModal() {
@@ -1251,6 +1540,110 @@
     window.setTimeout(() => {
       modal.hidden = true;
     }, 160);
+  }
+
+  function resetInternalScrollState(root = document) {
+    if (!root) return;
+    $$(
+      "#sortingTimeline, #holdList, .ranking-race-list, .ranking-dialog, .gallery-detail, .gallery-detail-grid, .tab-panel, [data-scroll-reset]",
+      root
+    ).forEach(node => {
+      if ("scrollTop" in node) node.scrollTop = 0;
+    });
+  }
+
+  function resetRankingModalUiState() {
+    const modal = $("#rankingModal");
+    if (!modal) return;
+    $$(".ranking-tab", modal).forEach(button => {
+      button.classList.toggle("is-active", button.dataset.rankingScope === "all");
+    });
+    resetInternalScrollState(modal);
+    modal.classList.remove("is-open");
+    modal.hidden = true;
+    document.body.classList.remove("ranking-modal-open");
+  }
+
+  function closeAllOpenOverlays() {
+    closeModal();
+    resetRankingModalUiState();
+    document.body.classList.remove("modal-open", "ranking-modal-open");
+  }
+
+  function resetGalleryUiState() {
+    const stage = $("#galleryStage");
+    if (!stage) return;
+    stage.classList.remove("is-detail", "is-active", "is-expanded");
+    $$("[data-gallery]", stage).forEach(card => card.classList.remove("is-active", "is-selected", "is-expanded"));
+    const grid = $("#galleryDetailGrid", stage);
+    if (grid) grid.innerHTML = "";
+    resetInternalScrollState(stage);
+  }
+
+  function resetHoldEmojiPreviewToCycle() {
+    const preview = $("#manualHoldEmojiPreview");
+    if (!preview) return;
+    preview.textContent = HOLD_EMOJI_CYCLE[0];
+    preview.classList.remove("is-matched");
+    preview.classList.add("is-cycling");
+  }
+
+  function resetThreeSecondAppUiState() {
+    const sortingSection = $("#sorting");
+    if (!sortingSection) return;
+
+    $$("[data-tab]", sortingSection).forEach(tab => {
+      tab.classList.toggle("is-active", tab.dataset.tab === "classify");
+    });
+    $$("[data-panel]", sortingSection).forEach(panel => {
+      panel.classList.toggle("is-active", panel.dataset.panel === "classify");
+    });
+
+    selectedSortingKey = "";
+    $$("[data-quick-item]", sortingSection).forEach(button => button.classList.remove("is-active"));
+    const searchInput = $("#searchInput", sortingSection);
+    if (searchInput) searchInput.value = "";
+    const result = $("[data-sorting-result]", sortingSection);
+    result?.classList.add("is-empty");
+    const category = $("[data-quick-category]", sortingSection);
+    if (category) category.innerHTML = "<b>H-A-H</b> AI 1차 제안 준비";
+    const guidance = $("[data-quick-guidance]", sortingSection);
+    if (guidance) guidance.textContent = "지금 버리려는 물건을 선택하거나 검색해 보세요. AI가 먼저 분류 후보를 제안하고, 여러분이 다시 확인해 실천 기록으로 남깁니다.";
+    const tip = $("[data-quick-tip]", sortingSection);
+    if (tip) {
+      tip.hidden = false;
+      tip.innerHTML = "<strong>실천 흐름</strong><span>사진 또는 검색 → AI 후보 → 학생 확인 → 실천 기록 또는 판단 보류</span>";
+    }
+    $(".quick-action-row", sortingSection)?.setAttribute("hidden", "");
+    $("#practiceLogButton", sortingSection)?.removeAttribute("disabled");
+    const holdButton = $("#holdLogButton", sortingSection);
+    if (holdButton) holdButton.textContent = "판단 보류";
+
+    quizSet = [];
+    quizIndex = 0;
+    quizScore = 0;
+    quizLocked = false;
+    showQuizQuestion();
+
+    const holdInput = $("#manualHoldInput", sortingSection);
+    if (holdInput) holdInput.value = "";
+    resetHoldEmojiPreviewToCycle();
+    resetInternalScrollState(sortingSection);
+  }
+
+  function resetTransientUiState(section) {
+    if (!section) return;
+    if (section.id === "gallery") resetGalleryUiState();
+    if (section.id === "sorting") resetThreeSecondAppUiState();
+    resetInternalScrollState(section);
+  }
+
+  function resetSectionEntryState(section) {
+    if (!section) return;
+    closeAllOpenOverlays();
+    if (section.id === "gallery") resetGalleryUiState();
+    if (section.id === "sorting") resetThreeSecondAppUiState();
+    resetInternalScrollState(section);
   }
 
   function applyDashboard(records) {
@@ -1366,11 +1759,7 @@
       app_version: "clean-2026-07"
     };
 
-    const nextRecords = localRecords();
-    nextRecords.push(safeRecord);
-    writeJson(STORAGE_RECORDS, nextRecords);
-    applyDashboard(allStoredRecords());
-
+    let result = DATA_CONFIG.appsScriptUrl ? true : "queued";
     try {
       if (DATA_CONFIG.appsScriptUrl) {
         await fetch(DATA_CONFIG.appsScriptUrl, {
@@ -1379,16 +1768,23 @@
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(safeRecord)
         });
-        return true;
+      } else {
+        const pending = readJson(STORAGE_PENDING, []);
+        pending.push(safeRecord);
+        writeJson(STORAGE_PENDING, pending);
       }
-      return "local";
     } catch {
+      result = false;
       const pending = readJson(STORAGE_PENDING, []);
       pending.push(safeRecord);
       writeJson(STORAGE_PENDING, pending);
-      applyDashboard(allStoredRecords());
-      return false;
     }
+
+    const nextRecords = localRecords();
+    nextRecords.push(safeRecord);
+    writeJson(STORAGE_RECORDS, nextRecords);
+    applyDashboard(allStoredRecords());
+    return result;
   }
 
   // COMMON_FINAL_FIX_START
@@ -1416,21 +1812,56 @@
     let scrollDebounce = 0;
     let clickLockUntil = 0;
     let dashboardLockUntil = Date.now() + 520;
+    let pendingLightTimer = 0;
+    let pendingLightFrame = 0;
 
-    function activate(section, force = false) {
+    function cancelPendingLight() {
+      window.clearTimeout(pendingLightTimer);
+      if (pendingLightFrame) cancelAnimationFrame(pendingLightFrame);
+      pendingLightFrame = 0;
+    }
+
+    function activate(section, force = false, options = {}) {
       if (!section) return;
       const id = section.id;
-      if (!force && id === currentId) return;
+      const sectionLight = options.sectionLight !== false;
+      if (!force && id === currentId && (!sectionLight || section.classList.contains("is-active"))) return;
+      const previousId = currentId;
+      const previousSection = previousId ? document.getElementById(previousId) : null;
+      if (previousId && previousId !== id) resetTransientUiState(previousSection);
+      if (previousId !== id) resetSectionEntryState(section);
       const label = navPairs.find(([, sectionId]) => sectionId === id)?.[0] || section.dataset.nav;
       currentId = id;
 
-      sections.forEach(item => item.classList.toggle("is-active", item === section));
+      if (sectionLight) {
+        sections.forEach(item => item.classList.toggle("is-active", item === section));
+      }
       links.forEach(link => {
         const active = cleanText(link.textContent) === label;
         link.classList.toggle("is-active", active);
         if (active) link.setAttribute("aria-current", "page");
         else link.removeAttribute("aria-current");
       });
+    }
+
+    function activateAfterSettle(section, delay = 105) {
+      if (!section) return;
+      cancelPendingLight();
+      const startedAt = performance.now();
+      const maxWait = 860;
+      const tolerance = Math.max(8, Math.round(window.innerHeight * 0.014));
+
+      function waitForSettle(now) {
+        const rect = section.getBoundingClientRect();
+        const settled = Math.abs(rect.top) <= tolerance || now - startedAt > maxWait;
+        if (!settled) {
+          pendingLightFrame = requestAnimationFrame(waitForSettle);
+          return;
+        }
+        pendingLightTimer = window.setTimeout(() => activate(section, true), delay);
+      }
+
+      pendingLightFrame = requestAnimationFrame(waitForSettle);
     }
 
     function nearestSection() {
@@ -1473,6 +1904,16 @@
         .sort((a, b) => a.distance - b.distance)[0]?.index || 0;
     }
 
+    function currentSectionIndex(direction) {
+      const activeIndex = sections.findIndex(section => section.id === currentId);
+      const scrollIndex = sectionIndexByScrollPosition();
+      if (activeIndex < 0) return scrollIndex;
+      if (direction < 0) return activeIndex;
+      const activeRect = sections[activeIndex].getBoundingClientRect();
+      const nearActive = Math.abs(activeRect.top) <= Math.max(80, window.innerHeight * 0.16);
+      return nearActive ? activeIndex : scrollIndex;
+    }
+
     function resetToDashboard() {
       dashboardLockUntil = Date.now() + 520;
       history.replaceState(null, "", window.location.pathname + window.location.search);
@@ -1481,33 +1922,45 @@
     }
 
     function shouldSkipSnap(event) {
-      return Boolean(event.target.closest("input, textarea, select, option, button, dialog, .ai-modal, [role='dialog']"));
+      return Boolean(event.target.closest("input, textarea, select, option, dialog, .ai-modal, [role='dialog']"));
     }
 
   function snapByWheel(event) {
       if (shouldSkipSnap(event) || Math.abs(event.deltaY) < 18 || snapLocked) return;
       const active = sections.find(section => section.id === currentId) || nearestSection();
       const direction = event.deltaY > 0 ? 1 : -1;
-      const currentIndex = direction < 0
-        ? sectionIndexByScrollPosition()
-        : Math.max(0, sections.indexOf(active));
+      const currentIndex = currentSectionIndex(direction);
       const nextIndex = Math.min(sections.length - 1, Math.max(0, currentIndex + direction));
-      if (nextIndex === currentIndex) return;
+      if (nextIndex === currentIndex) {
+        event.preventDefault();
+        snapLocked = true;
+        clickLockUntil = Date.now() + 420;
+        const edgeTarget = sections[currentIndex] || active;
+        edgeTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+        activate(edgeTarget, true, { sectionLight: false });
+        activateAfterSettle(edgeTarget, 80);
+        window.setTimeout(() => {
+          snapLocked = false;
+          clickLockUntil = 0;
+        }, 500);
+        return;
+      }
 
       event.preventDefault();
       snapLocked = true;
-      clickLockUntil = Date.now() + 760;
+      clickLockUntil = Date.now() + 820;
       const target = sections[nextIndex];
       history.replaceState(null, "", "#" + target.id);
       target.scrollIntoView({ behavior: "smooth", block: "start" });
-      activate(target, true);
+      activate(target, true, { sectionLight: false });
+      activateAfterSettle(target, 105);
       window.setTimeout(() => {
         snapLocked = false;
         clickLockUntil = 0;
         if (Math.abs(window.scrollY - target.offsetTop) > 4) {
           window.scrollTo({ top: target.offsetTop, left: 0, behavior: "auto" });
         }
-        activate(nearestSection());
+        activateAfterSettle(target, 65);
       }, 820);
     }
 
@@ -1522,13 +1975,14 @@
         const section = document.getElementById(id);
         if (!section) return;
         event.preventDefault();
-        clickLockUntil = Date.now() + 640;
+        clickLockUntil = Date.now() + 760;
         history.replaceState(null, "", "#" + id);
         section.scrollIntoView({ behavior: "smooth", block: "start" });
-        activate(section, true);
+        activate(section, true, { sectionLight: false });
+        activateAfterSettle(section, 105);
         window.setTimeout(() => {
           clickLockUntil = 0;
-          activate(nearestSection());
+          activateAfterSettle(section, 65);
         }, 700);
       });
     });
@@ -1556,7 +2010,28 @@
         logs: Array.isArray(stats.logs) ? stats.logs.slice(0, 30) : []
       };
     }
+    if (!sortingStats.logs.length) {
+      sortingStats = {
+        totalCount: 7,
+        carbonReduction: 1800,
+        logs: DEMO_SORTING_LOGS.slice()
+      };
+    } else if (sortingStats.logs.length < 10) {
+      const existing = new Set(sortingStats.logs.map(log => cleanText(`${log.time}:${log.label}`)));
+      const filler = DEMO_SORTING_LOGS.filter(log => !existing.has(cleanText(`${log.time}:${log.label}`)));
+      sortingStats = {
+        ...sortingStats,
+        logs: sortingStats.logs.concat(filler.slice(0, 10 - sortingStats.logs.length))
+      };
+    }
     sortingHoldItems = readJson(SORTING_HOLD_KEY, []);
+    if (!sortingHoldItems.length) {
+      sortingHoldItems = DEMO_HOLD_ITEMS.slice();
+    } else if (sortingHoldItems.length < 10) {
+      const existing = new Set(sortingHoldItems.map(item => cleanText(item.id || item.name)));
+      const filler = DEMO_HOLD_ITEMS.filter(item => !existing.has(cleanText(item.id || item.name)));
+      sortingHoldItems = sortingHoldItems.concat(filler.slice(0, 10 - sortingHoldItems.length));
+    }
   }
 
   function saveSortingStats() {
@@ -1567,85 +2042,289 @@
     writeJson(SORTING_HOLD_KEY, sortingHoldItems);
   }
 
+  const practiceBadgeSteps = [
+    { count: 1, emoji: "🌱", title: "새싹 실천가" },
+    { count: 3, emoji: "♻️", title: "분리배출 입문자" },
+    { count: 5, emoji: "🔎", title: "자원순환 탐험가" },
+    { count: 10, emoji: "🧃", title: "분리배출 실천가" },
+    { count: 20, emoji: "🌍", title: "자원순환 환경운동가" },
+    { count: 30, emoji: "🏆", title: "AI Ways 마스터" }
+  ];
+
+  function currentBadgeTitle(totalCount) {
+    return practiceBadgeSteps
+      .filter(step => totalCount >= step.count)
+      .at(-1)?.title || "기록 시작 전";
+  }
+
+  function recordForSortingItem(item, holdFlag = false, labelOverride = "") {
+    const label = cleanText(labelOverride || item?.label || item?.title || "판단 기록");
+    const category = holdFlag ? "기준 확인 필요" : cleanText(item?.category || "학생 확인");
+    return {
+      input_type: "search",
+      ai_engine: "main-3second-helper",
+      ai_raw_label: label,
+      ai_confidence: "",
+      mapped_item: label,
+      suggested_category: category,
+      final_decision: holdFlag ? "판단 보류" : category,
+      hold_flag: Boolean(holdFlag)
+    };
+  }
+
+  function recordSortingPracticeLocally(item, saved = true) {
+    const time = new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+    sortingStats.totalCount += 1;
+    sortingStats.carbonReduction += Number(item.carbonSaved) || 0;
+    sortingStats.logs.unshift({
+      label: item.label,
+      emoji: item.emoji || holdEmojiFor(item.label),
+      category: item.category || "학생 확인",
+      carbon: item.carbonSaved,
+      time,
+      synced: saved === true
+    });
+    sortingStats.logs = sortingStats.logs.slice(0, 30);
+    saveSortingStats();
+    renderSortingStats();
+  }
+
+  function addSortingHoldLocally(name, reason = "기준 확인 필요", saved = true) {
+    const cleaned = cleanText(name) || "판단 보류 물건";
+    sortingHoldItems.unshift({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      name: cleaned,
+      reason,
+      status: "회의 안건 대기",
+      candidate: holdCandidateFor(cleaned),
+      synced: saved === true,
+      time: new Date().toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
+    });
+    sortingHoldItems = sortingHoldItems.slice(0, 40);
+    saveSortingHolds();
+    renderSortingHolds();
+  }
+
+  function updateSortingFromRecord(record, saved = true) {
+    const label = cleanText(record.mapped_item || record.ai_raw_label || record.final_decision || "판단 기록");
+    if (record.hold_flag || cleanText(record.final_decision).includes("보류")) {
+      addSortingHoldLocally(label, "Google Sheets 기록 반영 대기 안건", saved);
+      return;
+    }
+
+    const item = {
+      label,
+      emoji: holdEmojiFor(label),
+      category: cleanText(record.final_decision || record.suggested_category || "학생 확인"),
+      carbonSaved: 6
+    };
+    recordSortingPracticeLocally(item, saved);
+  }
+
+  function storageMessage(saved, kind = "record") {
+    if (saved === true) return kind === "hold" ? "판단 보류를 Google Sheets에 저장하고 보류함에 반영했어요." : "기록을 Google Sheets에 저장하고 실천 통계에 반영했어요.";
+    return "현재 연결이 불안정해 임시 저장 후 다시 전송을 시도합니다.";
+  }
+
   function renderSortingStats() {
     setText("#sortingPracticeCount", `${sortingStats.totalCount.toLocaleString("ko-KR")}회`);
-    setText("#sortingCarbonCount", `${sortingStats.carbonReduction.toFixed(1)}g`);
-    setText("#sortingRecentItem", sortingStats.logs[0]?.label || "-");
+    setText("#sortingCarbonCount", `${sortingStats.carbonReduction >= 1000 ? `${(sortingStats.carbonReduction / 1000).toFixed(1)}kg` : `${sortingStats.carbonReduction.toFixed(1)}g`}`);
+    const recent = sortingStats.logs[0];
+    setText("#sortingRecentItem", recent ? `${recent.emoji || holdEmojiFor(recent.label)} ${recent.label}` : "-");
+
+    const statsPanel = $('[data-panel="stats"]');
+    const timelineBox = $("#sortingTimeline")?.closest(".timeline-box");
+    if (statsPanel && timelineBox) {
+      let insights = $(".impact-insights", statsPanel);
+      if (!insights) {
+        insights = document.createElement("section");
+        insights.className = "impact-insights";
+        timelineBox.before(insights);
+      }
+      const carbonKg = sortingStats.carbonReduction / 1000;
+      const treeCount = Math.max(0.1, carbonKg / 6).toFixed(1);
+      const resourceCount = sortingStats.logs.filter(log => !String(log.category || "").includes("일반")).length || sortingStats.totalCount;
+      insights.innerHTML = `
+        <article><b>🌳</b><strong>나무 보호 환산</strong><span>나무 ${treeCount}그루를 지켰어요</span></article>
+        <article><b>🌍</b><strong>탄소 절감 환산</strong><span>CO2 ${carbonKg.toFixed(1)}kg 감축에 기여했어요</span></article>
+        <article><b>♻️</b><strong>자원순환 효과</strong><span>재활용 가능 자원 ${resourceCount.toLocaleString("ko-KR")}건을 살렸어요</span></article>
+        <article><b>🐻‍❄️</b><strong>오늘의 메시지</strong><span>시원한 내일을 위한 작은 실천이 쌓이고 있어요</span></article>
+      `;
+
+      let badge = $(".badge-progress", statsPanel);
+      if (!badge) {
+        badge = document.createElement("section");
+        badge.className = "badge-progress";
+        timelineBox.before(badge);
+      }
+      const total = sortingStats.totalCount;
+      badge.innerHTML = `
+        <div class="badge-progress-head">
+          <strong>실천 배지 단계</strong>
+          <span>현재 ${total.toLocaleString("ko-KR")}회 · ${escapeHtml(currentBadgeTitle(total))}</span>
+        </div>
+        <div class="badge-track">
+          ${practiceBadgeSteps.map(step => `
+            <article class="${total >= step.count ? "is-earned" : ""}">
+              <b>${step.emoji}</b>
+              <strong>${step.title}</strong>
+              <span>${step.count}회</span>
+            </article>
+          `).join("")}
+        </div>
+      `;
+    }
 
     const timeline = $("#sortingTimeline");
     if (!timeline) return;
     if (!sortingStats.logs.length) {
-      timeline.innerHTML = "<li>아직 실천 기록이 없습니다.</li>";
+      timeline.innerHTML = '<li class="empty-state sorting-empty-state"><span aria-hidden="true">🌱</span><strong>아직 실천 기록이 없어요</strong><p>AI분류 탭에서 물건을 선택하고 실천 기록을 남기면 여기에 오늘의 흐름이 쌓입니다.</p></li>';
       return;
     }
-    timeline.innerHTML = sortingStats.logs.slice(0, 6).map(log => `
-      <li><span>${escapeHtml(log.time)}</span><strong>${escapeHtml(log.emoji)} ${escapeHtml(log.label)}</strong><em>${escapeHtml(log.category)}</em></li>
+    timeline.innerHTML = sortingStats.logs.slice(0, 12).map(log => `
+      <li class="timeline-item"><time>${escapeHtml(log.time)}</time><span class="timeline-emoji" aria-hidden="true">${escapeHtml(log.emoji || holdEmojiFor(log.label))}</span><div><strong>${escapeHtml(log.label)}</strong><span>${escapeHtml(log.category)}</span></div><em>CO2 ${Number(log.carbon || 0).toFixed(1)}g</em></li>
     `).join("");
+  }
+
+  function getItemEmojiByText(name) {
+    const text = cleanText(name).toLowerCase();
+    if (!text) return "";
+    const emojiRules = [
+      [["컵라면", "라면용기", "라면 용기", "사발면"], "🍜"],
+      [["라면봉지", "라면 봉지"], "🍜"],
+      [["과자봉지", "과자 봉지", "과자포장", "과자 포장", "스낵봉지"], "🍪"],
+      [["우유갑", "우유팩", "멸균팩", "종이팩", "요구르트병", "요구르트"], "🥛"],
+      [["종이컵", "코팅컵", "커피컵", "일회용컵", "플라스틱컵", "빨대", "텀블러"], "🥤"],
+      [["캡슐커피", "커피캡슐"], "☕"],
+      [["페트병", "생수병", "플라스틱병"], "🧴"],
+      [["샴푸통", "세제통", "화장품 용기", "화장품용기", "스프레이", "분무기", "로션통", "펌프형"], "🧴"],
+      [["유리병", "깨진 유리", "유리조각", "병"], "🫙"],
+      [["음료캔", "참치캔", "캔"], "🥫"],
+      [["택배상자", "골판지", "박스", "상자"], "📦"],
+      [["영수증", "감열지"], "🧾"],
+      [["문서", "프린트", "종이", "코팅지", "코팅 종이", "코팅종이", "스티커 붙은 종이"], "📄"],
+      [["공책", "노트", "책", "스프링노트", "스프링 노트"], "📘"],
+      [["알약", "약봉지", "약"], "💊"],
+      [["비닐봉투", "비닐 봉투", "비닐", "봉지", "쇼핑백"], "🛍️"],
+      [["건전지", "배터리", "보조배터리"], "🔋"],
+      [["전구", "형광등", "led", "LED"], "💡"],
+      [["물티슈", "휴지", "키친타월", "냅킨"], "🧻"],
+      [["칫솔", "치약"], "🪥"],
+      [["양말"], "🧦"],
+      [["수건", "의류", "옷", "티셔츠"], "👕"],
+      [["음식물", "과일껍질", "사과껍질", "채소", "야채"], "🥬"],
+      [["바나나껍질", "바나나 껍질", "바나나"], "🍌"],
+      [["계란판", "달걀판", "계란", "달걀"], "🥚"],
+      [["스티커", "테이프", "라벨"], "🏷️"],
+      [["부러진 자", "플라스틱 자", "자"], "📏"],
+      [["고무장갑", "장갑"], "🧤"],
+      [["마스크"], "😷"],
+      [["장난감", "인형"], "🧸"],
+      [["스티로폼", "완충재"], "🧊"],
+      [["빨대"], "🥤"],
+      [["뚜껑", "병뚜껑", "플라스틱"], "🧴"],
+      [["포장지"], "🛍️"]
+    ];
+
+    const matched = emojiRules.find(([keywords]) => keywords.some(keyword => text.includes(cleanText(keyword).toLowerCase())));
+    return matched ? matched[1] : "🟨";
+  }
+
+  function holdEmojiFor(name) {
+    return getItemEmojiByText(name);
+  }
+
+  function holdCandidateFor(name) {
+    const text = cleanText(name);
+    if (text.includes("우유") || text.includes("종이팩") || text.includes("멸균팩")) return "종이팩 / 전용 수거 여부 논의 필요";
+    if (text.includes("컵라면") || text.includes("라면")) return "오염도 확인 후 일반쓰레기 또는 스티로폼";
+    if (text.includes("비닐") || text.includes("봉지")) return "비닐류 / 오염도 확인 필요";
+    if (text.includes("캔")) return "캔류 / 내용물 제거 여부 확인";
+    if (text.includes("유리") || text.includes("병")) return "유리류 / 파손·뚜껑 분리 기준 확인";
+    if (text.includes("건전지") || text.includes("배터리")) return "폐건전지 전용 수거함";
+    if (text.includes("장난감")) return "복합 재질 / 일반쓰레기 또는 분해 가능 여부";
+    if (text.includes("공책") || text.includes("노트") || text.includes("코팅")) return "종이류 / 코팅·스프링 제거 기준 확인";
+    if (text.includes("상자")) return "종이류 / 송장·스티커 제거 여부";
+    if (text.includes("자")) return "플라스틱류 / 파손 상태 기준 확인";
+    return "분류 후보를 회의에서 함께 정하기";
   }
 
   function renderSortingHolds() {
     const list = $("#holdList");
     const count = $("#sortingHoldCount");
     if (count) count.textContent = String(sortingHoldItems.length);
+    const preview = $("#manualHoldEmojiPreview");
+    const inputValue = cleanText($("#manualHoldInput")?.value);
+    if (preview && inputValue) preview.textContent = holdEmojiFor(inputValue);
     if (!list) return;
     if (!sortingHoldItems.length) {
-      list.innerHTML = '<li class="empty-state">기록된 판단 보류 물건이 없습니다.</li>';
+      list.innerHTML = '<li class="empty-state hold-empty-state"><span aria-hidden="true">🟨</span><strong>회의 안건을 기다리는 중</strong><p>애매한 물건을 보류함에 남기면 금요일 회의에서 기준을 함께 확인할 수 있습니다.</p></li>';
       return;
     }
     list.innerHTML = sortingHoldItems.map(item => `
       <li class="hold-card" data-hold-id="${item.id}">
-        <div><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.reason || "기준 확인 필요")}</span></div>
+        <span class="hold-emoji" aria-hidden="true">${holdEmojiFor(item.name)}</span>
+        <div class="hold-body">
+          <strong>${escapeHtml(item.name)}</strong>
+          <em>${escapeHtml(item.status || "기준 확인 필요")}</em>
+          <span>${escapeHtml(item.reason || holdCandidateFor(item.name))}</span>
+          <small>${escapeHtml(item.candidate || holdCandidateFor(item.name))}</small>
+        </div>
         <time>${escapeHtml(item.time)}</time>
-        <button type="button" data-resolve-hold="${item.id}">해결 완료</button>
+        <div class="hold-card-actions">
+          <button type="button" data-resolve-hold="${item.id}">해결 완료👍</button>
+        </div>
       </li>
     `).join("");
   }
 
-  function logSortingPractice(item) {
-    const time = new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
-    sortingStats.totalCount += 1;
-    sortingStats.carbonReduction += Number(item.carbonSaved) || 0;
-    sortingStats.logs.unshift({
-      label: item.label,
-      emoji: item.emoji,
-      category: item.category,
-      carbon: item.carbonSaved,
-      time
-    });
-    sortingStats.logs = sortingStats.logs.slice(0, 30);
-    saveSortingStats();
-    renderSortingStats();
+  async function logSortingPractice(item) {
+    const saved = await appendRecord(recordForSortingItem(item, false));
+    recordSortingPracticeLocally(item, saved);
     const guidance = $("[data-quick-guidance]");
-    if (guidance) guidance.textContent = `${item.label} 실천이 기록되었습니다. CO2 ${item.carbonSaved}g 저감으로 반영했어요.`;
+    if (guidance) guidance.textContent = `${item.label} 실천이 Google Sheets 기록과 통계에 반영되었습니다. CO2 ${item.carbonSaved}g 저감으로 계산했어요.`;
   }
 
-  function addSortingHold(name, reason = "기준 확인 필요") {
+  async function addSortingHold(name, reason = "기준 확인 필요") {
     const cleaned = cleanText(name) || "판단 보류 물건";
-    sortingHoldItems.unshift({
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      name: cleaned,
-      reason,
-      time: new Date().toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
-    });
-    sortingHoldItems = sortingHoldItems.slice(0, 40);
-    saveSortingHolds();
-    renderSortingHolds();
+    const saved = await appendRecord(recordForSortingItem({ label: cleaned, category: "기준 확인 필요" }, true, cleaned));
+    addSortingHoldLocally(cleaned, reason, saved);
     const guidance = $("[data-quick-guidance]");
-    if (guidance) guidance.textContent = `${cleaned}을 판단 보류함에 기록했습니다. 회의에서 기준을 확인해 보세요.`;
+    if (guidance) guidance.textContent = `${cleaned}을 Google Sheets 기록과 판단 보류함에 반영했습니다. 회의에서 기준을 확인해 보세요.`;
   }
 
   function pickQuizSet() {
-    return [...sortingQuizData]
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 10);
+    const shuffle = items => [...items].sort(() => Math.random() - 0.5);
+    const truePool = shuffle(sortingQuizData.filter(item => item.answer === true));
+    const falsePool = shuffle(sortingQuizData.filter(item => item.answer === false));
+    return shuffle([...truePool.slice(0, 5), ...falsePool.slice(0, 5)]);
+  }
+
+  function quizRank(correctCount) {
+    if (correctCount >= 10) return { title: "AI Ways 자원순환 마스터", message: "완벽해요. 오늘의 분리배출 챔피언입니다 🏆", emoji: "🏆" };
+    if (correctCount >= 9) return { title: "자원순환 환경운동가", message: "와우! 기준도 좋고 실천 감각도 뛰어나요 🌍", emoji: "🌍" };
+    if (correctCount >= 7) return { title: "분리배출 실천가", message: "잘하고 있어요! 학교에서도 믿고 맡길 수 있는 수준이에요 ♻️", emoji: "♻️" };
+    if (correctCount >= 5) return { title: "자원순환 탐험가", message: "기준을 꽤 잘 알고 있어요. 이제 실천력을 더 키워봐요 🔎", emoji: "🔎" };
+    if (correctCount >= 3) return { title: "분리배출 연습생", message: "조금씩 감이 오고 있어요. 한 번 더 하면 더 잘할 수 있어요 🍀", emoji: "🍀" };
+    return { title: "분리배출 새싹", message: "처음은 누구나 헷갈릴 수 있어요. 다시 도전해봐요 🌱", emoji: "🌱" };
+  }
+
+  function quizRankTableHtml(correctCount) {
+    const ranges = [
+      ["0~2개", "분리배출 새싹", "🌱"],
+      ["3~4개", "분리배출 연습생", "🍀"],
+      ["5~6개", "자원순환 탐험가", "🔎"],
+      ["7~8개", "분리배출 실천가", "♻️"],
+      ["9개", "자원순환 환경운동가", "🌍"],
+      ["10개", "AI Ways 자원순환 마스터", "🏆"]
+    ];
+    return `<div class="quiz-rank-table">${ranges.map(([range, title, emoji]) => `
+      <span class="${title === quizRank(correctCount).title ? "is-current" : ""}"><b>${emoji}</b><em>${range}</em><strong>${title}</strong></span>
+    `).join("")}</div>`;
   }
 
   function quizMessage(score) {
-    if (score >= 90) return "와우! 자원순환 환경운동가예요 🌍";
-    if (score >= 70) return "멋져요! 우리반 분리배출 리더예요 🌱";
-    if (score >= 50) return "좋아요! 헷갈린 기준을 조금 더 확인해봐요 🔍";
-    if (score >= 30) return "괜찮아요. 다시 해보면 금방 늘어요 💪";
-    return "오늘부터 3초 판단 연습을 시작해봐요 ✨";
+    return quizRank(Math.round(score / 10)).message;
   }
 
   function showQuizQuestion() {
@@ -1654,21 +2333,55 @@
     setText("#quizProgress", quizSet.length ? `문제 ${quizIndex + 1} / ${quizSet.length}` : "대기 중");
     setText("#quizScore", `${quizScore}점`);
     setText("#quizEmoji", item?.emoji || "🎮");
-    setText("#quizQuestion", item?.question || "시작 버튼을 누르면 10문제가 자동으로 진행됩니다.");
+    setText("#quizQuestion", item?.question || "퀴즈 탭을 열면 10문제가 바로 시작됩니다.");
     setText("#quizResult", "");
+    $(".quiz-card")?.classList.remove("is-correct", "is-wrong", "is-finished");
+    $$("[data-quiz-choice]").forEach(button => {
+      button.classList.remove("is-picked", "is-answer");
+      button.disabled = false;
+    });
     const bar = $("#quizBar");
     if (bar) bar.style.width = `${progress}%`;
     quizLocked = false;
   }
 
   function finishQuiz() {
+    const correctCount = Math.round(quizScore / 10);
+    const wrongCount = Math.max(0, quizSet.length - correctCount);
+    const rank = quizRank(correctCount);
     setText("#quizProgress", "퀴즈 완료");
     setText("#quizScore", `${quizScore}점`);
-    setText("#quizEmoji", "🏆");
-    setText("#quizQuestion", quizMessage(quizScore));
-    setText("#quizResult", `10문제 중 ${Math.round(quizScore / 10)}문제를 맞혔습니다.`);
+    setText("#quizEmoji", "");
+    const question = $("#quizQuestion");
+    if (question) question.innerHTML = `
+      <span class="quiz-finish-title">퀴즈 결과 리포트</span>
+    `;
+    const result = $("#quizResult");
+    if (result) {
+      result.innerHTML = `
+        <div class="quiz-finish-layout">
+          <section class="quiz-rank-card">
+            <b>${escapeHtml(rank.emoji)}</b>
+            <span><strong>${escapeHtml(rank.title)}</strong><em>${escapeHtml(rank.message)}</em></span>
+          </section>
+          <div class="quiz-finish-summary" aria-label="퀴즈 점수 요약">
+            <span><em>총점</em><b>${quizScore}점</b></span>
+            <span><em>정답</em><b>${correctCount}/${quizSet.length}</b></span>
+            <span><em>오답</em><b>${wrongCount}</b></span>
+          </div>
+        </div>
+        <p class="quiz-finish-count">10문제 중 ${correctCount}문제를 맞혔습니다.</p>
+        ${quizRankTableHtml(correctCount)}
+        <button type="button" class="quiz-retry-btn" data-quiz-retry>💪 다시 도전하기</button>
+      `;
+    }
     const bar = $("#quizBar");
     if (bar) bar.style.width = "100%";
+    $(".quiz-card")?.classList.add("is-finished");
+    $$("[data-quiz-choice]").forEach(button => {
+      button.disabled = true;
+      button.classList.remove("is-picked", "is-answer");
+    });
     quizLocked = true;
   }
 
@@ -1685,9 +2398,25 @@
     quizLocked = true;
     const item = quizSet[quizIndex];
     const correct = item.answer === answer;
+    const correctLabel = item.answer ? "O" : "X";
     if (correct) quizScore += 10;
     setText("#quizScore", `${quizScore}점`);
-    setText("#quizResult", `${correct ? "정답" : "오답"} · ${item.explanation}`);
+    const result = $("#quizResult");
+    if (result) {
+      result.innerHTML = `
+        <strong class="${correct ? "is-good" : "is-bad"}">${correct ? "정답이에요!" : "아쉬워요!"}</strong>
+        <span>정답은 ${correctLabel}입니다. ${escapeHtml(item.explanation)}</span>
+      `;
+    }
+    const card = $(".quiz-card");
+    card?.classList.toggle("is-correct", correct);
+    card?.classList.toggle("is-wrong", !correct);
+    $$("[data-quiz-choice]").forEach(button => {
+      const buttonAnswer = button.dataset.quizChoice === "true";
+      button.disabled = true;
+      button.classList.toggle("is-picked", buttonAnswer === answer);
+      button.classList.toggle("is-answer", buttonAnswer === item.answer);
+    });
     window.setTimeout(() => {
       quizIndex += 1;
       if (quizIndex >= quizSet.length) finishQuiz();
@@ -1695,16 +2424,77 @@
     }, 900);
   }
 
+  function updateHoldEmojiPreview(forceMatch = false) {
+    const preview = $("#manualHoldEmojiPreview");
+    const input = $("#manualHoldInput");
+    if (!preview || !input) return;
+    const value = cleanText(input.value);
+    if (value) {
+      preview.textContent = holdEmojiFor(value);
+      preview.classList.toggle("is-matched", forceMatch);
+      preview.classList.remove("is-cycling");
+      return;
+    }
+    preview.classList.remove("is-matched");
+    preview.classList.add("is-cycling");
+  }
+
+  function initHoldEmojiPreview() {
+    const preview = $("#manualHoldEmojiPreview");
+    const input = $("#manualHoldInput");
+    if (!preview || !input) return;
+    input.value = "";
+    let index = 0;
+
+    const cycle = () => {
+      if (cleanText(input.value)) return;
+      preview.textContent = HOLD_EMOJI_CYCLE[index % HOLD_EMOJI_CYCLE.length];
+      preview.classList.remove("is-matched");
+      preview.classList.add("is-cycling");
+      index += 1;
+    };
+
+    cycle();
+    if (!holdEmojiCycleTimer) holdEmojiCycleTimer = window.setInterval(cycle, 500);
+    input.addEventListener("input", () => {
+      window.clearTimeout(holdEmojiSettleTimer);
+      if (!cleanText(input.value)) {
+        cycle();
+        return;
+      }
+      updateHoldEmojiPreview(false);
+      holdEmojiSettleTimer = window.setTimeout(() => updateHoldEmojiPreview(true), 360);
+    });
+    input.addEventListener("blur", () => updateHoldEmojiPreview(true));
+  }
+
+  function isolateWheelInside(selector) {
+    const node = $(selector);
+    if (!node || node.dataset.wheelIsolated === "true") return;
+    node.dataset.wheelIsolated = "true";
+    node.addEventListener("wheel", event => {
+      const canScroll = node.scrollHeight > node.clientHeight + 1;
+      if (!canScroll) return;
+      const atTop = node.scrollTop <= 0;
+      const atBottom = node.scrollTop + node.clientHeight >= node.scrollHeight - 1;
+      const leavingTop = event.deltaY < 0 && atTop;
+      const leavingBottom = event.deltaY > 0 && atBottom;
+      if (leavingTop || leavingBottom) return;
+      event.stopPropagation();
+    }, { passive: false });
+  }
+
+  function initNestedScrollIsolation() {
+    isolateWheelInside("#sortingTimeline");
+    isolateWheelInside("#holdList");
+  }
+
   function initSortingDataApp() {
     loadSortingStorage();
     renderSortingStats();
     renderSortingHolds();
-
-    $("#resetSortingStats")?.addEventListener("click", () => {
-      sortingStats = { totalCount: 0, carbonReduction: 0, logs: [] };
-      saveSortingStats();
-      renderSortingStats();
-    });
+    initHoldEmojiPreview();
+    initNestedScrollIsolation();
 
     $("#manualHoldButton")?.addEventListener("click", () => {
       const input = $("#manualHoldInput");
@@ -1712,6 +2502,7 @@
       if (!value) return;
       addSortingHold(value);
       input.value = "";
+      updateHoldEmojiPreview(false);
     });
 
     $("#manualHoldInput")?.addEventListener("keydown", event => {
@@ -1720,21 +2511,20 @@
       $("#manualHoldButton")?.click();
     });
 
-    $("#clearHoldButton")?.addEventListener("click", () => {
-      sortingHoldItems = [];
-      saveSortingHolds();
-      renderSortingHolds();
-    });
-
     $("#holdList")?.addEventListener("click", event => {
       const button = event.target.closest("[data-resolve-hold]");
       if (!button) return;
-      sortingHoldItems = sortingHoldItems.filter(item => item.id !== button.dataset.resolveHold);
+      const id = button.dataset.resolveHold;
+      sortingHoldItems = sortingHoldItems.filter(item => item.id !== id);
       saveSortingHolds();
       renderSortingHolds();
     });
 
     $("#quizStartButton")?.addEventListener("click", startSortingQuiz);
+    $(".quiz-card")?.addEventListener("click", event => {
+      if (!event.target.closest("[data-quiz-retry]")) return;
+      startSortingQuiz();
+    });
     $$("[data-quiz-choice]").forEach(button => {
       button.addEventListener("click", () => answerSortingQuiz(button.dataset.quizChoice === "true"));
     });
@@ -1765,11 +2555,11 @@
       selectedSortingKey = "";
       buttons.forEach(target => target.classList.remove("is-active"));
       result?.classList.add("is-empty");
-      if (category) category.textContent = "AI 1차 제안 대기";
-      if (guidance) guidance.textContent = "사진을 찍거나 물건을 선택하면 AI가 먼저 후보를 제안합니다.";
+      if (category) category.innerHTML = "<b>H-A-H</b> AI 1차 제안 준비";
+      if (guidance) guidance.textContent = "지금 버리려는 물건을 선택하거나 검색해 보세요. AI가 먼저 분류 후보를 제안하고, 여러분이 다시 확인해 실천 기록으로 남깁니다.";
       if (tip) {
-        tip.hidden = true;
-        tip.textContent = "";
+        tip.hidden = false;
+        tip.innerHTML = "<strong>실천 흐름</strong><span>사진 또는 검색 → AI 후보 → 학생 확인 → 실천 기록 또는 판단 보류</span>";
       }
       if (actionRow) actionRow.hidden = true;
     }
@@ -1785,7 +2575,7 @@
       if (guidance) guidance.textContent = item.guide;
       if (tip) {
         tip.hidden = false;
-        tip.innerHTML = `<strong>💡 핵심 팁</strong><span>${escapeHtml(item.tip)}</span>`;
+        tip.innerHTML = `<strong>핵심 팁</strong><span>${escapeHtml(item.tip)}</span>`;
       }
       if (actionRow) actionRow.hidden = false;
       $("#practiceLogButton")?.toggleAttribute("disabled", Boolean(item.isHold));
@@ -1867,7 +2657,9 @@
 
   async function loadTeachableMachineModel(modelUrl) {
     if (!modelUrl || !window.tmImage) return null;
-    const baseUrl = modelUrl.endsWith("/") ? modelUrl : modelUrl + "/";
+    let baseUrl = cleanText(modelUrl);
+    baseUrl = baseUrl.replace(/\/(model|metadata)\.json(?:\?.*)?$/i, "/");
+    baseUrl = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
     return window.tmImage.load(baseUrl + "model.json", baseUrl + "metadata.json");
   }
 
@@ -2033,6 +2825,9 @@
       tab.addEventListener("click", () => {
         tabs.forEach(item => item.classList.toggle("is-active", item === tab));
         panels.forEach(panel => panel.classList.toggle("is-active", panel.dataset.panel === tab.dataset.tab));
+        if (tab.dataset.tab === "quiz" && (!quizSet.length || cleanText($("#quizProgress")?.textContent) === "퀴즈 완료")) {
+          startSortingQuiz();
+        }
       });
     });
 
@@ -2256,12 +3051,14 @@
 
     $("#confirmDecision")?.addEventListener("click", async () => {
       if (!pendingDecision) return;
-      setSaveState(pendingDecision.hold_flag ? "판단 보류 저장 중입니다..." : "학생 최종 판단 저장 중입니다...");
+      setSaveState(pendingDecision.hold_flag ? "판단 보류를 Google Sheets에 저장 중입니다..." : "학생 최종 판단을 Google Sheets에 저장 중입니다...");
+      const decision = pendingDecision;
       const saved = await appendRecord(pendingDecision);
+      updateSortingFromRecord(decision, saved);
       pendingDecision = null;
       setDecisionConfirm(false);
       $$("[data-final-category]").forEach(item => item.classList.remove("is-selected"));
-      setSaveState(saved === true ? "Google Sheets로 전송했습니다." : saved === "local" ? "localStorage에 판단 기록을 저장했습니다." : "네트워크 문제로 localStorage에 임시 저장했습니다.");
+      setSaveState(storageMessage(saved, decision.hold_flag ? "hold" : "record"));
     });
 
     $("#cancelDecision")?.addEventListener("click", () => {

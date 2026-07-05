@@ -9451,6 +9451,42 @@ body,
   display: none !important;
 }
 
+/* SORTING_HOLD_LIST_DENSITY_FINAL_20260705_START */
+.tab-panel[data-panel="holds"].is-active {
+  min-height: 620px !important;
+  gap: 8px !important;
+  grid-template-rows: auto auto auto auto minmax(390px, 1fr) !important;
+  align-content: stretch !important;
+}
+
+.tab-panel[data-panel="holds"].is-active .hold-board-shell {
+  margin-bottom: 0 !important;
+}
+
+.tab-panel[data-panel="holds"].is-active .hold-list-head {
+  margin: 2px 0 0 !important;
+}
+
+.tab-panel[data-panel="holds"].is-active #holdList {
+  height: clamp(404px, 43vh, 492px) !important;
+  max-height: clamp(404px, 43vh, 492px) !important;
+  align-self: stretch !important;
+  padding-bottom: 4px !important;
+}
+
+@media (max-width: 980px) {
+  .tab-panel[data-panel="holds"].is-active {
+    min-height: 0 !important;
+    grid-template-rows: auto auto auto auto minmax(360px, 1fr) !important;
+  }
+
+  .tab-panel[data-panel="holds"].is-active #holdList {
+    height: clamp(360px, 56vh, 470px) !important;
+    max-height: clamp(360px, 56vh, 470px) !important;
+  }
+}
+/* SORTING_HOLD_LIST_DENSITY_FINAL_20260705_END */
+
 .landfill-panel .chart-wrap {
   gap: 3px 10px !important;
   align-items: start !important;

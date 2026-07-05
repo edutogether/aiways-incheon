@@ -341,6 +341,7 @@
   let dashboardAnimationScope = "";
   let dashboardRepaintTimer = 0;
   let dashboardIntroResetTimer = 0;
+  let dashboardIntroStartFrame = 0;
   let dashboardIntroPlayed = false;
   let dashboardIntroRenderConsumed = false;
   let dashboardDataReady = false;
@@ -548,6 +549,10 @@
   function prepareDashboardIntroState(options = {}) {
     if (!options.force && dashboardIntroPlayed) return;
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    if (dashboardIntroStartFrame) {
+      cancelAnimationFrame(dashboardIntroStartFrame);
+      dashboardIntroStartFrame = 0;
+    }
     document.body.classList.add("is-dashboard-preparing");
     document.body.classList.remove("is-dashboard-intro");
     [
@@ -570,15 +575,37 @@
     $$(".bar-list b, .confusion b, .progress-stack b").forEach(node => {
       node.textContent = "0";
     });
+    $$(".bar-list i, .confusion i").forEach(bar => {
+      bar.style.setProperty("--value", "0%");
+    });
+    $$(".progress-stack em").forEach(bar => {
+      bar.style.width = "0%";
+    });
     $$(".donut").forEach(donut => {
       donut.style.setProperty("--pct", "0");
       const span = $("span", donut);
       if (span) span.textContent = "0%";
     });
+    $$(".combo-chart .chart-area, .combo-chart .chart-line, .combo-chart .chart-points, .combo-chart .chart-average").forEach(node => {
+      node.style.opacity = "0";
+      node.setAttribute("opacity", "0");
+    });
+    $$(".combo-chart .chart-bars rect").forEach(rect => {
+      const y = Number(rect.getAttribute("y")) || 0;
+      const height = Number(rect.getAttribute("height")) || 0;
+      rect.setAttribute("y", String(Math.round(y + height)));
+      rect.setAttribute("height", "0");
+      rect.style.transform = "scaleY(0)";
+      rect.style.transition = "none";
+    });
   }
 
   function resetDashboardIntroCycleForNextEntry() {
     window.clearTimeout(dashboardRepaintTimer);
+    if (dashboardIntroStartFrame) {
+      cancelAnimationFrame(dashboardIntroStartFrame);
+      dashboardIntroStartFrame = 0;
+    }
     dashboardAnimationScope = "";
     countUpNextDashboard = false;
     dashboardIntroActive = false;
@@ -593,11 +620,14 @@
   function scheduleDashboardIntroResetForNextEntry() {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     window.clearTimeout(dashboardIntroResetTimer);
+    dashboardIntroPlayed = false;
+    dashboardIntroRenderConsumed = false;
+    dashboardIntroPendingOnSettle = false;
     dashboardIntroResetTimer = window.setTimeout(() => {
       if (!document.getElementById("dashboard")?.classList.contains("is-active")) {
         resetDashboardIntroCycleForNextEntry();
       }
-    }, 900);
+    }, 520);
   }
 
   function beginDashboardRepaint(scope, duration = 1050) {
@@ -645,10 +675,40 @@
     beginDashboardRepaint("all", 1050);
   }
 
-  function playDashboardIntroForCurrentData() {
-    if (!dashboardDataReady || dashboardIntroPlayed || dashboardIntroActive) return;
-    beginDashboardIntro();
-    applyDashboard(allStoredRecords());
+  function playDashboardIntroForCurrentData(options = {}) {
+    const dashboardSection = document.getElementById("dashboard");
+    if (!dashboardDataReady) {
+      dashboardIntroPendingOnSettle = true;
+      return;
+    }
+    if (!dashboardSection?.classList.contains("is-active") && !options.initial) {
+      dashboardIntroPendingOnSettle = true;
+      return;
+    }
+    if (dashboardIntroPlayed || dashboardIntroActive) return;
+
+    prepareDashboardIntroState({ force: true });
+    dashboardIntroPendingOnSettle = false;
+    if (dashboardIntroStartFrame) cancelAnimationFrame(dashboardIntroStartFrame);
+    dashboardIntroStartFrame = requestAnimationFrame(() => {
+      dashboardIntroStartFrame = requestAnimationFrame(() => {
+        if (!dashboardSection?.classList.contains("is-active") && !options.initial) {
+          dashboardIntroStartFrame = 0;
+          dashboardIntroPendingOnSettle = true;
+          return;
+        }
+        document.body.classList.remove("is-dashboard-preparing");
+        dashboardIntroStartFrame = requestAnimationFrame(() => {
+          dashboardIntroStartFrame = 0;
+          if (!dashboardSection?.classList.contains("is-active") && !options.initial) {
+            dashboardIntroPendingOnSettle = true;
+            return;
+          }
+          beginDashboardIntro();
+          applyDashboard(allStoredRecords());
+        });
+      });
+    });
   }
 
   function consumeDashboardIntroRender() {
@@ -657,9 +717,6 @@
     dashboardAnimationScope = "";
     countUpNextDashboard = false;
     dashboardIntroActive = false;
-    if (document.body.classList.contains("is-dashboard-preparing")) {
-      requestAnimationFrame(() => document.body.classList.remove("is-dashboard-preparing"));
-    }
   }
   // COMMON_FINAL_FIX_END
 
@@ -1495,14 +1552,7 @@
         }, 720);
       };
 
-      if (document.body.classList.contains("is-dashboard-preparing")) {
-        requestAnimationFrame(() => {
-          document.body.classList.remove("is-dashboard-preparing");
-          requestAnimationFrame(startChartAnimation);
-        });
-      } else {
-        requestAnimationFrame(startChartAnimation);
-      }
+      requestAnimationFrame(() => requestAnimationFrame(startChartAnimation));
     }
 
     const totalNode = $(".landfill-metrics strong");
@@ -1941,14 +1991,14 @@
       if (previousId && previousId !== id) resetTransientUiState(previousSection);
       if (previousId !== id) resetSectionEntryState(section);
       if (previousId === "dashboard" && id !== "dashboard") scheduleDashboardIntroResetForNextEntry();
-      const enteringDashboard = id === "dashboard" && previousId && previousId !== "dashboard";
-      if (enteringDashboard && !sectionLight) dashboardIntroPendingOnSettle = true;
-      const label = navPairs.find(([, sectionId]) => sectionId === id)?.[0] || section.dataset.nav;
-      currentId = id;
-      if (id === "dashboard" && sectionLight && (enteringDashboard || dashboardIntroPendingOnSettle)) {
-        dashboardIntroPendingOnSettle = false;
-        playDashboardIntroForCurrentData();
+      const enteringDashboard = id === "dashboard" && previousId !== "dashboard";
+      if (enteringDashboard) {
+        prepareDashboardIntroState({ force: true });
+        dashboardIntroPendingOnSettle = true;
       }
+      const label = navPairs.find(([, sectionId]) => sectionId === id)?.[0] || section.dataset.nav;
+      const shouldPlayDashboardIntro = id === "dashboard" && sectionLight && (enteringDashboard || dashboardIntroPendingOnSettle);
+      currentId = id;
 
       if (sectionLight) {
         sections.forEach(item => item.classList.toggle("is-active", item === section));
@@ -1959,6 +2009,11 @@
         if (active) link.setAttribute("aria-current", "page");
         else link.removeAttribute("aria-current");
       });
+
+      if (shouldPlayDashboardIntro) {
+        dashboardIntroPendingOnSettle = false;
+        playDashboardIntroForCurrentData();
+      }
     }
 
     function activateAfterSettle(section, delay = 105) {

@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AIWays Incheon Clean</title>
+    <title>AI Ways Incheon</title>
     <meta
       name="description"
       content="AI와 데이터로 실천하는 학교 자원순환 UX 개선 프로젝트"
     />
+    <link rel="icon" type="image/png" href="./assets/brand/aiways-logo.png" />
     <link rel="stylesheet" href="./style.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
@@ -113,55 +114,63 @@
             <div class="landfill-metrics">
               <div><strong>19,507t</strong><span>오늘 반입 총량</span></div>
               <div><strong>-3.2%</strong><span>전일 대비</span></div>
-              <div><strong>68.3%</strong><span>총량 대비<br />반입량</span></div>
+              <div><strong>68.3%</strong><span>총량 대비 반입량</span></div>
               <div><strong>32.7%</strong><span>잔여 관리 여력</span></div>
             </div>
             <div class="chart-wrap">
-              <h3 class="chart-title">최근 7일 반입량 추이</h3>
-              <svg class="combo-chart" viewBox="0 0 380 190" role="img" aria-label="최근 7일 반입량 막대와 선 그래프">
+              <div class="chart-title-row">
+                <h3 class="chart-title">최근 일주일 반입량 추이</h3>
+                <time class="landfill-time-now" datetime="2026-07-05T00:00:00" data-landfill-clock aria-live="polite">26.07.05(일) 00:00:00</time>
+              </div>
+              <svg class="combo-chart" viewBox="0 0 440 252" role="img" aria-label="최근 일주일 반입량 막대와 선 그래프">
                 <defs>
                   <linearGradient id="cleanLineFill" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stop-color="#61f5d5" stop-opacity=".16" />
-                    <stop offset="100%" stop-color="#64a9ff" stop-opacity="0" />
+                    <stop offset="0%" stop-color="#4bffe1" stop-opacity=".12" />
+                    <stop offset="58%" stop-color="#50b4ff" stop-opacity=".06" />
+                    <stop offset="100%" stop-color="#50b4ff" stop-opacity="0" />
                   </linearGradient>
                   <linearGradient id="cleanBarFill" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stop-color="#61f5d5" stop-opacity=".92" />
-                    <stop offset="100%" stop-color="#64a9ff" stop-opacity=".38" />
+                    <stop offset="0%" stop-color="#7affdf" stop-opacity=".96" />
+                    <stop offset="56%" stop-color="#56e9ff" stop-opacity=".72" />
+                    <stop offset="100%" stop-color="#5b96ff" stop-opacity=".42" />
                   </linearGradient>
                 </defs>
-                <g class="chart-grid" stroke="rgba(220,245,255,.18)" stroke-width="1">
-                  <path d="M44 22 H360" />
-                  <path d="M44 62 H360" />
-                  <path d="M44 102 H360" />
-                  <path d="M44 142 H360" />
-                  <path d="M44 18 V162 H366" />
+                <g class="chart-grid" stroke="rgba(220,245,255,.16)" stroke-width="1">
+                  <path d="M48 24 H400" />
+                  <path d="M48 57 H400" />
+                  <path d="M48 90 H400" />
+                  <path d="M48 122 H400" />
+                  <path d="M48 155 H400" />
+                  <path d="M48 188 H400" />
                 </g>
-                <g class="chart-axis" fill="rgba(220,245,255,.58)" font-size="10" font-weight="700">
-                  <text x="9" y="25">20k</text>
-                  <text x="9" y="65">19k</text>
-                  <text x="9" y="105">18k</text>
-                  <text x="9" y="145">17k</text>
-                  <text class="x-label" x="61" y="184" text-anchor="middle">월</text><text class="x-label" x="110" y="184" text-anchor="middle">화</text><text class="x-label" x="159" y="184" text-anchor="middle">수</text><text class="x-label" x="208" y="184" text-anchor="middle">목</text><text class="x-label" x="257" y="184" text-anchor="middle">금</text><text class="x-label" x="306" y="184" text-anchor="middle">토</text><text class="x-label" x="355" y="184" text-anchor="middle">일</text>
+                <g class="chart-axis" fill="rgba(220,245,255,.6)" font-size="10" font-weight="760">
+                  <text x="9" y="28">25K</text>
+                  <text x="9" y="61">20K</text>
+                  <text x="9" y="94">15K</text>
+                  <text x="9" y="126">10K</text>
+                  <text x="9" y="159">5K</text>
+                  <text x="9" y="192">0</text>
+                  <text class="x-label" x="64" y="216" text-anchor="middle"><tspan class="date-label" x="64">06.29</tspan><tspan class="weekday-label" x="64" dy="15">월</tspan></text><text class="x-label" x="114" y="216" text-anchor="middle"><tspan class="date-label" x="114">06.30</tspan><tspan class="weekday-label" x="114" dy="15">화</tspan></text><text class="x-label" x="164" y="216" text-anchor="middle"><tspan class="date-label" x="164">07.01</tspan><tspan class="weekday-label" x="164" dy="15">수</tspan></text><text class="x-label" x="214" y="216" text-anchor="middle"><tspan class="date-label" x="214">07.02</tspan><tspan class="weekday-label" x="214" dy="15">목</tspan></text><text class="x-label" x="264" y="216" text-anchor="middle"><tspan class="date-label" x="264">07.03</tspan><tspan class="weekday-label" x="264" dy="15">금</tspan></text><text class="x-label" x="314" y="216" text-anchor="middle"><tspan class="date-label" x="314">07.04</tspan><tspan class="weekday-label" x="314" dy="15">토</tspan></text><text class="x-label" x="364" y="216" text-anchor="middle"><tspan class="date-label" x="364">07.05</tspan><tspan class="weekday-label" x="364" dy="15">일</tspan></text>
                 </g>
-                <path class="chart-area" d="M61 38 L110 48 L159 44 L208 66 L257 60 L306 80 L355 88 L355 166 L61 166 Z" fill="url(#cleanLineFill)" opacity=".16" />
+                <path class="chart-area" d="M64 63 L114 65 L164 64 L214 68 L264 67 L314 71 L364 73 L364 188 L64 188 Z" fill="url(#cleanLineFill)" opacity=".18" />
                 <g class="chart-bars" fill="url(#cleanBarFill)">
-                  <rect x="50" y="38" width="22" height="128" rx="6" />
-                  <rect x="99" y="48" width="22" height="118" rx="6" />
-                  <rect x="148" y="44" width="22" height="122" rx="6" />
-                  <rect x="197" y="66" width="22" height="100" rx="6" />
-                  <rect x="246" y="60" width="22" height="106" rx="6" />
-                  <rect x="295" y="80" width="22" height="86" rx="6" />
-                  <rect x="344" y="88" width="22" height="78" rx="6" />
+                  <rect x="54" y="63" width="20" height="125" rx="6" />
+                  <rect x="104" y="65" width="20" height="123" rx="6" />
+                  <rect x="154" y="64" width="20" height="124" rx="6" />
+                  <rect x="204" y="68" width="20" height="120" rx="6" />
+                  <rect x="254" y="67" width="20" height="121" rx="6" />
+                  <rect x="304" y="71" width="20" height="117" rx="6" />
+                  <rect x="354" y="73" width="20" height="115" rx="6" />
                 </g>
-                <path class="chart-line" d="M61 38 L110 48 L159 44 L208 66 L257 60 L306 80 L355 88" fill="none" stroke="#65f4dc" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                <path class="chart-line" d="M64 63 L114 65 L164 64 L214 68 L264 67 L314 71 L364 73" fill="none" stroke="#65f4dc" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
               <div class="progress-stack">
-                <label><span>총량 대비<br />반입량</span><b>68.3%</b><i><em style="width:68.3%"></em></i></label>
+                <label><span>총량 대비 반입량</span><b>68.3%</b><i><em style="width:68.3%"></em></i></label>
                 <label><span>잔여 관리 여력</span><b>32.7%</b><i><em style="width:32.7%"></em></i></label>
               </div>
               <div class="donut-pair landfill-donuts">
-                <div class="donut" style="--pct:68.3"><span>68%</span><small>총량 대비<br />반입량</small></div>
-                <div class="donut violet" style="--pct:32.7"><span>33%</span><small>잔여 관리 여력</small></div>
+                <div class="donut" style="--pct:68.3"><span>68.3%</span><small>총량 대비<br />반입량</small></div>
+                <div class="donut violet" style="--pct:32.7"><span>32.7%</span><small>잔여 관리<br />여력</small></div>
               </div>
             </div>
           </article>
@@ -193,15 +202,17 @@
               </select>
             </label>
             <div class="class-kpis">
-              <div><strong data-today-observed>24</strong><span>오늘 관찰</span></div>
+              <div><strong data-today-observed>16</strong><span>오늘 관찰</span></div>
               <div><strong data-ai-classified>3</strong><span>판단 보류</span></div>
-              <div><strong data-human-confirmed>20</strong><span>전환 사례</span></div>
+              <div><strong data-human-confirmed>7</strong><span>전환 사례</span></div>
             </div>
             <div class="confusion">
-              <h3>헷갈린 물건 TOP 3</h3>
-              <div><span>코팅 종이컵</span><i style="--value:100%"></i><b>4</b></div>
-              <div><span>과자 포장지</span><i style="--value:75%"></i><b>3</b></div>
-              <div><span>영수증</span><i style="--value:75%"></i><b>3</b></div>
+              <h3>헷갈린 물건 TOP 5</h3>
+              <div><span>종이컵</span><i style="--value:100%"></i><b>4</b></div>
+              <div><span>우유갑</span><i style="--value:75%"></i><b>3</b></div>
+              <div><span>과자 포장지</span><i style="--value:50%"></i><b>2</b></div>
+              <div><span>컵라면 용기</span><i style="--value:50%"></i><b>2</b></div>
+              <div><span>영수증</span><i style="--value:25%"></i><b>1</b></div>
             </div>
             <p class="rank-note">RANKING 🥇 5학년 중 4위 · 🥉 전체 14개 학급 중 14위</p>
           </article>
@@ -230,7 +241,7 @@
                 <span>찍은 사진<br />올리기</span>
               </button>
             </div>
-            <small>사진은 저장하지 않고, 판단 기록만 남깁니다.</small>
+            <small>본 플랫폼은 인천광역시교육청 자원순환 및 환경부 공식 분리수거 지침을 바탕으로 제작되었습니다.</small>
           </article>
         </div>
       </section>
@@ -263,8 +274,8 @@
           <p class="eyebrow">Curriculum-based Learning Design</p>
           <h2 class="curriculum-title"><span>2022</span><span>교육과정 기반</span><span>수업 설계</span></h2>
           <p class="curriculum-description">
-            <span>본 프로젝트는 실과의 생활 자원 관리와 사회의 지속 가능한 미래·지역사회 문제 탐구,</span>
-            <span>국어의 토의·조정 역량을 연결하여 학생이 생활 속 배출 문제를 발견하고,</span>
+            <span>본 프로젝트는 생활 자원 관리와 지속 가능한 미래 및 지역사회 문제 탐구,</span>
+            <span>토의 · 토론, 조정 역량을 연결하여 학생이 생활 속 배출 문제를 발견하고,</span>
             <span>AI와 데이터를 활용해 학교 자원순환 UX를 개선하도록 설계한 융합 수업입니다.</span>
           </p>
         </div>
@@ -312,19 +323,19 @@
       <!-- PAGE_FINAL_FIX_05_FLOW_START -->
       <section class="scene flow-scene" id="flow" data-nav="차시흐름">
         <div class="scene-copy">
-          <p class="eyebrow">7-Lesson Journey + Experience + Diffusion</p>
-          <h2>7시간의<br />수업 여정</h2>
+          <p class="eyebrow">8-Lesson Journey + Experience + Diffusion</p>
+          <h2>여덟 발자국의<br />수업 여정</h2>
           <p>문제 발견에서 AI 활용, 인간 검증, 블록코딩·티처블머신·바이브코딩까지 이어지고,<br />대시보드 활용으로 실천 데이터를 아카이빙하고 실시간으로 확인합니다.</p>
         </div>
         <div class="flow-grid">
-          <a class="flow-card" href="https://drive.google.com/file/d/1hBE3AOAu4RqxsBDvEHamkUD2uEv6EbAs/view?usp=sharing" target="_blank" rel="noopener noreferrer"><span>1차시 · 문제 발견</span><h3>학생의 목소리에서 출발하는<br />문제 발견</h3><p>학생 VOC와 교실 관찰로 버리는 순간의 혼선을 찾습니다.</p><em>수업자료</em></a>
-          <a class="flow-card" href="https://padlet.com/ssam_kang/padlet-zvqohi1e8wbips6v" target="_blank" rel="noopener noreferrer"><span>2차시 · Flipped Learning</span><h3>내가 버린 쓰레기는 어디로 가는가</h3><p>거꾸로 학습을 통해 쓰레기의 문제가 우리 고장 속 살아있는 문제라는 현실에 직면합니다.</p><em>수업자료</em></a>
-          <a class="flow-card ai-badge" href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g" target="_blank" rel="noopener noreferrer"><span>3차시 · Brainstorming</span><h3>생성형 AI와 아이디어 보드로<br />생각 확장</h3><p>AI와 함께 학교 쓰레기 문제를 해결할 UX 후보를 탐색합니다.</p><em>수업자료</em></a>
-          <a class="flow-card h2-badge" href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g" target="_blank" rel="noopener noreferrer"><span>4차시 · Dilemma Discussion</span><h3>토의·토론을 통한 인간 검증</h3><p>AI 제안을 그대로 믿지 않고 기준으로 다시 판단합니다.</p><em>수업자료</em></a>
-          <a class="flow-card" href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g" target="_blank" rel="noopener noreferrer"><span>5차시 · Block Coding</span><h3>블록코딩으로 알아보는<br />AI 이미지 분류 원리</h3><p>이미지 분류 개념과 AI가 헷갈리는 이유를 체험합니다.</p><em>수업자료</em></a>
-          <a class="flow-card" href="https://padlet.com/ssam_kang/padlet-9vcpfg8gtpv008md" target="_blank" rel="noopener noreferrer"><span>6차시 · Teachable Machine</span><h3>우리 반 AI 모델 학습</h3><p>우리반 물건 사진으로 분리배출 모델을 학습시킵니다.</p><em>수업자료</em></a>
-          <a class="flow-card" href="./miniapp/3second.html" target="_blank" rel="noopener noreferrer"><span>7차시 · Vibe Coding</span><h3>자연어로 설계하는 프로토타입</h3><p>자연어로 앱 기능을 설계하고 UX 프로토타입을 개선합니다.</p><em>체험하기</em></a>
-          <a class="flow-card" href="#dashboard"><span>Experience · Diffusion</span><h3>데이터 아카이빙과 확산</h3><p>대시보드 활용으로 실천 데이터를 아카이빙하고 실시간으로 확인합니다.</p><em>체험하기</em></a>
+          <a class="flow-card" href="https://drive.google.com/file/d/1hBE3AOAu4RqxsBDvEHamkUD2uEv6EbAs/view?usp=sharing" target="_blank" rel="noopener noreferrer"><span>1차시 · 문제 발견</span><h3>학생의 목소리에서 출발하는<br />문제 발견</h3><p>학생 VOC와 교실 관찰로<br />버리는 순간의 어려움을 찾습니다.</p><em>수업자료</em></a>
+          <a class="flow-card" href="https://padlet.com/ssam_kang/padlet-zvqohi1e8wbips6v" target="_blank" rel="noopener noreferrer"><span>2차시 · Flipped Learning</span><h3>쓰레기의 끝은<br />어디일까</h3><p>거꾸로 학습을 통해 쓰레기 배출 문제가<br />우리 고장 속에서 살아있는 삶 속의 문제라는<br />현실에 직면합니다.</p><em>수업자료</em></a>
+          <a class="flow-card ai-badge" href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g" target="_blank" rel="noopener noreferrer"><span>3차시 · Brainstorming</span><h3>인간과 AI가 함께하는<br />생각의 확장</h3><p>아이디어 보드로 브레인스토밍하고,<br />AI와 함께 소통하며 분리배출 문제를 해결할<br />UX 개선 아이디어 후보를 탐색합니다.</p><em>수업자료</em></a>
+          <a class="flow-card h2-badge" href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g" target="_blank" rel="noopener noreferrer"><span>4차시 · Dilemma Discussion</span><h3>토의 · 토론을 통한<br />인간 검증</h3><p>AI 제안의 무비판적 수용이 아닌,<br />인간의 기준으로 다시 판단합니다.</p><em>수업자료</em></a>
+          <a class="flow-card" href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g" target="_blank" rel="noopener noreferrer"><span>5차시 · Block Coding</span><h3>블록코딩으로 알아보는<br />AI 이미지 분류 원리</h3><p>AI가 이미지를 인식하고 분류하는 개념을<br />블록코딩을 이용하여 쉽고 재미있게<br />체험하며 이해합니다.</p><em>수업자료</em></a>
+          <a class="flow-card" href="https://padlet.com/ssam_kang/padlet-9vcpfg8gtpv008md" target="_blank" rel="noopener noreferrer"><span>6차시 · Teachable Machine</span><h3>우리 반<br />AI 모델 학습</h3><p>우리 반 물건 사진을 찍으며 티처블 머신으로<br />이미지 인식 모델을 학습시킵니다.</p><em>수업자료</em></a>
+          <a class="flow-card" href="./miniapp/3second.html" target="_blank" rel="noopener noreferrer"><span>7차시 · Vibe Coding</span><h3>자연어로 설계하는<br />프로토타입</h3><p>자연어로 앱 기능을 설계하고<br />바이브 코딩으로 UX 프로토타입을 개선합니다.</p><em>체험하기</em></a>
+          <a class="flow-card" href="#dashboard"><span>Experience · Diffusion</span><h3>살아있는 데이터<br />아카이빙과 확산 및 공유</h3><p>대시보드 활용으로<br />살아있는 실천 데이터를 아카이빙하고,<br />공유하여 확산합니다.</p><em>체험하기</em></a>
         </div>
       </section>
       <!-- PAGE_FINAL_FIX_05_FLOW_END -->
@@ -334,7 +345,7 @@
         <div class="scene-copy">
           <p class="eyebrow">Student Outputs</p>
           <h2>갤러리</h2>
-          <p class="gallery-description">학생들이 발견한 불편함, AI와 함께 확장한 아이디어, 사람이 다시 판단한 기록을 모아 우리 학교 자원순환 UX가 어떻게 바뀌었는지 보여주는 산출물 아카이브입니다.</p>
+          <p class="gallery-description">학생들이 발견한 불편함, AI와 함께 확장한 아이디어, 사람이 다시 판단한 기록을 모아<br />우리 학교 자원순환 UX가 어떻게 바뀌었는지 보여주는 산출물 아카이브입니다.</p>
         </div>
         <div class="gallery-stage" id="galleryStage">
           <div class="gallery-grid">
@@ -348,7 +359,7 @@
             <article data-gallery="H-A-H 토의하기"><span>08</span><h3>H-A-H 토의하기</h3><button type="button">바로가기</button></article>
           </div>
           <aside class="gallery-detail" id="galleryDetail" aria-live="polite">
-            <button type="button" id="galleryBack">← 갤러리로 돌아가기</button>
+            <button type="button" id="galleryBack">← 돌아가기</button>
             <div class="gallery-detail-head">
               <span id="galleryDetailNumber">01</span>
               <strong id="galleryDetailTitle">학생 VOC 활동지</strong>
@@ -364,13 +375,13 @@
       <section class="scene sorting-scene" id="sorting" data-nav="3초판단">
         <div class="scene-copy">
           <p class="eyebrow">Output · 3-Second Sorting Helper App</p>
-          <h2>3초판단 앱</h2>
+          <h2>3초 판단 앱</h2>
           <p>학생이 사진을 찍거나 검색하면 AI가 먼저 물체 후보를 추정하고,<br />학생이 다시 확인해 실천 기록·판단 보류함·퀴즈·통계로 연결하는,<br />H-A-H 기반 우리 생활 속 작은 실천을 도와주는 자원순환 미니 도우미 앱입니다.</p>
           <div class="sorting-features" aria-label="3초판단 핵심 기능">
             <article><h3>이미지 AI분류</h3><p>사진을 올리면 AI가 물체 후보와 재질 후보를 제안합니다.</p></article>
             <article><h3>3초 판단 검색</h3><p>우유갑, 영수증, 물티슈처럼 자주 헷갈리는 물건을 빠르게 확인합니다.</p></article>
             <article><h3>OX 퀴즈</h3><p>분리배출 기준을 게임처럼 확인하고 점수로 피드백합니다.</p></article>
-            <article><h3>통계·보류함</h3><p>사진은 저장하지 않고 판단 결과만 쌓아 회의 안건으로 연결합니다.</p></article>
+            <article><h3>통계 · 보류함</h3><p>사진은 저장하지 않고 판단 결과만 쌓아 회의 안건으로 연결합니다.</p></article>
           </div>
         </div>
         <div class="sorting-layout">
@@ -384,50 +395,80 @@
             <div class="tab-panel is-active" data-panel="classify">
               <h3>사진 또는 검색으로 분류 초안 만들기</h3>
               <div class="upload-actions sorting-upload">
-                <button type="button" data-upload="camera">카메라로 지금 찍기</button>
-                <button type="button" data-upload="file">찍은 사진 올리기</button>
+                <button type="button" data-upload="camera"><span class="sorting-upload-icon">📷</span><strong>카메라로 지금 찍기</strong><em>교실에서 바로 촬영</em></button>
+                <button type="button" data-upload="file"><span class="sorting-upload-icon">🖼️</span><strong>찍은 사진 올리기</strong><em>저장된 사진 선택</em></button>
               </div>
               <label class="search-line">
                 <span>검색 입력</span>
                 <input id="searchInput" type="search" placeholder="예: 우유갑, 과자 봉지" />
-                <button type="button" id="searchButton">검색 분류</button>
+                <button type="button" id="searchButton" aria-label="검색 분류">⌕</button>
               </label>
               <div class="quick-buttons" aria-label="3초 판단 물건 선택">
-                <button class="is-active" type="button" data-quick-item="milk">우유갑</button>
-                <button type="button" data-quick-item="paper">종이류</button>
-                <button type="button" data-quick-item="cup">플라스틱컵</button>
-                <button type="button" data-quick-item="ramen">라면용기</button>
-                <button type="button" data-quick-item="snack">과자 봉지</button>
-                <button type="button" data-quick-item="can">캔류</button>
-                <button type="button" data-quick-item="receipt">영수증</button>
-                <button type="button" data-quick-item="vinyl">비닐</button>
+                <button type="button" data-quick-item="milk">🥛 우유갑</button>
+                <button type="button" data-quick-item="paper">📄 종이류</button>
+                <button type="button" data-quick-item="cup">🥤 플라스틱컵</button>
+                <button type="button" data-quick-item="ramen">🍜 라면용기</button>
+                <button type="button" data-quick-item="snack">🍿 과자 봉지</button>
+                <button type="button" data-quick-item="can">🥫 캔류</button>
+                <button type="button" data-quick-item="receipt">🧾 영수증</button>
+                <button type="button" data-quick-item="hold">🟨 판단 보류</button>
               </div>
-              <label class="tm-model-line">
+              <div class="tm-model-line">
                 <span>Teachable Machine 모델 링크</span>
-                <input id="tmModelInput" type="url" placeholder="https://teachablemachine.withgoogle.com/models/..." />
-              </label>
-              <div class="quick-result">
-                <span data-quick-category>AI 1차 제안: 종이팩</span>
-                <p data-quick-guidance>내용물을 비우고 물로 헹군 뒤 펼쳐서 말려 배출합니다. 일반 종이와 섞지 않는 것이 좋습니다.</p>
+                <div class="tm-model-controls">
+                  <input id="tmModelInput" type="url" placeholder="https://teachablemachine.withgoogle.com/models/..." />
+                  <button type="button" id="tmApplyButton">적용</button>
+                </div>
+                <small id="tmModelState">선택 사항 · 링크를 붙여 넣으면 사진 판단에 활용합니다.</small>
+              </div>
+              <div class="quick-result is-empty" data-sorting-result>
+                <span data-quick-category>AI 1차 제안 대기</span>
+                <p data-quick-guidance>사진을 찍거나 물건을 선택하면 AI가 먼저 후보를 제안합니다.</p>
+                <div class="quick-tip" data-quick-tip hidden></div>
+                <div class="quick-action-row" hidden>
+                  <button type="button" id="practiceLogButton">실천 기록</button>
+                  <button type="button" id="holdLogButton">판단 보류</button>
+                </div>
               </div>
             </div>
             <div class="tab-panel" data-panel="quiz">
-              <h3>오늘의 판단 퀴즈</h3>
-              <p>과자 봉지는 언제 비닐류가 아니라 판단 보류가 필요할까요?</p>
-              <button type="button" data-quiz-answer>기름기와 양념 오염이 심할 때</button>
-              <p class="quiz-result" id="quizResult" aria-live="polite"></p>
+              <h3>3초 판단 OX 퀴즈</h3>
+              <p>학교 쓰레기 맥락의 50문제 중 10문제를 무작위로 풀어봅니다.</p>
+              <div class="quiz-card">
+                <div class="quiz-status"><span id="quizProgress">대기 중</span><b id="quizScore">0점</b></div>
+                <i><em id="quizBar" style="width:0%"></em></i>
+                <strong id="quizEmoji">🎮</strong>
+                <p id="quizQuestion">시작 버튼을 누르면 10문제가 자동으로 진행됩니다.</p>
+                <div class="quiz-choice-row">
+                  <button type="button" data-quiz-choice="true">O</button>
+                  <button type="button" data-quiz-choice="false">X</button>
+                </div>
+                <p class="quiz-result" id="quizResult" aria-live="polite"></p>
+              </div>
+              <button class="quiz-start-btn" type="button" id="quizStartButton">퀴즈 시작</button>
             </div>
             <div class="tab-panel" data-panel="stats">
-              <h3>통계</h3>
+              <h3>실천 통계</h3>
               <dl class="mini-stats">
-                <div><dt>실제 기록</dt><dd data-real-count>0</dd></div>
-                <div><dt>판단 보류</dt><dd data-hold-count>0</dd></div>
-                <div><dt>임시 저장</dt><dd data-pending-count>0</dd></div>
+                <div><dt>올바른 배출</dt><dd id="sortingPracticeCount">0회</dd></div>
+                <div><dt>CO2 저감</dt><dd id="sortingCarbonCount">0.0g</dd></div>
+                <div><dt>최근 물건</dt><dd id="sortingRecentItem">-</dd></div>
               </dl>
+              <div class="timeline-box">
+                <strong>오늘의 실천 타임라인</strong>
+                <ul id="sortingTimeline"><li>아직 실천 기록이 없습니다.</li></ul>
+              </div>
+              <button class="quiet-reset" type="button" id="resetSortingStats">기록 초기화</button>
             </div>
             <div class="tab-panel" data-panel="holds">
               <h3>판단 보류함</h3>
-              <ul id="holdList"><li>아직 보류 기록이 없습니다.</li></ul>
+              <p>애매한 물건은 무단 투기하지 않고 회의 안건으로 모읍니다.</p>
+              <label class="hold-input-line">
+                <input id="manualHoldInput" type="text" placeholder="예: 코팅 공책, 부러진 자" />
+                <button type="button" id="manualHoldButton">보류 등록</button>
+              </label>
+              <div class="hold-list-head"><span>대기 목록 <b id="sortingHoldCount">0</b>개</span><button type="button" id="clearHoldButton">목록 비우기</button></div>
+              <ul id="holdList"><li class="empty-state">기록된 판단 보류 물건이 없습니다.</li></ul>
             </div>
           </article>
         </div>
@@ -439,16 +480,25 @@
         <div class="scene-copy center-copy">
           <p class="eyebrow">Resources</p>
           <h2>자료실</h2>
+          <p class="resources-description">수업 설계안, 활동지, 학부모 안내 자료, 학생 산출물 양식을 한곳에 모았습니다.<br />교사는 바로 활용하고, 학생은 자신의 실천 기록을 다시 확인할 수 있도록 구성했습니다.<br />자료는 수업 운영 흐름에 따라 계속 업데이트됩니다.</p>
         </div>
         <div class="resource-grid">
           <a href="https://drive.google.com/file/d/1YPJeTikagzwzejIKcZb9le1Y8PDOSVBF/view?usp=drive_link" target="_blank" rel="noopener noreferrer"><span>01</span>수업설계 사례 설명서</a>
           <a href="https://forms.gle/FvAwezV3drFjegCU9" target="_blank" rel="noopener noreferrer"><span>02</span>학부모 구글폼</a>
           <a href="https://drive.google.com/file/d/1AHAfrKy5DyWj_5vYQabv403n1u5n6_oY/view?usp=drive_link" target="_blank" rel="noopener noreferrer"><span>03</span>차시별 활동지</a>
           <a href="https://github.com/ssamkang/aiways-incheon" target="_blank" rel="noopener noreferrer"><span>04</span>GitHub 저장소</a>
+          <a class="resource-pending" aria-disabled="true" tabindex="-1"><span>05</span><em>업로드 예정</em></a>
+          <a class="resource-pending" aria-disabled="true" tabindex="-1"><span>06</span><em>업로드 예정</em></a>
+          <a class="resource-pending" aria-disabled="true" tabindex="-1"><span>07</span><em>업로드 예정</em></a>
+          <a class="resource-pending" aria-disabled="true" tabindex="-1"><span>08</span><em>업로드 예정</em></a>
+          <a class="resource-pending" aria-disabled="true" tabindex="-1"><span>09</span><em>업로드 예정</em></a>
+          <a class="resource-pending" aria-disabled="true" tabindex="-1"><span>10</span><em>업로드 예정</em></a>
+          <a class="resource-pending" aria-disabled="true" tabindex="-1"><span>11</span><em>업로드 예정</em></a>
+          <a class="resource-pending" aria-disabled="true" tabindex="-1"><span>12</span><em>업로드 예정</em></a>
         </div>
         <div class="footer-credit">
           <p>AI Ways Incheon · Human → AI → Human Learning Project</p>
-          <p>강서희 · 원나연 · 같이교육</p>
+          <p>같이교육 · 강서희 · 원나연</p>
         </div>
       </section>
       <!-- PAGE_FINAL_FIX_08_RESOURCES_END -->
@@ -456,7 +506,7 @@
 
     <dialog class="ai-modal" id="aiModal">
       <form method="dialog">
-        <button class="close-btn" value="close" aria-label="닫기">×</button>
+        <button class="close-btn" type="button" value="close" aria-label="닫기" data-close-analysis>×</button>
       </form>
       <div class="modal-preview"><img id="modalPreview" alt="업로드한 사진 미리보기" /><span class="scan-overlay" aria-hidden="true"></span></div>
       <div class="modal-body">
@@ -486,6 +536,7 @@
           <button type="button" id="confirmDecision">확인</button>
           <button type="button" id="cancelDecision">취소</button>
         </div>
+        <button class="modal-cancel-action" type="button" data-close-analysis>취소하고 닫기</button>
         <p class="save-state" id="saveState" aria-live="polite"></p>
       </div>
     </dialog>

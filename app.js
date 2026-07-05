@@ -1,6 +1,12 @@
 (() => {
   "use strict";
 
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  window.addEventListener("beforeunload", () => {
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+  });
+
   const DATA_CONFIG = {
     appsScriptUrl: "",
     seedUrl: "./base-data-seed.tsv",
@@ -12,32 +18,34 @@
   const STORAGE_RECORDS = "aiways_clean_records";
   const STORAGE_PENDING = "aiways_clean_pending_records";
   const STORAGE_PRIVACY = "aiways_clean_privacy_id";
+  const SORTING_STATS_KEY = "aiways_main_sorting_stats_v1";
+  const SORTING_HOLD_KEY = "aiways_main_sorting_hold_v1";
 
   const BASE_DASHBOARD = {
-    schoolObserved: 115,
+    schoolObserved: 244,
     schoolClasses: 4,
-    schoolHold: 9,
-    todayObserved: 24,
+    schoolHold: 36,
+    todayObserved: 16,
     aiClassified: 3,
-    humanConfirmed: 20,
+    humanConfirmed: 7,
     holdCount: 0
   };
 
   const BASE_CLASS_DATA = {
-    "3학년 1반": { today: 94, hold: 6, converted: 18, correct: 78, recycle: 43, reuse: 15, contamination: 7 },
-    "3학년 2반": { today: 88, hold: 5, converted: 17, correct: 73, recycle: 39, reuse: 14, contamination: 6 },
-    "3학년 3반": { today: 102, hold: 7, converted: 21, correct: 84, recycle: 48, reuse: 16, contamination: 8 },
-    "4학년 1반": { today: 97, hold: 5, converted: 19, correct: 81, recycle: 45, reuse: 15, contamination: 7 },
-    "4학년 2반": { today: 108, hold: 6, converted: 22, correct: 91, recycle: 52, reuse: 18, contamination: 7 },
-    "4학년 3반": { today: 91, hold: 7, converted: 16, correct: 75, recycle: 40, reuse: 13, contamination: 9 },
-    "4학년 4반": { today: 116, hold: 5, converted: 23, correct: 99, recycle: 56, reuse: 19, contamination: 6 },
-    "5학년 1반": { today: 128, hold: 18, converted: 63, correct: 106, recycle: 63, reuse: 22, contamination: 7 },
-    "5학년 2반": { today: 301, hold: 24, converted: 148, correct: 251, recycle: 148, reuse: 51, contamination: 19 },
-    "5학년 3반": { today: 284, hold: 29, converted: 137, correct: 235, recycle: 137, reuse: 46, contamination: 20 },
-    "5학년 4반": { today: 267, hold: 34, converted: 129, correct: 218, recycle: 129, reuse: 41, contamination: 23 },
-    "6학년 1반": { today: 346, hold: 26, converted: 169, correct: 292, recycle: 169, reuse: 64, contamination: 15 },
-    "6학년 2반": { today: 332, hold: 28, converted: 160, correct: 276, recycle: 160, reuse: 61, contamination: 17 },
-    "6학년 3반": { today: 318, hold: 27, converted: 153, correct: 262, recycle: 153, reuse: 58, contamination: 18 }
+    "3학년 1반": { today: 13, weekly: 72, hold: 8, converted: 25, correct: 56, recycle: 31, reuse: 7, contamination: 6 },
+    "3학년 2반": { today: 11, weekly: 64, hold: 9, converted: 21, correct: 48, recycle: 27, reuse: 6, contamination: 8 },
+    "3학년 3반": { today: 15, weekly: 78, hold: 7, converted: 28, correct: 62, recycle: 35, reuse: 8, contamination: 5 },
+    "4학년 1반": { today: 14, weekly: 74, hold: 8, converted: 27, correct: 58, recycle: 32, reuse: 8, contamination: 6 },
+    "4학년 2반": { today: 17, weekly: 88, hold: 9, converted: 34, correct: 70, recycle: 40, reuse: 10, contamination: 6 },
+    "4학년 3반": { today: 12, weekly: 67, hold: 10, converted: 22, correct: 50, recycle: 29, reuse: 5, contamination: 9 },
+    "4학년 4반": { today: 18, weekly: 92, hold: 7, converted: 36, correct: 74, recycle: 42, reuse: 11, contamination: 5 },
+    "5학년 1반": { today: 16, weekly: 86, hold: 3, converted: 7, correct: 62, recycle: 31, reuse: 5, contamination: 8 },
+    "5학년 2반": { today: 21, weekly: 103, hold: 8, converted: 41, correct: 84, recycle: 48, reuse: 13, contamination: 5 },
+    "5학년 3반": { today: 19, weekly: 97, hold: 10, converted: 37, correct: 76, recycle: 44, reuse: 11, contamination: 7 },
+    "5학년 4반": { today: 14, weekly: 78, hold: 14, converted: 24, correct: 55, recycle: 30, reuse: 6, contamination: 11 },
+    "6학년 1반": { today: 22, weekly: 108, hold: 7, converted: 44, correct: 90, recycle: 52, reuse: 14, contamination: 5 },
+    "6학년 2반": { today: 20, weekly: 101, hold: 9, converted: 40, correct: 82, recycle: 49, reuse: 12, contamination: 6 },
+    "6학년 3반": { today: 18, weekly: 95, hold: 11, converted: 34, correct: 74, recycle: 43, reuse: 10, contamination: 8 }
   };
 
   const BASE_LANDFILL_DAYS = [
@@ -49,6 +57,8 @@
     { date: "2026-07-06", weekday: "토", landfillTons: 17880 },
     { date: "2026-07-07", weekday: "일", landfillTons: 17540 }
   ];
+  const LANDFILL_INCOMING_PERCENT = 68.3;
+  const LANDFILL_REMAINING_PERCENT = 32.7;
 
   const quickItems = {
     paper: {
@@ -93,14 +103,160 @@
     }
   };
 
+  const sortingDb = {
+    milk: {
+      label: "우유갑",
+      emoji: "🥛",
+      title: "AI 1차 제안: 우유갑",
+      category: "종이팩류",
+      guide: "내용물을 비우고 물로 헹군 뒤 펼쳐서 말려 배출합니다.",
+      tip: "일반 종이와 종이팩은 재활용 공정이 달라 전용 수거함에 넣는 것이 좋습니다.",
+      carbonSaved: 25
+    },
+    paper: {
+      label: "종이류",
+      emoji: "📄",
+      title: "AI 1차 제안: 종이류",
+      category: "종이류",
+      guide: "물기와 음식물 오염이 없는 종이는 묶거나 정리해 종이류로 배출합니다.",
+      tip: "스프링, 비닐 코팅, 테이프처럼 종이가 아닌 부분은 최대한 제거해야 합니다.",
+      carbonSaved: 15
+    },
+    cup: {
+      label: "플라스틱컵",
+      emoji: "🥤",
+      title: "AI 1차 제안: 플라스틱컵",
+      category: "플라스틱류",
+      guide: "남은 음료를 비우고 빨대와 뚜껑을 분리한 뒤 깨끗하게 헹궈 배출합니다.",
+      tip: "라벨이나 실링 비닐이 잘 떨어지지 않으면 재활용 효율이 낮아질 수 있습니다.",
+      carbonSaved: 32.5
+    },
+    ramen: {
+      label: "라면용기",
+      emoji: "🍜",
+      title: "AI 1차 제안: 라면용기",
+      category: "일반쓰레기 검토",
+      guide: "기름때와 국물 자국이 남아 있으면 일반쓰레기로 검토합니다.",
+      tip: "깨끗하게 세척된 흰 스티로폼만 학교 기준에 따라 분리배출할 수 있습니다.",
+      carbonSaved: 5
+    },
+    snack: {
+      label: "과자 봉지",
+      emoji: "🍿",
+      title: "AI 1차 제안: 과자 봉지",
+      category: "비닐류",
+      guide: "부스러기를 털어내고 오염이 적으면 비닐류로 배출합니다.",
+      tip: "기름기와 양념이 많으면 비닐함을 오염시키므로 일반쓰레기 또는 판단 보류가 필요합니다.",
+      carbonSaved: 12
+    },
+    can: {
+      label: "캔류",
+      emoji: "🥫",
+      title: "AI 1차 제안: 캔류",
+      category: "캔류",
+      guide: "내용물을 비우고 가능하면 눌러서 캔류 수거함에 배출합니다.",
+      tip: "담배꽁초나 액체가 들어 있으면 선별 과정에서 오염원이 됩니다.",
+      carbonSaved: 28
+    },
+    receipt: {
+      label: "영수증",
+      emoji: "🧾",
+      title: "AI 1차 제안: 영수증",
+      category: "일반쓰레기",
+      guide: "감열지 영수증은 특수 코팅이 되어 있어 일반쓰레기로 배출합니다.",
+      tip: "영수증을 종이류에 섞으면 종이 재활용 품질을 떨어뜨릴 수 있습니다.",
+      carbonSaved: 4.5
+    },
+    hold: {
+      label: "판단 보류",
+      emoji: "🟨",
+      title: "AI 1차 제안: 판단 보류",
+      category: "기준 확인 필요",
+      guide: "복합 재질이거나 오염 상태가 애매하면 아무 데나 버리지 말고 보류함에 기록합니다.",
+      tip: "판단 보류도 자원순환 역량입니다. 금요일 회의에서 기준을 함께 정해 보세요.",
+      carbonSaved: 0,
+      isHold: true
+    }
+  };
+
+  const sortingQuizData = [
+    ["🧾", "영수증은 깨끗해 보여도 감열지라 일반쓰레기로 배출하는 것이 맞다.", true],
+    ["🥛", "우유갑은 일반 종이와 같은 수거함에 섞어도 항상 괜찮다.", false],
+    ["📦", "택배상자는 테이프와 송장을 최대한 제거하고 종이류로 배출한다.", true],
+    ["🥤", "플라스틱컵은 남은 음료를 비우고 헹군 뒤 배출해야 한다.", true],
+    ["🍜", "국물 자국이 심한 컵라면 용기는 재활용보다 일반쓰레기 검토가 필요하다.", true],
+    ["🍿", "과자봉지는 부스러기와 기름기가 많아도 무조건 비닐류다.", false],
+    ["🥫", "캔 안에 이물질이 들어 있으면 먼저 비우는 것이 좋다.", true],
+    ["🔋", "폐건전지는 일반쓰레기 봉투에 넣어도 안전하다.", false],
+    ["🪥", "칫솔처럼 여러 재질이 결합된 생활용품은 일반쓰레기 검토가 필요하다.", true],
+    ["🖊️", "볼펜은 플라스틱처럼 보여도 재질 분리가 어려워 일반쓰레기로 보는 경우가 많다.", true],
+    ["🧼", "지우개 조각은 종이류와 함께 버리면 좋다.", false],
+    ["🍌", "바나나 껍질은 지역 기준에 따라 음식물쓰레기로 배출할 수 있다.", true],
+    ["🥚", "달걀 껍데기는 음식물쓰레기로 항상 배출한다.", false],
+    ["🧃", "빨대가 붙은 음료팩은 빨대를 분리하고 팩을 헹구는 것이 좋다.", true],
+    ["☕", "종이컵 안쪽 코팅과 오염 상태가 애매하면 학교 기준을 다시 확인한다.", true],
+    ["🧴", "페트병은 내용물을 비우고 라벨을 제거한 뒤 찌그러뜨려 배출하면 좋다.", true],
+    ["🧴", "페트병 뚜껑은 닫아도 되는지 학교 기준에 따라 확인할 필요가 있다.", true],
+    ["🍱", "음식물이 묻은 배달 용기는 씻기 어렵다면 재활용함을 오염시킬 수 있다.", true],
+    ["🧻", "물티슈는 종이류로 재활용하는 것이 원칙이다.", false],
+    ["📄", "코팅된 전단지는 일반 종이와 다르게 판단이 필요할 수 있다.", true],
+    ["🧲", "자석이 붙은 홍보물은 종이류로만 보면 안 된다.", true],
+    ["🧃", "종이팩은 펼쳐 말린 뒤 배출하면 재활용 품질이 좋아진다.", true],
+    ["🥢", "나무젓가락은 깨끗하면 종이류로 배출한다.", false],
+    ["🍕", "기름이 밴 피자박스는 오염된 부분을 일반쓰레기로 검토한다.", true],
+    ["🧊", "스티로폼은 이물질과 테이프를 제거하고 깨끗할 때 분리배출한다.", true],
+    ["🧷", "클립과 종이는 가능하면 분리해서 배출한다.", true],
+    ["🧽", "수세미는 플라스틱류로 재활용하는 것이 일반적이다.", false],
+    ["🧴", "샴푸통은 내용물을 비우고 헹군 뒤 배출한다.", true],
+    ["🛍️", "비닐봉투는 음식물 오염이 심하면 비닐류 배출이 어려울 수 있다.", true],
+    ["🧃", "빨대는 작고 재질이 달라 별도 판단이 필요할 수 있다.", true],
+    ["🪙", "알루미늄 캔과 철 캔은 같은 캔류 흐름에서 관리될 수 있다.", true],
+    ["📚", "스프링 노트는 종이와 스프링을 분리하면 더 좋다.", true],
+    ["🧴", "펌프형 용기는 금속 스프링이 있어 재질 분리가 필요하다.", true],
+    ["🧂", "양념이 묻은 비닐은 깨끗한 비닐과 섞지 않는 것이 좋다.", true],
+    ["🥤", "플라스틱 빨대는 작아서 선별이 어려울 수 있다.", true],
+    ["📦", "택배 완충재는 재질에 따라 비닐류 또는 일반쓰레기로 나뉠 수 있다.", true],
+    ["🧻", "휴지는 사용 후 오염되므로 종이류로 재활용하지 않는다.", true],
+    ["🥫", "통조림 캔은 내용물을 비우고 헹구면 재활용에 도움이 된다.", true],
+    ["🧴", "화장품 용기는 내용물을 비우고 재질 표시를 확인한다.", true],
+    ["🧃", "멸균팩과 일반 종이팩은 수거 체계가 다를 수 있어 학교 기준을 확인한다.", true],
+    ["🧸", "고장난 장난감은 플라스틱류로 무조건 배출한다.", false],
+    ["📎", "복합 재질 물건은 판단 보류함에 기록해 기준을 정할 수 있다.", true],
+    ["🍗", "닭뼈는 음식물쓰레기가 아니라 일반쓰레기로 보는 지역이 많다.", true],
+    ["🐚", "조개껍데기는 음식물쓰레기로 배출하면 사료화에 좋다.", false],
+    ["🥤", "테이크아웃 컵의 뚜껑과 컵은 재질이 다를 수 있어 분리 확인이 필요하다.", true],
+    ["🧪", "깨진 유리는 안전하게 감싸 별도 배출 기준을 확인한다.", true],
+    ["🧼", "세제 리필 파우치는 내용물을 비우고 재질 표시를 확인한다.", true],
+    ["🥡", "검은색 플라스틱 용기는 선별이 어려울 수 있어 지역 기준을 확인한다.", true],
+    ["🟨", "모르는 물건을 아무 데나 버리지 않고 보류하는 것도 좋은 선택이다.", true],
+    ["🌱", "AI가 제안한 분류는 학생이 오염 상태와 학교 기준으로 다시 확인해야 한다.", true]
+  ].map(([emoji, question, answer]) => ({
+    emoji,
+    question,
+    answer,
+    explanation: answer ? "맞는 기준입니다. 실제 배출 전 오염 상태와 학교 기준을 한 번 더 확인해요." : "헷갈리기 쉬운 기준입니다. 재질과 오염 상태를 다시 살펴봐요."
+  }));
+
   let modelPromise = null;
   let currentDraft = null;
   let pendingDecision = null;
   let previewUrl = "";
+  let modalSession = 0;
   let countUpNextDashboard = false;
+  let dashboardIntroActive = false;
+  let dashboardAnimationScope = "";
+  let lastLandfillDays = [];
+  let landfillClockTimer = null;
   let seedRecords = [];
   let remoteRecords = [];
   let latestRanking = [];
+  let sortingStats = { totalCount: 0, carbonReduction: 0, logs: [] };
+  let sortingHoldItems = [];
+  let selectedSortingKey = "";
+  let quizSet = [];
+  let quizIndex = 0;
+  let quizScore = 0;
+  let quizLocked = false;
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -157,11 +313,130 @@
     requestAnimationFrame(tick);
   }
 
+  function shouldAnimateDashboardNumber(selector) {
+    if (!countUpNextDashboard) return false;
+    if (dashboardAnimationScope === "all") return true;
+    if (dashboardAnimationScope === "school") return selector.includes("data-school");
+    if (dashboardAnimationScope === "class") {
+      return selector.includes("data-today-observed")
+        || selector.includes("data-ai-classified")
+        || selector.includes("data-human-confirmed");
+    }
+    return false;
+  }
+
   function setDashboardNumber(selector, value) {
     const node = $(selector);
     if (!node) return;
-    if (countUpNextDashboard) animateNumber(node, value);
+    if (shouldAnimateDashboardNumber(selector)) animateNumber(node, value);
     else node.textContent = Number(value).toLocaleString("ko-KR");
+  }
+
+  function animateMetricText(node, finalText, duration = 760) {
+    if (!node) return;
+    const match = cleanText(finalText).match(/-?[\d,.]+/);
+    if (!match) {
+      node.textContent = finalText;
+      return;
+    }
+    const end = Number(match[0].replace(/,/g, ""));
+    const prefix = finalText.slice(0, match.index);
+    const suffix = finalText.slice(match.index + match[0].length);
+    const decimals = match[0].includes(".") ? 1 : 0;
+    const startTime = performance.now();
+
+    function tick(now) {
+      const progress = Math.min(1, (now - startTime) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const value = end * eased;
+      const formatted = decimals
+        ? value.toFixed(decimals)
+        : Math.round(value).toLocaleString("ko-KR");
+      node.textContent = `${prefix}${formatted}${suffix}`;
+      if (progress < 1) requestAnimationFrame(tick);
+      else node.textContent = finalText;
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  function formatPercent(value) {
+    const safe = Math.max(0, Math.min(100, Number(value) || 0));
+    const rounded = Math.round(safe * 10) / 10;
+    return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+  }
+
+  function animateDonutFill(donut, percent, duration = 720, delay = 0) {
+    if (!donut) return;
+    const target = Math.max(0, Math.min(100, Number(percent) || 0));
+    const start = () => {
+      const startTime = performance.now();
+      donut.style.setProperty("--pct", "0");
+
+      function tick(now) {
+        const progress = Math.min(1, (now - startTime) / duration);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        donut.style.setProperty("--pct", (target * eased).toFixed(2));
+        if (progress < 1) requestAnimationFrame(tick);
+        else donut.style.setProperty("--pct", String(target));
+      }
+
+      requestAnimationFrame(tick);
+    };
+
+    if (delay > 0) window.setTimeout(start, delay);
+    else start();
+  }
+
+  function updateDonut(donut, percent, options = {}) {
+    if (!donut) return;
+    const safe = Math.max(0, Math.min(100, Number(percent) || 0));
+    const span = $("span", donut);
+    const label = $("small", donut);
+    donut.dataset.percent = String(safe);
+    if (span) span.textContent = `${formatPercent(safe)}%`;
+    if (label && options.label) label.innerHTML = options.label;
+
+    if (options.animate && !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      animateDonutFill(donut, safe, options.duration || 720, options.delay || 0);
+    } else {
+      donut.style.setProperty("--pct", String(safe));
+    }
+  }
+
+  function beginDashboardRepaint(scope, duration = 1050) {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    dashboardAnimationScope = scope;
+    countUpNextDashboard = scope !== "landfill";
+    dashboardIntroActive = scope === "all";
+    const panelSelector = {
+      all: ".dashboard-grid",
+      school: ".school-panel",
+      class: ".class-panel",
+      landfill: ".landfill-panel"
+    }[scope];
+    const panel = panelSelector ? $(panelSelector) : null;
+    $$(".school-panel, .class-panel, .landfill-panel").forEach(item => item.classList.remove("is-dashboard-repaint"));
+    document.body.classList.toggle("is-dashboard-intro", scope === "all");
+    panel?.classList.add("is-dashboard-repaint");
+    window.setTimeout(() => {
+      if (dashboardAnimationScope === scope) {
+        dashboardAnimationScope = "";
+        countUpNextDashboard = false;
+        dashboardIntroActive = false;
+      }
+      document.body.classList.remove("is-dashboard-intro");
+      panel?.classList.remove("is-dashboard-repaint");
+    }, duration);
+  }
+
+  function animateDashboardVisuals(scope = dashboardAnimationScope) {
+    if (!scope || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    if (scope === "landfill" || scope === "all") animateLandfillChartSequence();
+  }
+
+  function beginDashboardIntro() {
+    beginDashboardRepaint("all", 1050);
   }
   // COMMON_FINAL_FIX_END
 
@@ -328,7 +603,7 @@
   function setClassMetric(classes, className, field, value) {
     if (!className || !Number.isFinite(value)) return;
     if (!classes[className]) return;
-    classes[className] = classes[className] || { today: 0, hold: 0, converted: 0, correct: 0, recycle: 0, reuse: 0, contamination: 0 };
+    classes[className] = classes[className] || { today: 0, weekly: 0, hold: 0, converted: 0, correct: 0, recycle: 0, reuse: 0, contamination: 0 };
     classes[className][field] = value;
   }
 
@@ -351,7 +626,7 @@
         ? normalizeFullClassName(record.grade || DATA_CONFIG.currentGrade, record.class_name)
         : "";
       if (classFromColumns && Number.isFinite(record.totalScans)) {
-        setClassMetric(classes, classFromColumns, "today", record.totalScans);
+        setClassMetric(classes, classFromColumns, "weekly", record.totalScans);
         setClassMetric(classes, classFromColumns, "correct", record.correctScans);
         setClassMetric(classes, classFromColumns, "hold", record.holdCount);
         setClassMetric(classes, classFromColumns, "converted", record.recycleCount);
@@ -374,7 +649,7 @@
         return;
       }
 
-      const classMatch = key.match(/^class:(.+):(today|hold|converted|correct|recycle|reuse|contamination)$/);
+      const classMatch = key.match(/^class:(.+):(today|weekly|hold|converted|correct|recycle|reuse|contamination)$/);
       if (!classMatch || !Number.isFinite(value)) return;
 
       const [, className, field] = classMatch;
@@ -389,11 +664,12 @@
 
     actualRecords.forEach(record => {
       const className = record.class_name ? normalizeFullClassName(record.grade || DATA_CONFIG.currentGrade, record.class_name) : selectedClassName();
-      const profile = merged[className] || { today: 0, hold: 0, converted: 0, correct: 0, recycle: 0, reuse: 0, contamination: 0 };
+      const profile = merged[className] || { today: 0, weekly: 0, hold: 0, converted: 0, correct: 0, recycle: 0, reuse: 0, contamination: 0 };
       const decision = cleanText(record.final_decision || record.suggested_category);
       const isHold = record.hold_flag || decision.includes("보류");
 
       profile.today += 1;
+      profile.weekly = toNumber(profile.weekly, 0) + 1;
       if (isHold) profile.hold += 1;
       else {
         profile.correct += 1;
@@ -429,7 +705,7 @@
           grade,
           classOnly: className,
           score: calculateClassScore(row),
-          scans: toNumber(row.today, 0),
+          scans: toNumber(row.weekly, row.today || 0),
           correct: toNumber(row.correct, row.converted || 0),
           hold: toNumber(row.hold, 0),
           contamination: toNumber(row.contamination, 0)
@@ -460,6 +736,148 @@
     return `RANKING 🥇 ${rank.grade} 중 ${rank.gradeRank}위 · 🏫 전체 ${rank.total}개 학급 중 ${rank.totalRank}위`;
   }
 
+  function selectedGrade() {
+    const select = $("#gradeSelect");
+    if (!select) return DATA_CONFIG.currentGrade;
+    const selected = select.options[select.selectedIndex];
+    return cleanText(select.value) || cleanText(selected?.textContent) || DATA_CONFIG.currentGrade;
+  }
+
+  function gradeSummaries(classes) {
+    const summaries = {};
+
+    Object.entries(classes).forEach(([name, row]) => {
+      const { grade } = classParts(name);
+      summaries[grade] = summaries[grade] || {
+        grade,
+        classCount: 0,
+        observed: 0,
+        today: 0,
+        hold: 0,
+        correct: 0,
+        converted: 0
+      };
+
+      const summary = summaries[grade];
+      summary.classCount += 1;
+      summary.observed += toNumber(row.weekly, row.today || 0);
+      summary.today += toNumber(row.today, 0);
+      summary.hold += toNumber(row.hold, 0);
+      summary.correct += toNumber(row.correct, row.converted || 0);
+      summary.converted += toNumber(row.converted, 0);
+    });
+
+    return summaries;
+  }
+
+  function aggregateSchoolDashboard(classes, grade) {
+    const summaries = gradeSummaries(classes);
+    const summary = summaries[grade] || Object.values(summaries)[0] || {
+      grade,
+      classCount: BASE_DASHBOARD.schoolClasses,
+      observed: BASE_DASHBOARD.schoolObserved,
+      hold: BASE_DASHBOARD.schoolHold,
+      correct: 0,
+      converted: 0
+    };
+
+    const observed = Math.max(1, summary.observed);
+    return {
+      ...summary,
+      successPct: Math.round((summary.correct / observed) * 1000) / 10,
+      holdPct: Math.round((summary.hold / observed) * 1000) / 10,
+      summaries
+    };
+  }
+
+  function renderSchoolDashboard(classes) {
+    const grade = selectedGrade();
+    const summary = aggregateSchoolDashboard(classes, grade);
+    const allSummaries = Object.values(summary.summaries).sort((a, b) => a.grade.localeCompare(b.grade, "ko"));
+    const maxObserved = Math.max(...allSummaries.map(item => item.observed), 1);
+
+    setDashboardNumber("[data-school-classes]", summary.classCount);
+    setDashboardNumber("[data-school-observed]", summary.observed);
+    setDashboardNumber("[data-school-hold]", summary.hold);
+
+    const bars = $("[data-grade-bars]");
+    if (bars) {
+      bars.innerHTML = allSummaries.map(item => {
+        const pct = Math.max(8, Math.round((item.observed / maxObserved) * 100));
+        return `<div class="${item.grade === grade ? "is-selected" : ""}"><span>${item.grade}</span><i style="--value:${pct}%"></i><b>${item.observed}</b></div>`;
+      }).join("");
+    }
+
+    const animate = dashboardAnimationScope === "school" || dashboardAnimationScope === "all";
+    const donuts = $$(".school-panel .donut");
+    updateDonut(donuts[0], summary.successPct, {
+      label: "분리 성공률",
+      animate,
+      duration: 720
+    });
+    updateDonut(donuts[1], summary.holdPct, {
+      label: "판단 보류 비율",
+      animate,
+      duration: 720,
+      delay: animate ? 90 : 0
+    });
+  }
+
+  function confusionItemsForClass(profile, classActual) {
+    const counts = new Map([
+      ["종이컵", Math.max(1, Math.round(toNumber(profile.hold, 0) * 0.48 + toNumber(profile.contamination, 0) * 0.42))],
+      ["우유갑", Math.max(1, Math.round(toNumber(profile.converted, 0) * 0.32 + toNumber(profile.hold, 0) * 0.32))],
+      ["과자 포장지", Math.max(1, Math.round(toNumber(profile.contamination, 0) * 0.55 + 1))],
+      ["컵라면 용기", Math.max(1, Math.round(toNumber(profile.hold, 0) * 0.38 + 1))],
+      ["영수증", Math.max(1, Math.round(toNumber(profile.today, 0) * 0.12 + 1))]
+    ]);
+
+    classActual.forEach(record => {
+      const name = cleanText(record.mapped_item || record.ai_raw_label || record.final_decision);
+      if (!name) return;
+      const key = name.includes("우유") ? "우유갑"
+        : name.includes("영수") ? "영수증"
+          : name.includes("라면") ? "컵라면 용기"
+            : name.includes("과자") || name.includes("비닐") ? "과자 포장지"
+              : name.includes("컵") ? "종이컵"
+                : name;
+      counts.set(key, (counts.get(key) || 0) + 1);
+    });
+
+    return Array.from(counts, ([label, value]) => ({ label, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
+  }
+
+  function renderClassDashboard(profile, classActual, className, ranking) {
+    const today = profile.today + classActual.length;
+    const classHold = profile.hold + classActual.filter(record => record.hold_flag || cleanText(record.final_decision).includes("보류")).length;
+    const confirmed = profile.converted + classActual.filter(record => !record.hold_flag).length;
+
+    setDashboardNumber("[data-today-observed]", today);
+    setDashboardNumber("[data-ai-classified]", classHold);
+    setDashboardNumber("[data-human-confirmed]", confirmed);
+
+    const confusion = $(".confusion");
+    if (confusion) {
+      const heading = $("h3", confusion)?.outerHTML || "<h3>헷갈린 물건 TOP 5</h3>";
+      const items = confusionItemsForClass(profile, classActual);
+      const max = Math.max(...items.map(item => item.value), 1);
+      confusion.innerHTML = heading + items.map(item => {
+        const pct = Math.max(12, Math.round((item.value / max) * 100));
+        return `<div><span>${escapeHtml(item.label)}</span><i style="--value:${pct}%"></i><b>${item.value}</b></div>`;
+      }).join("");
+    }
+
+    const rankNote = $(".rank-note");
+    if (rankNote) {
+      rankNote.textContent = formatClassRanking(className, ranking);
+      rankNote.setAttribute("role", "button");
+      rankNote.setAttribute("tabindex", "0");
+      rankNote.setAttribute("aria-label", "우리 학급 자원순환 랭킹 상세 보기");
+    }
+  }
+
   function landfillDaysForChart(days) {
     const byDate = new Map();
     [...BASE_LANDFILL_DAYS, ...days].forEach(item => {
@@ -471,12 +889,174 @@
         landfillTons: item.landfillTons
       });
     });
-    return Array.from(byDate.values()).slice(-7);
+    const values = Array.from(byDate.values()).slice(-7);
+    const fallbackValues = BASE_LANDFILL_DAYS.slice(-7);
+    const chartValues = values.length === 7 ? values : fallbackValues;
+
+    return getRecentSevenDaysLabels().map((label, index) => ({
+      ...label,
+      landfillTons: Number.isFinite(chartValues[index]?.landfillTons)
+        ? chartValues[index].landfillTons
+        : 0
+    }));
   }
 
   function yForChart(value, min, max, top, baseline) {
     if (max <= min) return baseline;
-    return top + ((max - value) / (max - min)) * (baseline - top);
+    const clamped = Math.min(max, Math.max(min, value));
+    return top + ((max - clamped) / (max - min)) * (baseline - top);
+  }
+
+  function padDatePart(value) {
+    return String(value).padStart(2, "0");
+  }
+
+  function getRecentSevenDaysLabels(referenceDate = new Date()) {
+    const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+    const today = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate());
+
+    return Array.from({ length: 7 }, (_, index) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() - (6 - index));
+      const yyyy = date.getFullYear();
+      const mm = padDatePart(date.getMonth() + 1);
+      const dd = padDatePart(date.getDate());
+      return {
+        date: `${yyyy}-${mm}-${dd}`,
+        displayDate: `${mm}.${dd}`,
+        weekday: weekdays[date.getDay()]
+      };
+    });
+  }
+
+  function renderLandfillTimeNow() {
+    const box = $(".landfill-time-now");
+    if (!box) return;
+
+    const update = () => {
+      const now = new Date();
+      const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+      const yy = padDatePart(now.getFullYear() % 100);
+      const mm = padDatePart(now.getMonth() + 1);
+      const dd = padDatePart(now.getDate());
+      const hh = padDatePart(now.getHours());
+      const mi = padDatePart(now.getMinutes());
+      const ss = padDatePart(now.getSeconds());
+      box.textContent = `${yy}.${mm}.${dd}(${weekdays[now.getDay()]}) ${hh}:${mi}:${ss}`;
+      if ("dateTime" in box) box.dateTime = `${now.getFullYear()}-${mm}-${dd}T${hh}:${mi}:${ss}`;
+    };
+
+    update();
+    if (!landfillClockTimer) landfillClockTimer = window.setInterval(update, 1000);
+  }
+
+  function ensureSvgItems(group, selector, tagName, count, className = "") {
+    if (!group) return [];
+    const ns = "http://www.w3.org/2000/svg";
+    let items = $$(selector, group);
+    while (items.length < count) {
+      const item = document.createElementNS(ns, tagName);
+      if (className) item.setAttribute("class", className);
+      group.appendChild(item);
+      items.push(item);
+    }
+    return items.slice(0, count);
+  }
+
+  function refreshLandfillMonitor() {
+    renderLandfillTimeNow();
+    renderLandfillChart(lastLandfillDays);
+  }
+
+  function numberFromText(value, fallback = 0) {
+    const number = Number(cleanText(value).replace(/[^\d.-]/g, ""));
+    return Number.isFinite(number) ? number : fallback;
+  }
+
+  function updateLandfillDonuts(animate) {
+    const progressLabels = $$(".landfill-panel .progress-stack label");
+    const donuts = $$(".landfill-donuts .donut");
+
+    [
+      { value: LANDFILL_INCOMING_PERCENT, label: "총량 대비<br />반입량" },
+      { value: LANDFILL_REMAINING_PERCENT, label: "잔여 관리<br />여력" }
+    ].forEach((item, index) => {
+      const pct = Math.max(0, Math.min(100, item.value));
+      const progress = progressLabels[index];
+      if (progress) {
+        const text = $("b", progress);
+        const fill = $("em", progress);
+        if (text) text.textContent = `${formatPercent(pct)}%`;
+        if (fill) fill.style.width = `${pct}%`;
+      }
+      updateDonut(donuts[index], pct, {
+        label: item.label,
+        animate,
+        duration: 740,
+        delay: animate ? 120 + index * 90 : 0
+      });
+    });
+  }
+
+  function animateLandfillChartSequence() {
+    const svg = $(".combo-chart");
+    if (!svg || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+
+    const bars = $$(".chart-bars rect", svg);
+    const line = $(".chart-line", svg);
+    const area = $(".chart-area", svg);
+
+    bars.forEach(bar => {
+      bar.style.animation = "none";
+      bar.style.transformBox = "fill-box";
+      bar.style.transformOrigin = "center bottom";
+    });
+
+    if (line?.getTotalLength) {
+      const length = line.getTotalLength();
+      line.style.transition = "none";
+      line.style.strokeDasharray = String(length);
+      line.style.strokeDashoffset = String(length);
+    }
+
+    if (area) {
+      area.style.transition = "none";
+      area.style.setProperty("opacity", "0", "important");
+    }
+
+    svg.classList.remove("is-landfill-chart-sequencing");
+    void svg.getBoundingClientRect();
+    svg.classList.add("is-landfill-chart-sequencing");
+
+    window.setTimeout(() => {
+      bars.forEach((bar, index) => {
+        bar.style.animation = `landfillBarGrow 760ms cubic-bezier(0.22, 1, 0.36, 1) ${index * 38}ms both`;
+      });
+    }, 260);
+
+    window.setTimeout(() => {
+      if (line?.getTotalLength) {
+        line.style.transition = "stroke-dashoffset 620ms cubic-bezier(0.22, 1, 0.36, 1), filter 620ms ease";
+        line.style.strokeDashoffset = "0";
+      }
+      if (area) {
+        area.style.transition = "opacity 520ms cubic-bezier(0.22, 1, 0.36, 1)";
+        area.style.setProperty("opacity", "0.16", "important");
+      }
+    }, 1120);
+
+    window.setTimeout(() => {
+      bars.forEach(bar => {
+        bar.style.animation = "";
+      });
+      if (line) {
+        line.style.strokeDasharray = "";
+        line.style.strokeDashoffset = "";
+        line.style.transition = "";
+      }
+      if (area) area.style.transition = "";
+      svg.classList.remove("is-landfill-chart-sequencing");
+    }, 1880);
   }
 
   function renderLandfillChart(days) {
@@ -484,29 +1064,52 @@
     if (!svg) return;
 
     const chartDays = landfillDaysForChart(days);
-    const values = chartDays.map(day => day.landfillTons);
-    const max = Math.max(...values);
-    const min = Math.min(...values);
-    const top = 26;
-    const baseline = 166;
-    const xs = [61, 110, 159, 208, 257, 306, 355];
-    const spread = Math.max(1200, max - min);
-    const chartMin = min - spread * 0.12;
-    const chartMax = max + spread * 0.12;
+    const top = 22;
+    const baseline = 186;
+    const left = 64;
+    const right = 384;
+    const xs = chartDays.map((_, index) => left + ((right - left) / Math.max(1, chartDays.length - 1)) * index);
+    const ticks = [25000, 20000, 15000, 10000, 5000, 0];
+    const chartMin = 0;
+    const chartMax = 25000;
     const points = chartDays.map((day, index) => ({
       ...day,
-      x: xs[index] || xs[xs.length - 1],
+      x: Math.round(xs[index] || xs[xs.length - 1]),
       y: yForChart(day.landfillTons, chartMin, chartMax, top, baseline)
     }));
 
-    const linePath = points.map((point, index) => `${index ? "L" : "M"}${point.x} ${Math.round(point.y)}`).join(" ");
+    function linePathFor(items) {
+      if (!items.length) return "";
+      return items
+        .map((point, index) => `${index ? "L" : "M"}${point.x} ${Math.round(point.y)}`)
+        .join(" ");
+    }
+
+    svg.setAttribute("aria-label", "최근 일주일 반입량 막대와 선 그래프");
+
+    const linePath = linePathFor(points);
     const first = points[0];
     const last = points[points.length - 1];
     const areaPath = first && last ? `${linePath} L${last.x} ${baseline} L${first.x} ${baseline} Z` : "";
     const area = $(".chart-area", svg);
     const line = $(".chart-line", svg);
-    const bars = $$(".chart-bars rect", svg);
-    const labels = $$(".chart-axis .x-label", svg);
+    const bars = ensureSvgItems($(".chart-bars", svg), "rect", "rect", points.length);
+    const gridLines = ensureSvgItems($(".chart-grid", svg), "path", "path", ticks.length);
+    const axis = $(".chart-axis", svg);
+    const yLabels = ensureSvgItems(axis, "text:not(.x-label)", "text", ticks.length, "y-label");
+    const labels = ensureSvgItems(axis, ".x-label", "text", points.length, "x-label");
+
+    ticks.forEach((tick, index) => {
+      const y = Math.round(yForChart(tick, chartMin, chartMax, top, baseline));
+      const grid = gridLines[index];
+      const label = yLabels[index];
+      if (grid) grid.setAttribute("d", `M48 ${y} H402`);
+      if (label) {
+        label.setAttribute("x", "9");
+        label.setAttribute("y", String(y + 4));
+        label.textContent = tick >= 1000 ? `${Math.round(tick / 1000)}K` : String(tick);
+      }
+    });
 
     if (area && areaPath) {
       area.setAttribute("d", areaPath);
@@ -518,16 +1121,52 @@
       const bar = bars[index];
       if (bar) {
         const barY = Math.round(point.y);
+        bar.setAttribute("x", String(point.x - 10));
+        bar.setAttribute("width", "20");
         bar.setAttribute("y", String(barY));
-        bar.setAttribute("height", String(Math.max(16, Math.round(baseline - point.y))));
+        bar.setAttribute("height", String(Math.max(6, Math.round(baseline - point.y))));
+        bar.setAttribute("rx", "6");
+        bar.dataset.finalY = String(barY);
+        bar.dataset.finalHeight = String(Math.max(6, Math.round(baseline - point.y)));
       }
 
       const label = labels[index];
-      if (label) label.textContent = point.weekday || ["월", "화", "수", "목", "금", "토", "일"][index];
+      if (label) {
+        label.textContent = "";
+        label.setAttribute("x", String(point.x));
+        label.setAttribute("y", "216");
+        label.setAttribute("text-anchor", "middle");
+
+        const dateLine = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+        dateLine.setAttribute("class", "date-label");
+        dateLine.setAttribute("x", String(point.x));
+        dateLine.setAttribute("dy", "0");
+        dateLine.textContent = point.displayDate;
+
+        const weekdayLine = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+        weekdayLine.setAttribute("class", "weekday-label");
+        weekdayLine.setAttribute("x", String(point.x));
+        weekdayLine.setAttribute("dy", "15");
+        weekdayLine.textContent = point.weekday;
+
+        label.append(dateLine, weekdayLine);
+      }
     });
 
+    $(".chart-markers", svg)?.remove();
+
+    const animateLandfill = dashboardAnimationScope === "landfill" || dashboardAnimationScope === "all";
     const totalNode = $(".landfill-metrics strong");
-    if (totalNode && last) totalNode.textContent = Math.round(last.landfillTons).toLocaleString("ko-KR") + "t";
+    if (totalNode && last) {
+      const totalText = Math.round(last.landfillTons).toLocaleString("ko-KR") + "t";
+      if (animateLandfill) animateMetricText(totalNode, totalText, 620);
+      else totalNode.textContent = totalText;
+    }
+    updateLandfillDonuts(animateLandfill);
+    if (animateLandfill) {
+      $$(".landfill-metrics strong").slice(1).forEach(node => animateMetricText(node, cleanText(node.textContent), 620));
+      requestAnimationFrame(() => animateLandfillChartSequence());
+    }
   }
 
   function escapeHtml(value) {
@@ -628,19 +1267,7 @@
       return !label || label === className;
     });
 
-    const observed = dashboard.schoolObserved + actual.length;
-    const today = profile.today + classActual.length;
-    const classHold = profile.hold + classActual.filter(record => record.hold_flag || cleanText(record.final_decision).includes("보류")).length;
-    const classified = classHold;
-    const confirmed = profile.converted + classActual.filter(record => !record.hold_flag).length;
-    const hold = dashboard.schoolHold + holdRecords.length;
-
-    setDashboardNumber("[data-school-observed]", observed);
-    setDashboardNumber("[data-school-classes]", dashboard.schoolClasses);
-    setDashboardNumber("[data-school-hold]", hold);
-    setDashboardNumber("[data-today-observed]", today);
-    setDashboardNumber("[data-ai-classified]", classified);
-    setDashboardNumber("[data-human-confirmed]", confirmed);
+    renderSchoolDashboard(mergedClasses);
     setDashboardNumber("[data-real-count]", actual.length);
     setDashboardNumber("[data-hold-count]", holdRecords.length);
     setDashboardNumber("[data-pending-count]", readJson(STORAGE_PENDING, []).length);
@@ -650,14 +1277,8 @@
     }
 
     latestRanking = buildClassRanking(mergedClasses);
-
-    const rankNote = $(".rank-note");
-    if (rankNote) {
-      rankNote.textContent = formatClassRanking(className, latestRanking);
-      rankNote.setAttribute("role", "button");
-      rankNote.setAttribute("tabindex", "0");
-      rankNote.setAttribute("aria-label", "우리 학급 자원순환 랭킹 상세 보기");
-    }
+    renderClassDashboard(profile, classActual, className, latestRanking);
+    lastLandfillDays = landfillDays;
     renderLandfillChart(landfillDays);
     renderHoldList(holdRecords);
   }
@@ -792,10 +1413,14 @@
     let currentId = "";
     let snapLocked = false;
     let scrollTicking = false;
+    let scrollDebounce = 0;
+    let clickLockUntil = 0;
+    let dashboardLockUntil = Date.now() + 520;
 
-    function activate(section) {
+    function activate(section, force = false) {
       if (!section) return;
       const id = section.id;
+      if (!force && id === currentId) return;
       const label = navPairs.find(([, sectionId]) => sectionId === id)?.[0] || section.dataset.nav;
       currentId = id;
 
@@ -811,41 +1436,79 @@
     function nearestSection() {
       const center = window.innerHeight / 2;
       return sections
-        .map(section => ({ section, distance: Math.abs(section.getBoundingClientRect().top + section.getBoundingClientRect().height / 2 - center) }))
-        .sort((a, b) => a.distance - b.distance)[0]?.section || sections[0];
+        .map(section => {
+          const rect = section.getBoundingClientRect();
+          const sectionCenter = rect.top + rect.height / 2;
+          const insideCenter = rect.top <= center && rect.bottom >= center;
+          return {
+            section,
+            insideCenter,
+            distance: Math.abs(sectionCenter - center)
+          };
+        })
+        .sort((a, b) => Number(b.insideCenter) - Number(a.insideCenter) || a.distance - b.distance)[0]?.section || sections[0];
     }
 
-    function activateByScroll() {
-      activate(nearestSection());
-      scrollTicking = false;
+    function scheduleActiveUpdate(delay = 110) {
+      if (Date.now() < dashboardLockUntil) return;
+      if (Date.now() < clickLockUntil) return;
+      window.clearTimeout(scrollDebounce);
+      scrollDebounce = window.setTimeout(() => {
+        if (scrollTicking) return;
+        scrollTicking = true;
+        requestAnimationFrame(() => {
+          activate(nearestSection());
+          scrollTicking = false;
+        });
+      }, delay);
+    }
+
+    function sectionIndexByScrollPosition() {
+      const y = window.scrollY;
+      return sections
+        .map((section, index) => ({
+          index,
+          distance: Math.abs(section.offsetTop - y)
+        }))
+        .sort((a, b) => a.distance - b.distance)[0]?.index || 0;
     }
 
     function resetToDashboard() {
+      dashboardLockUntil = Date.now() + 520;
       history.replaceState(null, "", window.location.pathname + window.location.search);
-      window.scrollTo(0, 0);
-      activate(sections[0]);
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      activate(sections[0], true);
     }
 
     function shouldSkipSnap(event) {
       return Boolean(event.target.closest("input, textarea, select, option, button, dialog, .ai-modal, [role='dialog']"));
     }
 
-    function snapByWheel(event) {
+  function snapByWheel(event) {
       if (shouldSkipSnap(event) || Math.abs(event.deltaY) < 18 || snapLocked) return;
       const active = sections.find(section => section.id === currentId) || nearestSection();
-      const currentIndex = Math.max(0, sections.indexOf(active));
-      const nextIndex = Math.min(sections.length - 1, Math.max(0, currentIndex + (event.deltaY > 0 ? 1 : -1)));
+      const direction = event.deltaY > 0 ? 1 : -1;
+      const currentIndex = direction < 0
+        ? sectionIndexByScrollPosition()
+        : Math.max(0, sections.indexOf(active));
+      const nextIndex = Math.min(sections.length - 1, Math.max(0, currentIndex + direction));
       if (nextIndex === currentIndex) return;
 
       event.preventDefault();
       snapLocked = true;
+      clickLockUntil = Date.now() + 760;
       const target = sections[nextIndex];
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
       history.replaceState(null, "", "#" + target.id);
-      activate(target);
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      activate(target, true);
       window.setTimeout(() => {
         snapLocked = false;
-      }, 760);
+        clickLockUntil = 0;
+        if (Math.abs(window.scrollY - target.offsetTop) > 4) {
+          window.scrollTo({ top: target.offsetTop, left: 0, behavior: "auto" });
+        }
+        activate(nearestSection());
+      }, 820);
     }
 
     if (!sections.length) return;
@@ -859,70 +1522,334 @@
         const section = document.getElementById(id);
         if (!section) return;
         event.preventDefault();
+        clickLockUntil = Date.now() + 640;
         history.replaceState(null, "", "#" + id);
         section.scrollIntoView({ behavior: "smooth", block: "start" });
-        activate(section);
+        activate(section, true);
+        window.setTimeout(() => {
+          clickLockUntil = 0;
+          activate(nearestSection());
+        }, 700);
       });
     });
 
-    const observer = new IntersectionObserver(entries => {
-      const visible = entries
-        .filter(entry => entry.isIntersecting && entry.intersectionRatio >= 0.7)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-
-      if (!visible || visible.target.id === currentId) return;
-      activate(visible.target);
-    }, {
-      threshold: [0.68, 0.7, 0.72, 0.75],
-      rootMargin: "-24% 0px -24% 0px"
-    });
-
-    sections.forEach(section => observer.observe(section));
-
-    window.addEventListener("scroll", () => {
-      if (scrollTicking) return;
-      scrollTicking = true;
-      requestAnimationFrame(activateByScroll);
-    }, { passive: true });
-
+    window.addEventListener("scroll", () => scheduleActiveUpdate(110), { passive: true });
     window.addEventListener("wheel", snapByWheel, { passive: false });
 
     resetToDashboard();
     window.addEventListener("pageshow", () => requestAnimationFrame(resetToDashboard), { once: true });
-    window.addEventListener("load", () => requestAnimationFrame(resetToDashboard), { once: true });
     requestAnimationFrame(resetToDashboard);
   }
   // COMMON_FINAL_FIX_END
+
+  function loadSortingStorage() {
+    let stats = null;
+    try {
+      stats = JSON.parse(localStorage.getItem(SORTING_STATS_KEY) || "null");
+    } catch {
+      stats = null;
+    }
+    if (stats && typeof stats === "object") {
+      sortingStats = {
+        totalCount: Number(stats.totalCount) || 0,
+        carbonReduction: Number(stats.carbonReduction) || 0,
+        logs: Array.isArray(stats.logs) ? stats.logs.slice(0, 30) : []
+      };
+    }
+    sortingHoldItems = readJson(SORTING_HOLD_KEY, []);
+  }
+
+  function saveSortingStats() {
+    writeJson(SORTING_STATS_KEY, sortingStats);
+  }
+
+  function saveSortingHolds() {
+    writeJson(SORTING_HOLD_KEY, sortingHoldItems);
+  }
+
+  function renderSortingStats() {
+    setText("#sortingPracticeCount", `${sortingStats.totalCount.toLocaleString("ko-KR")}회`);
+    setText("#sortingCarbonCount", `${sortingStats.carbonReduction.toFixed(1)}g`);
+    setText("#sortingRecentItem", sortingStats.logs[0]?.label || "-");
+
+    const timeline = $("#sortingTimeline");
+    if (!timeline) return;
+    if (!sortingStats.logs.length) {
+      timeline.innerHTML = "<li>아직 실천 기록이 없습니다.</li>";
+      return;
+    }
+    timeline.innerHTML = sortingStats.logs.slice(0, 6).map(log => `
+      <li><span>${escapeHtml(log.time)}</span><strong>${escapeHtml(log.emoji)} ${escapeHtml(log.label)}</strong><em>${escapeHtml(log.category)}</em></li>
+    `).join("");
+  }
+
+  function renderSortingHolds() {
+    const list = $("#holdList");
+    const count = $("#sortingHoldCount");
+    if (count) count.textContent = String(sortingHoldItems.length);
+    if (!list) return;
+    if (!sortingHoldItems.length) {
+      list.innerHTML = '<li class="empty-state">기록된 판단 보류 물건이 없습니다.</li>';
+      return;
+    }
+    list.innerHTML = sortingHoldItems.map(item => `
+      <li class="hold-card" data-hold-id="${item.id}">
+        <div><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.reason || "기준 확인 필요")}</span></div>
+        <time>${escapeHtml(item.time)}</time>
+        <button type="button" data-resolve-hold="${item.id}">해결 완료</button>
+      </li>
+    `).join("");
+  }
+
+  function logSortingPractice(item) {
+    const time = new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+    sortingStats.totalCount += 1;
+    sortingStats.carbonReduction += Number(item.carbonSaved) || 0;
+    sortingStats.logs.unshift({
+      label: item.label,
+      emoji: item.emoji,
+      category: item.category,
+      carbon: item.carbonSaved,
+      time
+    });
+    sortingStats.logs = sortingStats.logs.slice(0, 30);
+    saveSortingStats();
+    renderSortingStats();
+    const guidance = $("[data-quick-guidance]");
+    if (guidance) guidance.textContent = `${item.label} 실천이 기록되었습니다. CO2 ${item.carbonSaved}g 저감으로 반영했어요.`;
+  }
+
+  function addSortingHold(name, reason = "기준 확인 필요") {
+    const cleaned = cleanText(name) || "판단 보류 물건";
+    sortingHoldItems.unshift({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      name: cleaned,
+      reason,
+      time: new Date().toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
+    });
+    sortingHoldItems = sortingHoldItems.slice(0, 40);
+    saveSortingHolds();
+    renderSortingHolds();
+    const guidance = $("[data-quick-guidance]");
+    if (guidance) guidance.textContent = `${cleaned}을 판단 보류함에 기록했습니다. 회의에서 기준을 확인해 보세요.`;
+  }
+
+  function pickQuizSet() {
+    return [...sortingQuizData]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 10);
+  }
+
+  function quizMessage(score) {
+    if (score >= 90) return "와우! 자원순환 환경운동가예요 🌍";
+    if (score >= 70) return "멋져요! 우리반 분리배출 리더예요 🌱";
+    if (score >= 50) return "좋아요! 헷갈린 기준을 조금 더 확인해봐요 🔍";
+    if (score >= 30) return "괜찮아요. 다시 해보면 금방 늘어요 💪";
+    return "오늘부터 3초 판단 연습을 시작해봐요 ✨";
+  }
+
+  function showQuizQuestion() {
+    const item = quizSet[quizIndex];
+    const progress = quizSet.length ? ((quizIndex + 1) / quizSet.length) * 100 : 0;
+    setText("#quizProgress", quizSet.length ? `문제 ${quizIndex + 1} / ${quizSet.length}` : "대기 중");
+    setText("#quizScore", `${quizScore}점`);
+    setText("#quizEmoji", item?.emoji || "🎮");
+    setText("#quizQuestion", item?.question || "시작 버튼을 누르면 10문제가 자동으로 진행됩니다.");
+    setText("#quizResult", "");
+    const bar = $("#quizBar");
+    if (bar) bar.style.width = `${progress}%`;
+    quizLocked = false;
+  }
+
+  function finishQuiz() {
+    setText("#quizProgress", "퀴즈 완료");
+    setText("#quizScore", `${quizScore}점`);
+    setText("#quizEmoji", "🏆");
+    setText("#quizQuestion", quizMessage(quizScore));
+    setText("#quizResult", `10문제 중 ${Math.round(quizScore / 10)}문제를 맞혔습니다.`);
+    const bar = $("#quizBar");
+    if (bar) bar.style.width = "100%";
+    quizLocked = true;
+  }
+
+  function startSortingQuiz() {
+    quizSet = pickQuizSet();
+    quizIndex = 0;
+    quizScore = 0;
+    quizLocked = false;
+    showQuizQuestion();
+  }
+
+  function answerSortingQuiz(answer) {
+    if (quizLocked || !quizSet.length) return;
+    quizLocked = true;
+    const item = quizSet[quizIndex];
+    const correct = item.answer === answer;
+    if (correct) quizScore += 10;
+    setText("#quizScore", `${quizScore}점`);
+    setText("#quizResult", `${correct ? "정답" : "오답"} · ${item.explanation}`);
+    window.setTimeout(() => {
+      quizIndex += 1;
+      if (quizIndex >= quizSet.length) finishQuiz();
+      else showQuizQuestion();
+    }, 900);
+  }
+
+  function initSortingDataApp() {
+    loadSortingStorage();
+    renderSortingStats();
+    renderSortingHolds();
+
+    $("#resetSortingStats")?.addEventListener("click", () => {
+      sortingStats = { totalCount: 0, carbonReduction: 0, logs: [] };
+      saveSortingStats();
+      renderSortingStats();
+    });
+
+    $("#manualHoldButton")?.addEventListener("click", () => {
+      const input = $("#manualHoldInput");
+      const value = cleanText(input?.value);
+      if (!value) return;
+      addSortingHold(value);
+      input.value = "";
+    });
+
+    $("#manualHoldInput")?.addEventListener("keydown", event => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      $("#manualHoldButton")?.click();
+    });
+
+    $("#clearHoldButton")?.addEventListener("click", () => {
+      sortingHoldItems = [];
+      saveSortingHolds();
+      renderSortingHolds();
+    });
+
+    $("#holdList")?.addEventListener("click", event => {
+      const button = event.target.closest("[data-resolve-hold]");
+      if (!button) return;
+      sortingHoldItems = sortingHoldItems.filter(item => item.id !== button.dataset.resolveHold);
+      saveSortingHolds();
+      renderSortingHolds();
+    });
+
+    $("#quizStartButton")?.addEventListener("click", startSortingQuiz);
+    $$("[data-quiz-choice]").forEach(button => {
+      button.addEventListener("click", () => answerSortingQuiz(button.dataset.quizChoice === "true"));
+    });
+  }
 
   function initQuickButtons() {
     const buttons = $$("[data-quick-item]");
     const category = $("[data-quick-category]");
     const guidance = $("[data-quick-guidance]");
+    const tip = $("[data-quick-tip]");
+    const result = $("[data-sorting-result]");
+    const actionRow = $(".quick-action-row");
 
-    buttons.forEach(button => {
-      button.addEventListener("click", () => {
-        const item = quickItems[button.dataset.quickItem] || quickItems.paper;
-        buttons.forEach(target => target.classList.toggle("is-active", target === button));
-        if (category) category.textContent = "AI 1차 제안: " + item.category;
-        if (guidance) guidance.textContent = item.guidance;
-      });
-    });
+    function itemFromSearch(value) {
+      const text = cleanText(value);
+      if (!text) return null;
+      if (text.includes("우유") || text.includes("팩")) return "milk";
+      if (text.includes("컵") || text.includes("플라스틱")) return "cup";
+      if (text.includes("라면")) return "ramen";
+      if (text.includes("과자") || text.includes("비닐")) return "snack";
+      if (text.includes("캔")) return "can";
+      if (text.includes("영수")) return "receipt";
+      if (text.includes("종이")) return "paper";
+      return "hold";
+    }
 
-    $("#searchButton")?.addEventListener("click", () => {
+    function renderEmptySortingResult() {
+      selectedSortingKey = "";
+      buttons.forEach(target => target.classList.remove("is-active"));
+      result?.classList.add("is-empty");
+      if (category) category.textContent = "AI 1차 제안 대기";
+      if (guidance) guidance.textContent = "사진을 찍거나 물건을 선택하면 AI가 먼저 후보를 제안합니다.";
+      if (tip) {
+        tip.hidden = true;
+        tip.textContent = "";
+      }
+      if (actionRow) actionRow.hidden = true;
+    }
+
+    function renderSortingResult(key) {
+      const item = sortingDb[key] || sortingDb.hold;
+      selectedSortingKey = key;
+      buttons.forEach(target => target.classList.toggle("is-active", target.dataset.quickItem === key));
+      result?.classList.remove("is-empty");
+      if (category) {
+        category.innerHTML = `<b>${item.emoji}</b> ${escapeHtml(item.title)} <em>${escapeHtml(item.category)}</em>`;
+      }
+      if (guidance) guidance.textContent = item.guide;
+      if (tip) {
+        tip.hidden = false;
+        tip.innerHTML = `<strong>💡 핵심 팁</strong><span>${escapeHtml(item.tip)}</span>`;
+      }
+      if (actionRow) actionRow.hidden = false;
+      $("#practiceLogButton")?.toggleAttribute("disabled", Boolean(item.isHold));
+      $("#holdLogButton").textContent = item.isHold ? "보류함 등록" : "판단 보류";
+    }
+
+    function selectedSortingItem() {
+      return sortingDb[selectedSortingKey] || null;
+    }
+
+    function applySearchValue() {
       const value = cleanText($("#searchInput")?.value);
       if (!value) return;
-      const draft = chooseDraftFromLabel(value, null);
-      showDraftModal({
-        input_type: "search",
-        ai_engine: "mapping-rule",
-        ai_raw_label: value,
-        ai_confidence: "",
-        mapped_item: draft.item,
-        suggested_category: draft.category,
-        final_decision: draft.category,
-        hold_flag: false
-      }, draft.guidance);
+      renderSortingResult(itemFromSearch(value));
+    }
+
+    buttons.forEach(button => {
+      button.classList.remove("is-active");
+      button.addEventListener("click", () => renderSortingResult(button.dataset.quickItem));
     });
+
+    $("#searchButton")?.addEventListener("click", applySearchValue);
+    $("#searchInput")?.addEventListener("keydown", event => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      applySearchValue();
+    });
+
+    $("#tmApplyButton")?.addEventListener("click", async () => {
+      const state = $("#tmModelState");
+      const value = cleanText($("#tmModelInput")?.value);
+      if (!value) {
+        if (state) state.textContent = "모델 링크를 입력하면 적용할 수 있습니다.";
+        return;
+      }
+      if (state) state.textContent = "모델을 불러오는 중입니다...";
+      try {
+        modelPromise = await loadTeachableMachineModel(value);
+        if (state) state.textContent = modelPromise ? "Teachable Machine 모델이 적용되었습니다." : "모델 런타임을 사용할 수 없어 기본 판단을 유지합니다.";
+      } catch {
+        modelPromise = null;
+        if (state) state.textContent = "모델을 불러오지 못했습니다. 링크를 다시 확인해 주세요.";
+      }
+    });
+
+    $("#tmModelInput")?.addEventListener("keydown", event => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      $("#tmApplyButton")?.click();
+    });
+
+    $("#practiceLogButton")?.addEventListener("click", () => {
+      const item = selectedSortingItem();
+      if (!item || item.isHold) return;
+      logSortingPractice(item);
+    });
+
+    $("#holdLogButton")?.addEventListener("click", () => {
+      const item = selectedSortingItem();
+      const value = cleanText($("#searchInput")?.value);
+      addSortingHold(item?.label || value || "판단 보류 물건", item?.isHold ? item.tip : "기준 확인 필요");
+    });
+
+    renderEmptySortingResult();
   }
 
   function chooseDraftFromLabel(label, confidence) {
@@ -971,14 +1898,31 @@
     else modal.setAttribute("open", "");
   }
 
-  function closeModal() {
+  function resetModalState() {
+    pendingDecision = null;
+    currentDraft = null;
+    setScanning(false);
+    document.body.classList.remove("modal-open");
+    setDecisionConfirm(false);
+    setSaveState("");
+    $$("[data-final-category]").forEach(item => item.classList.remove("is-selected"));
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      previewUrl = "";
+    }
+    $("#modalPreview")?.removeAttribute("src");
+  }
+
+  function closeModal(event) {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
     const modal = $("#aiModal");
     if (!modal) return;
-    if (typeof modal.close === "function") modal.close();
-    else {
+    modalSession += 1;
+    resetModalState();
+    if (typeof modal.close === "function" && modal.open) modal.close();
+    else if (typeof modal.close !== "function") {
       modal.removeAttribute("open");
-      document.body.classList.remove("modal-open");
-      setScanning(false);
     }
   }
 
@@ -1030,6 +1974,7 @@
 
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     previewUrl = URL.createObjectURL(file);
+    const session = ++modalSession;
 
     const image = $("#modalPreview");
     if (!image) return;
@@ -1056,7 +2001,9 @@
     openModal();
 
     image.onload = async () => {
+      if (session !== modalSession) return;
       const draft = await classifyImage(image);
+      if (session !== modalSession) return;
       currentDraft = {
         input_type: "image",
         ai_engine: draft.ruleBased ? "fallback-rule" : "mobilenet",
@@ -1072,6 +2019,7 @@
     };
 
     image.onerror = () => {
+      if (session !== modalSession) return;
       setScanning(false);
       setSaveState("사진을 불러오지 못했습니다. 다른 사진을 선택해 주세요.");
     };
@@ -1167,7 +2115,6 @@
         ? item.images.map((src, index) => `
             <figure class="gallery-detail-photo">
               <img src="${src}" alt="${title} ${index + 1}" loading="lazy" />
-              <figcaption>${item.number}-${index + 1}</figcaption>
             </figure>
           `).join("")
         : showMissingSlot() + showMissingSlot();
@@ -1203,19 +2150,17 @@
     const refresh = $("[data-refresh-records]");
     if (!refresh) return;
 
-    refresh.addEventListener("click", async event => {
+    refresh.addEventListener("click", event => {
+      event.preventDefault();
       event.stopPropagation();
       refresh.classList.add("is-loading");
       refresh.setAttribute("aria-busy", "true");
-      countUpNextDashboard = true;
-      document.body.classList.add("is-refreshing-dashboard");
-      await loadDashboardRows();
+      beginDashboardRepaint("landfill", 1900);
+      refreshLandfillMonitor();
       window.setTimeout(() => {
-        countUpNextDashboard = false;
-        document.body.classList.remove("is-refreshing-dashboard");
-      }, 680);
-      refresh.classList.remove("is-loading");
-      refresh.removeAttribute("aria-busy");
+        refresh.classList.remove("is-loading");
+        refresh.removeAttribute("aria-busy");
+      }, 1600);
     });
   }
 
@@ -1255,13 +2200,22 @@
 
   function initSelectors() {
     const seenClasses = new Set();
+    $$("#gradeSelect option, #classSelect option").forEach(option => {
+      option.value = cleanText(option.textContent);
+    });
     $$("#classSelect option").forEach(option => {
       const label = cleanText(option.textContent);
       if (seenClasses.has(label)) option.remove();
       else seenClasses.add(label);
     });
-    $("#gradeSelect")?.addEventListener("change", () => applyDashboard(allStoredRecords()));
-    $("#classSelect")?.addEventListener("change", () => applyDashboard(allStoredRecords()));
+    $("#gradeSelect")?.addEventListener("change", () => {
+      beginDashboardRepaint("school", 980);
+      applyDashboard(allStoredRecords());
+    });
+    $("#classSelect")?.addEventListener("change", () => {
+      beginDashboardRepaint("class", 980);
+      applyDashboard(allStoredRecords());
+    });
   }
 
   function initUpload() {
@@ -1317,35 +2271,34 @@
       setSaveState("저장하지 않았습니다. 다시 판단을 선택할 수 있습니다.");
     });
 
-    $("#aiModal")?.addEventListener("close", () => {
-      pendingDecision = null;
-      setScanning(false);
-      document.body.classList.remove("modal-open");
-      setDecisionConfirm(false);
-      $$("[data-final-category]").forEach(item => item.classList.remove("is-selected"));
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-        previewUrl = "";
-      }
+    $("#aiModal")?.addEventListener("close", resetModalState);
+
+    $("#aiModal")?.addEventListener("cancel", event => {
+      closeModal(event);
     });
 
     $("#aiModal")?.addEventListener("click", event => {
       if (event.target === event.currentTarget) closeModal();
     });
 
-    $(".close-btn")?.addEventListener("click", closeModal);
+    $$("[data-close-analysis]").forEach(button => {
+      button.addEventListener("click", closeModal);
+    });
   }
 
   function boot() {
     initNavigation();
     initQuickButtons();
     initTabs();
+    initSortingDataApp();
     initGallery();
     initSelectors();
     initUpload();
     initRefreshControls();
     initRankingModal();
     initLandfillSourceLink();
+    renderLandfillTimeNow();
+    beginDashboardIntro();
     applyDashboard(allStoredRecords());
     loadDashboardRows();
   }

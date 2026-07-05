@@ -9583,3 +9583,140 @@ body,
   }
 }
 /* CLASS_CONFUSION_LABEL_SPACE_FINAL_20260705_END */
+
+/* AIWAYS_UI_MICRO_BALANCE_20260706_START */
+.class-panel .confusion div {
+  grid-template-columns: minmax(144px, 1.24fr) minmax(70px, 0.9fr) 38px !important;
+  column-gap: 8px !important;
+}
+
+.class-panel .confusion div span {
+  padding-right: 0;
+}
+
+.class-panel .confusion div b {
+  box-sizing: border-box;
+  min-width: 34px !important;
+  padding-right: 6px;
+  text-align: right;
+}
+
+.quiz-card.is-finished {
+  min-height: 638px !important;
+  padding: 24px 26px 25px !important;
+  grid-template-rows: 0 minmax(0, 1fr) !important;
+}
+
+.quiz-card.is-finished #quizQuestion {
+  display: none !important;
+}
+
+.quiz-card.is-finished #quizResult {
+  gap: 14px !important;
+}
+
+.quiz-report-panel {
+  position: relative;
+  grid-template-columns: minmax(0, 1.05fr) minmax(225px, 0.95fr) !important;
+  gap: 14px 22px !important;
+  min-height: 238px !important;
+  padding: 22px 24px 20px !important;
+  align-items: center !important;
+}
+
+.quiz-report-label {
+  grid-column: 1 / -1;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 219, 112, 0.24);
+  border-radius: 999px;
+  color: rgba(255, 236, 178, 0.94);
+  background: rgba(255, 219, 112, 0.075);
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.quiz-report-rank {
+  align-self: center !important;
+}
+
+.quiz-report-score span {
+  min-height: 104px !important;
+}
+
+.quiz-finish-count {
+  margin-top: -4px !important;
+  padding-top: 0 !important;
+}
+
+.quiz-card.is-finished .quiz-rank-table {
+  gap: 11px !important;
+  margin-top: 10px !important;
+}
+
+.quiz-card.is-finished .quiz-rank-table span {
+  min-height: 78px !important;
+  padding: 11px 10px !important;
+  border-radius: 17px !important;
+}
+
+.quiz-card.is-finished .quiz-rank-table b {
+  font-size: 1.34rem !important;
+}
+
+.quiz-card.is-finished .quiz-rank-table strong {
+  font-size: 0.78rem !important;
+}
+
+.quiz-card.is-finished .quiz-rank-table em {
+  font-size: 0.68rem !important;
+}
+
+.quiz-card.is-finished .quiz-retry-btn {
+  margin-top: 6px !important;
+}
+
+.tab-panel[data-panel="holds"].is-active {
+  grid-template-rows: auto auto auto auto minmax(426px, 1fr) !important;
+}
+
+.tab-panel[data-panel="holds"].is-active #holdList {
+  height: 428px !important;
+  max-height: 428px !important;
+  gap: 6px !important;
+  padding-bottom: 0 !important;
+}
+
+.tab-panel[data-panel="holds"].is-active .hold-card {
+  min-height: 56px !important;
+  padding-block: 6px !important;
+}
+
+.landfill-panel .landfill-time-now {
+  transform: translate(-24px, 5px) !important;
+}
+
+.landfill-panel .landfill-donuts {
+  transform: translateY(12px) !important;
+}
+
+@media (max-width: 980px) {
+  .class-panel .confusion div {
+    grid-template-columns: minmax(138px, 1.18fr) minmax(62px, 0.82fr) 36px !important;
+  }
+
+  .quiz-report-panel {
+    grid-template-columns: 1fr !important;
+    min-height: 0 !important;
+  }
+
+  .tab-panel[data-panel="holds"].is-active #holdList {
+    height: 410px !important;
+    max-height: 410px !important;
+  }
+}
+/* AIWAYS_UI_MICRO_BALANCE_20260706_END */

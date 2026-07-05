@@ -2758,13 +2758,12 @@
     setText("#quizScore", `${quizScore}점`);
     setText("#quizEmoji", "");
     const question = $("#quizQuestion");
-    if (question) question.innerHTML = `
-      <span class="quiz-finish-title">퀴즈 결과 리포트</span>
-    `;
+    if (question) question.textContent = "";
     const result = $("#quizResult");
     if (result) {
       result.innerHTML = `
         <section class="quiz-report-panel" aria-label="퀴즈 결과 리포트">
+          <span class="quiz-report-label">퀴즈 결과 리포트</span>
           <div class="quiz-report-rank">
             <b>${escapeHtml(rank.emoji)}</b>
             <span>

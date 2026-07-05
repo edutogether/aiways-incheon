@@ -48,6 +48,107 @@
     "6학년 3반": { today: 18, weekly: 95, hold: 11, converted: 34, correct: 74, recycle: 43, reuse: 10, contamination: 8 }
   };
 
+  const CLASS_CONFUSION_DATA = {
+    "3학년 1반": [
+      ["우유갑", 31],
+      ["멸균팩", 26],
+      ["빨대", 21],
+      ["종이컵", 16],
+      ["요구르트병", 12]
+    ],
+    "3학년 2반": [
+      ["과자봉지", 28],
+      ["비닐봉투", 24],
+      ["라면봉지", 19],
+      ["빨대", 15],
+      ["물티슈", 11]
+    ],
+    "3학년 3반": [
+      ["종이컵", 34],
+      ["코팅종이", 28],
+      ["영수증", 22],
+      ["스티커 붙은 종이상자", 17],
+      ["휴지", 13]
+    ],
+    "4학년 1반": [
+      ["플라스틱컵", 30],
+      ["페트병", 25],
+      ["생수병", 21],
+      ["빨대", 17],
+      ["캔류", 12]
+    ],
+    "4학년 2반": [
+      ["멸균팩", 36],
+      ["우유갑", 31],
+      ["플라스틱컵", 25],
+      ["과자봉지", 20],
+      ["빨대", 15]
+    ],
+    "4학년 3반": [
+      ["스티커 붙은 종이상자", 29],
+      ["테이프 붙은 박스", 24],
+      ["코팅종이", 20],
+      ["영수증", 16],
+      ["휴지", 11]
+    ],
+    "4학년 4반": [
+      ["페트병", 42],
+      ["플라스틱컵", 35],
+      ["생수병", 29],
+      ["캔류", 23],
+      ["요구르트병", 18]
+    ],
+    "5학년 1반": [
+      ["배달용기", 34],
+      ["컵라면 용기", 31],
+      ["과자봉지", 26],
+      ["테이프 붙은 박스", 20],
+      ["빨대", 16]
+    ],
+    "5학년 2반": [
+      ["코팅종이", 32],
+      ["영수증", 27],
+      ["종이컵", 22],
+      ["스티커 붙은 종이상자", 18],
+      ["물티슈", 13]
+    ],
+    "5학년 3반": [
+      ["캔류", 33],
+      ["참치캔", 28],
+      ["유리병", 23],
+      ["페트병", 19],
+      ["건전지", 14]
+    ],
+    "5학년 4반": [
+      ["라면봉지", 27],
+      ["과자봉지", 23],
+      ["비닐봉투", 19],
+      ["배달용기", 15],
+      ["물티슈", 11]
+    ],
+    "6학년 1반": [
+      ["배달용기", 38],
+      ["테이프 붙은 박스", 33],
+      ["컵라면 용기", 28],
+      ["건전지", 22],
+      ["전구", 17]
+    ],
+    "6학년 2반": [
+      ["페트병", 35],
+      ["생수병", 30],
+      ["플라스틱컵", 25],
+      ["칫솔", 19],
+      ["요구르트병", 14]
+    ],
+    "6학년 3반": [
+      ["유리병", 31],
+      ["참치캔", 27],
+      ["캔류", 23],
+      ["계란판", 18],
+      ["코팅종이", 13]
+    ]
+  };
+
   const BASE_LANDFILL_DAYS = [
     { date: "2026-07-01", weekday: "월", landfillTons: 22800 },
     { date: "2026-07-02", weekday: "화", landfillTons: 18900 },
@@ -356,6 +457,8 @@
   let sortingStats = { totalCount: 0, carbonReduction: 0, logs: [] };
   let sortingHoldItems = [];
   let selectedSortingKey = "";
+  let sortingJudgementRequest = 0;
+  let sortingJudgementTimer = 0;
   let quizSet = [];
   let quizIndex = 0;
   let quizScore = 0;
@@ -386,10 +489,104 @@
     { id: "demo-wet-paper", name: "젖은 종이", reason: "종이류 / 물기와 오염도 확인", status: "분류 논의 필요", time: "07.05 14:02", synced: true },
     { id: "demo-pump-bottle", name: "펌프형 샴푸통", reason: "플라스틱류 / 금속 스프링 분리 여부", status: "회의 안건 대기", time: "07.05 14:28", synced: true },
     { id: "demo-broken-glass", name: "깨진 유리 조각", reason: "유리류 / 안전 포장과 별도 배출 기준", status: "안전 기준 확인", time: "07.05 14:51", synced: true },
-    { id: "demo-coated-cup", name: "코팅 종이컵", reason: "종이류 / 코팅과 오염 상태 확인", status: "기준 확인 필요", time: "07.05 15:10", synced: true }
+    { id: "demo-coated-cup", name: "코팅 종이컵", reason: "종이류 / 코팅과 오염 상태 확인", status: "기준 확인 필요", time: "07.05 15:10", synced: true },
+    { id: "demo-label-bottle", name: "라벨 안 뗀 페트병", reason: "플라스틱류 / 라벨 제거 기준 확인", status: "회의 의견 대기", time: "07.05 15:24", synced: true },
+    { id: "demo-chicken-box", name: "치킨 상자", reason: "종이류 / 기름 오염도 판단 필요", status: "분류 논의 필요", time: "07.05 15:39", synced: true },
+    { id: "demo-taped-delivery-box", name: "테이프 붙은 택배상자", reason: "종이류 / 테이프와 송장 제거 여부", status: "기준 확인 필요", time: "07.05 15:52", synced: true },
+    { id: "demo-foil-snack", name: "은박 과자봉지", reason: "비닐류 / 복합 재질 여부 논의", status: "회의 안건 대기", time: "07.05 16:04", synced: true },
+    { id: "demo-soup-ramen-cup", name: "남은 국물 묻은 컵라면 용기", reason: "일반쓰레기 검토 / 세척 가능 여부", status: "분류 논의 필요", time: "07.05 16:17", synced: true },
+    { id: "demo-icecream-stick", name: "아이스크림 막대", reason: "나무류 / 오염 상태와 일반쓰레기 기준", status: "기준 확인 필요", time: "07.05 16:29", synced: true },
+    { id: "demo-yogurt-bundle", name: "요구르트 병 묶음", reason: "플라스틱류 / 묶음 비닐 분리 여부", status: "회의 의견 대기", time: "07.05 16:43", synced: true },
+    { id: "demo-can-lid", name: "캔 뚜껑 분리 문제", reason: "캔류 / 날카로운 뚜껑 처리 기준", status: "안전 기준 확인", time: "07.05 16:56", synced: true },
+    { id: "demo-toy-piece", name: "플라스틱 장난감 조각", reason: "복합 재질 / 재활용 가능 여부 확인", status: "기준 확인 필요", time: "07.05 17:08", synced: true },
+    { id: "demo-toothbrush-tube", name: "칫솔과 치약 튜브", reason: "일반쓰레기 검토 / 복합 재질 분리 어려움", status: "분류 논의 필요", time: "07.05 17:21", synced: true },
+    { id: "demo-wet-tissue", name: "물티슈", reason: "일반쓰레기 / 종이류 오인 가능성 확인", status: "기준 확인 필요", time: "07.05 17:33", synced: true },
+    { id: "demo-umbrella-vinyl", name: "우산 비닐", reason: "비닐류 / 물기와 오염 상태 확인", status: "회의 안건 대기", time: "07.05 17:47", synced: true }
   ];
 
-  const HOLD_EMOJI_CYCLE = ["🥛", "🥤", "🧃", "🧴", "🥫", "📦", "🧾", "📄", "🛍️", "🔋", "💡", "🧻", "🪥", "👕", "🧦", "🍌", "🥚", "🍜", "🏷️", "🫙", "☕"];
+  const HOLD_EMOJI_CYCLE = ["🥛", "🧃", "☕", "🥤", "🧴", "🥡", "🍱", "🍜", "🥫", "🍾", "🫙", "📦", "🧾", "📄", "📘", "📰", "🗒️", "🛍️", "🍪", "🍌", "🍎", "🍊", "🥬", "🍚", "🍲", "🍗", "🍕", "🍦", "🥢", "🧻", "🪥", "🧼", "🔋", "💡", "🔩", "📎", "🧷", "👕", "🧦", "🧤", "☂️", "🎒", "✏️", "🖊️", "📏", "✂️", "🏷️", "🔌", "🎧", "📱", "💻", "💾", "💿"];
+
+  const WASTE_EMOJI_RULES = [
+    ["🧴", ["라벨 안 뗀 페트병", "라벨안뗀페트병", "페트병", "생수병", "물병", "플라스틱병"]],
+    ["🍜", ["남은 국물 묻은 컵라면 용기", "남은국물묻은컵라면용기", "컵라면 용기", "컵라면", "라면용기", "라면 용기", "사발면", "라면봉지", "라면 봉지"]],
+    ["📦", ["스티커 붙은 종이상자", "스티커붙은종이상자", "테이프 붙은 택배상자", "테이프붙은택배상자", "테이프 붙은 박스", "테이프붙은박스", "종이상자", "택배상자", "골판지", "박스", "상자"]],
+    ["🥡", ["검은색 배달 용기", "검은색배달용기", "배달용기", "플라스틱 용기", "플라스틱용기", "반찬통", "용기"]],
+    ["🍱", ["도시락 용기", "도시락용기", "도시락"]],
+    ["🥛", ["우유팩 빨대 포함", "우유팩빨대포함", "우유갑", "우유팩", "멸균팩", "두유팩", "종이팩"]],
+    ["🧃", ["요구르트 병 묶음", "요구르트병묶음", "요구르트병", "요구르트", "주스팩", "음료팩"]],
+    ["☕", ["코팅 종이컵", "코팅종이컵", "종이컵", "코팅컵", "커피컵", "일회용컵", "컵홀더"]],
+    ["🥤", ["빨대 포함 컵", "빨대포함컵", "플라스틱컵", "투명컵", "빨대컵", "텀블러", "빨대", "컵"]],
+    ["🧴", ["펌프형 샴푸통", "펌프형샴푸통", "샴푸통", "린스통", "세제통", "화장품 용기", "화장품용기", "로션통", "스프레이", "분무기", "샴푸", "세제", "풀", "본드", "플라스틱"]],
+    ["🧢", ["플라스틱 뚜껑", "플라스틱뚜껑", "병뚜껑", "뚜껑"]],
+    ["🧸", ["플라스틱 장난감", "플라스틱장난감", "장난감"]],
+    ["🧩", ["플라스틱 장난감 조각", "플라스틱장난감조각", "장난감 조각", "장난감조각", "깨진 유리 조각", "깨진유리조각", "깨진 유리", "깨진유리", "유리조각"]],
+    ["📏", ["부러진 자", "부러진자", "플라스틱 자", "플라스틱자", "자"]],
+    ["🛍️", ["오염된 비닐봉투", "오염된비닐봉투", "택배 비닐", "택배비닐", "비닐봉투", "비닐 봉투", "종이봉투", "쇼핑백", "지퍼백", "비닐", "봉투", "봉지"]],
+    ["🍪", ["은박 과자봉지", "은박과자봉지", "과자봉지", "과자 봉지", "과자포장", "과자 포장", "스낵봉지"]],
+    ["🎁", ["포장지"]],
+    ["🧻", ["비닐랩", "은박지", "호일", "랩", "휴지심", "물티슈", "휴지", "키친타월", "냅킨"]],
+    ["☂️", ["우산 비닐", "우산비닐", "우산"]],
+    ["🥫", ["캔 뚜껑", "캔뚜껑", "알루미늄캔", "음료캔", "참치캔", "철캔", "캔"]],
+    ["🔩", ["고철", "금속", "나사"]],
+    ["📎", ["클립"]],
+    ["🧷", ["철사"]],
+    ["🍾", ["유리병", "병"]],
+    ["🫙", ["소스병", "잼병"]],
+    ["🪞", ["거울 조각", "거울조각", "거울"]],
+    ["💡", ["형광등", "전구", "led", "LED"]],
+    ["🔋", ["보조배터리", "건전지", "배터리"]],
+    ["💊", ["약봉지", "알약", "약"]],
+    ["💉", ["주사기"]],
+    ["🥬", ["음식물쓰레기", "음식물", "김치", "채소", "야채"]],
+    ["🍚", ["밥"]],
+    ["🍲", ["남은 국물", "남은국물", "국물"]],
+    ["🍎", ["사과껍질", "사과 껍질", "과일껍질", "과일 껍질"]],
+    ["🍌", ["바나나껍질", "바나나 껍질", "바나나"]],
+    ["🍊", ["귤껍질", "귤 껍질", "귤"]],
+    ["🍞", ["빵"]],
+    ["🍗", ["치킨상자", "치킨 상자", "치킨 박스", "치킨박스", "치킨"]],
+    ["🍕", ["피자박스", "피자 박스", "피자"]],
+    ["🍦", ["아이스크림 막대", "아이스크림막대", "아이스크림"]],
+    ["🥢", ["나무젓가락", "젓가락"]],
+    ["🥄", ["숟가락"]],
+    ["📄", ["코팅 종이", "코팅종이", "코팅지", "활동지", "시험지", "프린트", "문서", "색종이", "종이"]],
+    ["📘", ["코팅 공책", "코팅공책", "스프링노트", "스프링 노트", "공책", "노트"]],
+    ["📰", ["신문지", "잡지"]],
+    ["📚", ["책"]],
+    ["🧾", ["영수증", "감열지"]],
+    ["🗒️", ["포스트잇", "메모지"]],
+    ["🥚", ["계란판", "달걀판", "계란", "달걀"]],
+    ["😷", ["마스크"]],
+    ["🪥", ["치약튜브", "치약 튜브", "칫솔", "치약"]],
+    ["🧼", ["물비누", "비누"]],
+    ["🧺", ["수건"]],
+    ["👕", ["티셔츠", "의류", "옷"]],
+    ["🧦", ["양말"]],
+    ["🧤", ["고무장갑", "장갑"]],
+    ["🧥", ["우비"]],
+    ["👟", ["신발"]],
+    ["🎒", ["가방"]],
+    ["✏️", ["연필"]],
+    ["🖊️", ["볼펜"]],
+    ["🧽", ["지우개"]],
+    ["✂️", ["가위"]],
+    ["🏷️", ["스티커", "테이프", "라벨"]],
+    ["🎧", ["이어폰"]],
+    ["🔌", ["충전기", "케이블", "전선"]],
+    ["🖱️", ["마우스"]],
+    ["⌨️", ["키보드"]],
+    ["📱", ["휴대폰", "태블릿"]],
+    ["💻", ["노트북"]],
+    ["💾", ["usb", "USB"]],
+    ["⌚", ["시계"]],
+    ["🧮", ["계산기"]],
+    ["💿", ["cd", "CD"]],
+    ["💳", ["카드"]]
+  ];
+
+  const WASTE_EMOJI_MATCHERS = WASTE_EMOJI_RULES
+    .flatMap(([emoji, keywords]) => keywords.map(keyword => ({ emoji, keyword })))
+    .sort((a, b) => normalizeItemText(b.keyword).compact.length - normalizeItemText(a.keyword).compact.length);
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -1104,28 +1301,60 @@
     });
   }
 
-  function confusionItemsForClass(profile, classActual) {
+  function normalizeConfusionItemName(value) {
+    const text = cleanText(value);
+    if (!text) return "";
+    if (text.includes("스티커")) return "스티커 붙은 종이상자";
+    if (text.includes("테이프")) return "테이프 붙은 박스";
+    if (text.includes("멸균")) return "멸균팩";
+    if (text.includes("우유") || text.includes("종이팩")) return "우유갑";
+    if (text.includes("컵라면") || text.includes("라면용기")) return "컵라면 용기";
+    if (text.includes("라면")) return "라면봉지";
+    if (text.includes("과자")) return "과자봉지";
+    if (text.includes("비닐")) return "비닐봉투";
+    if (text.includes("배달")) return "배달용기";
+    if (text.includes("코팅")) return "코팅종이";
+    if (text.includes("영수")) return "영수증";
+    if (text.includes("플라스틱컵")) return "플라스틱컵";
+    if (text.includes("종이컵")) return "종이컵";
+    if (text.includes("생수")) return "생수병";
+    if (text.includes("페트")) return "페트병";
+    if (text.includes("참치")) return "참치캔";
+    if (text.includes("캔")) return "캔류";
+    if (text.includes("유리")) return "유리병";
+    if (text.includes("빨대")) return "빨대";
+    if (text.includes("물티슈")) return "물티슈";
+    if (text.includes("휴지")) return "휴지";
+    if (text.includes("칫솔")) return "칫솔";
+    if (text.includes("건전지") || text.includes("배터리")) return "건전지";
+    if (text.includes("전구")) return "전구";
+    if (text.includes("계란")) return "계란판";
+    if (text.includes("요구르트") || text.includes("요거트")) return "요구르트병";
+    if (text.includes("컵")) return "종이컵";
+    return text;
+  }
+
+  function fallbackConfusionItems(profile) {
     const baseHold = toNumber(profile.hold, 0);
     const baseToday = toNumber(profile.today, 0);
-    const balancedTop = Math.max(10, Math.round(baseToday * 0.42 + baseHold * 0.9));
-    const counts = new Map([
+    const balancedTop = Math.max(18, Math.round(baseToday * 0.72 + baseHold * 1.2));
+    return [
       ["우유갑", balancedTop],
-      ["종이컵", Math.max(8, balancedTop - 1)],
-      ["과자 포장지", Math.max(7, balancedTop - 3)],
-      ["컵라면 용기", Math.max(6, balancedTop - 4)],
-      ["영수증", Math.max(5, balancedTop - 6)]
-    ]);
+      ["종이컵", Math.max(14, balancedTop - 4)],
+      ["과자봉지", Math.max(11, balancedTop - 8)],
+      ["컵라면 용기", Math.max(9, balancedTop - 12)],
+      ["영수증", Math.max(7, balancedTop - 16)]
+    ];
+  }
+
+  function confusionItemsForClass(profile, classActual, className) {
+    const baseItems = CLASS_CONFUSION_DATA[className] || fallbackConfusionItems(profile);
+    const counts = new Map(baseItems.map(([label, value]) => [label, value]));
 
     classActual.forEach(record => {
-      const name = cleanText(record.mapped_item || record.ai_raw_label || record.final_decision);
+      const name = normalizeConfusionItemName(record.mapped_item || record.ai_raw_label || record.final_decision);
       if (!name) return;
-      const key = name.includes("우유") ? "우유갑"
-        : name.includes("영수") ? "영수증"
-          : name.includes("라면") ? "컵라면 용기"
-            : name.includes("과자") || name.includes("비닐") ? "과자 포장지"
-              : name.includes("컵") ? "종이컵"
-                : name;
-      counts.set(key, (counts.get(key) || 0) + 1);
+      counts.set(name, (counts.get(name) || 0) + 1);
     });
 
     return Array.from(counts, ([label, value]) => ({ label, value }))
@@ -1135,15 +1364,24 @@
 
   function itemEmoji(label) {
     const text = cleanText(label);
-    if (text.includes("우유")) return "🥛";
-    if (text.includes("종이컵") || text.includes("컵")) return "🥤";
+    if (text.includes("우유") || text.includes("멸균")) return "🥛";
+    if (text.includes("플라스틱컵") || text.includes("종이컵") || text.includes("컵")) return "🥤";
     if (text.includes("과자") || text.includes("비닐")) return "🍪";
     if (text.includes("라면")) return "🍜";
+    if (text.includes("배달")) return "🥡";
     if (text.includes("영수")) return "🧾";
+    if (text.includes("스티커") || text.includes("테이프") || text.includes("상자") || text.includes("박스")) return "📦";
+    if (text.includes("코팅") || text.includes("휴지")) return "📄";
+    if (text.includes("빨대")) return "🥤";
+    if (text.includes("물티슈")) return "🧻";
     if (text.includes("캔")) return "🥫";
-    if (text.includes("플라스틱") || text.includes("페트") || text.includes("뚜껑")) return "🧴";
-    if (text.includes("택배") || text.includes("상자")) return "📦";
+    if (text.includes("유리")) return "🍾";
+    if (text.includes("플라스틱") || text.includes("페트") || text.includes("생수") || text.includes("요구르트") || text.includes("뚜껑")) return "🧴";
+    if (text.includes("택배")) return "📦";
     if (text.includes("건전지") || text.includes("배터리")) return "🔋";
+    if (text.includes("전구")) return "💡";
+    if (text.includes("칫솔")) return "🪥";
+    if (text.includes("계란")) return "🥚";
     return "🟨";
   }
 
@@ -1159,7 +1397,7 @@
     const confusion = $(".confusion");
     if (confusion) {
       const heading = $("h3", confusion)?.outerHTML || "<h3>헷갈린 물건 TOP 5</h3>";
-      const items = confusionItemsForClass(profile, classActual);
+      const items = confusionItemsForClass(profile, classActual, className);
       const max = Math.max(...items.map(item => item.value), 1);
       confusion.innerHTML = heading + items.map(item => {
         const pct = Math.max(12, Math.round((item.value / max) * 100));
@@ -1746,6 +1984,7 @@
   }
 
   function resetThreeSecondAppUiState() {
+    cancelThreeSecondJudgement();
     const sortingSection = $("#sorting");
     if (!sortingSection) return;
 
@@ -1761,6 +2000,7 @@
     const searchInput = $("#searchInput", sortingSection);
     if (searchInput) searchInput.value = "";
     const result = $("[data-sorting-result]", sortingSection);
+    result?.classList.remove("is-scanning", "is-result");
     result?.classList.add("is-empty");
     const category = $("[data-quick-category]", sortingSection);
     if (category) category.innerHTML = "<b>H-A-H</b> AI 1차 제안 준비";
@@ -2213,10 +2453,10 @@
     sortingHoldItems = readJson(SORTING_HOLD_KEY, []);
     if (!sortingHoldItems.length) {
       sortingHoldItems = DEMO_HOLD_ITEMS.slice();
-    } else if (sortingHoldItems.length < 10) {
+    } else if (sortingHoldItems.length < 20) {
       const existing = new Set(sortingHoldItems.map(item => cleanText(item.id || item.name)));
       const filler = DEMO_HOLD_ITEMS.filter(item => !existing.has(cleanText(item.id || item.name)));
-      sortingHoldItems = sortingHoldItems.concat(filler.slice(0, 10 - sortingHoldItems.length));
+      sortingHoldItems = sortingHoldItems.concat(filler.slice(0, 20 - sortingHoldItems.length));
     }
   }
 
@@ -2372,48 +2612,27 @@
     `).join("");
   }
 
-  function getItemEmojiByText(name) {
-    const text = cleanText(name).toLowerCase();
-    if (!text) return "";
-    const emojiRules = [
-      [["컵라면", "라면용기", "라면 용기", "사발면"], "🍜"],
-      [["라면봉지", "라면 봉지"], "🍜"],
-      [["과자봉지", "과자 봉지", "과자포장", "과자 포장", "스낵봉지"], "🍪"],
-      [["우유갑", "우유팩", "멸균팩", "종이팩", "요구르트병", "요구르트"], "🥛"],
-      [["종이컵", "코팅컵", "커피컵", "일회용컵", "플라스틱컵", "빨대", "텀블러"], "🥤"],
-      [["캡슐커피", "커피캡슐"], "☕"],
-      [["페트병", "생수병", "플라스틱병"], "🧴"],
-      [["샴푸통", "세제통", "화장품 용기", "화장품용기", "스프레이", "분무기", "로션통", "펌프형"], "🧴"],
-      [["유리병", "깨진 유리", "유리조각", "병"], "🫙"],
-      [["음료캔", "참치캔", "캔"], "🥫"],
-      [["택배상자", "골판지", "박스", "상자"], "📦"],
-      [["영수증", "감열지"], "🧾"],
-      [["문서", "프린트", "종이", "코팅지", "코팅 종이", "코팅종이", "스티커 붙은 종이"], "📄"],
-      [["공책", "노트", "책", "스프링노트", "스프링 노트"], "📘"],
-      [["알약", "약봉지", "약"], "💊"],
-      [["비닐봉투", "비닐 봉투", "비닐", "봉지", "쇼핑백"], "🛍️"],
-      [["건전지", "배터리", "보조배터리"], "🔋"],
-      [["전구", "형광등", "led", "LED"], "💡"],
-      [["물티슈", "휴지", "키친타월", "냅킨"], "🧻"],
-      [["칫솔", "치약"], "🪥"],
-      [["양말"], "🧦"],
-      [["수건", "의류", "옷", "티셔츠"], "👕"],
-      [["음식물", "과일껍질", "사과껍질", "채소", "야채"], "🥬"],
-      [["바나나껍질", "바나나 껍질", "바나나"], "🍌"],
-      [["계란판", "달걀판", "계란", "달걀"], "🥚"],
-      [["스티커", "테이프", "라벨"], "🏷️"],
-      [["부러진 자", "플라스틱 자", "자"], "📏"],
-      [["고무장갑", "장갑"], "🧤"],
-      [["마스크"], "😷"],
-      [["장난감", "인형"], "🧸"],
-      [["스티로폼", "완충재"], "🧊"],
-      [["빨대"], "🥤"],
-      [["뚜껑", "병뚜껑", "플라스틱"], "🧴"],
-      [["포장지"], "🛍️"]
-    ];
+  function normalizeItemText(value) {
+    const spaced = cleanText(String(value || "")
+      .normalize("NFKC")
+      .toLowerCase()
+      .replace(/[()[\]{}.,/\\|:;'"!?·ㆍ•_+=~`<>]/g, " "));
+    return {
+      spaced,
+      compact: spaced.replace(/\s+/g, "")
+    };
+  }
 
-    const matched = emojiRules.find(([keywords]) => keywords.some(keyword => text.includes(cleanText(keyword).toLowerCase())));
-    return matched ? matched[1] : "🟨";
+  function getItemEmojiByText(name) {
+    const text = normalizeItemText(name);
+    if (!text.compact) return "";
+
+    const matched = WASTE_EMOJI_MATCHERS.find(({ keyword }) => {
+      const target = normalizeItemText(keyword);
+      return Boolean(target.compact)
+        && (text.compact.includes(target.compact) || text.spaced.includes(target.spaced));
+    });
+    return matched ? matched.emoji : "🟨";
   }
 
   function holdEmojiFor(name) {
@@ -2545,18 +2764,21 @@
     const result = $("#quizResult");
     if (result) {
       result.innerHTML = `
-        <div class="quiz-finish-layout">
-          <section class="quiz-rank-card">
+        <section class="quiz-report-panel" aria-label="퀴즈 결과 리포트">
+          <div class="quiz-report-rank">
             <b>${escapeHtml(rank.emoji)}</b>
-            <span><strong>${escapeHtml(rank.title)}</strong><em>${escapeHtml(rank.message)}</em></span>
-          </section>
-          <div class="quiz-finish-summary" aria-label="퀴즈 점수 요약">
-            <span><em>총점</em><b>${quizScore}점</b></span>
+            <span>
+              <strong>${escapeHtml(rank.title)}</strong>
+              <em>${escapeHtml(rank.message)}</em>
+            </span>
+          </div>
+          <div class="quiz-report-score" aria-label="퀴즈 점수 요약">
+            <span class="quiz-total-score"><em>총점</em><b>${quizScore}점</b></span>
             <span><em>정답</em><b>${correctCount}/${quizSet.length}</b></span>
             <span><em>오답</em><b>${wrongCount}</b></span>
           </div>
-        </div>
-        <p class="quiz-finish-count">10문제 중 ${correctCount}문제를 맞혔습니다.</p>
+          <p class="quiz-finish-count">10문제 중 ${correctCount}문제를 맞혔습니다.</p>
+        </section>
         ${quizRankTableHtml(correctCount)}
         <button type="button" class="quiz-retry-btn" data-quiz-retry>💪 다시 도전하기</button>
       `;
@@ -2661,11 +2883,11 @@
     node.addEventListener("wheel", event => {
       const canScroll = node.scrollHeight > node.clientHeight + 1;
       if (!canScroll) return;
-      const atTop = node.scrollTop <= 0;
-      const atBottom = node.scrollTop + node.clientHeight >= node.scrollHeight - 1;
-      const leavingTop = event.deltaY < 0 && atTop;
-      const leavingBottom = event.deltaY > 0 && atBottom;
-      if (leavingTop || leavingBottom) return;
+      const previousTop = node.scrollTop;
+      node.scrollTop += event.deltaY;
+      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) node.scrollLeft += event.deltaX;
+      if (node.scrollTop === previousTop && Math.abs(event.deltaY) < 1) return;
+      event.preventDefault();
       event.stopPropagation();
     }, { passive: false });
   }
@@ -2716,6 +2938,81 @@
     });
   }
 
+  function cancelThreeSecondJudgement() {
+    sortingJudgementRequest += 1;
+    if (sortingJudgementTimer) {
+      window.clearTimeout(sortingJudgementTimer);
+      sortingJudgementTimer = 0;
+    }
+  }
+
+  function getJudgementResult(input) {
+    const key = typeof input === "string" ? input : input?.key;
+    const safeKey = sortingDb[key] ? key : "hold";
+    return {
+      key: safeKey,
+      item: sortingDb[safeKey] || sortingDb.hold
+    };
+  }
+
+  function playJudgementScan(container, options = {}) {
+    if (!container) return;
+    const label = cleanText(options.label) || "선택한 물건";
+    const category = $("[data-quick-category]");
+    const guidance = $("[data-quick-guidance]");
+    const tip = $("[data-quick-tip]");
+    const actionRow = $(".quick-action-row");
+
+    selectedSortingKey = "";
+    container.classList.remove("is-empty", "is-result");
+    container.classList.add("is-scanning");
+    if (category) category.innerHTML = `<b>AI SCAN</b> ${escapeHtml(label)} 특징을 읽는 중 <em>분석 중</em>`;
+    if (guidance) guidance.textContent = "재질, 오염 여부, 복합 재질 가능성을 순서대로 확인하고 있습니다.";
+    if (tip) {
+      tip.hidden = false;
+      tip.innerHTML = '<strong>분석 중</strong><span><span class="quick-scan-meter" aria-hidden="true"><i></i></span>AI가 먼저 후보를 제안하고, 학생 확인 단계로 넘길 준비를 합니다.</span>';
+    }
+    if (actionRow) actionRow.hidden = true;
+  }
+
+  function renderJudgementResult(result, container) {
+    const item = result?.item || sortingDb.hold;
+    const key = result?.key || "hold";
+    const buttons = $$("[data-quick-item]");
+    const category = $("[data-quick-category]");
+    const guidance = $("[data-quick-guidance]");
+    const tip = $("[data-quick-tip]");
+    const actionRow = $(".quick-action-row");
+
+    selectedSortingKey = key;
+    buttons.forEach(target => target.classList.toggle("is-active", target.dataset.quickItem === key));
+    container?.classList.remove("is-empty", "is-scanning");
+    container?.classList.add("is-result");
+    if (category) category.innerHTML = `<b>${item.emoji}</b> ${escapeHtml(item.title)} <em>${escapeHtml(item.category)}</em>`;
+    if (guidance) guidance.textContent = item.guide;
+    if (tip) {
+      tip.hidden = false;
+      tip.innerHTML = `<strong>핵심 팁</strong><span>${escapeHtml(item.tip)}</span>`;
+    }
+    if (actionRow) actionRow.hidden = false;
+    $("#practiceLogButton")?.toggleAttribute("disabled", Boolean(item.isHold));
+    $("#holdLogButton").textContent = item.isHold ? "보류함 등록" : "판단 보류";
+  }
+
+  function runThreeSecondJudgement(input, options = {}) {
+    const container = options.container || $("[data-sorting-result]");
+    const result = getJudgementResult(input);
+    const request = ++sortingJudgementRequest;
+    if (sortingJudgementTimer) window.clearTimeout(sortingJudgementTimer);
+
+    playJudgementScan(container, { label: result.item?.label || result.item?.title });
+    sortingJudgementTimer = window.setTimeout(() => {
+      if (request !== sortingJudgementRequest) return;
+      sortingJudgementTimer = 0;
+      renderJudgementResult(result, container);
+    }, options.delay || 1080);
+  }
+
   function initQuickButtons() {
     const buttons = $$("[data-quick-item]");
     const category = $("[data-quick-category]");
@@ -2738,8 +3035,10 @@
     }
 
     function renderEmptySortingResult() {
+      cancelThreeSecondJudgement();
       selectedSortingKey = "";
       buttons.forEach(target => target.classList.remove("is-active"));
+      result?.classList.remove("is-scanning", "is-result");
       result?.classList.add("is-empty");
       if (category) category.innerHTML = "<b>H-A-H</b> AI 1차 제안 준비";
       if (guidance) guidance.textContent = "지금 버리려는 물건을 선택하거나 검색해 보세요. AI가 먼저 분류 후보를 제안하고, 여러분이 다시 확인해 실천 기록으로 남깁니다.";
@@ -2751,21 +3050,7 @@
     }
 
     function renderSortingResult(key) {
-      const item = sortingDb[key] || sortingDb.hold;
-      selectedSortingKey = key;
-      buttons.forEach(target => target.classList.toggle("is-active", target.dataset.quickItem === key));
-      result?.classList.remove("is-empty");
-      if (category) {
-        category.innerHTML = `<b>${item.emoji}</b> ${escapeHtml(item.title)} <em>${escapeHtml(item.category)}</em>`;
-      }
-      if (guidance) guidance.textContent = item.guide;
-      if (tip) {
-        tip.hidden = false;
-        tip.innerHTML = `<strong>핵심 팁</strong><span>${escapeHtml(item.tip)}</span>`;
-      }
-      if (actionRow) actionRow.hidden = false;
-      $("#practiceLogButton")?.toggleAttribute("disabled", Boolean(item.isHold));
-      $("#holdLogButton").textContent = item.isHold ? "보류함 등록" : "판단 보류";
+      renderJudgementResult(getJudgementResult(key), result);
     }
 
     function selectedSortingItem() {
@@ -2775,12 +3060,15 @@
     function applySearchValue() {
       const value = cleanText($("#searchInput")?.value);
       if (!value) return;
-      renderSortingResult(itemFromSearch(value));
+      runThreeSecondJudgement(itemFromSearch(value), { container: result });
     }
 
     buttons.forEach(button => {
       button.classList.remove("is-active");
-      button.addEventListener("click", () => renderSortingResult(button.dataset.quickItem));
+      button.addEventListener("click", () => {
+        buttons.forEach(target => target.classList.toggle("is-active", target === button));
+        runThreeSecondJudgement(button.dataset.quickItem, { container: result });
+      });
     });
 
     $("#searchButton")?.addEventListener("click", applySearchValue);

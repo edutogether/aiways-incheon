@@ -28,7 +28,7 @@ html {
 body {
   margin: 0;
   min-width: 320px;
-  overflow-x: hidden;
+  overflow-x: visible;
   font-family: Inter, Pretendard, "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background:
     radial-gradient(circle at 72% 16%, rgba(86, 141, 255, 0.22), transparent 34vw),
@@ -1975,14 +1975,14 @@ body {
 
 /* PAGE_FIX_01_DASHBOARD_START */
 .dashboard-scene {
-  grid-template-columns: minmax(500px, 0.86fr) minmax(880px, 1.14fr);
+  grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
   gap: clamp(34px, 3.4vw, 88px);
   padding-top: calc(var(--clean-header-h) + 34px);
   padding-bottom: 34px;
 }
 
 .hero-copy h1 {
-  font-size: clamp(5.35rem, 6.6vw, 8.25rem);
+  font-size: clamp(3.9rem, 6.1vw, 8.25rem);
   letter-spacing: 0;
 }
 
@@ -1999,10 +1999,12 @@ body {
 
 .dashboard-grid {
   align-self: center;
+  width: min(100%, 1058px);
+  min-width: 0;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  grid-template-rows: minmax(286px, 0.95fr) minmax(286px, 0.95fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: 18px;
-  max-height: calc(100dvh - var(--clean-header-h) - 80px);
+  max-height: calc(100dvh - var(--clean-header-h) - 34px);
 }
 
 .dashboard-grid .panel {
@@ -2427,7 +2429,27 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .dashboard-scene {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    min-height: auto;
+    padding: calc(var(--clean-header-h) + 24px) clamp(20px, 4vw, 48px) 40px;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(3rem, 8vw, 5.25rem);
+  }
+
+  .hero-description {
+    margin-top: 24px;
+  }
+
+  .hero-actions {
+    flex-wrap: wrap;
+  }
+
   .dashboard-grid {
+    width: min(100%, 820px);
     max-height: none;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
@@ -2441,6 +2463,173 @@ body {
   .flow-grid,
   .gallery-stage .gallery-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1181px) and (max-width: 1600px) {
+  .dashboard-scene {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(22px, 2.6vw, 44px);
+    padding: calc(var(--clean-header-h) + 22px) clamp(28px, 4vw, 72px) 24px;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(3.7rem, 5.6vw, 6.6rem);
+  }
+
+  .hero-description {
+    margin-top: clamp(18px, 1.7vw, 28px);
+    font-size: clamp(0.92rem, 1vw, 1.1rem);
+  }
+
+  .hero-actions {
+    margin-top: clamp(20px, 2vw, 28px);
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    min-height: 46px;
+    padding-inline: clamp(16px, 1.45vw, 22px);
+  }
+
+  .dashboard-grid {
+    gap: clamp(10px, 1vw, 16px);
+  }
+
+  .dashboard-grid .panel {
+    padding: clamp(14px, 1.15vw, 20px);
+    border-radius: clamp(18px, 1.4vw, 22px);
+  }
+
+  .school-panel,
+  .class-panel {
+    grid-template-columns: 104px minmax(0, 1fr);
+    column-gap: 12px;
+  }
+
+  .school-panel .panel-head,
+  .class-panel .panel-head {
+    padding-right: 92px;
+  }
+
+  .school-panel .select-line,
+  .class-panel .select-line {
+    top: 14px;
+    right: 14px;
+    width: 86px;
+  }
+
+  .school-panel .donut,
+  .class-panel .donut {
+    width: clamp(68px, 5vw, 86px);
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .school-panel .bar-list div {
+    grid-template-columns: 62px minmax(0, 1fr) 30px !important;
+    column-gap: 8px !important;
+    font-size: 0.76rem;
+  }
+
+  .landfill-panel .chart-wrap {
+    grid-template-columns: minmax(0, 1fr) clamp(76px, 6vw, 100px) !important;
+    grid-template-rows: auto minmax(164px, 1fr) auto !important;
+    gap: 6px 8px !important;
+  }
+
+  .landfill-panel .combo-chart {
+    height: clamp(164px, 12vw, 210px) !important;
+    min-height: 164px !important;
+  }
+
+  .landfill-panel .landfill-donuts .donut {
+    width: clamp(64px, 4.6vw, 82px) !important;
+    min-width: 0;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .dashboard-scene {
+    padding-inline: 16px;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(2.55rem, 12vw, 3.5rem);
+    line-height: 1;
+  }
+
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    width: 100%;
+  }
+
+  .dashboard-grid {
+    width: 100%;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .dashboard-grid .panel {
+    padding: 16px;
+  }
+
+  .school-panel,
+  .class-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .school-panel .panel-head,
+  .class-panel .panel-head,
+  .school-panel .kpi-row,
+  .class-panel .class-kpis,
+  .school-panel .school-visuals,
+  .class-panel .confusion,
+  .rank-note {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .school-panel .panel-head,
+  .class-panel .panel-head {
+    padding-right: 0;
+  }
+
+  .school-panel .select-line,
+  .class-panel .select-line {
+    position: static;
+    width: min(100%, 180px);
+    margin-bottom: 12px;
+  }
+
+  .school-panel .kpi-row,
+  .class-panel .class-kpis,
+  .landfill-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .school-panel .school-visuals,
+  .landfill-panel .chart-wrap {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas: "title" "chart" "donuts" "progress" !important;
+  }
+
+  .landfill-panel .combo-chart {
+    height: clamp(170px, 52vw, 210px) !important;
+    min-height: 170px !important;
+  }
+
+  .landfill-panel .landfill-donuts {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    width: min(220px, 100%) !important;
+    justify-self: center;
   }
 }
 
@@ -2493,7 +2682,7 @@ body {
 
 /* PAGE_FINAL_FIX_01_DASHBOARD_START */
 .dashboard-grid {
-  grid-template-rows: minmax(292px, 1fr) minmax(292px, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
 }
 
 .landfill-metrics strong {
@@ -7927,7 +8116,7 @@ body,
     "chart donuts"
     "progress progress" !important;
   grid-template-columns: minmax(0, 1fr) clamp(106px, 5.4vw, 128px) !important;
-  grid-template-rows: auto minmax(224px, 1fr) auto !important;
+  grid-template-rows: auto minmax(160px, 1fr) auto !important;
   gap: 8px 12px !important;
   align-items: center !important;
 }
@@ -7939,8 +8128,8 @@ body,
 
 .landfill-panel .combo-chart {
   grid-area: chart;
-  height: clamp(224px, 11.7vw, 268px) !important;
-  min-height: 224px !important;
+  height: clamp(160px, 11.7vw, 268px) !important;
+  min-height: 160px !important;
   transform: none !important;
 }
 
@@ -7963,7 +8152,7 @@ body,
 }
 
 .landfill-panel .landfill-donuts .donut {
-  width: clamp(88px, 4.9vw, 108px) !important;
+  width: clamp(72px, 4.9vw, 108px) !important;
 }
 
 .landfill-panel .landfill-donuts .donut small {
@@ -9720,3 +9909,642 @@ body,
   }
 }
 /* AIWAYS_UI_MICRO_BALANCE_20260706_END */
+
+/* RESPONSIVE OVERFLOW FIX PASS 2 */
+html,
+body {
+  overflow-x: visible;
+}
+
+.snap-root {
+  width: 100%;
+  max-width: 100%;
+}
+
+.hero-description {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: keep-all;
+}
+
+@media (min-width: 1181px) and (max-width: 1600px) {
+  .curriculum-scene,
+  .gallery-scene {
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr) !important;
+  }
+
+  .curriculum-layout,
+  .subject-grid,
+  .standards-panel,
+  .gallery-stage,
+  .gallery-grid {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 1180px) {
+  .project-scene,
+  .curriculum-scene,
+  .hah-scene,
+  .gallery-scene {
+    grid-template-columns: minmax(0, 1fr) !important;
+    min-width: 0;
+  }
+
+  .curriculum-layout,
+  .subject-grid,
+  .standards-panel,
+  .hah-scene .center-copy,
+  .hah-grid,
+  .gallery-stage,
+  .gallery-grid {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .gallery-stage,
+  .gallery-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .project-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .dashboard-grid .panel {
+    height: auto;
+    min-height: 0;
+  }
+
+  .school-panel .kpi-row,
+  .class-panel .class-kpis,
+  .school-panel .school-visuals,
+  .class-panel .confusion,
+  .rank-note {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-description br {
+    display: none;
+  }
+
+  .hero-description,
+  .hero-fixed-line {
+    display: inline;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: keep-all;
+  }
+
+  .project-cards,
+  .subject-grid,
+  .standards-grid,
+  .gallery-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .project-cards article,
+  .subject-grid > *,
+  .gallery-grid > * {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .dashboard-grid .panel,
+  .school-panel,
+  .class-panel,
+  .landfill-panel,
+  .upload-panel {
+    min-height: 0;
+    height: auto;
+  }
+
+  .chart-title-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .chart-title-row .chart-title,
+  .landfill-time-now {
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .landfill-time-now {
+    transform: none !important;
+  }
+
+  .upload-panel small,
+  .rank-note,
+  .confusion span {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: keep-all;
+  }
+}
+/* RESPONSIVE OVERFLOW FIX PASS 2 END */
+
+/* RESPONSIVE OVERFLOW FIX PASS 2.1 */
+@media (min-width: 1181px) and (max-width: 1600px) {
+  .sorting-scene {
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr) !important;
+    gap: clamp(24px, 3vw, 48px) !important;
+  }
+
+  .sorting-scene .scene-copy,
+  .sorting-layout,
+  .sorting-app {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 1180px) {
+  .sorting-scene {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .sorting-scene .scene-copy,
+  .sorting-layout,
+  .sorting-app,
+  .sorting-features {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .sorting-features {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .school-panel,
+  .class-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .school-panel .panel-head,
+  .class-panel .panel-head,
+  .school-panel .kpi-row,
+  .class-panel .class-kpis,
+  .school-panel .school-visuals,
+  .class-panel .confusion,
+  .rank-note {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .school-panel .panel-head,
+  .class-panel .panel-head {
+    padding-right: 0;
+  }
+
+  .school-panel .select-line,
+  .class-panel .select-line {
+    position: static;
+    width: min(100%, 180px);
+    margin-bottom: 12px;
+  }
+
+  .school-panel .kpi-row,
+  .class-panel .class-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .school-panel .school-visuals {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.56fr);
+  }
+
+  .dashboard-grid {
+    grid-template-rows: none;
+    align-items: start;
+  }
+}
+
+@media (max-width: 560px) {
+  .sorting-features,
+  .school-panel .kpi-row,
+  .class-panel .class-kpis,
+  .school-panel .school-visuals {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .project-intro,
+  .project-cards,
+  .hah-scene .center-copy,
+  .hah-scene .scene-copy,
+  .hah-grid {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .project-cards h3,
+  .project-cards p,
+  .hah-scene h2,
+  .hah-scene .callout,
+  .sorting-scene h2,
+  .sorting-scene p {
+    overflow-wrap: anywhere;
+    word-break: keep-all;
+  }
+
+  .project-cards h3,
+  .hah-title span,
+  .sorting-scene .scene-copy > p:not(.eyebrow) {
+    white-space: normal !important;
+  }
+
+  .sorting-app .tab-panel[data-panel="classify"].is-active {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .sorting-app .quick-result {
+    grid-column: 1;
+    grid-row: auto;
+    min-height: 0 !important;
+  }
+
+  .sorting-app .tm-model-controls,
+  .sorting-app .quick-action-row {
+    grid-template-columns: minmax(0, 1fr);
+    flex-wrap: wrap;
+  }
+
+  .sorting-app .tm-model-controls button,
+  .sorting-app .quick-action-row button {
+    width: 100%;
+  }
+
+  .hah-title span {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+/* RESPONSIVE OVERFLOW FIX PASS 2.1 END */
+
+/* RESPONSIVE OVERFLOW FIX PASS 2.2 */
+@media (max-width: 1366px) {
+  .hah-scene .center-copy,
+  .hah-grid,
+  .hah-scene .callout {
+    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .hah-title span,
+  .hah-description {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+
+  .flow-scene {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .flow-grid {
+    box-sizing: border-box;
+    width: min(100%, 820px) !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+/* RESPONSIVE OVERFLOW FIX PASS 2.2 END */
+
+/* RESPONSIVE ARCHITECTURE REFACTOR
+   Shared constraints deliberately live here so the older visual-tuning rules
+   keep their desktop character while every layout has the same fluid contract. */
+.snap-root,
+.scene,
+.scene > *,
+.dashboard-grid,
+.curriculum-layout,
+.sorting-layout,
+.gallery-stage,
+.flow-grid,
+.project-cards,
+.hah-grid,
+.resource-grid {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.scene {
+  width: 100%;
+}
+
+#hah .center-copy,
+#hah .hah-grid,
+#hah .callout {
+  box-sizing: border-box;
+  width: auto !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+#hah .hah-title,
+#hah .hah-description,
+#hah .callout {
+  overflow-wrap: anywhere;
+}
+
+.project-statement,
+.project-statement h2,
+.project-statement h2 span,
+.gallery-description,
+.resources-description,
+.sorting-scene .scene-copy > p:not(.eyebrow) {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 1181px) and (max-width: 1600px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .school-panel .school-visuals {
+    grid-template-columns: minmax(0, 1fr) minmax(72px, 0.52fr);
+    gap: 10px;
+  }
+
+  .school-panel .donut-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .class-panel .confusion div {
+    grid-template-columns: minmax(74px, 1fr) minmax(0, 1fr) 28px !important;
+    gap: 6px !important;
+  }
+
+  .class-panel .confusion span,
+  .rank-note,
+  .upload-panel small {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+
+  .landfill-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .landfill-metrics div {
+    min-width: 0;
+    padding: 8px;
+  }
+
+  .landfill-metrics strong,
+  .landfill-metrics span {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .landfill-panel .chart-title-row {
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
+  .landfill-panel .chart-wrap {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 1366px) {
+  .school-panel .school-visuals {
+    grid-template-columns: minmax(0, 1fr) 68px;
+    gap: 8px;
+  }
+
+  .school-panel .bar-list div {
+    grid-template-columns: minmax(40px, 0.72fr) minmax(0, 1fr) 24px !important;
+    column-gap: 4px !important;
+    font-size: 0.68rem;
+  }
+
+  .school-panel .donut-pair {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .school-panel .donut {
+    width: 60px !important;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .school-panel .donut small {
+    max-width: 58px;
+    margin-bottom: 8px;
+    font-size: 0.52rem;
+  }
+
+  .flow-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .flow-grid article,
+  .gallery-grid article,
+  .project-cards article {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .flow-grid h3,
+  .flow-grid p,
+  .gallery-grid h3,
+  .project-cards h3,
+  .project-cards p {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1180px) {
+  .scene {
+    min-height: auto;
+    align-content: start;
+    padding: calc(var(--clean-header-h, var(--header)) + 28px) clamp(24px, 5vw, 48px) 56px;
+  }
+
+  .curriculum-scene,
+  .flow-scene,
+  .gallery-scene,
+  .sorting-scene {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .curriculum-layout,
+  .sorting-layout,
+  .gallery-stage,
+  .flow-grid,
+  .resource-grid,
+  .project-cards,
+  .hah-grid {
+    width: min(100%, 820px) !important;
+    justify-self: center;
+  }
+
+  .flow-grid,
+  .gallery-grid,
+  .resource-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .project-cards,
+  .hah-grid,
+  .subject-grid,
+  .standards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gallery-detail {
+    grid-column: 1;
+  }
+
+  .ai-modal,
+  .ranking-dialog {
+    width: min(100% - 32px, 760px);
+    max-height: min(86dvh, 900px);
+  }
+}
+
+@media (max-width: 768px) {
+  html {
+    scroll-snap-type: none;
+  }
+
+  .scene {
+    min-height: auto;
+    align-content: start;
+    padding: calc(var(--clean-header-h, var(--header)) + 24px) clamp(16px, 6vw, 32px) 48px;
+  }
+
+  .curriculum-scene,
+  .flow-scene,
+  .gallery-scene,
+  .sorting-scene,
+  .resources-scene {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .project-cards,
+  .hah-grid,
+  .subject-grid,
+  .standards,
+  .flow-grid,
+  .gallery-grid,
+  .resource-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100% !important;
+  }
+
+  .project-cards article,
+  .hah-grid .panel,
+  .flow-grid article,
+  .gallery-grid article,
+  .resource-grid a {
+    min-height: 0;
+  }
+
+  .gallery-detail {
+    grid-column: 1;
+    min-width: 0;
+  }
+
+  .info-list div,
+  .hold-board-shell,
+  .quiz-finish-layout,
+  .quiz-report-panel {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .app-tabs,
+  .quick-buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sorting-app,
+  .tab-panel[data-panel="quiz"].is-active,
+  .tab-panel[data-panel="stats"].is-active,
+  .tab-panel[data-panel="holds"].is-active {
+    min-height: 0 !important;
+  }
+
+  #holdList {
+    max-height: min(52dvh, 460px) !important;
+    overflow: auto;
+  }
+
+  .ai-modal,
+  .ranking-dialog {
+    width: calc(100% - 24px);
+    max-width: none;
+    max-height: calc(100dvh - 24px);
+    overflow: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .project-intro,
+  .project-statement,
+  .scene-copy,
+  .center-copy {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .project-statement h2,
+  .project-statement h2 span,
+  .scene-copy h2,
+  .scene-copy h2 span,
+  .hah-title,
+  .hah-title span {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+
+  .project-intro,
+  .scene-copy {
+    text-align: left;
+  }
+
+  .app-tabs,
+  .quick-buttons,
+  .mini-stats,
+  .stats-panel dl,
+  .school-panel .kpi-row,
+  .class-panel .class-kpis,
+  .landfill-metrics {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .app-tabs button,
+  .quick-buttons button,
+  .sorting-upload,
+  .sorting-upload button,
+  .modal-actions button,
+  .upload-actions button {
+    width: 100%;
+  }
+
+  .sorting-upload,
+  .modal-actions {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .ranking-table {
+    min-width: 620px;
+  }
+}
+/* RESPONSIVE ARCHITECTURE REFACTOR END */

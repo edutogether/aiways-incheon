@@ -10548,3 +10548,244 @@ body {
   }
 }
 /* RESPONSIVE ARCHITECTURE REFACTOR END */
+
+/* LANDFILL_DUAL_RING_KPI_MODULE */
+.landfill-panel .chart-wrap {
+  grid-template-areas:
+    "title title"
+    "chart kpi"
+    "progress progress" !important;
+  grid-template-columns: minmax(0, 1fr) clamp(128px, 10vw, 156px) !important;
+  grid-template-rows: auto minmax(156px, 1fr) auto !important;
+  gap: 8px clamp(12px, 1.1vw, 18px) !important;
+  align-items: center !important;
+}
+
+.landfill-panel .combo-chart {
+  height: clamp(156px, 10.6vw, 208px) !important;
+  min-height: 156px !important;
+  margin-top: 0 !important;
+}
+
+.landfill-kpi-module {
+  grid-area: kpi;
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.landfill-kpi-ring {
+  position: relative;
+  isolation: isolate;
+  width: clamp(108px, 8.4vw, 136px) !important;
+  min-width: 0 !important;
+  aspect-ratio: 1;
+  background: conic-gradient(var(--mint) calc(var(--pct) * 1%), rgba(109, 143, 181, 0.18) 0) !important;
+  box-shadow: 0 0 22px rgba(94, 247, 205, 0.13), inset 0 0 22px rgba(255, 255, 255, 0.045);
+}
+
+.landfill-kpi-ring::before,
+.landfill-kpi-ring::after {
+  content: "";
+  position: absolute;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.landfill-kpi-ring::before {
+  z-index: -1;
+  inset: 18%;
+  background: conic-gradient(var(--violet) 32.7%, rgba(126, 116, 177, 0.22) 0);
+  box-shadow: 0 0 16px rgba(173, 140, 255, 0.1);
+}
+
+.landfill-kpi-ring::after {
+  z-index: -1;
+  inset: 34%;
+  background: radial-gradient(circle at 36% 28%, rgba(33, 64, 102, 0.98), #0a1830 72%);
+  box-shadow: inset 0 0 0 1px rgba(173, 214, 255, 0.08);
+}
+
+.landfill-kpi-ring > span,
+.landfill-kpi-ring > small {
+  position: relative;
+  z-index: 1;
+  grid-area: 1 / 1;
+  text-align: center;
+}
+
+.landfill-kpi-ring > span {
+  align-self: center;
+  margin: -13px 0 0;
+  color: #f3fffe;
+  font-size: clamp(1.18rem, 1.22vw, 1.48rem);
+  font-weight: 950;
+  line-height: 1;
+  text-shadow: 0 0 16px rgba(94, 247, 205, 0.22);
+}
+
+.landfill-kpi-ring > small {
+  align-self: end;
+  max-width: 78px;
+  margin: 0 0 17%;
+  color: rgba(219, 241, 249, 0.76);
+  font-size: 0.57rem !important;
+  font-weight: 850;
+  line-height: 1.18;
+}
+
+.landfill-kpi-legend {
+  width: min(100%, 156px);
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 9px;
+  border: 1px solid rgba(173, 140, 255, 0.26);
+  border-radius: 999px;
+  color: rgba(226, 218, 255, 0.86);
+  background: linear-gradient(135deg, rgba(173, 140, 255, 0.13), rgba(100, 169, 255, 0.055));
+  font-size: 0.6rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.landfill-kpi-legend span {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.landfill-kpi-legend i {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--violet);
+  box-shadow: 0 0 9px rgba(173, 140, 255, 0.62);
+}
+
+.landfill-kpi-legend b {
+  color: #f2edff;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 980px) {
+  .landfill-panel .chart-wrap {
+    grid-template-areas:
+      "title"
+      "chart"
+      "kpi"
+      "progress" !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto auto auto !important;
+  }
+
+  .landfill-kpi-module {
+    grid-template-columns: auto minmax(0, 1fr);
+    width: min(100%, 360px);
+    justify-self: center;
+  }
+
+  .landfill-kpi-legend {
+    width: 100%;
+    max-width: 180px;
+  }
+}
+
+@media (min-width: 981px) and (max-width: 1366px) {
+  .landfill-panel .landfill-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .landfill-panel .landfill-metrics div {
+    min-width: 0;
+    padding: 7px 6px;
+  }
+
+  .landfill-panel .landfill-metrics strong {
+    font-size: clamp(1rem, 1.32vw, 1.25rem);
+  }
+
+  .landfill-panel .landfill-metrics span {
+    margin-top: 4px;
+    font-size: 0.53rem;
+    line-height: 1.18;
+    white-space: normal;
+  }
+
+  .landfill-panel .chart-wrap {
+    grid-template-areas:
+      "title title"
+      "chart kpi" !important;
+    grid-template-rows: auto minmax(98px, 1fr) !important;
+    gap: 5px 9px !important;
+  }
+
+  .landfill-panel .chart-wrap .progress-stack {
+    display: none !important;
+  }
+
+  .landfill-panel .combo-chart {
+    height: 104px !important;
+    min-height: 104px !important;
+  }
+
+  .landfill-kpi-module {
+    gap: 4px;
+    padding: 0;
+    transform: translateY(-50px);
+  }
+
+  .landfill-kpi-ring {
+    width: 76px !important;
+  }
+
+  .landfill-kpi-ring > span {
+    font-size: 1rem;
+  }
+
+  .landfill-kpi-ring > small {
+    margin-bottom: 15%;
+    font-size: 0.43rem !important;
+  }
+
+  .landfill-kpi-legend {
+    padding: 5px 7px;
+    font-size: 0.48rem;
+  }
+
+  .landfill-kpi-legend b {
+    font-size: 0.59rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .landfill-kpi-module {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .landfill-kpi-ring {
+    width: clamp(112px, 34vw, 132px) !important;
+  }
+
+  .landfill-kpi-legend {
+    width: min(100%, 220px);
+  }
+}
+
+@media (min-width: 981px) and (max-width: 1280px) {
+  .landfill-kpi-module {
+    transform: translateY(-60px);
+  }
+}
+/* LANDFILL_DUAL_RING_KPI_MODULE END */

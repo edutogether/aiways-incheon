@@ -1520,7 +1520,8 @@
 
   function updateLandfillDonuts(animate) {
     const progressLabels = $$(".landfill-panel .progress-stack label");
-    const donuts = $$(".landfill-donuts .donut");
+    const donuts = $$(".landfill-kpi-ring");
+    const secondaryValue = $("[data-landfill-secondary-value]");
 
     [
       { value: LANDFILL_INCOMING_PERCENT, label: "총량 대비<br />반입량" },
@@ -1541,6 +1542,8 @@
         delay: animate ? 120 + index * 90 : 0
       });
     });
+
+    if (secondaryValue) secondaryValue.textContent = `${formatPercent(LANDFILL_REMAINING_PERCENT)}%`;
   }
 
   function animateLandfillChartSequence() {

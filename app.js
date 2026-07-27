@@ -293,7 +293,7 @@
   };
 
   function checklist(...keys) {
-    return keys.map(key => ({ id: CHECKS[key][0], label: CHECKS[key][1], required: true }));
+    return keys.map(key => ({ id: CHECKS[key][0], label: CHECKS[key][1], required: true, checked: false }));
   }
 
   function judgementItem(config) {
@@ -395,6 +395,10 @@
       holdReasons: ["물체 후보가 불명확함", "지역 기준 확인이 필요함"], searchKeywords: ["기타", "모름", "판단보류", "unknown", "other"]
     })
   };
+
+  Object.entries(sortingDbV2).forEach(([id, item]) => {
+    item.id = id;
+  });
 
   const sortingKeyAliases = {
     milk: "milk-carton", paper: "paper-cup", cup: "plastic-cup", ramen: "ramen-container",
@@ -2687,14 +2691,22 @@
     if (!decision?.item) return;
     sortingDecisionHistory.unshift({
       source: decision.source,
+      query: decision.query,
+      selectedItemId: decision.selectedItemId,
       objectCandidates: decision.objectCandidates,
       materialCandidates: decision.materialCandidates,
+      disposalCandidates: decision.disposalCandidates,
       visibleCautions: decision.visibleCautions,
       checklist: decision.checklist,
+      primaryFlow: decision.primaryFlow,
       recommendation: decision.recommendation,
+      holdReasons: decision.holdReasons,
+      isAmbiguous: decision.isAmbiguous,
+      canRecord: decision.canRecord,
       hold: decision.hold,
       selectedCorrectionType: decision.selectedCorrectionType,
       action,
+      createdAt: decision.createdAt,
       timestamp: new Date().toISOString()
     });
     sortingDecisionHistory = sortingDecisionHistory.slice(0, 40);
@@ -3220,27 +3232,54 @@
   }
 
   function getJudgementResult(input, options = {}) {
-    const source = options.source || input?.source || (typeof input === "string" ? "quick" : "search");
-    const candidateKeys = options.candidateKeys || (source === "search" ? findJudgementKeys(input?.query || input) : [judgementKeyFor(input)]);
+    const inputSource = options.source || input?.source || (typeof input === "string" ? "quick" : "search");
+    const source = {
+      quick: "quick_select",
+      search: "search_rule",
+      correction: "user_correction",
+      photo: options.candidateSource || "mobilenet_hint",
+      initial: "quick_select",
+      future_gemini: "future_gemini"
+    }[inputSource] || inputSource;
+    const query = cleanText(options.query || input?.query || "");
+    const candidateKeys = options.candidateKeys || (inputSource === "search" ? findJudgementKeys(query || input) : [judgementKeyFor(input)]);
     const key = judgementKeyFor(options.key || candidateKeys[0]);
     const item = sortingDbV2[key] || sortingDbV2.hold;
-    const candidateSource = options.candidateSource || (source === "photo" ? "mobilenet_hint" : source === "correction" ? "user" : source === "search" ? "search" : "user");
+    const candidateSource = options.candidateSource || source;
+    const isAmbiguous = item.objectType === "hold" || candidateKeys.length > 1;
+    const objectCandidateKeys = candidateKeys.length === 1 && key !== "hold" ? [...candidateKeys, "hold"] : candidateKeys;
+    const createdAt = new Date().toISOString();
     return {
       key,
       item,
       source,
-      objectCandidates: candidateKeys.map((candidateKey, index) => {
+      query,
+      selectedItemId: key,
+      objectCandidates: objectCandidateKeys.map((candidateKey, index) => {
         const candidate = sortingDbV2[judgementKeyFor(candidateKey)] || sortingDbV2.hold;
-        return { id: candidate.objectType, label: candidate.label, confidence: index === 0 ? options.confidence || "reference" : "possible", source: index === 0 ? candidateSource : "search" };
+        return {
+          id: candidate.objectType,
+          itemId: judgementKeyFor(candidateKey),
+          label: index === 1 && candidate.objectType === "hold" && !isAmbiguous ? "추가 확인 필요" : candidate.label,
+          objectType: candidate.objectType,
+          confidence: index === 0 ? options.confidence || "reference" : "possible",
+          source: index === 0 ? candidateSource : "search_rule"
+        };
       }),
       materialCandidates: item.materialCandidates.map((label, index) => ({ id: `${item.objectType}-material-${index + 1}`, label, confidence: index === 0 ? "medium" : "check" })),
+      disposalCandidates: item.disposalCandidates.slice(),
       visibleCautions: item.visibleCautions.slice(),
-      checklist: item.checklist.map(check => ({ ...check, status: "unknown" })),
+      checklist: item.checklist.map(check => ({ ...check, checked: false, status: "unknown" })),
+      primaryFlow: item.primaryFlow,
       recommendation: { status: item.objectType === "hold" ? "hold_recommended" : "needs_user_check", primary: item.primaryFlow, reason: "사진과 이름만으로 오염·부속품·재질 표기·지역 기준을 확정할 수 없습니다." },
-      hold: { recommended: item.objectType === "hold" || candidateKeys.length > 1, reasons: [...item.holdReasons] },
+      holdReasons: [...item.holdReasons],
+      isAmbiguous,
+      canRecord: false,
+      hold: { recommended: isAmbiguous, reasons: [...item.holdReasons] },
       imageHints: options.imageHints || [],
       selectedCorrectionType: options.selectedCorrectionType || "",
-      timestamp: new Date().toISOString()
+      createdAt,
+      timestamp: createdAt
     };
   }
 
@@ -3259,7 +3298,8 @@
     const buttons = $$("[data-quick-item]");
     const completed = safeResult.checklist.filter(check => check.required).every(check => check.status === "done");
     const needsHold = safeResult.hold.recommended || !completed;
-    const objectChips = safeResult.objectCandidates.map(candidate => `<span class="judgement-chip object"><b>${escapeHtml(candidate.label)}</b><em>${escapeHtml(candidate.source === "mobilenet_hint" ? "사진 기반 참고 후보" : candidate.source === "tm_hint" ? "우리 학교 학습 모델 참고" : candidate.source === "user" ? "사용자 선택" : "검색 후보")}</em></span>`).join("");
+    safeResult.canRecord = completed && !safeResult.hold.recommended;
+    const objectChips = safeResult.objectCandidates.map(candidate => `<span class="judgement-chip object"><b>${escapeHtml(candidate.label)}</b><em>${escapeHtml(candidate.source === "mobilenet_hint" ? "사진 기반 참고 후보" : candidate.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : candidate.source === "user" ? "사용자 선택" : "검색 후보")}</em></span>`).join("");
     const materialChips = safeResult.materialCandidates.map(candidate => `<span class="judgement-chip material">${escapeHtml(candidate.label)}</span>`).join("");
     const correctionButtons = [["pet-bottle", "병"], ["plastic-cup", "컵"], ["tape-box", "박스"], ["snack-wrapper", "봉지"], ["paper-cup", "종이"], ["can", "캔"], ["glass-bottle", "유리"], ["hold", "기타"]].map(([type, label]) => `<button type="button" data-judgement-correction="${type}" class="${safeResult.selectedCorrectionType === type ? "is-active" : ""}">${label}</button>`).join("");
     const checklistHtml = safeResult.checklist.map(check => `<button type="button" class="judgement-check ${check.status === "done" ? "is-done" : ""}" data-judgement-check="${check.id}" aria-pressed="${check.status === "done"}"><span aria-hidden="true">${check.status === "done" ? "✓" : ""}</span>${escapeHtml(check.label)}</button>`).join("");
@@ -3269,15 +3309,17 @@
     container?.classList.add("is-result");
     currentSortingJudgement = safeResult;
     container.innerHTML = `
-      <header class="judgement-result-head"><p>AI가 확인할 항목을 제안합니다.</p><strong>${item.emoji} ${escapeHtml(item.label)}</strong><span>분리배출 판단은 사용자가 결정합니다.</span></header>
+      <header class="judgement-result-head"><p>AI가 확인할 항목을 제안합니다.</p><strong>${item.emoji} ${escapeHtml(item.label)}</strong><span>최종 배출 판단은 사용자가 결정합니다.</span></header>
       <section class="judgement-candidate-block"><h4>물체 후보</h4><div class="judgement-chip-row">${objectChips}</div></section>
       <section class="judgement-candidate-block"><h4>재질 후보</h4><div class="judgement-chip-row">${materialChips}</div></section>
       ${safeResult.imageHints.length ? `<p class="judgement-image-hint">${escapeHtml(safeResult.imageHints.join(" · "))}</p>` : ""}
       <section class="judgement-cautions"><h4>보이는 주의 요소</h4><ul>${safeResult.visibleCautions.map(caution => `<li>${escapeHtml(caution)}</li>`).join("")}</ul></section>
       <section class="judgement-checklist"><h4>배출 전 체크리스트</h4><div>${checklistHtml}</div></section>
-      <section class="judgement-recommendation ${completed ? "is-ready" : "is-hold"}"><strong>${completed ? "준비되어 있어요. 배출 준비가 완료되었습니다." : needsHold ? "지금은 확정하지 않아도 됩니다. 확인이 필요한 물건으로 보류함에 담아둘까요?" : "확인 항목을 마친 뒤 사용자가 최종 판단합니다."}</strong><span>${escapeHtml(item.primaryFlow)}</span></section>
+      <section class="judgement-recommendation ${completed ? "is-ready" : "is-hold"}"><strong>${completed ? "잘했어요. 배출 준비가 완료됐습니다." : needsHold ? "지금 확정하지 않아도 됩니다. 확인이 필요한 물건으로 보류함에 저장할까요?" : "확인 항목을 마친 뒤 사용자가 최종 판단합니다."}</strong><span>${escapeHtml(item.primaryFlow)}</span></section>
       <section class="judgement-corrections"><span>AI가 항목을 잘못 읽었다면 바로 고쳐 주세요.</span><div>${correctionButtons}</div></section>
       <div class="quick-action-row judgement-actions"><button type="button" data-judgement-action="record" ${completed && !safeResult.hold.recommended ? "" : "disabled"}>배출 기록 남기기</button><button type="button" data-judgement-action="decide" ${completed ? "" : "disabled"}>확인 후 결정하기</button><button type="button" data-judgement-action="hold">보류함에 저장</button></div>`;
+    const holdAction = container?.querySelector('[data-judgement-action="hold"]');
+    if (holdAction) holdAction.disabled = !needsHold;
   }
 
   function runThreeSecondJudgement(input, options = {}) {
@@ -3342,7 +3384,7 @@
       if (state) state.textContent = "모델을 불러오는 중입니다...";
       try {
         teachableMachineModelPromise = await loadTeachableMachineModel(value);
-        if (state) state.textContent = teachableMachineModelPromise ? "우리 학교 학습 모델 참고 기능이 적용되었습니다. 최종 판단에는 사용하지 않습니다." : "모델 런타임을 사용할 수 없어 기본 판단 지원을 유지합니다.";
+        if (state) state.textContent = teachableMachineModelPromise ? "우리 학교 학습 모델 참고 후보 기능이 적용되었습니다. 최종 판단에는 사용하지 않습니다." : "모델 런타임을 사용할 수 없어 기본 판단 지원을 유지합니다.";
       } catch {
         teachableMachineModelPromise = null;
         if (state) state.textContent = "모델을 불러오지 못했습니다. 링크를 다시 확인해 주세요.";
@@ -3364,7 +3406,10 @@
       const check = event.target.closest("[data-judgement-check]");
       if (check && currentSortingJudgement) {
         const target = currentSortingJudgement.checklist.find(item => item.id === check.dataset.judgementCheck);
-        if (target) target.status = target.status === "done" ? "unknown" : "done";
+        if (target) {
+          target.checked = !target.checked;
+          target.status = target.checked ? "done" : "unknown";
+        }
         renderJudgementResult(currentSortingJudgement, result);
         return;
       }
@@ -3577,7 +3622,7 @@
         source: "photo",
         candidateSource: draft.hints?.[0]?.source || "mobilenet_hint",
         confidence: draft.confidence,
-        imageHints: draft.hints.map(hint => `${hint.source === "tm_hint" ? "우리 학교 학습 모델 참고" : "사진 기반 참고 후보"}: ${hint.label}`),
+        imageHints: draft.hints.map(hint => `${hint.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : "사진 기반 참고 후보"}: ${hint.label}`),
         delay: 0
       });
     };

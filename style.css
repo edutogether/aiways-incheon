@@ -10768,6 +10768,8 @@ body {
   }
 
   .class-panel .confusion {
+    height: 100%;
+    box-sizing: border-box;
     min-width: 0;
     height: 100%;
     padding: 10px;
@@ -11223,3 +11225,499 @@ body {
   }
 }
 /* FULL_MICRO_POLISH_PASS END */
+
+/* DASHBOARD_FIRST_SCREEN_FINE_TUNE */
+/* First-screen dashboard only: keeps the existing responsive architecture intact. */
+@media (min-width: 1181px) {
+  .class-panel {
+    grid-template-columns: clamp(68px, 5.45vw, 82px) minmax(0, 1fr);
+    column-gap: clamp(8px, 0.7vw, 11px);
+  }
+
+  .class-panel .class-kpis {
+    gap: 7px;
+  }
+
+  .class-panel .class-kpis div {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    min-width: 0;
+    padding: 6px 4px;
+    text-align: center;
+  }
+
+  .class-panel .class-kpis strong {
+    line-height: 1;
+  }
+
+  .class-panel .class-kpis span {
+    margin-top: 4px;
+    line-height: 1.16;
+    white-space: nowrap;
+  }
+
+  .class-panel .confusion {
+    min-width: 0;
+    padding: 10px 11px;
+    transform: translateY(-14px);
+  }
+
+  .class-panel .confusion h3 {
+    margin-bottom: 9px;
+  }
+
+  .class-panel .confusion div {
+    grid-template-columns: minmax(88px, 1.25fr) minmax(54px, 0.9fr) 22px !important;
+    column-gap: 7px !important;
+  }
+
+  .class-panel .confusion div span {
+    min-width: 0;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: nowrap;
+    font-size: clamp(0.55rem, 0.61vw, 0.68rem);
+    letter-spacing: -0.045em;
+  }
+
+  .class-panel .confusion div i {
+    min-width: 0;
+  }
+
+  .class-panel .confusion div b {
+    justify-self: end;
+    text-align: right;
+  }
+
+  .class-panel .rank-note {
+    align-self: end;
+    min-height: 0;
+    margin-top: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: clamp(0.68rem, 0.7vw, 0.8rem);
+    line-height: 1.18;
+  }
+
+  .landfill-panel .chart-title-row {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto !important;
+    gap: 4px;
+    min-height: 0;
+    padding-right: 0;
+  }
+
+  .landfill-panel .chart-title-row .chart-title {
+    white-space: nowrap;
+  }
+
+  .landfill-panel .landfill-time-now {
+    justify-self: end;
+    transform: none !important;
+  }
+
+  .landfill-panel .chart-wrap {
+    grid-template-columns: minmax(0, 1fr) clamp(94px, 7vw, 112px) !important;
+    grid-template-rows: auto minmax(108px, 1fr) auto !important;
+    gap: 8px 10px !important;
+  }
+
+  .landfill-panel .combo-chart {
+    height: clamp(108px, 8vw, 126px) !important;
+    min-height: clamp(108px, 8vw, 126px) !important;
+  }
+
+  .landfill-kpi-module {
+    align-self: center;
+    width: 100%;
+    min-height: 0 !important;
+    height: auto !important;
+    grid-template-rows: auto auto;
+    gap: 5px;
+    padding: 2px 0 4px;
+    transform: none !important;
+  }
+
+  .landfill-kpi-ring {
+    width: clamp(62px, 4.9vw, 82px) !important;
+    height: clamp(62px, 4.9vw, 82px) !important;
+    min-height: 0 !important;
+    background: conic-gradient(
+      rgba(83, 226, 196, 0.88) calc(var(--pct) * 1%),
+      rgba(91, 111, 145, 0.28) 0
+    ) !important;
+    box-shadow: inset 0 0 0 1px rgba(189, 242, 235, 0.12), 0 0 12px rgba(83, 226, 196, 0.08);
+  }
+
+  .landfill-kpi-ring::before {
+    z-index: 0;
+    inset: 18%;
+    background: conic-gradient(rgba(153, 126, 229, 0.94) 32.7%, rgba(96, 85, 136, 0.28) 0);
+    box-shadow: none;
+  }
+
+  .landfill-kpi-ring::after {
+    z-index: 1;
+    inset: 32%;
+    background: radial-gradient(circle at 38% 30%, rgba(27, 55, 87, 0.98), #091426 74%);
+  }
+
+  .landfill-kpi-ring > span,
+  .landfill-kpi-ring > small {
+    z-index: 2;
+  }
+
+  .landfill-kpi-ring > span {
+    margin-top: -10px;
+    font-size: clamp(0.88rem, 0.95vw, 1.12rem);
+    text-shadow: none;
+  }
+
+  .landfill-kpi-ring > small {
+    max-width: 62px;
+    margin-bottom: 13%;
+    font-size: 0.43rem !important;
+  }
+
+  .landfill-kpi-legend {
+    width: min(100%, 112px);
+    margin: 0;
+    padding: 5px 7px;
+    border-color: rgba(153, 126, 229, 0.34);
+    background: linear-gradient(135deg, rgba(153, 126, 229, 0.12), rgba(39, 65, 104, 0.1));
+    font-size: 0.47rem;
+  }
+
+  .landfill-kpi-legend i {
+    background: #9b7ee5;
+    box-shadow: 0 0 7px rgba(153, 126, 229, 0.48);
+  }
+
+  .landfill-kpi-legend b {
+    font-size: 0.57rem;
+  }
+}
+
+@media (min-width: 1181px) and (max-width: 1280px) {
+  .landfill-panel .chart-wrap {
+    grid-template-rows: auto minmax(88px, 1fr) auto !important;
+  }
+
+  .landfill-panel .combo-chart {
+    height: 88px !important;
+    min-height: 88px !important;
+  }
+
+  .landfill-kpi-module {
+    gap: 3px;
+    padding: 0;
+  }
+
+  .landfill-kpi-ring {
+    width: 52px !important;
+    height: 52px !important;
+  }
+}
+
+@media (max-width: 1180px) {
+  .landfill-panel .landfill-time-now {
+    transform: none;
+  }
+}
+/* DASHBOARD_FIRST_SCREEN_FINE_TUNE END */
+
+/* HAH_DESCRIPTION_VERTICAL_BALANCE */
+@media (min-width: 1181px) {
+  #hah .hah-description {
+    max-width: min(1760px, 100%);
+    margin-bottom: 15px;
+    line-height: 1.6;
+  }
+
+  #hah .hah-grid {
+    transform: translateY(-14px);
+  }
+}
+
+@media (max-width: 1180px) {
+  #hah .hah-description {
+    max-width: 100%;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+}
+/* HAH_DESCRIPTION_VERTICAL_BALANCE END */
+
+/* SORTING_APP_LAYOUT_BALANCE */
+@media (min-width: 1181px) {
+  #sorting .sorting-app {
+    min-height: clamp(670px, 72vh, 760px) !important;
+    padding: 18px !important;
+  }
+
+  #sorting .app-tabs {
+    margin-bottom: 14px;
+  }
+
+  #sorting .app-tabs button {
+    min-height: 48px;
+  }
+
+  #sorting .sorting-app .tab-panel[data-panel="classify"].is-active {
+    gap: 12px !important;
+  }
+
+  #sorting .sorting-upload {
+    gap: 10px !important;
+  }
+
+  #sorting .sorting-upload button {
+    min-height: 88px !important;
+    padding: 10px !important;
+  }
+
+  #sorting .sorting-app .search-line input,
+  #sorting .sorting-app .search-line button {
+    height: 44px !important;
+  }
+
+  #sorting .quick-buttons {
+    gap: 8px;
+  }
+
+  #sorting .quick-buttons button {
+    min-height: 38px !important;
+  }
+
+  #sorting .quick-result {
+    min-height: 0;
+    padding: 16px 18px !important;
+  }
+
+  #sorting .tm-model-line {
+    gap: 7px;
+    margin-top: 2px;
+    padding: 10px 12px;
+  }
+
+  #sorting .tm-model-controls input,
+  #sorting .tm-model-controls button {
+    min-height: 34px;
+  }
+
+  #sorting .tm-model-line small {
+    line-height: 1.35;
+  }
+
+  #sorting .sorting-features {
+    gap: 16px;
+  }
+
+  #sorting .sorting-features article {
+    min-height: 0;
+    padding: 22px;
+  }
+}
+
+@media (max-width: 1180px) {
+  #sorting .sorting-app {
+    padding: clamp(14px, 2.8vw, 20px) !important;
+  }
+
+  #sorting .tm-model-line {
+    padding: 10px;
+  }
+}
+
+@media (min-width: 1181px) and (max-width: 1366px) {
+  #sorting .scene-copy > p:not(.eyebrow) {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+/* SORTING_APP_LAYOUT_BALANCE END */
+
+/* LANDFILL_STATUS_GAUGE_REFRAME */
+.landfill-panel .chart-wrap {
+  grid-template-areas:
+    "title title"
+    "chart status" !important;
+  grid-template-columns: minmax(0, 1fr) clamp(128px, 10.6vw, 168px) !important;
+  grid-template-rows: auto minmax(124px, 1fr) !important;
+  gap: 9px clamp(12px, 1vw, 18px) !important;
+  align-items: stretch !important;
+}
+
+.landfill-panel .chart-title-row {
+  grid-area: title;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  grid-template-rows: auto !important;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.landfill-panel .chart-title-row .chart-title {
+  grid-column: 1;
+  min-width: 0;
+}
+
+.landfill-panel .chart-title-row .landfill-time-now {
+  grid-column: 2;
+  white-space: nowrap;
+}
+
+.landfill-panel .landfill-time-now {
+  justify-self: end;
+  transform: none !important;
+}
+
+.landfill-panel .combo-chart {
+  grid-area: chart;
+  width: 100%;
+  height: 100% !important;
+  min-height: 0 !important;
+  align-self: stretch;
+}
+
+.landfill-panel .chart-wrap .progress-stack {
+  display: none !important;
+}
+
+.landfill-panel .landfill-status-card {
+  grid-area: status;
+  width: 100%;
+  min-width: 0;
+  min-height: 0 !important;
+  align-self: stretch;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+  align-content: center;
+  gap: 3px;
+  padding: 13px 12px 12px !important;
+  transform: none !important;
+  border: 1px solid rgba(157, 188, 235, 0.17);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(18, 42, 72, 0.76), rgba(7, 20, 42, 0.88));
+  box-shadow: inset 0 1px 0 rgba(234, 249, 255, 0.035);
+}
+
+.landfill-status-eyebrow,
+.landfill-status-label {
+  color: rgba(196, 218, 240, 0.72);
+  font-size: clamp(0.52rem, 0.54vw, 0.65rem);
+  font-weight: 760;
+  line-height: 1.2;
+}
+
+.landfill-status-value {
+  color: #eafffa;
+  font-size: clamp(1.28rem, 1.45vw, 1.72rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.055em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 12px rgba(88, 224, 200, 0.13);
+}
+
+.landfill-status-gauge {
+  display: flex;
+  width: 100%;
+  height: 9px;
+  margin: 7px 0 5px;
+  overflow: hidden;
+  border: 1px solid rgba(187, 212, 241, 0.12);
+  border-radius: 999px;
+  background: #09172d;
+}
+
+.landfill-status-gauge i { display: block; height: 100%; transition: width 540ms ease; }
+.landfill-gauge-incoming { background: linear-gradient(90deg, #42cdb3, #62e6ca); }
+.landfill-gauge-remaining { background: linear-gradient(90deg, #7053ba, #9b7ee5); }
+
+.landfill-status-footer {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding-top: 2px;
+  color: rgba(226, 219, 255, 0.84);
+  font-size: clamp(0.5rem, 0.51vw, 0.62rem);
+  font-weight: 760;
+  line-height: 1.2;
+}
+
+.landfill-status-footer span { min-width: 0; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.landfill-status-footer span i { width: 6px; height: 6px; flex: 0 0 auto; border-radius: 999px; background: #9b7ee5; }
+.landfill-status-footer b { color: #ede8ff; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.upload-panel {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  align-content: stretch;
+}
+.upload-panel .panel-head h2 { line-height: 1.22; margin-bottom: 7px; }
+.upload-panel > p { margin: 2px 0 13px; line-height: 1.58; }
+.upload-panel .upload-actions { align-self: center; margin: 0; gap: 12px; }
+.upload-panel small { width: 100%; max-width: 100%; margin: 0; line-height: 1.4; }
+
+@media (min-width: 981px) and (max-width: 1366px) {
+  .landfill-panel .chart-wrap { grid-template-columns: minmax(0, 1fr) clamp(118px, 10vw, 142px) !important; gap: 8px 11px !important; }
+  .landfill-panel .combo-chart { height: 100% !important; min-height: 0 !important; }
+  .landfill-panel .landfill-status-card { padding: 10px 10px 9px !important; gap: 2px; }
+  .landfill-status-gauge { margin: 5px 0 4px; }
+}
+
+@media (max-width: 980px) {
+  .landfill-panel .chart-wrap {
+    grid-template-areas: "title" "chart" "status" !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto auto !important;
+    gap: 12px !important;
+  }
+  .landfill-panel .chart-title-row { grid-template-columns: minmax(0, 1fr) auto !important; }
+  .landfill-panel .combo-chart { height: clamp(160px, 24vw, 210px) !important; min-height: clamp(160px, 24vw, 210px) !important; }
+  .landfill-panel .landfill-status-card { width: min(100%, 420px); justify-self: center; grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; padding: 14px 16px !important; }
+  .landfill-status-eyebrow, .landfill-status-value, .landfill-status-label { grid-column: 1; }
+  .landfill-status-gauge, .landfill-status-footer { grid-column: 2; }
+  .landfill-status-gauge { align-self: end; margin: 0 0 3px; }
+  .landfill-status-footer { align-self: start; }
+}
+
+@media (max-width: 560px) {
+  .landfill-panel .chart-title-row { grid-template-columns: minmax(0, 1fr) !important; gap: 5px; }
+  .landfill-panel .landfill-time-now { justify-self: start; }
+  .landfill-panel .chart-title { white-space: normal !important; }
+  .landfill-panel .combo-chart { height: 152px !important; min-height: 152px !important; }
+  .landfill-panel .landfill-status-card { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .landfill-status-eyebrow, .landfill-status-value, .landfill-status-label, .landfill-status-gauge, .landfill-status-footer { grid-column: 1; }
+  .landfill-status-gauge { margin: 5px 0 4px; }
+}
+/* LANDFILL_STATUS_GAUGE_REFRAME END */
+
+/* SECTION_ALIGNMENT_COMPLETION */
+@media (min-width: 1181px) {
+  #hah .callout {
+    width: min(1780px, 100%) !important;
+    margin-top: -8px !important;
+    padding-block: 13px;
+  }
+
+  #flow .scene-copy > p:not(.eyebrow) {
+    max-width: 760px;
+    line-height: 1.62;
+  }
+
+  #gallery::before {
+    background: radial-gradient(circle at 54% 52%, rgba(77, 168, 255, 0.09), transparent 44%), radial-gradient(circle at 52% 82%, rgba(94, 247, 205, 0.045), transparent 48%) !important;
+  }
+
+  #gallery .gallery-grid article h3 { line-height: 1.28; }
+}
+/* SECTION_ALIGNMENT_COMPLETION END */

@@ -1211,7 +1211,7 @@
 
   function formatClassRanking(className, ranking) {
     const rank = getCurrentClassRank(ranking, className);
-    return `RANKING 🥇 ${rank.grade} 중 ${rank.gradeRank}위 · 🏫 전체 ${rank.total}개 학급 중 ${rank.totalRank}위`;
+    return `RANKING 🥇 ${rank.grade} 중 ${rank.gradeRank}위 · 🏫 전교 ${rank.totalRank}위`;
   }
 
   function selectedGrade() {
@@ -1521,7 +1521,10 @@
   function updateLandfillDonuts(animate) {
     const progressLabels = $$(".landfill-panel .progress-stack label");
     const donuts = $$(".landfill-kpi-ring");
+    const primaryValue = $("[data-landfill-primary-value]");
     const secondaryValue = $("[data-landfill-secondary-value]");
+    const incomingGauge = $("[data-landfill-incoming-gauge]");
+    const remainingGauge = $("[data-landfill-remaining-gauge]");
 
     [
       { value: LANDFILL_INCOMING_PERCENT, label: "총량 대비<br />반입량" },
@@ -1543,7 +1546,10 @@
       });
     });
 
+    if (primaryValue) primaryValue.textContent = `${formatPercent(LANDFILL_INCOMING_PERCENT)}%`;
     if (secondaryValue) secondaryValue.textContent = `${formatPercent(LANDFILL_REMAINING_PERCENT)}%`;
+    if (incomingGauge) incomingGauge.style.width = `${formatPercent(LANDFILL_INCOMING_PERCENT)}%`;
+    if (remainingGauge) remainingGauge.style.width = `${formatPercent(LANDFILL_REMAINING_PERCENT)}%`;
   }
 
   function animateLandfillChartSequence() {

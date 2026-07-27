@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="./style.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
     <script defer src="./app.js"></script>
   </head>
   <body class="is-dashboard-preparing">
@@ -330,7 +331,7 @@
         <div class="scene-copy">
           <p class="eyebrow">8-Lesson Journey + Experience + Diffusion</p>
           <h2>여덟 발자국의<br />수업 여정</h2>
-          <p>문제 발견에서 AI 활용, 인간 검증, 블록코딩·티처블머신·바이브코딩까지 이어지고,<br />대시보드 활용으로 실천 데이터를 아카이빙하고 실시간으로 확인합니다.</p>
+          <p>문제 발견에서 AI 활용, 인간 검증, 블록코딩·바이브코딩까지 이어지고,<br />대시보드 활용으로 실천 데이터를 아카이빙하고 실시간으로 확인합니다.</p>
         </div>
         <div class="flow-grid">
           <a class="flow-card" href="https://drive.google.com/file/d/1KBEZLVRLCXwKL2GoyCZbFar_s7omKd4l/view?usp=sharing" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span>1차시 · 문제 발견</span><h3>학생의 목소리에서 출발하는<br />문제 발견</h3><p>학생 VOC와 교실 관찰로<br />버리는 순간의 어려움을 찾습니다.</p><em>수업자료</em></a>
@@ -417,6 +418,14 @@
                 <button type="button" data-quick-item="can">🥫 캔류</button>
                 <button type="button" data-quick-item="receipt">🧾 영수증</button>
                 <button type="button" data-quick-item="hold">🟨 판단 보류</button>
+              </div>
+              <div class="tm-model-line">
+                <span>Teachable Machine 모델 링크</span>
+                <div class="tm-model-controls">
+                  <input id="tmModelInput" type="url" placeholder="https://teachablemachine.withgoogle.com/models/..." />
+                  <button type="button" id="tmApplyButton">적용</button>
+                </div>
+                <small id="tmModelState">선택 사항 · 링크를 붙여 넣으면 사진 판단에 활용합니다.</small>
               </div>
               <div class="quick-result is-empty" data-sorting-result>
                 <span data-quick-category>AI 1차 제안 대기</span>

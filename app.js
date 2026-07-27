@@ -3158,6 +3158,29 @@
       applySearchValue();
     });
 
+    $("#tmApplyButton")?.addEventListener("click", async () => {
+      const state = $("#tmModelState");
+      const value = cleanText($("#tmModelInput")?.value);
+      if (!value) {
+        if (state) state.textContent = "모델 링크를 입력하면 적용할 수 있습니다.";
+        return;
+      }
+      if (state) state.textContent = "모델을 불러오는 중입니다...";
+      try {
+        modelPromise = await loadTeachableMachineModel(value);
+        if (state) state.textContent = modelPromise ? "Teachable Machine 모델이 적용되었습니다." : "모델 런타임을 사용할 수 없어 기본 판단을 유지합니다.";
+      } catch {
+        modelPromise = null;
+        if (state) state.textContent = "모델을 불러오지 못했습니다. 링크를 다시 확인해 주세요.";
+      }
+    });
+
+    $("#tmModelInput")?.addEventListener("keydown", event => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      $("#tmApplyButton")?.click();
+    });
+
     $("#practiceLogButton")?.addEventListener("click", () => {
       const item = selectedSortingItem();
       if (!item || item.isHold) return;
@@ -3184,6 +3207,14 @@
     if (normalized.includes("receipt") || normalized.includes("영수증")) return { ...quickItems.receipt, confidence };
     if (normalized.includes("vinyl") || normalized.includes("비닐")) return { ...quickItems.vinyl, confidence };
     return { ...quickItems.paper, confidence };
+  }
+
+  async function loadTeachableMachineModel(modelUrl) {
+    if (!modelUrl || !window.tmImage) return null;
+    let baseUrl = cleanText(modelUrl);
+    baseUrl = baseUrl.replace(/\/(model|metadata)\.json(?:\?.*)?$/i, "/");
+    baseUrl = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+    return window.tmImage.load(baseUrl + "model.json", baseUrl + "metadata.json");
   }
 
   async function classifyImage(image) {

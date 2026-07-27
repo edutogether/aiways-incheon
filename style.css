@@ -6690,10 +6690,6 @@ body,
   font-size: 0.72rem;
 }
 
-.sorting-app {
-  min-height: clamp(760px, 78vh, 880px) !important;
-}
-
 .app-tabs {
   padding: 6px;
   border: 1px solid rgba(94, 247, 205, 0.16);
@@ -6711,11 +6707,6 @@ body,
   color: #06111c !important;
   background: linear-gradient(135deg, rgba(126, 255, 226, 0.96), rgba(86, 218, 255, 0.92)) !important;
   box-shadow: 0 10px 24px rgba(94, 247, 205, 0.15);
-}
-
-.sorting-upload button {
-  min-height: 128px !important;
-  gap: 9px !important;
 }
 
 .sorting-upload-icon {
@@ -6754,24 +6745,6 @@ body,
   color: #06111c;
   background: linear-gradient(135deg, var(--mint), var(--cyan));
   font-weight: 950;
-}
-
-.quick-buttons button {
-  min-height: 54px !important;
-  border-radius: 16px !important;
-  font-size: 0.9rem;
-}
-
-.quick-result {
-  min-height: 204px !important;
-  border-radius: 22px !important;
-}
-
-.quick-result.is-empty {
-  border-color: rgba(94, 247, 205, 0.2);
-  background:
-    radial-gradient(circle at 18% 12%, rgba(94, 247, 205, 0.12), transparent 42%),
-    rgba(255, 255, 255, 0.038) !important;
 }
 
 .quick-tip {
@@ -7059,21 +7032,6 @@ body,
 
 .app-tabs button.is-active:hover {
   color: #06111c !important;
-}
-
-.quick-result {
-  position: relative;
-  overflow: hidden;
-  padding: 18px 20px !important;
-  background:
-    radial-gradient(circle at 14% 12%, rgba(94, 247, 205, 0.105), transparent 38%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.055), rgba(8, 22, 43, 0.56)) !important;
-}
-
-.quick-result.is-empty {
-  background:
-    radial-gradient(circle at 14% 12%, rgba(94, 247, 205, 0.085), transparent 38%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(8, 22, 43, 0.52)) !important;
 }
 
 .quick-result.is-scanning {
@@ -10808,58 +10766,6 @@ body {
     row-gap: clamp(12px, 1.5vh, 18px);
   }
 
-  #sorting {
-    align-content: center;
-    padding-bottom: clamp(44px, 5vh, 68px);
-  }
-
-  #sorting .sorting-app {
-    min-height: clamp(610px, 66vh, 700px) !important;
-    padding: 18px !important;
-  }
-
-  #sorting .sorting-layout {
-    transform: translateY(-50px);
-  }
-
-  #sorting .scene-copy {
-    transform: translateY(-16px);
-  }
-
-  #sorting .sorting-upload {
-    gap: 12px !important;
-  }
-
-  #sorting .sorting-upload button {
-    min-height: 92px;
-    padding: 12px !important;
-  }
-
-  #sorting .sorting-app .search-line input,
-  #sorting .sorting-app .search-line button {
-    height: 44px;
-  }
-
-  #sorting .quick-buttons button {
-    min-height: 38px;
-  }
-
-  #sorting .quick-result {
-    min-height: 132px;
-    padding: 14px;
-  }
-
-  #sorting .sorting-app .tab-panel[data-panel="classify"].is-active {
-    gap: 12px !important;
-  }
-
-  #sorting .app-tabs {
-    margin-bottom: 12px;
-  }
-
-  #sorting .quick-buttons {
-    gap: 8px;
-  }
 }
 
 @media (max-width: 1180px) {
@@ -10973,44 +10879,6 @@ body {
     line-height: 1.62;
   }
 
-  #sorting .sorting-layout {
-    transform: translateY(-48px);
-  }
-
-  #sorting .scene-copy {
-    transform: none;
-  }
-
-  #sorting .sorting-app {
-    min-height: clamp(650px, 70vh, 735px) !important;
-    padding: 14px !important;
-  }
-
-  #sorting .sorting-app .tab-panel[data-panel="classify"].is-active {
-    gap: 8px !important;
-  }
-
-  #sorting .sorting-upload {
-    gap: 8px !important;
-  }
-
-  #sorting .sorting-upload button {
-    min-height: 78px !important;
-    padding: 8px !important;
-  }
-
-  #sorting .sorting-app .search-line input,
-  #sorting .sorting-app .search-line button {
-    height: 40px !important;
-  }
-
-  #sorting .quick-buttons {
-    gap: 6px;
-  }
-
-  #sorting .quick-buttons button {
-    min-height: 34px !important;
-  }
 }
 
 .tm-model-line {
@@ -11193,8 +11061,50 @@ body {
 }
 /* HAH_DESCRIPTION_VERTICAL_BALANCE END */
 
-/* SORTING_APP_LAYOUT_BALANCE */
+/* SORTING_LAYOUT_OWNERSHIP: 3초판단 layout, tabs, classify UI, and TM controls */
+#sorting .sorting-upload button {
+  min-height: 128px !important;
+  gap: 9px !important;
+}
+
+#sorting .quick-buttons button {
+  min-height: 54px !important;
+  border-radius: 16px !important;
+  font-size: 0.9rem;
+}
+
+#sorting .quick-result {
+  position: relative;
+  overflow: hidden;
+  min-height: 204px !important;
+  padding: 18px 20px !important;
+  border-radius: 22px !important;
+  background:
+    radial-gradient(circle at 14% 12%, rgba(94, 247, 205, 0.105), transparent 38%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.055), rgba(8, 22, 43, 0.56)) !important;
+}
+
+#sorting .quick-result.is-empty {
+  border-color: rgba(94, 247, 205, 0.2);
+  background:
+    radial-gradient(circle at 14% 12%, rgba(94, 247, 205, 0.085), transparent 38%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(8, 22, 43, 0.52)) !important;
+}
+
 @media (min-width: 1181px) {
+  #sorting {
+    align-content: center;
+    padding-bottom: clamp(44px, 5vh, 68px);
+  }
+
+  #sorting .sorting-layout {
+    transform: translateY(-48px);
+  }
+
+  #sorting .scene-copy {
+    transform: none;
+  }
+
   #sorting .sorting-app {
     min-height: clamp(670px, 72vh, 760px) !important;
     padding: 18px !important;
@@ -11218,6 +11128,7 @@ body {
 
   #sorting .sorting-upload button {
     min-height: 88px !important;
+    gap: 9px !important;
     padding: 10px !important;
   }
 
@@ -11235,7 +11146,6 @@ body {
   }
 
   #sorting .quick-result {
-    min-height: 0;
     padding: 16px 18px !important;
   }
 
@@ -11266,11 +11176,18 @@ body {
 
 @media (max-width: 1180px) {
   #sorting .sorting-app {
+    min-height: 0 !important;
     padding: clamp(14px, 2.8vw, 20px) !important;
   }
 
   #sorting .tm-model-line {
     padding: 10px;
+  }
+}
+
+@media (max-width: 560px) {
+  #sorting .quick-result {
+    min-height: 0 !important;
   }
 }
 
@@ -11281,7 +11198,10 @@ body {
     overflow-wrap: anywhere;
   }
 }
-/* SORTING_APP_LAYOUT_BALANCE END */
+/* TODO(phase2B): Shared responsive architecture rules still own the <=1180px
+   one-column scene shell and <=560px classify grid. Keep them until a visual
+   regression pass can safely separate the common scene rules. */
+/* SORTING_LAYOUT_OWNERSHIP END */
 
 /* LANDFILL_STATUS_GAUGE_REFRAME */
 .landfill-panel .chart-wrap {

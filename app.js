@@ -20,6 +20,7 @@
   const STORAGE_PRIVACY = "aiways_clean_privacy_id";
   const SORTING_STATS_KEY = "aiways_main_sorting_stats_v1";
   const SORTING_HOLD_KEY = "aiways_main_sorting_hold_v1";
+  const SORTING_DECISIONS_V2_KEY = "aiways_sorting_decisions_v2";
 
   const BASE_DASHBOARD = {
     schoolObserved: 244,
@@ -280,6 +281,128 @@
     }
   };
 
+  // SORTING_JUDGEMENT_V2: rule and checklist data. This supplements the
+  // original quick-item database so legacy quiz/statistics flows remain intact.
+  const CHECKS = {
+    empty: ["empty", "내용물을 비웠나요?"],
+    rinse: ["rinse", "이물질을 헹구거나 닦았나요?"],
+    label: ["label", "라벨·뚜껑·부속품을 분리했나요?"],
+    material: ["material", "재질 표기와 분리 방법을 확인했나요?"],
+    tape: ["tape", "테이프·송장·스티커를 제거했나요?"],
+    local: ["local", "우리 지역 또는 학교 기준과 맞는지 확인했나요?"]
+  };
+
+  function checklist(...keys) {
+    return keys.map(key => ({ id: CHECKS[key][0], label: CHECKS[key][1], required: true }));
+  }
+
+  function judgementItem(config) {
+    return {
+      materialCandidates: [],
+      disposalCandidates: [],
+      visibleCautions: [],
+      checklist: checklist("material", "local"),
+      holdReasons: [],
+      searchKeywords: [],
+      carbonSaved: 0,
+      ...config
+    };
+  }
+
+  const sortingDbV2 = {
+    "pet-bottle": judgementItem({
+      label: "페트병", emoji: "🧴", objectType: "pet-bottle", category: "플라스틱류 검토", carbonSaved: 22,
+      materialCandidates: ["PET 플라스틱", "라벨·뚜껑 별도 재질"], disposalCandidates: ["플라스틱류", "지역 기준 확인"],
+      visibleCautions: ["내용물·라벨·뚜껑 상태는 사진만으로 확정할 수 없습니다."],
+      checklist: checklist("empty", "rinse", "label", "material", "local"), primaryFlow: "플라스틱류 배출을 우선 검토",
+      holdReasons: ["라벨 또는 뚜껑 재질이 불명확함", "내용물이 남아 있음"], searchKeywords: ["페트", "페트병", "생수병", "음료병", "bottle"]
+    }),
+    "plastic-cup": judgementItem({
+      label: "플라스틱컵", emoji: "🥤", objectType: "plastic-cup", category: "플라스틱류 검토", carbonSaved: 18,
+      materialCandidates: ["플라스틱", "뚜껑·빨대 별도 재질"], disposalCandidates: ["플라스틱류", "일반폐기물 또는 지역 기준"],
+      visibleCautions: ["음료·음식물 오염과 재질 표기를 함께 확인하세요."],
+      checklist: checklist("empty", "rinse", "label", "material", "local"), primaryFlow: "세척 후 플라스틱류 배출을 우선 검토",
+      holdReasons: ["기름·음식물 오염이 심함", "재질 표기가 없음"], searchKeywords: ["플라스틱컵", "테이크아웃컵", "컵", "plastic cup"]
+    }),
+    "paper-cup": judgementItem({
+      label: "종이컵", emoji: "☕", objectType: "paper-cup", category: "종이류 확정 금지", carbonSaved: 3,
+      materialCandidates: ["코팅 종이", "복합재질 가능"], disposalCandidates: ["지역 기준 확인", "판단 보류"],
+      visibleCautions: ["종이컵은 코팅 여부와 지역 수거 기준에 따라 달라질 수 있습니다."],
+      checklist: checklist("empty", "rinse", "material", "local"), primaryFlow: "종이류로 바로 확정하지 말고 지역 기준 확인",
+      holdReasons: ["코팅·오염 여부가 불명확함"], searchKeywords: ["종이컵", "paper cup", "코팅컵"]
+    }),
+    "milk-carton": judgementItem({
+      label: "우유갑 / 종이팩", emoji: "🥛", objectType: "milk-carton", category: "종이팩류 검토", carbonSaved: 25,
+      materialCandidates: ["종이팩", "빨대·뚜껑 별도 재질"], disposalCandidates: ["종이팩 전용 수거함", "지역 기준 확인"],
+      visibleCautions: ["빨대·비닐·뚜껑은 종이팩과 분리 가능한지 확인하세요."],
+      checklist: checklist("empty", "rinse", "label", "material", "local"), primaryFlow: "비우고 헹군 뒤 펼쳐 말려 종이팩 수거함을 우선 확인",
+      holdReasons: ["빨대·비닐이 붙어 있음", "전용 수거함을 찾을 수 없음"], searchKeywords: ["우유갑", "우유팩", "종이팩", "멸균팩", "milk carton"]
+    }),
+    can: judgementItem({
+      label: "캔류", emoji: "🥫", objectType: "can", category: "캔류 검토", carbonSaved: 28,
+      materialCandidates: ["알루미늄", "철", "뚜껑·부속품 별도 재질"], disposalCandidates: ["캔류", "지역 기준 확인"],
+      visibleCautions: ["날카로운 뚜껑과 내용물 잔여물을 확인하세요."],
+      checklist: checklist("empty", "rinse", "label", "local"), primaryFlow: "내용물을 비우고 세척한 뒤 캔류 배출을 우선 검토",
+      holdReasons: ["내용물이 남아 있음", "복합 부속품이 분리되지 않음"], searchKeywords: ["캔", "캔류", "알루미늄", "철캔", "can"]
+    }),
+    "glass-bottle": judgementItem({
+      label: "유리병", emoji: "🍾", objectType: "glass-bottle", category: "유리류 검토", carbonSaved: 22,
+      materialCandidates: ["유리", "뚜껑 별도 재질"], disposalCandidates: ["유리류", "깨진 유리 별도 기준"],
+      visibleCautions: ["깨진 유리는 안전하게 감싼 뒤 별도 배출 기준을 확인하세요."],
+      checklist: checklist("empty", "rinse", "label", "local"), primaryFlow: "내용물과 뚜껑을 분리한 뒤 유리류 배출을 우선 검토",
+      holdReasons: ["깨진 유리임", "뚜껑·마개가 분리되지 않음"], searchKeywords: ["유리병", "유리", "병", "glass bottle"]
+    }),
+    "snack-wrapper": judgementItem({
+      label: "과자 봉지", emoji: "🍪", objectType: "snack-wrapper", category: "비닐류 또는 판단 보류", carbonSaved: 12,
+      materialCandidates: ["비닐류", "복합 포장재 가능"], disposalCandidates: ["비닐류", "일반폐기물 또는 지역 기준"],
+      visibleCautions: ["기름·가루 오염과 복합 포장재 여부를 확인하세요."],
+      checklist: checklist("empty", "rinse", "material", "local"), primaryFlow: "내용물 제거 후 비닐류 배출 가능 여부를 우선 검토",
+      holdReasons: ["기름·음식물 오염이 심함", "복합 포장재임"], searchKeywords: ["과자", "과자봉지", "포장지", "wrapper", "snack"]
+    }),
+    "vinyl-bag": judgementItem({
+      label: "비닐 봉투", emoji: "🛍️", objectType: "vinyl-bag", category: "비닐류 검토", carbonSaved: 9,
+      materialCandidates: ["비닐류"], disposalCandidates: ["비닐류", "일반폐기물 또는 지역 기준"],
+      visibleCautions: ["음식물·기름 오염이 남아 있으면 선별이 어려울 수 있습니다."],
+      checklist: checklist("empty", "rinse", "local"), primaryFlow: "이물질을 제거한 뒤 비닐류 배출을 우선 검토",
+      holdReasons: ["세척하기 어려운 오염이 있음"], searchKeywords: ["비닐", "비닐봉투", "봉투", "plastic bag"]
+    }),
+    "ramen-container": judgementItem({
+      label: "컵라면 용기", emoji: "🍜", objectType: "ramen-container", category: "재질·오염 확인 필요", carbonSaved: 5,
+      materialCandidates: ["플라스틱", "발포재", "코팅 종이 가능"], disposalCandidates: ["재질 표기별 배출", "판단 보류"],
+      visibleCautions: ["국물·기름 오염과 용기 재질에 따라 배출 흐름이 달라집니다."],
+      checklist: checklist("empty", "rinse", "material", "local"), primaryFlow: "국물과 기름을 제거한 뒤 재질 표기와 지역 기준을 확인",
+      holdReasons: ["기름 오염이 남아 있음", "재질 표기를 찾기 어려움"], searchKeywords: ["컵라면", "라면용기", "라면", "noodle cup", "ramen"]
+    }),
+    receipt: judgementItem({
+      label: "영수증", emoji: "🧾", objectType: "receipt", category: "일반폐기물 검토", carbonSaved: 0,
+      materialCandidates: ["감열지 가능", "코팅 종이 가능"], disposalCandidates: ["일반폐기물", "지역 기준 확인"],
+      visibleCautions: ["감열지 영수증은 일반 종이류로 확정하지 않는 것이 안전합니다."],
+      checklist: checklist("material", "local"), primaryFlow: "일반 종이류가 아닌 일반폐기물 배출을 우선 검토",
+      holdReasons: ["재질을 확인할 수 없음"], searchKeywords: ["영수증", "감열지", "receipt"]
+    }),
+    "tape-box": judgementItem({
+      label: "테이프 붙은 박스", emoji: "📦", objectType: "tape-box", category: "종이류 검토", carbonSaved: 18,
+      materialCandidates: ["골판지", "테이프·송장 별도 재질"], disposalCandidates: ["종이류", "지역 기준 확인"],
+      visibleCautions: ["테이프·송장·완충재를 제거하지 않으면 종이류 선별이 어려울 수 있습니다."],
+      checklist: checklist("tape", "material", "local"), primaryFlow: "테이프와 송장을 제거한 뒤 종이류 배출을 우선 검토",
+      holdReasons: ["테이프·코팅·오염이 많이 남아 있음"], searchKeywords: ["박스", "상자", "택배상자", "테이프", "cardboard"]
+    }),
+    hold: judgementItem({
+      label: "기타 / 판단 보류", emoji: "🟨", objectType: "hold", category: "기준 확인 필요", carbonSaved: 0,
+      materialCandidates: ["재질 미확인"], disposalCandidates: ["판단 보류", "지역 기준 확인"],
+      visibleCautions: ["사진이나 이름만으로 재질·오염·복합재질을 확정할 수 없습니다."],
+      checklist: checklist("material", "local"), primaryFlow: "지금은 확정하지 않고 확인이 필요한 물건으로 보류함에 저장",
+      holdReasons: ["물체 후보가 불명확함", "지역 기준 확인이 필요함"], searchKeywords: ["기타", "모름", "판단보류", "unknown", "other"]
+    })
+  };
+
+  const sortingKeyAliases = {
+    milk: "milk-carton", paper: "paper-cup", cup: "plastic-cup", ramen: "ramen-container",
+    snack: "snack-wrapper", can: "can", receipt: "receipt", hold: "hold",
+    bottle: "pet-bottle", pet: "pet-bottle", glass: "glass-bottle", vinyl: "vinyl-bag",
+    box: "tape-box"
+  };
+
   function buildExpandedSortingQuizData(seedQuestions) {
     const quizItems = [
       ["🥛", "우유갑", "종이팩류", "내용물을 비우고 헹군 뒤 펼쳐 말린"],
@@ -432,7 +555,8 @@
     explanation: answer ? "맞는 기준입니다. 실제 배출 전 오염 상태와 학교 기준을 한 번 더 확인해요." : "헷갈리기 쉬운 기준입니다. 재질과 오염 상태를 다시 살펴봐요."
   })));
 
-  let modelPromise = null;
+  let mobileNetModelPromise = null;
+  let teachableMachineModelPromise = null;
   let currentDraft = null;
   let pendingDecision = null;
   let previewUrl = "";
@@ -459,6 +583,8 @@
   let selectedSortingKey = "";
   let sortingJudgementRequest = 0;
   let sortingJudgementTimer = 0;
+  let currentSortingJudgement = null;
+  let sortingDecisionHistory = [];
   let quizSet = [];
   let quizIndex = 0;
   let quizScore = 0;
@@ -2042,6 +2168,7 @@
     $("#practiceLogButton", sortingSection)?.removeAttribute("disabled");
     const holdButton = $("#holdLogButton", sortingSection);
     if (holdButton) holdButton.textContent = "판단 보류";
+    if (result) renderJudgementResult(getJudgementResult("hold", { source: "initial" }), result);
 
     quizSet = [];
     quizIndex = 0;
@@ -2545,6 +2672,7 @@
       const filler = DEMO_HOLD_ITEMS.filter(item => !existing.has(cleanText(item.id || item.name)));
       sortingHoldItems = sortingHoldItems.concat(filler.slice(0, 20 - sortingHoldItems.length));
     }
+    sortingDecisionHistory = readJson(SORTING_DECISIONS_V2_KEY, []).slice(0, 40);
   }
 
   function saveSortingStats() {
@@ -2553,6 +2681,24 @@
 
   function saveSortingHolds() {
     writeJson(SORTING_HOLD_KEY, sortingHoldItems);
+  }
+
+  function saveSortingDecisionV2(decision, action = "saved") {
+    if (!decision?.item) return;
+    sortingDecisionHistory.unshift({
+      source: decision.source,
+      objectCandidates: decision.objectCandidates,
+      materialCandidates: decision.materialCandidates,
+      visibleCautions: decision.visibleCautions,
+      checklist: decision.checklist,
+      recommendation: decision.recommendation,
+      hold: decision.hold,
+      selectedCorrectionType: decision.selectedCorrectionType,
+      action,
+      timestamp: new Date().toISOString()
+    });
+    sortingDecisionHistory = sortingDecisionHistory.slice(0, 40);
+    writeJson(SORTING_DECISIONS_V2_KEY, sortingDecisionHistory);
   }
 
   const practiceBadgeSteps = [
@@ -2602,7 +2748,7 @@
     renderSortingStats();
   }
 
-  function addSortingHoldLocally(name, reason = "기준 확인 필요", saved = true) {
+  function addSortingHoldLocally(name, reason = "기준 확인 필요", saved = true, decision = null) {
     const cleaned = cleanText(name) || "판단 보류 물건";
     sortingHoldItems.unshift({
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
@@ -2610,6 +2756,16 @@
       reason,
       status: "회의 안건 대기",
       candidate: holdCandidateFor(cleaned),
+      judgement: decision ? {
+        source: decision.source,
+        objectCandidates: decision.objectCandidates,
+        materialCandidates: decision.materialCandidates,
+        visibleCautions: decision.visibleCautions,
+        checklist: decision.checklist,
+        recommendation: decision.recommendation,
+        holdReasons: decision.hold?.reasons || [],
+        selectedCorrectionType: decision.selectedCorrectionType || ""
+      } : null,
       synced: saved === true,
       time: new Date().toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
     });
@@ -2777,12 +2933,11 @@
     if (guidance) guidance.textContent = `${item.label} 실천이 Google Sheets 기록과 통계에 반영되었습니다. CO2 ${item.carbonSaved}g 저감으로 계산했어요.`;
   }
 
-  async function addSortingHold(name, reason = "기준 확인 필요") {
+  async function addSortingHold(name, reason = "기준 확인 필요", decision = null) {
     const cleaned = cleanText(name) || "판단 보류 물건";
     const saved = await appendRecord(recordForSortingItem({ label: cleaned, category: "기준 확인 필요" }, true, cleaned));
-    addSortingHoldLocally(cleaned, reason, saved);
-    const guidance = $("[data-quick-guidance]");
-    if (guidance) guidance.textContent = `${cleaned}을 Google Sheets 기록과 판단 보류함에 반영했습니다. 회의에서 기준을 확인해 보세요.`;
+    addSortingHoldLocally(cleaned, reason, saved, decision);
+    if (decision) saveSortingDecisionV2(decision, "held");
   }
 
   function pickQuizSet() {
@@ -3032,128 +3187,141 @@
     }
   }
 
-  function getJudgementResult(input) {
-    const key = typeof input === "string" ? input : input?.key;
-    const safeKey = sortingDb[key] ? key : "hold";
+  function judgementKeyFor(input) {
+    const rawKey = String(typeof input === "string" ? input : input?.key || "").trim().toLowerCase();
+    if (sortingDbV2[rawKey]) return rawKey;
+    const key = cleanText(rawKey).toLowerCase();
+    if (sortingDbV2[key]) return key;
+    return sortingKeyAliases[key] || "hold";
+  }
+
+  function findJudgementKeys(value) {
+    const text = cleanText(value).toLowerCase();
+    if (!text) return ["hold"];
+    const explicitMatches = [
+      ["milk-carton", ["우유", "종이팩", "우유팩", "멸균팩"]],
+      ["tape-box", ["테이프", "택배상자", "종이상자", "박스", "상자"]],
+      ["pet-bottle", ["페트", "생수병", "음료병"]],
+      ["plastic-cup", ["플라스틱컵", "테이크아웃컵"]],
+      ["paper-cup", ["종이컵", "코팅컵"]],
+      ["ramen-container", ["컵라면", "라면용기"]],
+      ["snack-wrapper", ["과자", "과자봉지", "포장지"]],
+      ["vinyl-bag", ["비닐", "비닐봉투"]],
+      ["glass-bottle", ["유리병", "유리"]],
+      ["receipt", ["영수증", "감열지"]],
+      ["can", ["캔", "알루미늄", "철캔"]]
+    ].filter(([, keywords]) => keywords.some(keyword => text.includes(keyword))).map(([key]) => key);
+    if (explicitMatches.length) return explicitMatches.slice(0, 3);
+    const matches = Object.entries(sortingDbV2)
+      .filter(([, item]) => [item.label, ...(item.searchKeywords || [])]
+        .some(keyword => text.includes(cleanText(keyword).toLowerCase())))
+      .map(([key]) => key);
+    return matches.length ? matches.slice(0, 3) : ["hold"];
+  }
+
+  function getJudgementResult(input, options = {}) {
+    const source = options.source || input?.source || (typeof input === "string" ? "quick" : "search");
+    const candidateKeys = options.candidateKeys || (source === "search" ? findJudgementKeys(input?.query || input) : [judgementKeyFor(input)]);
+    const key = judgementKeyFor(options.key || candidateKeys[0]);
+    const item = sortingDbV2[key] || sortingDbV2.hold;
+    const candidateSource = options.candidateSource || (source === "photo" ? "mobilenet_hint" : source === "correction" ? "user" : source === "search" ? "search" : "user");
     return {
-      key: safeKey,
-      item: sortingDb[safeKey] || sortingDb.hold
+      key,
+      item,
+      source,
+      objectCandidates: candidateKeys.map((candidateKey, index) => {
+        const candidate = sortingDbV2[judgementKeyFor(candidateKey)] || sortingDbV2.hold;
+        return { id: candidate.objectType, label: candidate.label, confidence: index === 0 ? options.confidence || "reference" : "possible", source: index === 0 ? candidateSource : "search" };
+      }),
+      materialCandidates: item.materialCandidates.map((label, index) => ({ id: `${item.objectType}-material-${index + 1}`, label, confidence: index === 0 ? "medium" : "check" })),
+      visibleCautions: item.visibleCautions.slice(),
+      checklist: item.checklist.map(check => ({ ...check, status: "unknown" })),
+      recommendation: { status: item.objectType === "hold" ? "hold_recommended" : "needs_user_check", primary: item.primaryFlow, reason: "사진과 이름만으로 오염·부속품·재질 표기·지역 기준을 확정할 수 없습니다." },
+      hold: { recommended: item.objectType === "hold" || candidateKeys.length > 1, reasons: [...item.holdReasons] },
+      imageHints: options.imageHints || [],
+      selectedCorrectionType: options.selectedCorrectionType || "",
+      timestamp: new Date().toISOString()
     };
   }
 
   function playJudgementScan(container, options = {}) {
     if (!container) return;
-    const label = cleanText(options.label) || "선택한 물건";
-    const category = $("[data-quick-category]");
-    const guidance = $("[data-quick-guidance]");
-    const tip = $("[data-quick-tip]");
-    const actionRow = $(".quick-action-row");
-
     selectedSortingKey = "";
     container.classList.remove("is-empty", "is-result");
     container.classList.add("is-scanning");
-    if (category) category.innerHTML = `<b>AI SCAN</b> ${escapeHtml(label)} 특징을 읽는 중 <em>분석 중</em>`;
-    if (guidance) guidance.textContent = "재질, 오염 여부, 복합 재질 가능성을 순서대로 확인하고 있습니다.";
-    if (tip) {
-      tip.hidden = false;
-      tip.innerHTML = '<strong>분석 중</strong><span><span class="quick-scan-meter" aria-hidden="true"><i></i></span>AI가 먼저 후보를 제안하고, 학생 확인 단계로 넘길 준비를 합니다.</span>';
-    }
-    if (actionRow) actionRow.hidden = true;
+    container.innerHTML = `<div class="judgement-scan"><strong>AI 판단 지원을 준비하는 중</strong><span class="quick-scan-meter" aria-hidden="true"><i></i></span><p>${escapeHtml(cleanText(options.label) || "선택한 물건")}의 재질·주의 요소·확인 항목을 정리하고 있습니다.</p></div>`;
   }
 
   function renderJudgementResult(result, container) {
-    const item = result?.item || sortingDb.hold;
-    const key = result?.key || "hold";
+    const safeResult = result || getJudgementResult("hold");
+    const item = safeResult.item || sortingDbV2.hold;
+    const key = safeResult.key || "hold";
     const buttons = $$("[data-quick-item]");
-    const category = $("[data-quick-category]");
-    const guidance = $("[data-quick-guidance]");
-    const tip = $("[data-quick-tip]");
-    const actionRow = $(".quick-action-row");
-
+    const completed = safeResult.checklist.filter(check => check.required).every(check => check.status === "done");
+    const needsHold = safeResult.hold.recommended || !completed;
+    const objectChips = safeResult.objectCandidates.map(candidate => `<span class="judgement-chip object"><b>${escapeHtml(candidate.label)}</b><em>${escapeHtml(candidate.source === "mobilenet_hint" ? "사진 기반 참고 후보" : candidate.source === "tm_hint" ? "우리 학교 학습 모델 참고" : candidate.source === "user" ? "사용자 선택" : "검색 후보")}</em></span>`).join("");
+    const materialChips = safeResult.materialCandidates.map(candidate => `<span class="judgement-chip material">${escapeHtml(candidate.label)}</span>`).join("");
+    const correctionButtons = [["pet-bottle", "병"], ["plastic-cup", "컵"], ["tape-box", "박스"], ["snack-wrapper", "봉지"], ["paper-cup", "종이"], ["can", "캔"], ["glass-bottle", "유리"], ["hold", "기타"]].map(([type, label]) => `<button type="button" data-judgement-correction="${type}" class="${safeResult.selectedCorrectionType === type ? "is-active" : ""}">${label}</button>`).join("");
+    const checklistHtml = safeResult.checklist.map(check => `<button type="button" class="judgement-check ${check.status === "done" ? "is-done" : ""}" data-judgement-check="${check.id}" aria-pressed="${check.status === "done"}"><span aria-hidden="true">${check.status === "done" ? "✓" : ""}</span>${escapeHtml(check.label)}</button>`).join("");
     selectedSortingKey = key;
     buttons.forEach(target => target.classList.toggle("is-active", target.dataset.quickItem === key));
     container?.classList.remove("is-empty", "is-scanning");
     container?.classList.add("is-result");
-    if (category) category.innerHTML = `<b>${item.emoji}</b> ${escapeHtml(item.title)} <em>${escapeHtml(item.category)}</em>`;
-    if (guidance) guidance.textContent = item.guide;
-    if (tip) {
-      tip.hidden = false;
-      tip.innerHTML = `<strong>핵심 팁</strong><span>${escapeHtml(item.tip)}</span>`;
-    }
-    if (actionRow) actionRow.hidden = false;
-    $("#practiceLogButton")?.toggleAttribute("disabled", Boolean(item.isHold));
-    $("#holdLogButton").textContent = item.isHold ? "보류함 등록" : "판단 보류";
+    currentSortingJudgement = safeResult;
+    container.innerHTML = `
+      <header class="judgement-result-head"><p>AI가 확인할 항목을 제안합니다.</p><strong>${item.emoji} ${escapeHtml(item.label)}</strong><span>분리배출 판단은 사용자가 결정합니다.</span></header>
+      <section class="judgement-candidate-block"><h4>물체 후보</h4><div class="judgement-chip-row">${objectChips}</div></section>
+      <section class="judgement-candidate-block"><h4>재질 후보</h4><div class="judgement-chip-row">${materialChips}</div></section>
+      ${safeResult.imageHints.length ? `<p class="judgement-image-hint">${escapeHtml(safeResult.imageHints.join(" · "))}</p>` : ""}
+      <section class="judgement-cautions"><h4>보이는 주의 요소</h4><ul>${safeResult.visibleCautions.map(caution => `<li>${escapeHtml(caution)}</li>`).join("")}</ul></section>
+      <section class="judgement-checklist"><h4>배출 전 체크리스트</h4><div>${checklistHtml}</div></section>
+      <section class="judgement-recommendation ${completed ? "is-ready" : "is-hold"}"><strong>${completed ? "준비되어 있어요. 배출 준비가 완료되었습니다." : needsHold ? "지금은 확정하지 않아도 됩니다. 확인이 필요한 물건으로 보류함에 담아둘까요?" : "확인 항목을 마친 뒤 사용자가 최종 판단합니다."}</strong><span>${escapeHtml(item.primaryFlow)}</span></section>
+      <section class="judgement-corrections"><span>AI가 항목을 잘못 읽었다면 바로 고쳐 주세요.</span><div>${correctionButtons}</div></section>
+      <div class="quick-action-row judgement-actions"><button type="button" data-judgement-action="record" ${completed && !safeResult.hold.recommended ? "" : "disabled"}>배출 기록 남기기</button><button type="button" data-judgement-action="decide" ${completed ? "" : "disabled"}>확인 후 결정하기</button><button type="button" data-judgement-action="hold">보류함에 저장</button></div>`;
   }
 
   function runThreeSecondJudgement(input, options = {}) {
     const container = options.container || $("[data-sorting-result]");
-    const result = getJudgementResult(input);
+    const result = getJudgementResult(input, options);
     const request = ++sortingJudgementRequest;
     if (sortingJudgementTimer) window.clearTimeout(sortingJudgementTimer);
 
-    playJudgementScan(container, { label: result.item?.label || result.item?.title });
+    playJudgementScan(container, { label: result.item?.label });
     sortingJudgementTimer = window.setTimeout(() => {
       if (request !== sortingJudgementRequest) return;
       sortingJudgementTimer = 0;
       renderJudgementResult(result, container);
-    }, options.delay || 1080);
+    }, options.delay ?? 1080);
   }
 
   function initQuickButtons() {
     const buttons = $$("[data-quick-item]");
-    const category = $("[data-quick-category]");
-    const guidance = $("[data-quick-guidance]");
-    const tip = $("[data-quick-tip]");
     const result = $("[data-sorting-result]");
-    const actionRow = $(".quick-action-row");
 
     function itemFromSearch(value) {
-      const text = cleanText(value);
-      if (!text) return null;
-      if (text.includes("우유") || text.includes("팩")) return "milk";
-      if (text.includes("컵") || text.includes("플라스틱")) return "cup";
-      if (text.includes("라면")) return "ramen";
-      if (text.includes("과자") || text.includes("비닐")) return "snack";
-      if (text.includes("캔")) return "can";
-      if (text.includes("영수")) return "receipt";
-      if (text.includes("종이")) return "paper";
-      return "hold";
+      return findJudgementKeys(value);
     }
 
     function renderEmptySortingResult() {
       cancelThreeSecondJudgement();
       selectedSortingKey = "";
       buttons.forEach(target => target.classList.remove("is-active"));
-      result?.classList.remove("is-scanning", "is-result");
-      result?.classList.add("is-empty");
-      if (category) category.innerHTML = "<b>H-A-H</b> AI 1차 제안 준비";
-      if (guidance) guidance.textContent = "지금 버리려는 물건을 선택하거나 검색해 보세요. AI가 먼저 분류 후보를 제안하고, 여러분이 다시 확인해 실천 기록으로 남깁니다.";
-      if (tip) {
-        tip.hidden = false;
-        tip.innerHTML = "<strong>실천 흐름</strong><span>사진 또는 검색 → AI 후보 → 학생 확인 → 실천 기록 또는 판단 보류</span>";
-      }
-      if (actionRow) actionRow.hidden = true;
-    }
-
-    function renderSortingResult(key) {
-      renderJudgementResult(getJudgementResult(key), result);
-    }
-
-    function selectedSortingItem() {
-      return sortingDb[selectedSortingKey] || null;
+      renderJudgementResult(getJudgementResult("hold", { source: "initial" }), result);
     }
 
     function applySearchValue() {
       const value = cleanText($("#searchInput")?.value);
       if (!value) return;
-      runThreeSecondJudgement(itemFromSearch(value), { container: result });
+      const candidateKeys = itemFromSearch(value);
+      const primaryKey = candidateKeys[0] || "hold";
+      runThreeSecondJudgement({ key: primaryKey, query: value }, { container: result, source: "search", key: primaryKey, candidateKeys });
     }
 
     buttons.forEach(button => {
       button.classList.remove("is-active");
       button.addEventListener("click", () => {
         buttons.forEach(target => target.classList.toggle("is-active", target === button));
-        runThreeSecondJudgement(button.dataset.quickItem, { container: result });
+        runThreeSecondJudgement(button.dataset.quickItem, { container: result, source: "quick" });
       });
     });
 
@@ -3173,10 +3341,10 @@
       }
       if (state) state.textContent = "모델을 불러오는 중입니다...";
       try {
-        modelPromise = await loadTeachableMachineModel(value);
-        if (state) state.textContent = modelPromise ? "Teachable Machine 모델이 적용되었습니다." : "모델 런타임을 사용할 수 없어 기본 판단을 유지합니다.";
+        teachableMachineModelPromise = await loadTeachableMachineModel(value);
+        if (state) state.textContent = teachableMachineModelPromise ? "우리 학교 학습 모델 참고 기능이 적용되었습니다. 최종 판단에는 사용하지 않습니다." : "모델 런타임을 사용할 수 없어 기본 판단 지원을 유지합니다.";
       } catch {
-        modelPromise = null;
+        teachableMachineModelPromise = null;
         if (state) state.textContent = "모델을 불러오지 못했습니다. 링크를 다시 확인해 주세요.";
       }
     });
@@ -3187,16 +3355,33 @@
       $("#tmApplyButton")?.click();
     });
 
-    $("#practiceLogButton")?.addEventListener("click", () => {
-      const item = selectedSortingItem();
-      if (!item || item.isHold) return;
-      logSortingPractice(item);
-    });
-
-    $("#holdLogButton")?.addEventListener("click", () => {
-      const item = selectedSortingItem();
-      const value = cleanText($("#searchInput")?.value);
-      addSortingHold(item?.label || value || "판단 보류 물건", item?.isHold ? item.tip : "기준 확인 필요");
+    result?.addEventListener("click", event => {
+      const correction = event.target.closest("[data-judgement-correction]");
+      if (correction) {
+        runThreeSecondJudgement(correction.dataset.judgementCorrection, { container: result, source: "correction", selectedCorrectionType: correction.dataset.judgementCorrection });
+        return;
+      }
+      const check = event.target.closest("[data-judgement-check]");
+      if (check && currentSortingJudgement) {
+        const target = currentSortingJudgement.checklist.find(item => item.id === check.dataset.judgementCheck);
+        if (target) target.status = target.status === "done" ? "unknown" : "done";
+        renderJudgementResult(currentSortingJudgement, result);
+        return;
+      }
+      const action = event.target.closest("[data-judgement-action]");
+      if (!action || !currentSortingJudgement) return;
+      const decision = currentSortingJudgement;
+      const legacyItem = { label: decision.item.label, emoji: decision.item.emoji, category: decision.item.category, carbonSaved: decision.item.carbonSaved };
+      if (action.dataset.judgementAction === "record") {
+        logSortingPractice(legacyItem);
+        saveSortingDecisionV2(decision, "recorded");
+      } else if (action.dataset.judgementAction === "decide") {
+        saveSortingDecisionV2(decision, "user_confirmed");
+        renderJudgementResult({ ...decision, hold: { ...decision.hold, recommended: false } }, result);
+      } else {
+        const reason = decision.hold.reasons[0] || "확인 항목 또는 지역 기준 확인 필요";
+        addSortingHold(decision.item.label, reason, decision);
+      }
     });
 
     renderEmptySortingResult();
@@ -3215,6 +3400,19 @@
     return { ...quickItems.paper, confidence };
   }
 
+  function judgementKeyFromVisualLabel(label) {
+    const normalized = cleanText(label).toLowerCase();
+    if (normalized.includes("carton") || normalized.includes("milk") || normalized.includes("우유") || normalized.includes("종이팩")) return "milk-carton";
+    if (normalized.includes("bottle") || normalized.includes("pet") || normalized.includes("페트")) return "pet-bottle";
+    if (normalized.includes("glass") || normalized.includes("유리")) return "glass-bottle";
+    if (normalized.includes("cup") || normalized.includes("plastic") || normalized.includes("플라스틱") || normalized.includes("컵")) return "plastic-cup";
+    if (normalized.includes("bag") || normalized.includes("packet") || normalized.includes("wrapper") || normalized.includes("과자")) return "snack-wrapper";
+    if (normalized.includes("ramen") || normalized.includes("noodle") || normalized.includes("라면")) return "ramen-container";
+    if (normalized.includes("can") || normalized.includes("캔")) return "can";
+    if (normalized.includes("receipt") || normalized.includes("영수")) return "receipt";
+    return "hold";
+  }
+
   async function loadTeachableMachineModel(modelUrl) {
     if (!modelUrl || !window.tmImage) return null;
     let baseUrl = cleanText(modelUrl);
@@ -3224,22 +3422,29 @@
   }
 
   async function classifyImage(image) {
-    if (!modelPromise && window.mobilenet) {
-      modelPromise = window.mobilenet.load();
-    }
-
-    if (modelPromise) {
+    const hints = [];
+    if (teachableMachineModelPromise) {
       try {
-        const model = await modelPromise;
-        const result = await model.classify(image);
-        const top = result && result[0] ? result[0] : null;
-        if (top) return chooseDraftFromLabel(top.className, top.probability);
+        const model = await teachableMachineModelPromise;
+        const top = (await model.predict(image))?.[0];
+        if (top) hints.push({ label: top.className, confidence: top.probability, source: "tm_hint" });
       } catch {
-        modelPromise = null;
+        teachableMachineModelPromise = null;
       }
     }
-
-    return { ...quickItems.paper, confidence: null, ruleBased: true };
+    if (window.mobilenet) {
+      try {
+        if (!mobileNetModelPromise) mobileNetModelPromise = window.mobilenet.load();
+        const model = await mobileNetModelPromise;
+        const top = (await model.classify(image))?.[0];
+        if (top) hints.push({ label: top.className, confidence: top.probability, source: "mobilenet_hint" });
+      } catch {
+        mobileNetModelPromise = null;
+      }
+    }
+    const topHint = hints[0];
+    const mapped = topHint ? chooseDraftFromLabel(topHint.label, topHint.confidence) : { item: "기타 / 판단 보류", category: "기준 확인 필요", guidance: "사진만으로 재질과 오염 상태를 확정할 수 없습니다.", ruleBased: true };
+    return { ...mapped, hints, judgementKey: topHint ? judgementKeyFromVisualLabel(topHint.label) : "hold", confidence: topHint?.confidence ?? null, ruleBased: !topHint };
   }
 
   function openModal() {
@@ -3358,7 +3563,7 @@
       if (session !== modalSession) return;
       currentDraft = {
         input_type: "image",
-        ai_engine: draft.ruleBased ? "fallback-rule" : "mobilenet",
+        ai_engine: draft.hints?.[0]?.source || (draft.ruleBased ? "fallback-rule" : "mobilenet_hint"),
         ai_raw_label: draft.item,
         ai_confidence: draft.ruleBased ? "" : Number(draft.confidence || 0).toFixed(4),
         mapped_item: draft.item,
@@ -3368,6 +3573,13 @@
       };
 
       showDraftModal(currentDraft, draft.guidance);
+      runThreeSecondJudgement({ key: draft.judgementKey }, {
+        source: "photo",
+        candidateSource: draft.hints?.[0]?.source || "mobilenet_hint",
+        confidence: draft.confidence,
+        imageHints: draft.hints.map(hint => `${hint.source === "tm_hint" ? "우리 학교 학습 모델 참고" : "사진 기반 참고 후보"}: ${hint.label}`),
+        delay: 0
+      });
     };
 
     image.onerror = () => {

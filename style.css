@@ -505,11 +505,6 @@ strong {
   box-shadow: 0 0 18px var(--mint);
 }
 
-.upload-panel {
-  display: flex;
-  flex-direction: column;
-}
-
 .upload-actions {
   display: grid;
   grid-template-columns: 1fr;
@@ -5170,11 +5165,6 @@ body,
   line-height: 1.08;
 }
 
-.confusion {
-  gap: 7px !important;
-  margin-top: 14px !important;
-}
-
 .confusion h3 {
   margin-bottom: 2px;
   font-size: clamp(0.94rem, 0.84vw, 1.12rem) !important;
@@ -8927,50 +8917,7 @@ body,
 }
 /* AIWAYS_UI_DATA_STATE_DETAIL_20260705_END */
 
-/* AIWAYS_CLASS_CONFUSION_MICRO_TUNE_20260705_START */
-.class-panel .confusion {
-  padding-inline: 8px !important;
-}
-
-.class-panel .confusion div {
-  grid-template-columns: 102px minmax(52px, 1fr) 40px !important;
-  column-gap: 12px !important;
-}
-
-.class-panel .confusion div span {
-  min-width: 0;
-  white-space: nowrap;
-}
-
-.class-panel .confusion div b {
-  justify-self: end;
-  min-width: 34px;
-  text-align: right;
-}
-/* AIWAYS_CLASS_CONFUSION_MICRO_TUNE_20260705_END */
-
 /* AIWAYS_LANDFILL_QUIZ_HOLD_POLISH_20260705_START */
-.landfill-panel .chart-title-row {
-  align-items: center !important;
-  gap: 14px !important;
-}
-
-.landfill-panel .landfill-time-now {
-  transform: translate(-24px, 9px) !important;
-  min-width: clamp(184px, 9.6vw, 218px) !important;
-  padding: 6px 13px !important;
-  font-size: clamp(0.76rem, 0.66vw, 0.86rem) !important;
-}
-
-.landfill-panel .combo-chart {
-  height: clamp(272px, 14.2vw, 326px) !important;
-  min-height: 272px !important;
-}
-
-.landfill-panel .landfill-donuts {
-  transform: translateY(-10px) !important;
-}
-
 .combo-chart .weekday-label {
   font-size: 13px !important;
   font-weight: 960 !important;
@@ -10740,63 +10687,6 @@ body {
   .dashboard-grid {
     transform: translateY(-10px);
   }
-
-  .class-panel {
-    grid-template-columns: 92px minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    column-gap: 12px;
-    row-gap: 8px;
-  }
-
-  .class-panel .class-kpis {
-    gap: 7px;
-    min-height: 0;
-  }
-
-  .class-panel .class-kpis div {
-    min-height: 0;
-    padding: 7px 8px;
-  }
-
-  .class-panel .class-kpis strong {
-    font-size: clamp(1.2rem, 1.5vw, 1.55rem);
-  }
-
-  .class-panel .class-kpis span {
-    margin-top: 4px;
-    font-size: 0.66rem;
-  }
-
-  .class-panel .confusion {
-    height: 100%;
-    box-sizing: border-box;
-    min-width: 0;
-    height: 100%;
-    padding: 10px;
-    transform: translateY(-14px);
-  }
-
-  .class-panel .confusion h3 {
-    margin-bottom: 10px;
-  }
-
-  .class-panel .confusion div {
-    grid-template-columns: minmax(0, 1.36fr) minmax(52px, 0.8fr) 30px !important;
-    column-gap: 7px !important;
-  }
-
-  .class-panel .confusion div span {
-    min-width: 0;
-  }
-
-  .class-panel .rank-note {
-    align-self: stretch;
-    min-height: 0;
-    margin: 0;
-    padding: 7px 9px;
-    font-size: 0.66rem;
-    line-height: 1.25;
-  }
 }
 
 @media (min-width: 1601px) {
@@ -10991,43 +10881,6 @@ body {
 /* SECONDARY_SECTION_POLISH END */
 
 /* FULL_MICRO_POLISH_PASS */
-@media (min-width: 1181px) and (max-width: 1600px) {
-  .class-panel {
-    grid-template-columns: 86px minmax(0, 1fr);
-    column-gap: 10px;
-  }
-
-  .class-panel .class-kpis div {
-    padding: 6px 7px;
-  }
-
-  .class-panel .confusion {
-    padding: 9px;
-  }
-
-  .class-panel .confusion div {
-    grid-template-columns: minmax(0, 1.42fr) minmax(48px, 0.82fr) 24px !important;
-    column-gap: 6px !important;
-  }
-
-  .class-panel .confusion div span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .class-panel .confusion div b {
-    justify-self: end;
-    min-width: 0;
-    text-align: right;
-  }
-
-  .class-panel .rank-note {
-    margin-top: 5px;
-    padding: 5px 10px;
-    text-align: center;
-  }
-}
 
 @media (min-width: 981px) and (max-width: 1366px) {
   .landfill-panel .chart-title-row {
@@ -11226,39 +11079,53 @@ body {
 }
 /* FULL_MICRO_POLISH_PASS END */
 
-/* Dashboard - desktop class panel layout */
+/* DASHBOARD_LAYOUT_OWNERSHIP: class panel, landfill monitor, and upload panel */
+.class-panel .confusion {
+  gap: 7px !important;
+  margin-top: 14px !important;
+  padding-inline: 8px !important;
+}
+
 @media (min-width: 1181px) {
   .class-panel {
     grid-template-columns: clamp(68px, 5.45vw, 82px) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
     column-gap: clamp(8px, 0.7vw, 11px);
+    row-gap: 8px;
   }
 
   .class-panel .class-kpis {
     gap: 7px;
+    min-height: 0;
   }
 
   .class-panel .class-kpis div {
     display: grid;
     place-content: center;
     justify-items: center;
+    min-height: 0;
     min-width: 0;
     padding: 6px 4px;
     text-align: center;
   }
 
   .class-panel .class-kpis strong {
+    font-size: clamp(1.2rem, 1.5vw, 1.55rem);
     line-height: 1;
   }
 
   .class-panel .class-kpis span {
     margin-top: 4px;
+    font-size: 0.66rem;
     line-height: 1.16;
     white-space: nowrap;
   }
 
   .class-panel .confusion {
+    box-sizing: border-box;
+    height: 100%;
     min-width: 0;
-    padding: 10px 11px;
+    padding-block: 10px;
     transform: translateY(-14px);
   }
 
@@ -11295,13 +11162,14 @@ body {
     margin-top: 8px;
     padding: 6px 12px;
     border-radius: 999px;
+    text-align: center;
     font-size: clamp(0.68rem, 0.7vw, 0.8rem);
     line-height: 1.18;
   }
 
 }
 
-/* Dashboard - landfill layout is owned by the status-card block below. */
+/* Dashboard - landfill monitor and upload panel ownership continue below. */
 
 /* HAH_DESCRIPTION_VERTICAL_BALANCE */
 @media (min-width: 1181px) {
@@ -11432,7 +11300,7 @@ body {
   grid-template-columns: minmax(0, 1fr) auto !important;
   grid-template-rows: auto !important;
   align-items: center;
-  gap: 10px;
+  gap: 14px !important;
   min-width: 0;
 }
 
@@ -11449,6 +11317,9 @@ body {
 .landfill-panel .landfill-time-now {
   justify-self: end;
   transform: none !important;
+  min-width: clamp(184px, 9.6vw, 218px) !important;
+  padding: 6px 13px !important;
+  font-size: clamp(0.76rem, 0.66vw, 0.86rem) !important;
 }
 
 .landfill-panel .combo-chart {

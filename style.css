@@ -2193,7 +2193,7 @@ body {
 }
 /* PAGE_FIX_03_CURRICULUM_END */
 
-/* PAGE_FIX_04_HAH_START */
+/* SECTION_HAH_BASELINE_LAYOUT */
 .hah-scene {
   gap: clamp(22px, 2.4vw, 44px);
 }
@@ -2222,9 +2222,9 @@ body {
   text-align: center;
   font-weight: 780;
 }
-/* PAGE_FIX_04_HAH_END */
+/* SECTION_HAH_BASELINE_LAYOUT END */
 
-/* PAGE_FIX_05_FLOW_START */
+/* SECTION_FLOW_BASELINE_LAYOUT */
 .flow-scene {
   align-content: center;
   gap: 28px;
@@ -2280,9 +2280,9 @@ body {
 .flow-card.h2-badge {
   border-color: rgba(173, 140, 255, 0.34);
 }
-/* PAGE_FIX_05_FLOW_END */
+/* SECTION_FLOW_BASELINE_LAYOUT END */
 
-/* PAGE_FIX_06_GALLERY_START */
+/* SECTION_GALLERY_BASELINE_LAYOUT */
 .gallery-scene {
   grid-template-columns: minmax(420px, 0.78fr) minmax(720px, 1.22fr);
 }
@@ -2332,7 +2332,7 @@ body {
 .gallery-stage:not(.is-detail) #galleryBack {
   display: none;
 }
-/* PAGE_FIX_06_GALLERY_END */
+/* SECTION_GALLERY_BASELINE_LAYOUT END */
 
 /* PAGE_FIX_07_SORTING_START */
 .sorting-scene {
@@ -2354,7 +2354,7 @@ body {
 }
 /* PAGE_FIX_07_SORTING_END */
 
-/* PAGE_FIX_08_RESOURCES_START */
+/* SECTION_RESOURCES_BASELINE_LAYOUT */
 .resources-scene {
   align-content: center;
   gap: clamp(34px, 4vh, 70px);
@@ -2383,7 +2383,7 @@ body {
 .footer-credit p:first-child {
   color: rgba(244, 252, 255, 0.94);
 }
-/* PAGE_FIX_08_RESOURCES_END */
+/* SECTION_RESOURCES_BASELINE_LAYOUT END */
 
 @media (min-width: 2560px) {
   :root {
@@ -2928,7 +2928,7 @@ body {
 }
 /* PAGE_FINAL_FIX_03_CURRICULUM_END */
 
-/* PAGE_FINAL_FIX_04_HAH_START */
+/* SECTION_HAH_INTERACTION_REFINEMENT */
 .hah-description {
   max-width: min(1560px, 96vw);
   white-space: nowrap;
@@ -2962,9 +2962,9 @@ body {
   width: min(1280px, 100%);
   font-size: clamp(1.02rem, 0.96vw, 1.22rem);
 }
-/* PAGE_FINAL_FIX_04_HAH_END */
+/* SECTION_HAH_INTERACTION_REFINEMENT END */
 
-/* PAGE_FINAL_FIX_05_FLOW_START */
+/* SECTION_FLOW_INTERACTION_REFINEMENT */
 .flow-scene .scene-copy h2 {
   line-height: 1.02;
 }
@@ -2977,9 +2977,9 @@ body {
 .flow-card.is-disabled::after {
   display: none;
 }
-/* PAGE_FINAL_FIX_05_FLOW_END */
+/* SECTION_FLOW_INTERACTION_REFINEMENT END */
 
-/* PAGE_FINAL_FIX_06_GALLERY_START */
+/* SECTION_GALLERY_DETAIL_STATE */
 .gallery-stage:not(.is-detail) .gallery-detail {
   display: none;
 }
@@ -3011,7 +3011,7 @@ body {
   color: rgba(222, 240, 255, 0.72);
   text-align: center;
 }
-/* PAGE_FINAL_FIX_06_GALLERY_END */
+/* SECTION_GALLERY_DETAIL_STATE END */
 
 /* PAGE_FINAL_FIX_07_SORTING_START */
 .sorting-scene {
@@ -3031,7 +3031,7 @@ body {
 }
 /* PAGE_FINAL_FIX_07_SORTING_END */
 
-/* PAGE_FINAL_FIX_08_RESOURCES_START */
+/* SECTION_RESOURCES_CARD_LAYOUT */
 .resources-scene {
   justify-items: stretch;
   padding-left: clamp(72px, 7vw, 150px);
@@ -3067,7 +3067,7 @@ body {
   justify-self: end;
   text-align: right;
 }
-/* PAGE_FINAL_FIX_08_RESOURCES_END */
+/* SECTION_RESOURCES_CARD_LAYOUT END */
 
 /* MAIN_ROOT_UI_FIX_20260704_START */
 body,
@@ -3854,7 +3854,7 @@ body.modal-open {
 }
 /* PAGE_FINAL_FIX_03_CURRICULUM_END */
 
-/* PAGE_FINAL_FIX_04_HAH_START */
+/* SECTION_HAH_VISUAL_REFINEMENT */
 .hah-scene {
   align-content: center;
   gap: clamp(26px, 2.5vw, 48px);
@@ -3876,9 +3876,9 @@ body.modal-open {
   border-color: rgba(94, 247, 205, 0.34);
   box-shadow: 0 0 26px rgba(94, 247, 205, 0.14);
 }
-/* PAGE_FINAL_FIX_04_HAH_END */
+/* SECTION_HAH_VISUAL_REFINEMENT END */
 
-/* PAGE_FINAL_FIX_05_FLOW_START */
+/* SECTION_FLOW_CARD_REFINEMENT */
 .flow-grid {
   align-items: stretch;
 }
@@ -3911,9 +3911,9 @@ body.modal-open {
 .flow-card p {
   flex: 1 1 auto;
 }
-/* PAGE_FINAL_FIX_05_FLOW_END */
+/* SECTION_FLOW_CARD_REFINEMENT END */
 
-/* PAGE_FINAL_FIX_06_GALLERY_START */
+/* SECTION_GALLERY_CARD_INTERACTION */
 .gallery-grid article {
   position: relative;
   overflow: hidden;
@@ -3951,7 +3951,7 @@ body.modal-open {
   background-size: cover;
   background-position: center;
 }
-/* PAGE_FINAL_FIX_06_GALLERY_END */
+/* SECTION_GALLERY_CARD_INTERACTION END */
 
 /* PAGE_FINAL_FIX_07_SORTING_START */
 .sorting-scene {
@@ -3976,7 +3976,7 @@ body.modal-open {
 
 /* PAGE_FINAL_FIX_07_SORTING_END */
 
-/* PAGE_FINAL_FIX_08_RESOURCES_START */
+/* SECTION_RESOURCES_FINAL_SPACING */
 .resources-scene {
   align-content: center;
   gap: clamp(38px, 4vw, 80px);
@@ -3989,7 +3989,7 @@ body.modal-open {
 .footer-credit {
   margin-top: clamp(12px, 1vw, 24px);
 }
-/* PAGE_FINAL_FIX_08_RESOURCES_END */
+/* SECTION_RESOURCES_FINAL_SPACING END */
 
 /* MAIN_ROOT_UI_FIX_20260704_FINAL_OVERRIDE_START */
 .brand-mark {
@@ -10696,7 +10696,7 @@ body {
 }
 /* DASHBOARD_FIRST_VIEW_POLISH END */
 
-/* SECONDARY_SECTION_POLISH */
+/* SECONDARY_SECTION_DESKTOP_LAYOUT */
 @media (min-width: 1181px) {
   #hah {
     gap: clamp(18px, 2vh, 30px);
@@ -10773,7 +10773,7 @@ body {
     min-height: 0 !important;
   }
 }
-/* SECONDARY_SECTION_POLISH END */
+/* SECONDARY_SECTION_DESKTOP_LAYOUT END */
 
 /* FULL_MICRO_POLISH_PASS */
 
@@ -11019,7 +11019,7 @@ body {
 
 /* Dashboard - landfill monitor and upload panel ownership continue below. */
 
-/* HAH_DESCRIPTION_VERTICAL_BALANCE */
+/* HAH_DESCRIPTION_LAYOUT */
 @media (min-width: 1181px) {
   #hah .hah-description {
     max-width: min(1760px, 100%);
@@ -11039,7 +11039,7 @@ body {
     overflow-wrap: anywhere;
   }
 }
-/* HAH_DESCRIPTION_VERTICAL_BALANCE END */
+/* HAH_DESCRIPTION_LAYOUT END */
 
 /* SORTING_LAYOUT_OWNERSHIP: 3초판단 layout, tabs, classify UI, and TM controls */
 #sorting .sorting-upload button {
@@ -11356,14 +11356,8 @@ body {
 /* SECTION_ALIGNMENT_COMPLETION */
 @media (min-width: 1181px) {
   #hah .callout {
-    width: min(1780px, 100%) !important;
     margin-top: -8px !important;
     padding-block: 13px;
-  }
-
-  #flow .scene-copy > p:not(.eyebrow) {
-    max-width: 760px;
-    line-height: 1.62;
   }
 
   #gallery::before {

@@ -2691,6 +2691,9 @@
     if (!decision?.item) return;
     sortingDecisionHistory.unshift({
       source: decision.source,
+      provider: decision.provider || decision.source,
+      schemaVersion: decision.schemaVersion || SORTING_VISION_SCHEMA_VERSION,
+      requestId: cleanText(decision.requestId),
       query: decision.query,
       selectedItemId: decision.selectedItemId,
       objectCandidates: decision.objectCandidates,
@@ -3214,6 +3217,147 @@
     return sortingKeyAliases[key] || "hold";
   }
 
+  // Stage 4 contract only: no remote provider, endpoint, credential, or image payload is used here.
+  const SORTING_INPUT_SOURCES = Object.freeze({ quick: "quick_select", search: "search_rule", photo: "mobilenet_hint", correction: "user_correction", future: "future_gemini" });
+  const SORTING_VISION_SOURCES = Object.freeze({ MOBILENET: "mobilenet_hint", TEACHABLE_MACHINE: "tm_hint", FUTURE_GEMINI: "future_gemini" });
+  const SORTING_VISION_SCHEMA_VERSION = "sorting-vision-v1";
+  const SORTING_VISION_STATES = Object.freeze({ IDLE: "idle", PREPARING: "preparing", ANALYZING: "analyzing", SUCCESS: "success", UNCERTAIN: "uncertain", UNAVAILABLE: "unavailable", INVALID_RESPONSE: "invalid_response", ERROR: "error" });
+  const SORTING_CONFIDENCE_BANDS = Object.freeze(["high", "medium", "low", "unknown"]);
+  const SORTING_VISION_LIMITS = Object.freeze({ candidates: 3, cautions: 5, labelLength: 40, cautionLength: 100 });
+  let sortingVisionRequestSequence = 0;
+  let activeSortingVisionRequestId = "";
+
+  function createSortingVisionRequestId(prefix = "sorting") {
+    sortingVisionRequestSequence += 1;
+    return `${prefix}-${Date.now().toString(36)}-${sortingVisionRequestSequence.toString(36)}`;
+  }
+
+  function createSortingVisionRequestMetadata(input = {}) {
+    const requestId = cleanText(input.requestId) || createSortingVisionRequestId();
+    const sessionId = cleanText(input.sessionId) || `session-${Date.now().toString(36)}`;
+    return {
+      schemaVersion: SORTING_VISION_SCHEMA_VERSION,
+      requestId,
+      sessionId,
+      locale: cleanText(input.locale) || "ko-KR",
+      source: SORTING_VISION_SOURCES.FUTURE_GEMINI,
+      imageMetadata: {
+        mimeType: cleanText(input.imageMetadata?.mimeType),
+        width: Number.isFinite(input.imageMetadata?.width) ? input.imageMetadata.width : 0,
+        height: Number.isFinite(input.imageMetadata?.height) ? input.imageMetadata.height : 0,
+        byteLength: Number.isFinite(input.imageMetadata?.byteLength) ? input.imageMetadata.byteLength : 0
+      },
+      userContext: {
+        searchQuery: cleanText(input.userContext?.searchQuery),
+        selectedCorrectionType: cleanText(input.userContext?.selectedCorrectionType),
+        locale: cleanText(input.userContext?.locale) || "ko-KR"
+      }
+    };
+  }
+
+  function sortingVisionText(value, maxLength) {
+    return cleanText(value).slice(0, maxLength);
+  }
+
+  function sortingVisionConfidence(value) {
+    return SORTING_CONFIDENCE_BANDS.includes(value) ? value : "unknown";
+  }
+
+  function normalizeSortingVisionResponse(value) {
+    const raw = value && typeof value === "object" ? value : {};
+    const objectCandidates = Array.isArray(raw.objectCandidates) ? raw.objectCandidates : [];
+    const materialCandidates = Array.isArray(raw.materialCandidates) ? raw.materialCandidates : [];
+    const visibleCautions = Array.isArray(raw.visibleCautions) ? raw.visibleCautions : [];
+    const validItem = itemId => Boolean(sortingDbV2[itemId]);
+    const unique = new Set();
+    const normalizedObjects = objectCandidates
+      .map(candidate => ({
+        label: sortingVisionText(candidate?.label, SORTING_VISION_LIMITS.labelLength),
+        objectType: cleanText(candidate?.objectType),
+        itemId: cleanText(candidate?.itemId),
+        confidenceBand: sortingVisionConfidence(candidate?.confidenceBand)
+      }))
+      .filter(candidate => candidate.label && validItem(candidate.itemId) && sortingDbV2[candidate.itemId].objectType === candidate.objectType)
+      .filter(candidate => !unique.has(candidate.itemId) && unique.add(candidate.itemId))
+      .slice(0, SORTING_VISION_LIMITS.candidates);
+    const normalizedMaterials = materialCandidates
+      .map(candidate => ({ label: sortingVisionText(candidate?.label, SORTING_VISION_LIMITS.labelLength), confidenceBand: sortingVisionConfidence(candidate?.confidenceBand) }))
+      .filter(candidate => candidate.label)
+      .slice(0, SORTING_VISION_LIMITS.candidates);
+    const normalizedCautions = [...new Set(visibleCautions.map(caution => sortingVisionText(caution, SORTING_VISION_LIMITS.cautionLength)).filter(Boolean))]
+      .slice(0, SORTING_VISION_LIMITS.cautions);
+    return {
+      schemaVersion: raw.schemaVersion,
+      requestId: sortingVisionText(raw.requestId, 80),
+      provider: raw.provider,
+      objectCandidates: normalizedObjects,
+      materialCandidates: normalizedMaterials,
+      visibleCautions: normalizedCautions,
+      uncertainty: ["low", "medium", "high"].includes(raw.uncertainty) ? raw.uncertainty : "high",
+      needsUserCheck: typeof raw.needsUserCheck === "boolean" ? raw.needsUserCheck : true
+    };
+  }
+
+  function validateSortingVisionResponse(value) {
+    const errors = [];
+    if (!value || typeof value !== "object") errors.push("invalid_response");
+    if (value?.schemaVersion !== SORTING_VISION_SCHEMA_VERSION) errors.push("unsupported_schema");
+    if (value?.provider !== SORTING_VISION_SOURCES.FUTURE_GEMINI) errors.push("invalid_provider");
+    if (!cleanText(value?.requestId)) errors.push("invalid_request_id");
+    if (!Array.isArray(value?.objectCandidates)) errors.push("invalid_object_candidates");
+    if (!Array.isArray(value?.materialCandidates)) errors.push("invalid_material_candidates");
+    if (!Array.isArray(value?.visibleCautions)) errors.push("invalid_visible_cautions");
+    if (!["low", "medium", "high"].includes(value?.uncertainty)) errors.push("invalid_uncertainty");
+    if (typeof value?.needsUserCheck !== "boolean") errors.push("invalid_user_check");
+    const sanitizedValue = normalizeSortingVisionResponse(value);
+    if (sanitizedValue.objectCandidates.length !== (Array.isArray(value?.objectCandidates) ? value.objectCandidates.length : 0)) errors.push("invalid_candidate");
+    return { valid: errors.length === 0, errors: [...new Set(errors)], sanitizedValue };
+  }
+
+  function createSortingVisionHint(candidate, source, options = {}) {
+    const itemId = judgementKeyFor(candidate?.itemId || candidate?.key || "hold");
+    const item = sortingDbV2[itemId] || sortingDbV2.hold;
+    return {
+      source,
+      provider: options.provider || source,
+      label: sortingVisionText(candidate?.label || item.label, SORTING_VISION_LIMITS.labelLength),
+      objectType: item.objectType,
+      itemId,
+      confidenceBand: sortingVisionConfidence(options.confidenceBand || candidate?.confidenceBand),
+      rawConfidence: Number.isFinite(options.rawConfidence) ? options.rawConfidence : null,
+      requestId: cleanText(options.requestId),
+      schemaVersion: options.schemaVersion || SORTING_VISION_SCHEMA_VERSION
+    };
+  }
+
+  const sortingVisionProviders = Object.freeze({
+    mobilenet: { source: SORTING_VISION_SOURCES.MOBILENET, enabled: true },
+    teachableMachine: { source: SORTING_VISION_SOURCES.TEACHABLE_MACHINE, enabled: true },
+    futureGemini: {
+      source: SORTING_VISION_SOURCES.FUTURE_GEMINI,
+      enabled: false,
+      async analyze({ requestId } = {}) {
+        return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: "provider_not_connected", requestId: cleanText(requestId) };
+      }
+    }
+  });
+
+  function mergeSortingVisionHints(hints) {
+    const seen = new Set();
+    return hints.filter(hint => hint?.itemId && !seen.has(`${hint.source}:${hint.itemId}`) && seen.add(`${hint.source}:${hint.itemId}`));
+  }
+
+  window.AIWaysSortingVisionContract = Object.freeze({
+    schemaVersion: SORTING_VISION_SCHEMA_VERSION,
+    sources: SORTING_VISION_SOURCES,
+    states: SORTING_VISION_STATES,
+    createRequestMetadata: createSortingVisionRequestMetadata,
+    validateResponse: validateSortingVisionResponse,
+    normalizeResponse: normalizeSortingVisionResponse,
+    createHint: createSortingVisionHint,
+    futureProvider: sortingVisionProviders.futureGemini
+  });
+
   function findJudgementKeys(value) {
     const text = cleanText(value).toLowerCase();
     if (!text) return ["hold"];
@@ -3241,15 +3385,17 @@
   function getJudgementResult(input, options = {}) {
     const inputSource = options.source || input?.source || (typeof input === "string" ? "quick" : "search");
     const source = {
-      quick: "quick_select",
-      search: "search_rule",
-      correction: "user_correction",
+      quick: SORTING_INPUT_SOURCES.quick,
+      search: SORTING_INPUT_SOURCES.search,
+      correction: SORTING_INPUT_SOURCES.correction,
       photo: options.candidateSource || "mobilenet_hint",
       initial: "quick_select",
       future_gemini: "future_gemini"
     }[inputSource] || inputSource;
     const query = cleanText(options.query || input?.query || "");
-    const candidateKeys = options.candidateKeys || (inputSource === "search" ? findJudgementKeys(query || input) : [judgementKeyFor(input)]);
+    const candidateKeys = Array.isArray(options.candidateKeys) && options.candidateKeys.length
+      ? options.candidateKeys
+      : (inputSource === "search" ? findJudgementKeys(query || input) : [judgementKeyFor(input)]);
     const key = judgementKeyFor(options.key || candidateKeys[0]);
     const item = sortingDbV2[key] || sortingDbV2.hold;
     const candidateSource = options.candidateSource || source;
@@ -3260,6 +3406,9 @@
       key,
       item,
       source,
+      provider: options.provider || candidateSource,
+      schemaVersion: options.schemaVersion || SORTING_VISION_SCHEMA_VERSION,
+      requestId: cleanText(options.requestId),
       query,
       selectedItemId: key,
       objectCandidates: objectCandidateKeys.map((candidateKey, index) => {
@@ -3270,6 +3419,7 @@
           label: index === 1 && candidate.objectType === "hold" && !isAmbiguous ? "추가 확인 필요" : candidate.label,
           objectType: candidate.objectType,
           confidence: index === 0 ? options.confidence || "reference" : "possible",
+          confidenceBand: index === 0 ? sortingVisionConfidence(options.confidenceBand) : "unknown",
           source: index === 0 ? candidateSource : "search_rule"
         };
       }),
@@ -3495,13 +3645,28 @@
     return window.tmImage.load(baseUrl + "model.json", baseUrl + "metadata.json");
   }
 
-  async function classifyImage(image) {
+  function sortingVisionConfidenceBand(confidence) {
+    if (!Number.isFinite(confidence)) return "unknown";
+    if (confidence >= 0.8) return "high";
+    if (confidence >= 0.5) return "medium";
+    return "low";
+  }
+
+  async function classifyImage(image, options = {}) {
+    const requestMetadata = createSortingVisionRequestMetadata({
+      requestId: options.requestId,
+      imageMetadata: options.imageMetadata,
+      userContext: options.userContext
+    });
+    activeSortingVisionRequestId = requestMetadata.requestId;
     const hints = [];
     if (teachableMachineModelPromise) {
       try {
         const model = await teachableMachineModelPromise;
         const top = (await model.predict(image))?.[0];
-        if (top) hints.push({ label: top.className, confidence: top.probability, source: "tm_hint" });
+        if (top) hints.push(createSortingVisionHint({ label: top.className, itemId: judgementKeyFromVisualLabel(top.className) }, SORTING_VISION_SOURCES.TEACHABLE_MACHINE, {
+          provider: "teachable_machine", rawConfidence: top.probability, confidenceBand: sortingVisionConfidenceBand(top.probability), requestId: requestMetadata.requestId
+        }));
       } catch {
         teachableMachineModelPromise = null;
       }
@@ -3511,14 +3676,25 @@
         if (!mobileNetModelPromise) mobileNetModelPromise = window.mobilenet.load();
         const model = await mobileNetModelPromise;
         const top = (await model.classify(image))?.[0];
-        if (top) hints.push({ label: top.className, confidence: top.probability, source: "mobilenet_hint" });
+        if (top) hints.push(createSortingVisionHint({ label: top.className, itemId: judgementKeyFromVisualLabel(top.className) }, SORTING_VISION_SOURCES.MOBILENET, {
+          provider: "mobilenet", rawConfidence: top.probability, confidenceBand: sortingVisionConfidenceBand(top.probability), requestId: requestMetadata.requestId
+        }));
       } catch {
         mobileNetModelPromise = null;
       }
     }
-    const topHint = hints[0];
-    const mapped = topHint ? chooseDraftFromLabel(topHint.label, topHint.confidence) : { item: "기타 / 판단 보류", category: "기준 확인 필요", guidance: "사진만으로 재질과 오염 상태를 확정할 수 없습니다.", ruleBased: true };
-    return { ...mapped, hints, judgementKey: topHint ? judgementKeyFromVisualLabel(topHint.label) : "hold", confidence: topHint?.confidence ?? null, ruleBased: !topHint };
+    const mergedHints = mergeSortingVisionHints(hints);
+    const topHint = mergedHints[0];
+    const mapped = topHint ? chooseDraftFromLabel(topHint.label, topHint.rawConfidence) : { item: "기타 / 판단 보류", category: "기준 확인 필요", guidance: "사진만으로 재질과 오염 상태를 확정할 수 없습니다.", ruleBased: true };
+    return {
+      ...mapped,
+      hints: mergedHints,
+      judgementKey: topHint?.itemId || "hold",
+      confidence: topHint?.rawConfidence ?? null,
+      ruleBased: !topHint,
+      requestMetadata,
+      state: topHint ? (mergedHints.length > 1 ? SORTING_VISION_STATES.UNCERTAIN : SORTING_VISION_STATES.SUCCESS) : SORTING_VISION_STATES.UNAVAILABLE
+    };
   }
 
   function openModal() {
@@ -3633,7 +3809,10 @@
 
     image.onload = async () => {
       if (session !== modalSession) return;
-      const draft = await classifyImage(image);
+      const draft = await classifyImage(image, {
+        imageMetadata: { mimeType: file.type, width: image.naturalWidth, height: image.naturalHeight, byteLength: file.size },
+        userContext: { selectedCorrectionType: currentSortingJudgement?.selectedCorrectionType || "" }
+      });
       if (session !== modalSession) return;
       currentDraft = {
         input_type: "image",
@@ -3650,6 +3829,11 @@
       runThreeSecondJudgement({ key: draft.judgementKey }, {
         source: "photo",
         candidateSource: draft.hints?.[0]?.source || "mobilenet_hint",
+        provider: draft.hints?.[0]?.provider || "fallback_rule",
+        schemaVersion: draft.requestMetadata?.schemaVersion,
+        requestId: draft.requestMetadata?.requestId,
+        confidenceBand: draft.hints?.[0]?.confidenceBand,
+        candidateKeys: draft.hints?.map(hint => hint.itemId).filter(Boolean),
         confidence: draft.confidence,
         imageHints: draft.hints.map(hint => `${hint.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : "사진 기반 참고 후보"}: ${hint.label}`),
         delay: 0

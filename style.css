@@ -3562,20 +3562,12 @@ body.ranking-modal-open {
   .hah-description {
     white-space: normal;
   }
-}
-/* MAIN_ROOT_UI_FIX_20260704_END */
 
-@media (max-width: 1180px) {
-  .project-statement h2 span,
-  .hah-description {
-    white-space: normal;
-  }
-
-  .curriculum-scene,
-  .sorting-scene {
+  .curriculum-scene {
     grid-template-columns: 1fr;
   }
 }
+/* MAIN_ROOT_UI_FIX_20260704_END */
 
 /* COMMON_FINAL_FIX_START */
 body.modal-open {
@@ -10023,7 +10015,6 @@ body {
   .sorting-app .quick-result {
     grid-column: 1;
     grid-row: auto;
-    min-height: 0 !important;
   }
 
   .sorting-app .quick-action-row {
@@ -10229,8 +10220,7 @@ body {
 
   .curriculum-scene,
   .flow-scene,
-  .gallery-scene,
-  .sorting-scene {
+  .gallery-scene {
     grid-template-columns: minmax(0, 1fr) !important;
   }
 
@@ -10283,7 +10273,6 @@ body {
   .curriculum-scene,
   .flow-scene,
   .gallery-scene,
-  .sorting-scene,
   .resources-scene {
     grid-template-columns: minmax(0, 1fr) !important;
   }
@@ -10936,15 +10925,6 @@ body {
   line-height: 1.25;
 }
 
-@media (max-width: 1180px) {
-  .tm-model-line {
-    grid-template-columns: 1fr;
-  }
-
-  .tm-model-line small {
-    grid-column: auto;
-  }
-}
 /* FULL_MICRO_POLISH_PASS END */
 
 /* DASHBOARD_LAYOUT_OWNERSHIP: class panel, landfill monitor, and upload panel */
@@ -11181,7 +11161,12 @@ body {
   }
 
   #sorting .tm-model-line {
+    grid-template-columns: minmax(0, 1fr);
     padding: 10px;
+  }
+
+  #sorting .tm-model-line small {
+    grid-column: auto;
   }
 }
 

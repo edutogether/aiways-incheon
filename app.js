@@ -2710,7 +2710,14 @@
       timestamp: new Date().toISOString()
     });
     sortingDecisionHistory = sortingDecisionHistory.slice(0, 40);
-    writeJson(SORTING_DECISIONS_V2_KEY, sortingDecisionHistory);
+    try {
+      writeJson(SORTING_DECISIONS_V2_KEY, sortingDecisionHistory);
+      return true;
+    } catch {
+      // Keep the current result and checklist usable when browser storage is unavailable.
+      sortingDecisionHistory.shift();
+      return false;
+    }
   }
 
   const practiceBadgeSteps = [
@@ -3310,10 +3317,10 @@
     currentSortingJudgement = safeResult;
     container.innerHTML = `
       <header class="judgement-result-head"><p>AI가 확인할 항목을 제안합니다.</p><strong>${item.emoji} ${escapeHtml(item.label)}</strong><span>최종 배출 판단은 사용자가 결정합니다.</span></header>
-      <section class="judgement-candidate-block"><h4>물체 후보</h4><div class="judgement-chip-row">${objectChips}</div></section>
-      <section class="judgement-candidate-block"><h4>재질 후보</h4><div class="judgement-chip-row">${materialChips}</div></section>
+      <details class="judgement-details judgement-candidate-block" open><summary>물체 후보</summary><div class="judgement-chip-row">${objectChips}</div></details>
+      <details class="judgement-details judgement-candidate-block" open><summary>재질 후보</summary><div class="judgement-chip-row">${materialChips}</div></details>
       ${safeResult.imageHints.length ? `<p class="judgement-image-hint">${escapeHtml(safeResult.imageHints.join(" · "))}</p>` : ""}
-      <section class="judgement-cautions"><h4>보이는 주의 요소</h4><ul>${safeResult.visibleCautions.map(caution => `<li>${escapeHtml(caution)}</li>`).join("")}</ul></section>
+      <details class="judgement-details judgement-cautions"><summary>보이는 주의 요소</summary><ul>${safeResult.visibleCautions.map(caution => `<li>${escapeHtml(caution)}</li>`).join("")}</ul></details>
       <section class="judgement-checklist"><h4>배출 전 체크리스트</h4><div>${checklistHtml}</div></section>
       <section class="judgement-recommendation ${completed ? "is-ready" : "is-hold"}"><strong>${completed ? "잘했어요. 배출 준비가 완료됐습니다." : needsHold ? "지금 확정하지 않아도 됩니다. 확인이 필요한 물건으로 보류함에 저장할까요?" : "확인 항목을 마친 뒤 사용자가 최종 판단합니다."}</strong><span>${escapeHtml(item.primaryFlow)}</span></section>
       <section class="judgement-corrections"><span>AI가 항목을 잘못 읽었다면 바로 고쳐 주세요.</span><div>${correctionButtons}</div></section>
@@ -3339,6 +3346,26 @@
   function initQuickButtons() {
     const buttons = $$("[data-quick-item]");
     const result = $("[data-sorting-result]");
+    const modeButtons = $$("button[data-sorting-mode]");
+    const modeStatus = $("[data-sorting-mode-status]");
+    const modeCopy = {
+      photo: "사진을 찍거나 올려서 참고 후보를 확인할 수 있어요.",
+      search: "물건 이름을 검색해 규칙 기반 판단 지원을 받아보세요.",
+      quick: "자주 헷갈리는 물건을 빠르게 선택해 확인할 수 있어요."
+    };
+
+    function setSortingMode(mode) {
+      modeButtons.forEach(button => {
+        const active = button.dataset.sortingMode === mode;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+      result?.closest(".sorting-app")?.setAttribute("data-sorting-mode", mode);
+      if (modeStatus) modeStatus.textContent = modeCopy[mode] || modeCopy.photo;
+    }
+
+    modeButtons.forEach(button => button.addEventListener("click", () => setSortingMode(button.dataset.sortingMode)));
+    setSortingMode("photo");
 
     function itemFromSearch(value) {
       return findJudgementKeys(value);
@@ -3415,11 +3442,13 @@
       }
       const action = event.target.closest("[data-judgement-action]");
       if (!action || !currentSortingJudgement) return;
+      if (action.disabled || action.dataset.pending === "true") return;
+      action.dataset.pending = "true";
       const decision = currentSortingJudgement;
       const legacyItem = { label: decision.item.label, emoji: decision.item.emoji, category: decision.item.category, carbonSaved: decision.item.carbonSaved };
       if (action.dataset.judgementAction === "record") {
         logSortingPractice(legacyItem);
-        saveSortingDecisionV2(decision, "recorded");
+        if (!saveSortingDecisionV2(decision, "recorded")) action.textContent = "저장 공간을 확인해 주세요";
       } else if (action.dataset.judgementAction === "decide") {
         saveSortingDecisionV2(decision, "user_confirmed");
         renderJudgementResult({ ...decision, hold: { ...decision.hold, recommended: false } }, result);

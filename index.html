@@ -403,16 +403,22 @@
             </div>
             <div class="tab-panel is-active" data-panel="classify">
               <h3>사진 또는 검색으로 분류 초안 만들기</h3>
-              <div class="upload-actions sorting-upload">
+              <div class="sorting-mode-switch" role="group" aria-label="판단 입력 방식">
+                <button type="button" class="is-active" data-sorting-mode="photo" aria-pressed="true">사진 확인</button>
+                <button type="button" data-sorting-mode="search" aria-pressed="false">검색</button>
+                <button type="button" data-sorting-mode="quick" aria-pressed="false">빠른 선택</button>
+              </div>
+              <p class="sorting-mode-status" data-sorting-mode-status aria-live="polite">사진을 찍거나 올려서 참고 후보를 확인할 수 있어요.</p>
+              <div class="upload-actions sorting-upload" data-sorting-mode-panel="photo">
                 <button type="button" data-upload="camera"><span class="sorting-upload-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8.5h4.2L10 6h4l1.8 2.5H20v10H4z" /><circle cx="12" cy="13.5" r="3.3" /></svg></span><strong>카메라로 지금 찍기</strong><em>교실에서 바로 촬영</em></button>
                 <button type="button" data-upload="file"><span class="sorting-upload-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2.4" /><path d="M7 16l3.2-3.2 2.6 2.6 2-2L20 18" /><circle cx="15.7" cy="9.4" r="1.3" /></svg></span><strong>찍은 사진 올리기</strong><em>저장된 사진 선택</em></button>
               </div>
-              <label class="search-line">
+              <label class="search-line" data-sorting-mode-panel="search">
                 <span>검색 입력</span>
                 <input id="searchInput" type="search" placeholder="예: 우유갑, 과자 봉지" />
                 <button type="button" id="searchButton" aria-label="검색 분류"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="5.8" /><path d="M15.2 15.2L20 20" /></svg></button>
               </label>
-              <div class="quick-buttons" aria-label="3초 판단 물건 선택">
+              <div class="quick-buttons" data-sorting-mode-panel="quick" aria-label="3초 판단 물건 선택">
                 <button type="button" data-quick-item="milk">🥛 우유갑</button>
                 <button type="button" data-quick-item="paper">📄 종이류</button>
                 <button type="button" data-quick-item="cup">🥤 플라스틱컵</button>
@@ -422,14 +428,14 @@
                 <button type="button" data-quick-item="receipt">🧾 영수증</button>
                 <button type="button" data-quick-item="hold">🟨 판단 보류</button>
               </div>
-              <div class="tm-model-line">
-                <span>Teachable Machine 모델 링크</span>
+              <details class="tm-model-line" data-sorting-details="tm">
+                <summary>우리 학교 학습 모델 · 수업 확장 기능</summary>
                 <div class="tm-model-controls">
                   <input id="tmModelInput" type="url" placeholder="https://teachablemachine.withgoogle.com/models/..." />
                   <button type="button" id="tmApplyButton">적용</button>
                 </div>
                 <small id="tmModelState">선택 사항 · 우리 학교 학습 모델의 참고 후보로만 사진 판단에 활용합니다.</small>
-              </div>
+              </details>
               <div class="quick-result is-empty" data-sorting-result>
                 <span data-quick-category>AI 판단 지원 준비</span>
                 <p data-quick-guidance>AI가 확인할 항목을 제안하고, 분리배출 판단은 사용자가 결정합니다.</p>

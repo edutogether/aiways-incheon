@@ -11461,6 +11461,177 @@ body {
 /* TODO(phase2B): Shared responsive architecture rules still own the <=1180px
    one-column scene shell and <=560px classify grid. Keep them until a visual
    regression pass can safely separate the common scene rules. */
+/* STAGE_3_SORTING_MOBILE_APP_UX */
+#sorting .sorting-mode-switch {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid rgba(129, 181, 210, 0.18);
+  border-radius: 14px;
+  background: rgba(4, 17, 31, 0.48);
+}
+
+#sorting .sorting-mode-switch button {
+  min-height: 44px;
+  min-width: 0;
+  padding: 8px 6px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(197, 219, 231, 0.76);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+#sorting .sorting-mode-switch button.is-active {
+  border-color: rgba(94, 247, 205, 0.45);
+  background: rgba(57, 189, 158, 0.16);
+  color: #eafff8;
+}
+
+#sorting .sorting-mode-status {
+  min-height: 1.4em;
+  margin: -2px 2px 2px;
+  color: rgba(181, 208, 222, 0.76);
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+#sorting .sorting-app[data-sorting-mode] [data-sorting-mode-panel] {
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+#sorting .judgement-details {
+  display: grid;
+  gap: 7px;
+}
+
+#sorting .judgement-details > summary {
+  display: flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: space-between;
+  color: rgba(175, 205, 224, 0.7);
+  cursor: pointer;
+  font-size: 0.69rem;
+  font-weight: 850;
+  list-style: none;
+}
+
+#sorting .judgement-details > summary::-webkit-details-marker { display: none; }
+#sorting .judgement-details > summary::after { content: "+"; color: #a98aef; font-size: 1rem; }
+#sorting .judgement-details[open] > summary::after { content: "−"; }
+
+#sorting .tm-model-line {
+  display: block;
+}
+
+#sorting .tm-model-line > summary {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: space-between;
+  color: rgba(221, 239, 255, 0.8);
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 850;
+  list-style: none;
+}
+
+#sorting .tm-model-line > summary::-webkit-details-marker { display: none; }
+#sorting .tm-model-line > summary::after { content: "+"; color: #b89cff; font-size: 1rem; }
+#sorting .tm-model-line[open] > summary::after { content: "−"; }
+#sorting .tm-model-line .tm-model-controls { margin: 0 0 7px; }
+#sorting .tm-model-line small { display: block; margin: 0; }
+
+#sorting .judgement-actions button:disabled::after {
+  display: block;
+  margin-top: 2px;
+  color: rgba(215, 228, 236, 0.65);
+  content: "체크 후 사용";
+  font-size: 0.55rem;
+}
+
+@media (max-width: 768px) {
+  #sorting .sorting-app[data-sorting-mode="photo"] [data-sorting-mode-panel]:not([data-sorting-mode-panel="photo"]),
+  #sorting .sorting-app[data-sorting-mode="search"] [data-sorting-mode-panel]:not([data-sorting-mode-panel="search"]),
+  #sorting .sorting-app[data-sorting-mode="quick"] [data-sorting-mode-panel]:not([data-sorting-mode-panel="quick"]) {
+    display: none;
+  }
+
+  #sorting .sorting-upload button,
+  #sorting .quick-buttons button,
+  #sorting .judgement-check,
+  #sorting .judgement-corrections button {
+    min-height: 44px !important;
+  }
+
+  #sorting .judgement-result-head {
+    gap: 5px;
+    padding-bottom: 12px;
+  }
+
+  #sorting .judgement-details:not([open]) {
+    gap: 0;
+  }
+
+  #sorting .judgement-details > summary {
+    min-height: 44px;
+    padding: 0 2px;
+  }
+
+  #sorting .judgement-chip {
+    min-height: 36px;
+    align-items: flex-start;
+    padding: 8px 10px;
+  }
+
+  #sorting .judgement-chip-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #sorting .judgement-corrections > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #sorting .judgement-corrections button {
+    font-size: 0.72rem;
+  }
+
+  #sorting .judgement-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    gap: 8px;
+    padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+    background: linear-gradient(to bottom, transparent, rgba(4, 16, 30, 0.96) 22%);
+  }
+
+  #sorting .judgement-actions button {
+    min-height: 48px !important;
+    padding: 9px 10px;
+    font-size: 0.72rem;
+  }
+
+  #sorting .tm-model-line {
+    margin-top: 4px;
+    border-color: rgba(173, 140, 255, 0.2);
+  }
+}
+
+@media (max-width: 420px) {
+  #sorting .sorting-mode-switch button {
+    font-size: 0.68rem;
+  }
+
+  #sorting .judgement-chip-row,
+  #sorting .judgement-corrections > div {
+    grid-template-columns: 1fr;
+  }
+}
 /* SORTING_LAYOUT_OWNERSHIP END */
 
 /* LANDFILL_STATUS_GAUGE_REFRAME */

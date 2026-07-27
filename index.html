@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="./style.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
     <script defer src="./app.js"></script>
   </head>
   <body class="is-dashboard-preparing">
@@ -418,14 +417,6 @@
                 <button type="button" data-quick-item="can">🥫 캔류</button>
                 <button type="button" data-quick-item="receipt">🧾 영수증</button>
                 <button type="button" data-quick-item="hold">🟨 판단 보류</button>
-              </div>
-              <div class="tm-model-line">
-                <span>Teachable Machine 모델 링크</span>
-                <div class="tm-model-controls">
-                  <input id="tmModelInput" type="url" placeholder="https://teachablemachine.withgoogle.com/models/..." />
-                  <button type="button" id="tmApplyButton">적용</button>
-                </div>
-                <small id="tmModelState">선택 사항 · 링크를 붙여 넣으면 사진 판단에 활용합니다.</small>
               </div>
               <div class="quick-result is-empty" data-sorting-result>
                 <span data-quick-category>AI 1차 제안 대기</span>

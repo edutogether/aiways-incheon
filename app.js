@@ -1796,16 +1796,34 @@
       requestAnimationFrame(() => requestAnimationFrame(startChartAnimation));
     }
 
-    const totalNode = $(".landfill-metrics strong");
+    const landfillMetricNodes = $$(".landfill-metrics strong");
+    const totalNode = landfillMetricNodes[0];
     if (totalNode && last) {
       const totalText = Math.round(last.landfillTons).toLocaleString("ko-KR") + "t";
       if (animateLandfill) animateMetricText(totalNode, totalText, 620);
       else totalNode.textContent = totalText;
     }
+
+    const previous = points[points.length - 2];
+    const dayOverDay = previous?.landfillTons
+      ? ((last.landfillTons - previous.landfillTons) / previous.landfillTons) * 100
+      : 0;
+    const dayOverDayText = `${dayOverDay > 0 ? "+" : ""}${Math.round(dayOverDay * 10) / 10}%`;
+    const landfillMetrics = [
+      null,
+      dayOverDayText,
+      `${formatPercent(LANDFILL_INCOMING_PERCENT)}%`,
+      `${formatPercent(LANDFILL_REMAINING_PERCENT)}%`
+    ];
+
+    landfillMetrics.forEach((value, index) => {
+      const node = landfillMetricNodes[index];
+      if (!node || value === null) return;
+      if (animateLandfill) animateMetricText(node, value, 620);
+      else node.textContent = value;
+    });
+
     updateLandfillDonuts(animateLandfill);
-    if (animateLandfill) {
-      $$(".landfill-metrics strong").slice(1).forEach(node => animateMetricText(node, cleanText(node.textContent), 620));
-    }
   }
 
   function escapeHtml(value) {
@@ -2217,6 +2235,9 @@
     let dashboardLockUntil = Date.now() + 520;
     let pendingLightTimer = 0;
     let pendingLightFrame = 0;
+    let rewindTimer = 0;
+    let rewindActive = false;
+    let rewindCooldownUntil = 0;
 
     function cancelPendingLight() {
       window.clearTimeout(pendingLightTimer);
@@ -2340,13 +2361,70 @@
       return Boolean(event.target.closest("input, textarea, select, option, dialog, .ai-modal, [role='dialog']"));
     }
 
+    function canContinueInternalScroll(target, direction) {
+      let node = target instanceof Element ? target : null;
+      while (node && node !== document.body) {
+        const style = window.getComputedStyle(node);
+        const scrollable = /(auto|scroll|overlay)/.test(style.overflowY) && node.scrollHeight > node.clientHeight + 1;
+        if (scrollable) {
+          const remaining = direction > 0
+            ? node.scrollTop < node.scrollHeight - node.clientHeight - 1
+            : node.scrollTop > 1;
+          if (remaining) return true;
+        }
+        node = node.parentElement;
+      }
+      return false;
+    }
+
+    function rewindFromLastSection() {
+      if (rewindActive || Date.now() < rewindCooldownUntil) return;
+      rewindActive = true;
+      snapLocked = true;
+      clickLockUntil = Date.now() + 1800;
+      let nextIndex = sections.length - 2;
+
+      function moveToPrevious() {
+        const target = sections[nextIndex];
+        if (!target) {
+          const first = sections[0];
+          history.replaceState(null, "", "#" + first.id);
+          first.scrollIntoView({ behavior: "smooth", block: "start" });
+          activate(first, true, { sectionLight: false });
+          activateAfterSettle(first, 75);
+          window.setTimeout(() => {
+            activate(first, true);
+            rewindActive = false;
+            snapLocked = false;
+            clickLockUntil = 0;
+            rewindCooldownUntil = Date.now() + 900;
+          }, 360);
+          return;
+        }
+
+        history.replaceState(null, "", "#" + target.id);
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        activate(target, true, { sectionLight: false });
+        nextIndex -= 1;
+        rewindTimer = window.setTimeout(moveToPrevious, 120);
+      }
+
+      rewindTimer = window.setTimeout(moveToPrevious, 100);
+    }
+
   function snapByWheel(event) {
-      if (shouldSkipSnap(event) || Math.abs(event.deltaY) < 18 || snapLocked) return;
+      if (event.ctrlKey || shouldSkipSnap(event) || Math.abs(event.deltaY) < 18 || snapLocked) return;
       const active = sections.find(section => section.id === currentId) || nearestSection();
       const direction = event.deltaY > 0 ? 1 : -1;
+      if (canContinueInternalScroll(event.target, direction)) return;
       const currentIndex = currentSectionIndex(direction);
       const nextIndex = Math.min(sections.length - 1, Math.max(0, currentIndex + direction));
       if (nextIndex === currentIndex) {
+        if (direction > 0 && currentIndex === sections.length - 1 && window.innerWidth > 980) {
+          event.preventDefault();
+          rewindFromLastSection();
+          return;
+        }
         event.preventDefault();
         snapLocked = true;
         clickLockUntil = Date.now() + 420;
@@ -3080,29 +3158,6 @@
       applySearchValue();
     });
 
-    $("#tmApplyButton")?.addEventListener("click", async () => {
-      const state = $("#tmModelState");
-      const value = cleanText($("#tmModelInput")?.value);
-      if (!value) {
-        if (state) state.textContent = "모델 링크를 입력하면 적용할 수 있습니다.";
-        return;
-      }
-      if (state) state.textContent = "모델을 불러오는 중입니다...";
-      try {
-        modelPromise = await loadTeachableMachineModel(value);
-        if (state) state.textContent = modelPromise ? "Teachable Machine 모델이 적용되었습니다." : "모델 런타임을 사용할 수 없어 기본 판단을 유지합니다.";
-      } catch {
-        modelPromise = null;
-        if (state) state.textContent = "모델을 불러오지 못했습니다. 링크를 다시 확인해 주세요.";
-      }
-    });
-
-    $("#tmModelInput")?.addEventListener("keydown", event => {
-      if (event.key !== "Enter") return;
-      event.preventDefault();
-      $("#tmApplyButton")?.click();
-    });
-
     $("#practiceLogButton")?.addEventListener("click", () => {
       const item = selectedSortingItem();
       if (!item || item.isHold) return;
@@ -3129,14 +3184,6 @@
     if (normalized.includes("receipt") || normalized.includes("영수증")) return { ...quickItems.receipt, confidence };
     if (normalized.includes("vinyl") || normalized.includes("비닐")) return { ...quickItems.vinyl, confidence };
     return { ...quickItems.paper, confidence };
-  }
-
-  async function loadTeachableMachineModel(modelUrl) {
-    if (!modelUrl || !window.tmImage) return null;
-    let baseUrl = cleanText(modelUrl);
-    baseUrl = baseUrl.replace(/\/(model|metadata)\.json(?:\?.*)?$/i, "/");
-    baseUrl = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
-    return window.tmImage.load(baseUrl + "model.json", baseUrl + "metadata.json");
   }
 
   async function classifyImage(image) {

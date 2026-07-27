@@ -3217,7 +3217,7 @@
     return sortingKeyAliases[key] || "hold";
   }
 
-  // Stage 4 contract only: no remote provider, endpoint, credential, or image payload is used here.
+  // Stage 5 keeps image analysis advisory-only: remote hints never decide a disposal outcome.
   const SORTING_INPUT_SOURCES = Object.freeze({ quick: "quick_select", search: "search_rule", photo: "mobilenet_hint", correction: "user_correction", future: "future_gemini" });
   const SORTING_VISION_SOURCES = Object.freeze({ MOBILENET: "mobilenet_hint", TEACHABLE_MACHINE: "tm_hint", FUTURE_GEMINI: "future_gemini" });
   const SORTING_VISION_SCHEMA_VERSION = "sorting-vision-v1";
@@ -3330,14 +3330,74 @@
     };
   }
 
+  function getSortingVisionEndpoint() {
+    const configured = cleanText(window.AIWaysConfig?.sortingVisionEndpoint);
+    if (configured) return configured;
+    if (["127.0.0.1", "localhost"].includes(window.location.hostname)) {
+      return "http://127.0.0.1:5001/demo-aiways-incheon/asia-northeast3/analyzeSortingImage";
+    }
+    return "";
+  }
+
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || "").split(",")[1] || "");
+      reader.onerror = () => reject(new Error("image_encode_failed"));
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async function prepareSortingVisionImage(image) {
+    const sourceWidth = image?.naturalWidth || image?.width || 0;
+    const sourceHeight = image?.naturalHeight || image?.height || 0;
+    if (!sourceWidth || !sourceHeight) return null;
+    const scale = Math.min(1, 768 / Math.max(sourceWidth, sourceHeight));
+    const width = Math.max(1, Math.round(sourceWidth * scale));
+    const height = Math.max(1, Math.round(sourceHeight * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+    if (!context) return null;
+    context.drawImage(image, 0, 0, width, height);
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.78));
+    if (!blob || blob.size > 1_500_000) return null;
+    const data = await blobToBase64(blob);
+    return data ? { mimeType: "image/jpeg", data, metadata: { mimeType: "image/jpeg", width, height, byteLength: blob.size } } : null;
+  }
+
+  async function requestSortingVisionHint({ requestMetadata, imagePayload }) {
+    const endpoint = getSortingVisionEndpoint();
+    if (!endpoint) return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: "provider_not_connected", requestId: requestMetadata.requestId };
+    if (!imagePayload || !window.fetch) return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: "image_prepare_failed", requestId: requestMetadata.requestId };
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 14_000);
+    try {
+      const response = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, signal: controller.signal, body: JSON.stringify({ ...requestMetadata, image: { mimeType: imagePayload.mimeType, data: imagePayload.data, metadata: imagePayload.metadata }, imageMetadata: imagePayload.metadata }) });
+      if (!response.ok) return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: "provider_unavailable", requestId: requestMetadata.requestId };
+      const raw = await response.json();
+      if (activeSortingVisionRequestId !== requestMetadata.requestId) return { ok: false, state: SORTING_VISION_STATES.IDLE, code: "stale", requestId: requestMetadata.requestId };
+      const checked = validateSortingVisionResponse(raw);
+      if (!checked.valid || checked.sanitizedValue.requestId !== requestMetadata.requestId) return { ok: false, state: SORTING_VISION_STATES.INVALID_RESPONSE, code: "invalid_response", requestId: requestMetadata.requestId };
+      return { ok: true, state: checked.sanitizedValue.uncertainty === "high" || checked.sanitizedValue.needsUserCheck ? SORTING_VISION_STATES.UNCERTAIN : SORTING_VISION_STATES.SUCCESS, value: checked.sanitizedValue, requestId: requestMetadata.requestId };
+    } catch (error) {
+      const code = error?.name === "AbortError" ? "timeout" : "analysis_failed";
+      return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code, requestId: requestMetadata.requestId };
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  }
+
   const sortingVisionProviders = Object.freeze({
     mobilenet: { source: SORTING_VISION_SOURCES.MOBILENET, enabled: true },
     teachableMachine: { source: SORTING_VISION_SOURCES.TEACHABLE_MACHINE, enabled: true },
     futureGemini: {
       source: SORTING_VISION_SOURCES.FUTURE_GEMINI,
-      enabled: false,
-      async analyze({ requestId } = {}) {
-        return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: "provider_not_connected", requestId: cleanText(requestId) };
+      enabled: true,
+      async analyze({ requestMetadata, imagePayload } = {}) {
+        if (!requestMetadata?.requestId) return { ok: false, state: SORTING_VISION_STATES.ERROR, code: "invalid_request", requestId: "" };
+        return requestSortingVisionHint({ requestMetadata, imagePayload });
       }
     }
   });
@@ -3456,7 +3516,7 @@
     const completed = safeResult.checklist.filter(check => check.required).every(check => check.status === "done");
     const needsHold = safeResult.hold.recommended || !completed;
     safeResult.canRecord = completed && !safeResult.hold.recommended;
-    const objectChips = safeResult.objectCandidates.map(candidate => `<span class="judgement-chip object"><b>${escapeHtml(candidate.label)}</b><em>${escapeHtml(candidate.source === "mobilenet_hint" ? "사진 기반 참고 후보" : candidate.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : candidate.source === "user" ? "사용자 선택" : "검색 후보")}</em></span>`).join("");
+    const objectChips = safeResult.objectCandidates.map(candidate => `<span class="judgement-chip object"><b>${escapeHtml(candidate.label)}</b><em>${escapeHtml(candidate.source === "mobilenet_hint" ? "사진 기반 참고 후보" : candidate.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : candidate.source === "future_gemini" ? "AI 사진 분석 참고 후보" : candidate.source === "user" ? "사용자 선택" : "검색 후보")}</em></span>`).join("");
     const materialChips = safeResult.materialCandidates.map(candidate => `<span class="judgement-chip material">${escapeHtml(candidate.label)}</span>`).join("");
     const correctionButtons = [["pet-bottle", "병"], ["plastic-cup", "컵"], ["tape-box", "박스"], ["snack-wrapper", "봉지"], ["paper-cup", "종이"], ["can", "캔"], ["glass-bottle", "유리"], ["hold", "기타"]].map(([type, label]) => `<button type="button" data-judgement-correction="${type}" class="${safeResult.selectedCorrectionType === type ? "is-active" : ""}">${label}</button>`).join("");
     const checklistHtml = safeResult.checklist.map(check => `<button type="button" class="judgement-check ${check.status === "done" ? "is-done" : ""}" data-judgement-check="${check.id}" aria-pressed="${check.status === "done"}"><span aria-hidden="true">${check.status === "done" ? "✓" : ""}</span>${escapeHtml(check.label)}</button>`).join("");
@@ -3683,6 +3743,17 @@
         mobileNetModelPromise = null;
       }
     }
+    try {
+      const imagePayload = await prepareSortingVisionImage(image);
+      const remote = await sortingVisionProviders.futureGemini.analyze({ requestMetadata, imagePayload });
+      if (remote.ok && activeSortingVisionRequestId === requestMetadata.requestId) {
+        remote.value.objectCandidates.forEach(candidate => hints.push(createSortingVisionHint(candidate, SORTING_VISION_SOURCES.FUTURE_GEMINI, {
+          provider: "future_gemini", confidenceBand: candidate.confidenceBand, requestId: requestMetadata.requestId, schemaVersion: remote.value.schemaVersion
+        })));
+      }
+    } catch {
+      // A local model or rule-based result remains available when advisory analysis cannot run.
+    }
     const mergedHints = mergeSortingVisionHints(hints);
     const topHint = mergedHints[0];
     const mapped = topHint ? chooseDraftFromLabel(topHint.label, topHint.rawConfidence) : { item: "기타 / 판단 보류", category: "기준 확인 필요", guidance: "사진만으로 재질과 오염 상태를 확정할 수 없습니다.", ruleBased: true };
@@ -3835,7 +3906,7 @@
         confidenceBand: draft.hints?.[0]?.confidenceBand,
         candidateKeys: draft.hints?.map(hint => hint.itemId).filter(Boolean),
         confidence: draft.confidence,
-        imageHints: draft.hints.map(hint => `${hint.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : "사진 기반 참고 후보"}: ${hint.label}`),
+        imageHints: draft.hints.map(hint => `${hint.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : hint.source === "future_gemini" ? "AI 사진 분석 참고 후보" : "사진 기반 참고 후보"}: ${hint.label}`),
         delay: 0
       });
     };

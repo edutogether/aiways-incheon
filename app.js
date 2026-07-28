@@ -2951,6 +2951,8 @@
   const FIRESTORE_EMULATOR_PROJECT_ID = "demo-aiways-incheon";
   const FIRESTORE_EMULATOR_ACTOR_ID = "emulator-test-actor";
   const FIRESTORE_EMULATOR_SAVE_URL = `http://127.0.0.1:5001/${FIRESTORE_EMULATOR_PROJECT_ID}/asia-northeast3/saveSortingRecord`;
+  const FIRESTORE_EMULATOR_LIST_URL = `http://127.0.0.1:5001/${FIRESTORE_EMULATOR_PROJECT_ID}/asia-northeast3/listSortingRecords`;
+  const FIRESTORE_EMULATOR_RESOLVE_URL = `http://127.0.0.1:5001/${FIRESTORE_EMULATOR_PROJECT_ID}/asia-northeast3/resolveSortingRecord`;
   let pendingFirestoreRecordSave = null;
 
   function isFirestoreEmulatorStorageMode(locationLike = window.location) {
@@ -2963,6 +2965,29 @@
     if (window.crypto?.randomUUID) return window.crypto.randomUUID();
     const bytes = window.crypto?.getRandomValues ? window.crypto.getRandomValues(new Uint32Array(4)) : [Date.now(), Math.random() * 0xffffffff, Math.random() * 0xffffffff, Math.random() * 0xffffffff];
     return Array.from(bytes, value => Number(value >>> 0).toString(36)).join("-");
+  }
+
+  async function loadFirestoreEmulatorHolds() {
+    if (!isFirestoreEmulatorStorageMode()) return false;
+    try {
+      const response = await fetch(FIRESTORE_EMULATOR_LIST_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actorId: FIRESTORE_EMULATOR_ACTOR_ID, pageSize: 20, statusFilter: "held" }) });
+      const body = await response.json();
+      if (!response.ok || !Array.isArray(body.records)) return false;
+      const remote = body.records.map(record => ({ id: `firestore-${record.recordId}`, remoteRecordId: record.recordId, name: cleanText(record.analysis?.objectCandidates?.[0]?.label) || "판단 보류 물건", reason: cleanText(record.hold?.reasons?.[0]) || "기준 확인 필요", status: "테스트 서버 보류", candidate: cleanText(record.provider), judgement: { checklist: Array.isArray(record.checklist) ? record.checklist : [], userDecision: record.userDecision || {} }, time: cleanText(record.createdAt).replace("T", " ").slice(0, 16), synced: true }));
+      sortingHoldItems = [...remote, ...sortingHoldItems.filter(item => !item.remoteRecordId)];
+      renderSortingHolds();
+      return true;
+    } catch { return false; }
+  }
+
+  async function resolveFirestoreEmulatorHold(item) {
+    if (!isFirestoreEmulatorStorageMode() || !item?.remoteRecordId) return false;
+    const checklist = Array.isArray(item.judgement?.checklist) ? item.judgement.checklist : [];
+    if (!checklist.length || checklist.some(check => !check.checked)) return false;
+    const userDecision = item.judgement?.userDecision;
+    if (!userDecision?.userConfirmed) return false;
+    const response = await fetch(FIRESTORE_EMULATOR_RESOLVE_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actorId: FIRESTORE_EMULATOR_ACTOR_ID, recordId: item.remoteRecordId, idempotencyKey: item.__resolveKey || (item.__resolveKey = createFirestoreIdempotencyKey()), resolutionType: "confirmed_after_review", userDecision: { selectedItemId: userDecision.selectedItemId, action: "recorded", userConfirmed: true }, checklist }) });
+    return response.ok;
   }
 
   function recordPayloadFromDecision(decision, status, idempotencyKey) {
@@ -3228,6 +3253,7 @@
     loadSortingStorage();
     renderSortingStats();
     renderSortingHolds();
+    loadFirestoreEmulatorHolds();
     initHoldEmojiPreview();
     initNestedScrollIsolation();
 
@@ -3246,10 +3272,20 @@
       $("#manualHoldButton")?.click();
     });
 
-    $("#holdList")?.addEventListener("click", event => {
+    $("#holdList")?.addEventListener("click", async event => {
       const button = event.target.closest("[data-resolve-hold]");
       if (!button) return;
       const id = button.dataset.resolveHold;
+      const item = sortingHoldItems.find(entry => entry.id === id);
+      if (item?.remoteRecordId) {
+        if (button.dataset.pending === "true") return;
+        button.dataset.pending = "true";
+        button.disabled = true;
+        try {
+          if (await resolveFirestoreEmulatorHold(item)) await loadFirestoreEmulatorHolds();
+        } finally { button.disabled = false; button.dataset.pending = "false"; }
+        return;
+      }
       sortingHoldItems = sortingHoldItems.filter(item => item.id !== id);
       saveSortingHolds();
       renderSortingHolds();

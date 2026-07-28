@@ -4,8 +4,8 @@
   "main": "index.js",
   "engines": { "node": "20" },
   "scripts": {
-    "test": "node --test test/sortingVision.test.js test/sortingRecord.test.js",
-    "check": "node --check index.js && node --check lib/sortingVision.js && node --check lib/sortingVisionSchema.js && node --check lib/sortingRecord.js && node --check test/sortingVision.test.js && node --check test/sortingRecord.test.js && node --check test/emulatorSmoke.js && node --check test/recordEmulatorSmoke.js && node --check test/browserSmoke.js",
+    "test": "node --test test/sortingVision.test.js test/sortingRecord.test.js test/stage6ClientContract.test.js",
+    "check": "node --check index.js && node --check lib/sortingVision.js && node --check lib/sortingVisionSchema.js && node --check lib/sortingRecord.js && node --check test/sortingVision.test.js && node --check test/sortingRecord.test.js && node --check test/stage6ClientContract.test.js && node --check test/emulatorSmoke.js && node --check test/recordEmulatorSmoke.js && node --check test/browserSmoke.js",
     "serve": "firebase emulators:start --only functions,firestore --project demo-aiways-incheon",
     "emulator:test": "firebase emulators:exec --only functions,firestore --project demo-aiways-incheon \"node test/recordEmulatorSmoke.js\""
   },

@@ -2948,16 +2948,80 @@
     `).join("");
   }
 
-  async function logSortingPractice(item) {
-    const saved = await appendRecord(recordForSortingItem(item, false));
+  const FIRESTORE_EMULATOR_PROJECT_ID = "demo-aiways-incheon";
+  const FIRESTORE_EMULATOR_ACTOR_ID = "emulator-test-actor";
+  const FIRESTORE_EMULATOR_SAVE_URL = `http://127.0.0.1:5001/${FIRESTORE_EMULATOR_PROJECT_ID}/asia-northeast3/saveSortingRecord`;
+  let pendingFirestoreRecordSave = null;
+
+  function isFirestoreEmulatorStorageMode(locationLike = window.location) {
+    const hostname = cleanText(locationLike?.hostname).toLowerCase();
+    const storage = new URLSearchParams(locationLike?.search || "").get("storage");
+    return (hostname === "localhost" || hostname === "127.0.0.1") && storage === "firestore-emulator";
+  }
+
+  function createFirestoreIdempotencyKey() {
+    if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+    const bytes = window.crypto?.getRandomValues ? window.crypto.getRandomValues(new Uint32Array(4)) : [Date.now(), Math.random() * 0xffffffff, Math.random() * 0xffffffff, Math.random() * 0xffffffff];
+    return Array.from(bytes, value => Number(value >>> 0).toString(36)).join("-");
+  }
+
+  function recordPayloadFromDecision(decision, status, idempotencyKey) {
+    const objectCandidates = (Array.isArray(decision?.objectCandidates) ? decision.objectCandidates : []).slice(0, 3).map(candidate => ({
+      label: cleanText(candidate?.label).slice(0, 200), itemId: cleanText(candidate?.itemId).slice(0, 40), objectType: cleanText(candidate?.objectType).slice(0, 40), confidenceBand: sortingVisionConfidence(candidate?.confidenceBand || candidate?.confidence)
+    }));
+    const materialCandidates = (Array.isArray(decision?.materialCandidates) ? decision.materialCandidates : []).slice(0, 3).map(candidate => ({
+      label: cleanText(candidate?.label).slice(0, 200), confidenceBand: sortingVisionConfidence(candidate?.confidenceBand || candidate?.confidence)
+    }));
+    const visibleCautions = (Array.isArray(decision?.visibleCautions) ? decision.visibleCautions : []).slice(0, 5).map(value => cleanText(value).slice(0, 200)).filter(Boolean);
+    const checklist = (Array.isArray(decision?.checklist) ? decision.checklist : []).filter(item => item?.required !== false).slice(0, 20).map(item => ({ id: cleanText(item?.id).slice(0, 80), label: cleanText(item?.label).slice(0, 200), checked: item?.checked === true }));
+    const action = status === "held" ? "held" : "recorded";
+    return {
+      schemaVersion: "sorting-record-v1", status, provider: cleanText(decision?.provider || decision?.source || "local_rule").slice(0, 80),
+      ...(cleanText(decision?.model).slice(0, 80) ? { model: cleanText(decision.model).slice(0, 80) } : {}),
+      analysis: { objectCandidates, materialCandidates, visibleCautions }, checklist,
+      userDecision: { selectedItemId: cleanText(decision?.selectedItemId).slice(0, 40), ...(cleanText(decision?.selectedCorrectionType).slice(0, 80) ? { selectedCorrectionType: cleanText(decision.selectedCorrectionType).slice(0, 80) } : {}), action, userConfirmed: true },
+      hold: status === "held" ? { recommended: true, reasons: (Array.isArray(decision?.hold?.reasons) ? decision.hold.reasons : []).slice(0, 5).map(value => cleanText(value).slice(0, 200)).filter(Boolean) } : null,
+      appVersion: "clean-2026-07", sourceSchemaVersion: cleanText(decision?.schemaVersion).slice(0, 80), idempotencyKey, actorId: FIRESTORE_EMULATOR_ACTOR_ID
+    };
+  }
+
+  async function persistSortingRecordRemote(decision, status) {
+    if (!isFirestoreEmulatorStorageMode() || !decision) return { attempted: false, saved: null };
+    const existing = decision.__firestoreIdempotencyKey || createFirestoreIdempotencyKey();
+    decision.__firestoreIdempotencyKey = existing;
+    if (pendingFirestoreRecordSave?.key === existing) return pendingFirestoreRecordSave.promise;
+    const promise = fetch(FIRESTORE_EMULATOR_SAVE_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(recordPayloadFromDecision(decision, status, existing)) })
+      .then(async response => ({ attempted: true, saved: response.ok, status: response.status }))
+      .catch(() => ({ attempted: true, saved: false, status: 0 }));
+    pendingFirestoreRecordSave = { key: existing, promise };
+    try { return await promise; } finally { if (pendingFirestoreRecordSave?.key === existing) pendingFirestoreRecordSave = null; }
+  }
+
+  async function appendSortingDecisionRecord(record, decision, status) {
+    const remote = await persistSortingRecordRemote(decision, status);
+    if (remote.attempted) {
+      const nextRecords = localRecords();
+      nextRecords.push({ ...record, timestamp: new Date().toISOString(), local_time: new Date().toLocaleString("ko-KR") });
+      writeJson(STORAGE_RECORDS, nextRecords);
+      applyDashboard(allStoredRecords());
+      return remote.saved;
+    }
+    return appendRecord(record);
+  }
+
+  async function logSortingPractice(item, decision = null) {
+    const saved = await appendSortingDecisionRecord(recordForSortingItem(item, false), decision, "completed");
     recordSortingPracticeLocally(item, saved);
     const guidance = $("[data-quick-guidance]");
-    if (guidance) guidance.textContent = `${item.label} 실천이 Google Sheets 기록과 통계에 반영되었습니다. CO2 ${item.carbonSaved}g 저감으로 계산했어요.`;
+    if (guidance) guidance.textContent = isFirestoreEmulatorStorageMode()
+      ? (saved ? `${item.label} 테스트 기록을 로컬 저장소와 테스트 서버에 저장했어요.` : `${item.label} 기록은 로컬에 저장했어요. 테스트 서버 저장은 다시 시도할 수 있어요.`)
+      : `${item.label} 실천이 Google Sheets 기록과 통계에 반영되었습니다. CO2 ${item.carbonSaved}g 저감으로 계산했어요.`;
+    return saved;
   }
 
   async function addSortingHold(name, reason = "기준 확인 필요", decision = null) {
     const cleaned = cleanText(name) || "판단 보류 물건";
-    const saved = await appendRecord(recordForSortingItem({ label: cleaned, category: "기준 확인 필요" }, true, cleaned));
+    const saved = await appendSortingDecisionRecord(recordForSortingItem({ label: cleaned, category: "기준 확인 필요" }, true, cleaned), decision, "held");
     addSortingHoldLocally(cleaned, reason, saved, decision);
     if (decision) saveSortingDecisionV2(decision, "held");
   }
@@ -3639,7 +3703,7 @@
       $("#tmApplyButton")?.click();
     });
 
-    result?.addEventListener("click", event => {
+    result?.addEventListener("click", async event => {
       const correction = event.target.closest("[data-judgement-correction]");
       if (correction) {
         runThreeSecondJudgement(correction.dataset.judgementCorrection, { container: result, source: "correction", selectedCorrectionType: correction.dataset.judgementCorrection });
@@ -3661,15 +3725,19 @@
       action.dataset.pending = "true";
       const decision = currentSortingJudgement;
       const legacyItem = { label: decision.item.label, emoji: decision.item.emoji, category: decision.item.category, carbonSaved: decision.item.carbonSaved };
-      if (action.dataset.judgementAction === "record") {
-        logSortingPractice(legacyItem);
-        if (!saveSortingDecisionV2(decision, "recorded")) action.textContent = "저장 공간을 확인해 주세요";
-      } else if (action.dataset.judgementAction === "decide") {
-        saveSortingDecisionV2(decision, "user_confirmed");
-        renderJudgementResult({ ...decision, hold: { ...decision.hold, recommended: false } }, result);
-      } else {
-        const reason = decision.hold.reasons[0] || "확인 항목 또는 지역 기준 확인 필요";
-        addSortingHold(decision.item.label, reason, decision);
+      try {
+        if (action.dataset.judgementAction === "record") {
+          await logSortingPractice(legacyItem, decision);
+          if (!saveSortingDecisionV2(decision, "recorded")) action.textContent = "저장 공간을 확인해 주세요";
+        } else if (action.dataset.judgementAction === "decide") {
+          saveSortingDecisionV2(decision, "user_confirmed");
+          renderJudgementResult({ ...decision, hold: { ...decision.hold, recommended: false } }, result);
+        } else {
+          const reason = decision.hold.reasons[0] || "확인 항목 또는 지역 기준 확인 필요";
+          await addSortingHold(decision.item.label, reason, decision);
+        }
+      } finally {
+        action.dataset.pending = "false";
       }
     });
 

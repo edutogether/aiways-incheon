@@ -15,6 +15,11 @@ async function main() {
   assert.equal(doc.data().expireAt.toDate().getTime() - doc.data().createdAt.toDate().getTime() > 89 * 24 * 60 * 60 * 1000, true);
   const duplicate = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
   assert.equal(duplicate.status, 200);
+  const heldPayload = { ...payload, status: "held", idempotencyKey: "stage6-emulator-key-0002", userDecision: { selectedItemId: "pet-bottle", action: "held", userConfirmed: true }, hold: { recommended: true, reasons: ["Check local rule"] } };
+  const heldResponse = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(heldPayload) });
+  const held = await heldResponse.json();
+  assert.equal(heldResponse.status, 201); assert.equal(held.status, "held");
+  assert.equal((await getFirestore().doc(`actors/stage6-test-actor/records/${held.recordId}`).get()).data().hold.recommended, true);
   const directWrite = await fetch("http://127.0.0.1:8080/v1/projects/demo-aiways-incheon/databases/(default)/documents/actors/stage6-test-actor/records/direct-client-write", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fields: { status: { stringValue: "completed" } } }) });
   assert.equal(directWrite.ok, false, "default-deny Firestore Rules must reject direct client writes");
   process.stdout.write("Firestore Emulator record smoke test passed\n");

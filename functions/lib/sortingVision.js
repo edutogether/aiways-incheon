@@ -4,6 +4,7 @@ const { GoogleGenAI } = require("@google/genai");
 const { logger } = require("firebase-functions");
 const { randomUUID } = require("node:crypto");
 const { SCHEMA, ITEM_TYPES, errorResponse, validateRequest, validateResponse } = require("./sortingVisionSchema");
+const { observeAppCheck } = require("./appCheckProtection");
 
 const GEMINI_MODEL_ID = "gemini-3.5-flash-lite";
 
@@ -29,7 +30,7 @@ function applyCors(req, res) {
     res.set("Access-Control-Allow-Origin", origin);
     res.set("Vary", "Origin");
     res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.set("Access-Control-Allow-Headers", "Content-Type");
+    res.set("Access-Control-Allow-Headers", "Content-Type, X-Firebase-AppCheck");
   }
   return true;
 }
@@ -114,11 +115,13 @@ function createAnalyzeSortingHandler(dependencies = {}) {
   const logProviderError = dependencies.logProviderError || ((metadata) => logger.write({ severity: "ERROR", ...metadata }));
   const rateLimiter = dependencies.rateLimiter || { check: async () => ({ allowed: false, outcome: "unavailable" }) };
   const analysisRequests = dependencies.analysisRequests || { claimAnalysisRequest: async () => ({ state: "unavailable" }), completeAnalysisRequest: async () => false, failAnalysisRequest: async () => false };
+  const appCheck = dependencies.appCheck || (options => observeAppCheck(options.req,options));
   const logRateLimit = dependencies.logRateLimit || ((metadata) => logger.write({ severity: "INFO", ...metadata }));
   return async (req, res) => {
     if (!applyCors(req, res)) return res.status(403).json(errorResponse("invalid_request"));
     if (req.method === "OPTIONS") return res.status(204).send("");
     if (req.method !== "POST") return res.status(405).json(errorResponse("method_not_allowed"));
+    const appCheckResult=await appCheck({req,functionName:"analyzeSortingImage",logger:dependencies.logAppCheck}); if(appCheckResult.httpStatus)return res.status(appCheckResult.httpStatus).json(errorResponse(appCheckResult.code));
     const requestCheck = validateRequest(req.body);
     if (!requestCheck.valid) return res.status(["payload_too_large", "image_too_large", "image_dimensions_too_large"].includes(requestCheck.code) ? 413 : 400).json(errorResponse(requestCheck.code, requestCheck.requestId));
     const claim = await analysisRequests.claimAnalysisRequest(req.body.idempotencyKey);

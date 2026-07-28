@@ -2954,6 +2954,7 @@
   const FIRESTORE_EMULATOR_LIST_URL = `http://127.0.0.1:5001/${FIRESTORE_EMULATOR_PROJECT_ID}/asia-northeast3/listSortingRecords`;
   const FIRESTORE_EMULATOR_RESOLVE_URL = `http://127.0.0.1:5001/${FIRESTORE_EMULATOR_PROJECT_ID}/asia-northeast3/resolveSortingRecord`;
   let pendingFirestoreRecordSave = null;
+  async function appCheckHeaders() { return window.AIWaysAppCheck?.getAIWaysAppCheckHeaders?.() || null; }
 
   function isFirestoreEmulatorStorageMode(locationLike = window.location) {
     const hostname = cleanText(locationLike?.hostname).toLowerCase();
@@ -2970,7 +2971,7 @@
   async function loadFirestoreEmulatorHolds() {
     if (!isFirestoreEmulatorStorageMode()) return false;
     try {
-      const response = await fetch(FIRESTORE_EMULATOR_LIST_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actorId: FIRESTORE_EMULATOR_ACTOR_ID, pageSize: 20, statusFilter: "held" }) });
+      const tokenHeaders=await appCheckHeaders(); if(!tokenHeaders)return false; const response = await fetch(FIRESTORE_EMULATOR_LIST_URL, { method: "POST", headers: { "Content-Type": "application/json", ...tokenHeaders }, body: JSON.stringify({ actorId: FIRESTORE_EMULATOR_ACTOR_ID, pageSize: 20, statusFilter: "held" }) });
       const body = await response.json();
       if (!response.ok || !Array.isArray(body.records)) return false;
       const remote = body.records.map(record => ({ id: `firestore-${record.recordId}`, remoteRecordId: record.recordId, name: cleanText(record.analysis?.objectCandidates?.[0]?.label) || "판단 보류 물건", reason: cleanText(record.hold?.reasons?.[0]) || "기준 확인 필요", status: "테스트 서버 보류", candidate: cleanText(record.provider), judgement: { checklist: Array.isArray(record.checklist) ? record.checklist : [], userDecision: record.userDecision || {} }, time: cleanText(record.createdAt).replace("T", " ").slice(0, 16), synced: true }));
@@ -2986,7 +2987,7 @@
     if (!checklist.length || checklist.some(check => !check.checked)) return false;
     const userDecision = item.judgement?.userDecision;
     if (!userDecision?.userConfirmed) return false;
-    const response = await fetch(FIRESTORE_EMULATOR_RESOLVE_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actorId: FIRESTORE_EMULATOR_ACTOR_ID, recordId: item.remoteRecordId, idempotencyKey: item.__resolveKey || (item.__resolveKey = createFirestoreIdempotencyKey()), resolutionType: "confirmed_after_review", userDecision: { selectedItemId: userDecision.selectedItemId, action: "recorded", userConfirmed: true }, checklist }) });
+    const tokenHeaders=await appCheckHeaders(); if(!tokenHeaders)return false; const response = await fetch(FIRESTORE_EMULATOR_RESOLVE_URL, { method: "POST", headers: { "Content-Type": "application/json", ...tokenHeaders }, body: JSON.stringify({ actorId: FIRESTORE_EMULATOR_ACTOR_ID, recordId: item.remoteRecordId, idempotencyKey: item.__resolveKey || (item.__resolveKey = createFirestoreIdempotencyKey()), resolutionType: "confirmed_after_review", userDecision: { selectedItemId: userDecision.selectedItemId, action: "recorded", userConfirmed: true }, checklist }) });
     return response.ok;
   }
 
@@ -3015,7 +3016,7 @@
     const existing = decision.__firestoreIdempotencyKey || createFirestoreIdempotencyKey();
     decision.__firestoreIdempotencyKey = existing;
     if (pendingFirestoreRecordSave?.key === existing) return pendingFirestoreRecordSave.promise;
-    const promise = fetch(FIRESTORE_EMULATOR_SAVE_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(recordPayloadFromDecision(decision, status, existing)) })
+    const tokenHeaders=await appCheckHeaders(); if(!tokenHeaders)return {attempted:false,saved:false,status:0,code:"app_check_unavailable"}; const promise = fetch(FIRESTORE_EMULATOR_SAVE_URL, { method: "POST", headers: { "Content-Type": "application/json", ...tokenHeaders }, body: JSON.stringify(recordPayloadFromDecision(decision, status, existing)) })
       .then(async response => ({ attempted: true, saved: response.ok, status: response.status }))
       .catch(() => ({ attempted: true, saved: false, status: 0 }));
     pendingFirestoreRecordSave = { key: existing, promise };
@@ -3483,7 +3484,7 @@
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 14_000);
     try {
-      const response = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, signal: controller.signal, body: JSON.stringify({ ...requestMetadata, image: { mimeType: imagePayload.mimeType, data: imagePayload.data, metadata: imagePayload.metadata }, imageMetadata: imagePayload.metadata }) });
+      const tokenHeaders=await appCheckHeaders(); if(!tokenHeaders)return {ok:false,state:SORTING_VISION_STATES.UNAVAILABLE,code:"app_check_unavailable",requestId:requestMetadata.requestId}; const response = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json", ...tokenHeaders }, signal: controller.signal, body: JSON.stringify({ ...requestMetadata, image: { mimeType: imagePayload.mimeType, data: imagePayload.data, metadata: imagePayload.metadata }, imageMetadata: imagePayload.metadata }) });
       if (!response.ok) { const errorBody = await response.json().catch(() => ({})); return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: cleanText(errorBody?.code) || "provider_unavailable", requestId: requestMetadata.requestId }; }
       const raw = await response.json();
       if (activeSortingVisionRequestId !== requestMetadata.requestId) return { ok: false, state: SORTING_VISION_STATES.IDLE, code: "stale", requestId: requestMetadata.requestId };

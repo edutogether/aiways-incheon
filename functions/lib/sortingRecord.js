@@ -5,6 +5,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const MAX_BODY_BYTES = 24 * 1024;
 const FORBIDDEN_KEY = /(?:image|base64|data:image|url|authorization|api[_-]?key|secret|prompt|raw.*response|email|name|access.*code)/i;
 const ALLOWED_ORIGIN = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
+const { observeAppCheck } = require("./appCheckProtection");
 
 function reject(code) { return { valid: false, code }; }
 function cleanText(value, max = 200) {
@@ -23,7 +24,7 @@ function applyCors(req, res) {
     res.set("Access-Control-Allow-Origin", origin);
     res.set("Vary", "Origin");
     res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.set("Access-Control-Allow-Headers", "Content-Type");
+    res.set("Access-Control-Allow-Headers", "Content-Type, X-Firebase-AppCheck");
   }
   return true;
 }
@@ -94,10 +95,12 @@ function createSaveSortingRecordHandler(dependencies = {}) {
   const serverTimestamp = dependencies.serverTimestamp || (() => now());
   const store = dependencies.store;
   const rateLimiter = dependencies.rateLimiter || { check: async () => ({ allowed: false, outcome: "unavailable" }) };
+  const appCheck = dependencies.appCheck || (options => observeAppCheck(options.req,options));
   return async (req, res) => {
     if (!applyCors(req, res)) return res.status(403).json({ ok: false, code: "invalid_origin" });
     if (req.method === "OPTIONS") return res.status(204).send("");
     if (req.method !== "POST") return res.status(405).json({ ok: false, code: "method_not_allowed" });
+    const observed=await appCheck({req,functionName:"saveSortingRecord",logger:dependencies.logAppCheck}); if(observed.httpStatus)return res.status(observed.httpStatus).json({ok:false,code:observed.code});
     const bodyBytes = req.rawBody?.length ?? Buffer.byteLength(JSON.stringify(req.body || {}));
     if (bodyBytes > MAX_BODY_BYTES) return res.status(413).json({ ok: false, code: "request_too_large" });
     const checked = validateRecordRequest(req.body);

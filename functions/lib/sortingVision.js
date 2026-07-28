@@ -112,12 +112,21 @@ function createAnalyzeSortingHandler(dependencies = {}) {
   const getApiKey = dependencies.getApiKey || (() => "");
   const createClient = dependencies.createClient || createGeminiClient;
   const logProviderError = dependencies.logProviderError || ((metadata) => logger.write({ severity: "ERROR", ...metadata }));
+  const rateLimiter = dependencies.rateLimiter || { check: async () => ({ allowed: false, outcome: "unavailable" }) };
+  const logRateLimit = dependencies.logRateLimit || ((metadata) => logger.write({ severity: "INFO", ...metadata }));
   return async (req, res) => {
     if (!applyCors(req, res)) return res.status(403).json(errorResponse("invalid_request"));
     if (req.method === "OPTIONS") return res.status(204).send("");
     if (req.method !== "POST") return res.status(405).json(errorResponse("method_not_allowed"));
     const requestCheck = validateRequest(req.body);
     if (!requestCheck.valid) return res.status(["payload_too_large", "image_too_large", "image_dimensions_too_large"].includes(requestCheck.code) ? 413 : 400).json(errorResponse(requestCheck.code, requestCheck.requestId));
+    const limit = await rateLimiter.check("analyzeSortingImage");
+    logRateLimit({ functionName: "analyzeSortingImage", requestId: requestCheck.requestId, outcome: limit.outcome, retryAfterSeconds: limit.retryAfterSeconds || 0 });
+    if (!limit.allowed) {
+      if (limit.outcome === "unavailable") return res.status(503).json(errorResponse("protection_unavailable", requestCheck.requestId));
+      res.set("Retry-After", String(limit.retryAfterSeconds));
+      return res.status(429).json({ ...errorResponse("rate_limit_exceeded", requestCheck.requestId), retryAfterSeconds: limit.retryAfterSeconds });
+    }
     let apiKey = "";
     try { apiKey = getApiKey() || ""; } catch { apiKey = ""; }
     if (!apiKey) return res.status(503).json(errorResponse("provider_unavailable", requestCheck.requestId));

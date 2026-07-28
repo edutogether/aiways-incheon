@@ -93,6 +93,7 @@ function createSaveSortingRecordHandler(dependencies = {}) {
   const logger = dependencies.logger || (() => {});
   const serverTimestamp = dependencies.serverTimestamp || (() => now());
   const store = dependencies.store;
+  const rateLimiter = dependencies.rateLimiter || { check: async () => ({ allowed: false, outcome: "unavailable" }) };
   return async (req, res) => {
     if (!applyCors(req, res)) return res.status(403).json({ ok: false, code: "invalid_origin" });
     if (req.method === "OPTIONS") return res.status(204).send("");
@@ -103,6 +104,12 @@ function createSaveSortingRecordHandler(dependencies = {}) {
     if (!checked.valid) { logger({ validationCode: checked.code }); return res.status(400).json({ ok: false, code: checked.code }); }
     const actorId = dependencies.allowTestActor ? checked.value.testActorId : "";
     if (!actorId) return res.status(503).json({ ok: false, code: "actor_not_resolved" });
+    const limit = await rateLimiter.check("saveSortingRecord");
+    if (!limit.allowed) {
+      if (limit.outcome === "unavailable") return res.status(503).json({ ok: false, code: "protection_unavailable" });
+      res.set("Retry-After", String(limit.retryAfterSeconds));
+      return res.status(429).json({ ok: false, code: "rate_limit_exceeded", retryAfterSeconds: limit.retryAfterSeconds });
+    }
     const createdAt = now();
     const expireAt = new Date(createdAt.getTime() + 90 * DAY_MS);
     const record = { ...checked.value, actorId, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), expireAt };

@@ -39,7 +39,7 @@ function validateRequest(body) {
   const image = body.image || {};
   if (!ALLOWED_IMAGE_TYPES.has(image.mimeType)) return { valid: false, code: "unsupported_image_type", requestId };
   if (!isBase64(image.data)) return { valid: false, code: "invalid_image", requestId };
-  if (Buffer.byteLength(JSON.stringify(body), "utf8") > MAX_REQUEST_BYTES) return { valid: false, code: "image_too_large", requestId };
+  if (Buffer.byteLength(JSON.stringify(body), "utf8") > MAX_REQUEST_BYTES) return { valid: false, code: "payload_too_large", requestId };
   const byteLength = decodedByteLength(image.data);
   if (byteLength > MAX_IMAGE_BYTES) return { valid: false, code: "image_too_large", requestId };
   const imageCheck=validateImage(image.data,image.mimeType); if(!imageCheck.ok)return {valid:false,code:imageCheck.code,requestId};

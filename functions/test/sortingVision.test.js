@@ -37,9 +37,26 @@ test("rejects invalid schema, unknown item, type mismatch, long and HTML candida
   }
 });
 test("rejects unsupported, malformed and oversized image payloads", async () => {
-  assert.equal((await invoke(handlerFor(), "POST", requestBody({ image: { mimeType: "image/heic", data: imageData } }))).payload.code, "unsupported_image_type");
-  assert.equal((await invoke(handlerFor(), "POST", requestBody({ image: { mimeType: "image/jpeg", data: "not_base64" } }))).payload.code, "invalid_image");
-  assert.equal((await invoke(handlerFor(), "POST", requestBody({ imageMetadata: { mimeType: "image/jpeg", width: 12, height: 8, byteLength: 1_500_001 } }))).payload.code, "image_too_large");
+  let providerCalls = 0;
+  const inputHandler = createAnalyzeSortingHandler({ getApiKey: () => "mock", createClient: () => ({ models: { generateContent: async () => { providerCalls += 1; throw new Error("provider should not be called"); } } }) });
+  assert.equal((await invoke(inputHandler, "POST", requestBody({ image: { mimeType: "image/heic", data: imageData } }))).payload.code, "unsupported_image_type");
+  assert.equal((await invoke(inputHandler, "POST", requestBody({ image: { mimeType: "image/jpeg", data: "not_base64" } }))).payload.code, "invalid_image");
+
+  const payloadResult = await invoke(inputHandler, "POST", requestBody({ userContext: { searchQuery: "x".repeat(6 * 1024 * 1024) } }));
+  assert.equal(payloadResult.statusCode, 413); assert.equal(payloadResult.payload.code, "payload_too_large");
+
+  const oversized = Buffer.alloc(4 * 1024 * 1024 + 1); Buffer.from([137,80,78,71,13,10,26,10]).copy(oversized);
+  const data = oversized.toString("base64");
+  const imageResult = await invoke(inputHandler, "POST", requestBody({ image: { mimeType: "image/png", data }, imageMetadata: { mimeType: "image/png", width: 1, height: 1, byteLength: oversized.length } }));
+  assert.equal(imageResult.statusCode, 413); assert.equal(imageResult.payload.code, "image_too_large");
+
+  const signatureResult = await invoke(inputHandler, "POST", requestBody({ image: { mimeType: "image/jpeg", data: imageData }, imageMetadata: { mimeType: "image/jpeg", width: 1, height: 1, byteLength: Buffer.from(imageData, "base64").length } }));
+  assert.equal(signatureResult.statusCode, 400); assert.equal(signatureResult.payload.code, "image_signature_mismatch");
+
+  const overDimension = Buffer.alloc(24); Buffer.from([137,80,78,71,13,10,26,10]).copy(overDimension); overDimension.writeUInt32BE(5001, 16); overDimension.writeUInt32BE(1, 20);
+  const dimensionResult = await invoke(inputHandler, "POST", requestBody({ image: { mimeType: "image/png", data: overDimension.toString("base64") }, imageMetadata: { mimeType: "image/png", width: 5001, height: 1, byteLength: overDimension.length } }));
+  assert.equal(dimensionResult.statusCode, 413); assert.equal(dimensionResult.payload.code, "image_dimensions_too_large");
+  assert.equal(providerCalls, 0);
 });
 test("returns stable errors for unavailable provider, client error and method", async () => {
   assert.equal((await invoke(createAnalyzeSortingHandler({ getApiKey: () => "" }))).payload.code, "provider_unavailable");

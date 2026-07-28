@@ -117,7 +117,7 @@ function createAnalyzeSortingHandler(dependencies = {}) {
     if (req.method === "OPTIONS") return res.status(204).send("");
     if (req.method !== "POST") return res.status(405).json(errorResponse("method_not_allowed"));
     const requestCheck = validateRequest(req.body);
-    if (!requestCheck.valid) return res.status(400).json(errorResponse(requestCheck.code, requestCheck.requestId));
+    if (!requestCheck.valid) return res.status(["payload_too_large", "image_too_large", "image_dimensions_too_large"].includes(requestCheck.code) ? 413 : 400).json(errorResponse(requestCheck.code, requestCheck.requestId));
     let apiKey = "";
     try { apiKey = getApiKey() || ""; } catch { apiKey = ""; }
     if (!apiKey) return res.status(503).json(errorResponse("provider_unavailable", requestCheck.requestId));

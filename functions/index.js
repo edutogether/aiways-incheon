@@ -3,6 +3,7 @@ const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const { createAnalyzeSortingHandler } = require("./lib/sortingVision");
 const { createSaveSortingRecordHandler } = require("./lib/sortingRecord");
+const { createListSortingRecordsHandler, createResolveSortingRecordHandler } = require("./lib/sortingRecordQuery");
 const { getApps, initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const geminiApiKey = defineSecret("GEMINI_API_KEY");
@@ -31,3 +32,9 @@ exports.saveSortingRecord = onRequest({ region: "asia-northeast3", memory: "256M
   allowTestActor: process.env.FUNCTIONS_EMULATOR === "true",
   serverTimestamp: () => FieldValue.serverTimestamp(), store: recordStore
 }));
+const queryStore = {
+  async list(actorId, size, cursor, filter) { let q=db.collection("actors").doc(actorId).collection("records").orderBy("createdAt","desc").limit(size+1); if(filter!=="all") q=q.where("status","==",filter); if(cursor) q=q.startAfter(await db.collection("actors").doc(actorId).collection("records").doc(cursor).get()); const snap=await q.get(); const docs=snap.docs.slice(0,size); return {records:docs.map(d=>({id:d.id,data:d.data()})),nextCursor:snap.docs.length>size?docs.at(-1).id:null}; },
+  async resolve(actorId,b,serverTime) { const record=db.collection("actors").doc(actorId).collection("records").doc(b.recordId); const key=db.collection("actors").doc(actorId).collection("_resolutions").doc(b.idempotencyKey); return db.runTransaction(async tx=>{const prior=await tx.get(key); if(prior.exists)return {...prior.data(),duplicate:true}; const snap=await tx.get(record); if(!snap.exists)return {code:"not_found"}; if(snap.data().status!=="held")return {code:"conflict"}; const result={recordId:b.recordId,status:"completed",resolutionType:b.resolutionType,duplicate:false}; tx.update(record,{status:"completed",updatedAt:serverTime,resolvedAt:serverTime,resolutionType:b.resolutionType,userDecision:b.userDecision,checklist:b.checklist}); tx.create(key,result); return result;}); }
+};
+exports.listSortingRecords=onRequest({region:"asia-northeast3",cors:false},createListSortingRecordsHandler({store:queryStore,allowTestActor:process.env.FUNCTIONS_EMULATOR==="true"}));
+exports.resolveSortingRecord=onRequest({region:"asia-northeast3",cors:false},createResolveSortingRecordHandler({store:queryStore,allowTestActor:process.env.FUNCTIONS_EMULATOR==="true",serverTimestamp:()=>FieldValue.serverTimestamp()}));

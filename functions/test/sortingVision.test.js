@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { createAnalyzeSortingHandler } = require("../lib/sortingVision");
+const { createAnalyzeSortingHandler, redactProviderMessage, classifyProviderError, createSafeProviderErrorMeta } = require("../lib/sortingVision");
 
 const imageData = Buffer.from("aiways-image").toString("base64");
 function requestBody(overrides = {}) {
@@ -43,7 +43,10 @@ test("rejects unsupported, malformed and oversized image payloads", async () => 
 });
 test("returns stable errors for unavailable provider, client error and method", async () => {
   assert.equal((await invoke(createAnalyzeSortingHandler({ getApiKey: () => "" }))).payload.code, "provider_unavailable");
-  assert.equal((await invoke(createAnalyzeSortingHandler({ getApiKey: () => "mock", createClient: () => ({ models: { generateContent: async () => { throw new Error("internal"); } } }) }))).payload.code, "analysis_failed");
+  const logged = [];
+  const failed = await invoke(createAnalyzeSortingHandler({ getApiKey: () => "mock", createClient: () => ({ models: { generateContent: async () => { throw new Error("internal"); } } }), logProviderError: (metadata) => logged.push(metadata) }));
+  assert.equal(failed.payload.code, "analysis_failed");
+  assert.equal(failed.statusCode, 502); assert.equal(logged.length, 1); assert.equal(Object.hasOwn(logged[0], "stack"), false);
   assert.equal((await invoke(handlerFor(), "GET")).payload.code, "method_not_allowed");
 });
 test("does not reflect an unapproved browser origin", async () => {
@@ -56,4 +59,24 @@ test("does not reflect an unapproved browser origin", async () => {
 test("rejects a response whose requestId differs from the request", async () => {
   const result = await invoke(handlerFor(responseBody({ requestId: "other" })));
   assert.equal(result.statusCode, 502); assert.equal(result.payload.requestId, "test-request");
+});
+
+test("redacts API keys, bearer tokens, image data and base64 from provider messages", () => {
+  const apiKey = ["AI", "za", "123456789012345678901234567890"].join("");
+  const sensitive = `${apiKey} Bearer token-secret-123 data:image/png;base64,QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo= inlineData.data=QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo=`;
+  const redacted = redactProviderMessage(sensitive);
+  assert.match(redacted, /\[REDACTED\]/); assert.equal(redacted.includes(apiKey), false); assert.doesNotMatch(redacted, /token-secret|QUJDREV/);
+});
+
+test("classifies safe upstream error metadata without retaining request content", () => {
+  assert.equal(classifyProviderError({ status: 400 }), "invalid_request");
+  assert.equal(classifyProviderError({ status: 401, code: "API_KEY_INVALID" }), "api_key_invalid");
+  assert.equal(classifyProviderError({ status: 403, message: "API has not been used" }), "api_not_enabled");
+  assert.equal(classifyProviderError({ status: 403, providerStatus: "PERMISSION_DENIED" }), "permission_denied");
+  assert.equal(classifyProviderError({ status: 429 }), "quota_or_rate_limit");
+  assert.equal(classifyProviderError({ status: 503 }), "provider_internal");
+  assert.equal(classifyProviderError({}), "unknown");
+  const apiKey = ["AI", "za", "123456789012345678901234567890"].join("");
+  const metadata = createSafeProviderErrorMeta({ name: "ApiError", response: { status: 401, data: { error: { code: "API_KEY_INVALID", message: `key=${apiKey}` } } } }, "test-request", "diagnostic-test");
+  assert.equal(metadata.classification, "api_key_invalid"); assert.equal(metadata.providerMessage.includes(apiKey), false); assert.equal(Object.hasOwn(metadata, "body"), false);
 });

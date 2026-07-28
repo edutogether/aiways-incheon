@@ -3221,6 +3221,7 @@
   const SORTING_INPUT_SOURCES = Object.freeze({ quick: "quick_select", search: "search_rule", photo: "mobilenet_hint", correction: "user_correction", future: "future_gemini" });
   const SORTING_VISION_SOURCES = Object.freeze({ MOBILENET: "mobilenet_hint", TEACHABLE_MACHINE: "tm_hint", FUTURE_GEMINI: "future_gemini" });
   const SORTING_VISION_SCHEMA_VERSION = "sorting-vision-v1";
+  const SORTING_VISION_PRODUCTION_ENDPOINT = "https://asia-northeast3-ai-ways-incheon.cloudfunctions.net/analyzeSortingImage";
   const SORTING_VISION_STATES = Object.freeze({ IDLE: "idle", PREPARING: "preparing", ANALYZING: "analyzing", SUCCESS: "success", UNCERTAIN: "uncertain", UNAVAILABLE: "unavailable", INVALID_RESPONSE: "invalid_response", ERROR: "error" });
   const SORTING_CONFIDENCE_BANDS = Object.freeze(["high", "medium", "low", "unknown"]);
   const SORTING_VISION_LIMITS = Object.freeze({ candidates: 3, cautions: 5, labelLength: 40, cautionLength: 100 });
@@ -3336,7 +3337,7 @@
     if (["127.0.0.1", "localhost"].includes(window.location.hostname)) {
       return "http://127.0.0.1:5001/demo-aiways-incheon/asia-northeast3/analyzeSortingImage";
     }
-    return "";
+    return SORTING_VISION_PRODUCTION_ENDPOINT;
   }
 
   function blobToBase64(blob) {
@@ -3494,6 +3495,7 @@
       canRecord: false,
       hold: { recommended: isAmbiguous, reasons: [...item.holdReasons] },
       imageHints: options.imageHints || [],
+      liveGemini: options.liveGemini === true,
       selectedCorrectionType: options.selectedCorrectionType || "",
       createdAt,
       timestamp: createdAt
@@ -3515,6 +3517,7 @@
     const buttons = $$("[data-quick-item]");
     const completed = safeResult.checklist.filter(check => check.required).every(check => check.status === "done");
     const needsHold = safeResult.hold.recommended || !completed;
+    const liveGemini = safeResult.liveGemini === true;
     safeResult.canRecord = completed && !safeResult.hold.recommended;
     const objectChips = safeResult.objectCandidates.map(candidate => `<span class="judgement-chip object"><b>${escapeHtml(candidate.label)}</b><em>${escapeHtml(candidate.source === "mobilenet_hint" ? "사진 기반 참고 후보" : candidate.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : candidate.source === "future_gemini" ? "AI 사진 분석 참고 후보" : candidate.source === "user" ? "사용자 선택" : "검색 후보")}</em></span>`).join("");
     const materialChips = safeResult.materialCandidates.map(candidate => `<span class="judgement-chip material">${escapeHtml(candidate.label)}</span>`).join("");
@@ -3524,9 +3527,11 @@
     buttons.forEach(target => target.classList.toggle("is-active", target.dataset.quickItem === key));
     container?.classList.remove("is-empty", "is-scanning");
     container?.classList.add("is-result");
+    container?.classList.toggle("is-live-gemini", liveGemini);
     currentSortingJudgement = safeResult;
     container.innerHTML = `
       <header class="judgement-result-head"><p>AI가 확인할 항목을 제안합니다.</p><strong>${item.emoji} ${escapeHtml(item.label)}</strong><span>최종 배출 판단은 사용자가 결정합니다.</span></header>
+      ${liveGemini ? `<aside class="judgement-gemini-live" aria-label="Google Gemini live analysis"><strong>Google Gemini 분석 결과</strong><span>AI 사진 분석 참고 후보 · Live 분석 · Firebase Functions 연결</span><small>분석 엔진: Google Gemini · 서버 연결: Firebase Functions · 결과 출처: future_gemini · 최종 판단: 사용자</small></aside>` : ""}
       <details class="judgement-details judgement-candidate-block" open><summary>물체 후보</summary><div class="judgement-chip-row">${objectChips}</div></details>
       <details class="judgement-details judgement-candidate-block" open><summary>재질 후보</summary><div class="judgement-chip-row">${materialChips}</div></details>
       ${safeResult.imageHints.length ? `<p class="judgement-image-hint">${escapeHtml(safeResult.imageHints.join(" · "))}</p>` : ""}
@@ -3720,6 +3725,7 @@
     });
     activeSortingVisionRequestId = requestMetadata.requestId;
     const hints = [];
+    let liveGemini = false;
     if (teachableMachineModelPromise) {
       try {
         const model = await teachableMachineModelPromise;
@@ -3747,6 +3753,7 @@
       const imagePayload = await prepareSortingVisionImage(image);
       const remote = await sortingVisionProviders.futureGemini.analyze({ requestMetadata, imagePayload });
       if (remote.ok && activeSortingVisionRequestId === requestMetadata.requestId) {
+        liveGemini = true;
         remote.value.objectCandidates.forEach(candidate => hints.push(createSortingVisionHint(candidate, SORTING_VISION_SOURCES.FUTURE_GEMINI, {
           provider: "future_gemini", confidenceBand: candidate.confidenceBand, requestId: requestMetadata.requestId, schemaVersion: remote.value.schemaVersion
         })));
@@ -3762,6 +3769,7 @@
       hints: mergedHints,
       judgementKey: topHint?.itemId || "hold",
       confidence: topHint?.rawConfidence ?? null,
+      liveGemini,
       ruleBased: !topHint,
       requestMetadata,
       state: topHint ? (mergedHints.length > 1 ? SORTING_VISION_STATES.UNCERTAIN : SORTING_VISION_STATES.SUCCESS) : SORTING_VISION_STATES.UNAVAILABLE
@@ -3907,6 +3915,7 @@
         candidateKeys: draft.hints?.map(hint => hint.itemId).filter(Boolean),
         confidence: draft.confidence,
         imageHints: draft.hints.map(hint => `${hint.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : hint.source === "future_gemini" ? "AI 사진 분석 참고 후보" : "사진 기반 참고 후보"}: ${hint.label}`),
+        liveGemini: draft.liveGemini,
         delay: 0
       });
     };

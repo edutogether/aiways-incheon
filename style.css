@@ -11213,6 +11213,27 @@ body {
   line-height: 1.22;
 }
 
+#sorting .judgement-gemini-live {
+  display: grid;
+  gap: 3px;
+  padding: 9px 10px;
+  border: 1px solid rgba(151, 125, 255, 0.42);
+  border-radius: 11px;
+  background: linear-gradient(110deg, rgba(83, 163, 255, 0.16), rgba(162, 98, 245, 0.18), rgba(62, 222, 177, 0.14));
+  background-size: 220% 100%;
+  animation: gemini-live-shimmer 3.8s ease-in-out infinite;
+  color: #f2f4ff;
+}
+
+#sorting .judgement-gemini-live strong { font-size: 0.74rem; }
+#sorting .judgement-gemini-live span,
+#sorting .judgement-gemini-live small { color: rgba(230, 239, 255, 0.88); font-size: 0.66rem; line-height: 1.35; }
+
+@keyframes gemini-live-shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
 #sorting .judgement-candidate-block,
 #sorting .judgement-cautions,
 #sorting .judgement-checklist,

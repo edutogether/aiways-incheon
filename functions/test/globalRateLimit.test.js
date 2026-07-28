@@ -10,7 +10,7 @@ function memoryDb() { const docs=new Map(); return { docs, collection(name){retu
 function response() { const out={headers:{}}; return { out, set(k,v){out.headers[k]=v;return this;}, status(s){out.status=s;return this;}, json(b){out.body=b;return this;}, send(b){out.body=b;return this;} }; }
 async function invoke(handler, body={}) { const res=response(); await handler({method:"POST",headers:{"content-type":"application/json"},body},res); return res.out; }
 const imageData=Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADElEQVR42mNk+M/wHwAF/gL+QKQe2QAAAABJRU5ErkJggg==","base64").toString("base64");
-const imageBody={schemaVersion:"sorting-vision-v1",requestId:"rate-request",sessionId:"rate-session",locale:"ko-KR",source:"future_gemini",image:{mimeType:"image/png",data:imageData},imageMetadata:{mimeType:"image/png",width:1,height:1,byteLength:70},userContext:{}};
+const imageBody={schemaVersion:"sorting-vision-v1",requestId:"rate-request",sessionId:"rate-session",idempotencyKey:"123e4567-e89b-42d3-a456-426614174000",locale:"ko-KR",source:"future_gemini",image:{mimeType:"image/png",data:imageData},imageMetadata:{mimeType:"image/png",width:1,height:1,byteLength:70},userContext:{}};
 
 test("uses UTC buckets, retry bounds and deterministic rate-limit documents", async () => {
   let now=new Date("2026-07-28T23:59:59.500Z"); const db=memoryDb(); const limiter=createGlobalRateLimiter({db,now:()=>now,serverTimestamp:()=>"SERVER"});
@@ -30,8 +30,8 @@ test("enforces daily and record-function minute limits", async () => {
 
 test("handlers reject limits and failures before provider or record operations", async () => {
   let provider=0; const limited={check:async()=>({allowed:false,outcome:"minute_limited",retryAfterSeconds:9})};
-  const analyze=createAnalyzeSortingHandler({getApiKey:()=>"mock",rateLimiter:limited,createClient:()=>({models:{generateContent:async()=>{provider++;}}})}); const result=await invoke(analyze,imageBody); assert.equal(result.status,429); assert.equal(result.body.code,"rate_limit_exceeded"); assert.equal(result.headers["Retry-After"],"9"); assert.equal(provider,0);
-  const unavailable=createAnalyzeSortingHandler({getApiKey:()=>"mock",rateLimiter:{check:async()=>({allowed:false,outcome:"unavailable"})},createClient:()=>({models:{generateContent:async()=>{provider++;}}})}); assert.equal((await invoke(unavailable,imageBody)).body.code,"protection_unavailable"); assert.equal(provider,0);
+  const requests={claimAnalysisRequest:async()=>({state:"claimed"}),completeAnalysisRequest:async()=>true,failAnalysisRequest:async()=>true}; const analyze=createAnalyzeSortingHandler({getApiKey:()=>"mock",rateLimiter:limited,analysisRequests:requests,createClient:()=>({models:{generateContent:async()=>{provider++;}}})}); const result=await invoke(analyze,imageBody); assert.equal(result.status,429); assert.equal(result.body.code,"rate_limit_exceeded"); assert.equal(result.headers["Retry-After"],"9"); assert.equal(provider,0);
+  const unavailable=createAnalyzeSortingHandler({getApiKey:()=>"mock",rateLimiter:{check:async()=>({allowed:false,outcome:"unavailable"})},analysisRequests:requests,createClient:()=>({models:{generateContent:async()=>{provider++;}}})}); assert.equal((await invoke(unavailable,imageBody)).body.code,"protection_unavailable"); assert.equal(provider,0);
   const guard={check:async()=>{throw new Error("must not run")}}; const save=createSaveSortingRecordHandler({allowTestActor:false,rateLimiter:guard,store:{}}); assert.equal((await invoke(save,{})).body.code,"invalid_schema");
   const list=createListSortingRecordsHandler({allowTestActor:false,rateLimiter:guard,store:{}}); assert.equal((await invoke(list,{})).body.code,"actor_not_resolved");
   const resolve=createResolveSortingRecordHandler({allowTestActor:false,rateLimiter:guard,store:{}}); assert.equal((await invoke(resolve,{})).body.code,"actor_not_resolved");

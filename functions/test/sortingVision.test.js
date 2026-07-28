@@ -6,7 +6,7 @@ const { createAnalyzeSortingHandler, redactProviderMessage, classifyProviderErro
 
 const imageData = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADElEQVR42mNk+M/wHwAF/gL+QKQe2QAAAABJRU5ErkJggg==", "base64").toString("base64");
 function requestBody(overrides = {}) {
-  return { schemaVersion: "sorting-vision-v1", requestId: "test-request", sessionId: "test-session", locale: "ko-KR", source: "future_gemini", image: { mimeType: "image/png", data: imageData }, imageMetadata: { mimeType: "image/png", width: 1, height: 1, byteLength: Buffer.from(imageData, "base64").length }, userContext: {}, ...overrides };
+  return { schemaVersion: "sorting-vision-v1", requestId: "test-request", sessionId: "test-session", idempotencyKey: "123e4567-e89b-42d3-a456-426614174000", locale: "ko-KR", source: "future_gemini", image: { mimeType: "image/png", data: imageData }, imageMetadata: { mimeType: "image/png", width: 1, height: 1, byteLength: Buffer.from(imageData, "base64").length }, userContext: {}, ...overrides };
 }
 function responseBody(overrides = {}) {
   return { schemaVersion: "sorting-vision-v1", requestId: "test-request", provider: "future_gemini", objectCandidates: [{ label: "페트병", itemId: "pet-bottle", objectType: "pet-bottle", confidenceBand: "high" }], materialCandidates: [{ label: "PET", confidenceBand: "medium" }], visibleCautions: ["내용물을 비우세요"], uncertainty: "low", needsUserCheck: true, ...overrides };
@@ -18,7 +18,8 @@ async function invoke(handler, method = "POST", body = requestBody()) {
   return result;
 }
 const allowLimit = { check: async () => ({ allowed: true, outcome: "allowed" }) };
-function handlerFor(response = responseBody()) { return createAnalyzeSortingHandler({ getApiKey: () => "mock", rateLimiter: allowLimit, createClient: () => ({ models: { generateContent: async () => ({ text: JSON.stringify(response) }) } }) }); }
+const allowAnalysis = { claimAnalysisRequest: async () => ({ state: "claimed" }), completeAnalysisRequest: async () => true, failAnalysisRequest: async () => true };
+function handlerFor(response = responseBody()) { return createAnalyzeSortingHandler({ getApiKey: () => "mock", rateLimiter: allowLimit, analysisRequests: allowAnalysis, createClient: () => ({ models: { generateContent: async () => ({ text: JSON.stringify(response) }) } }) }); }
 
 test("returns validated observation candidates without raw model content", async () => {
   const result = await invoke(handlerFor());
@@ -39,7 +40,7 @@ test("rejects invalid schema, unknown item, type mismatch, long and HTML candida
 });
 test("rejects unsupported, malformed and oversized image payloads", async () => {
   let providerCalls = 0;
-  const inputHandler = createAnalyzeSortingHandler({ getApiKey: () => "mock", rateLimiter: allowLimit, createClient: () => ({ models: { generateContent: async () => { providerCalls += 1; throw new Error("provider should not be called"); } } }) });
+  const inputHandler = createAnalyzeSortingHandler({ getApiKey: () => "mock", rateLimiter: allowLimit, analysisRequests: allowAnalysis, createClient: () => ({ models: { generateContent: async () => { providerCalls += 1; throw new Error("provider should not be called"); } } }) });
   assert.equal((await invoke(inputHandler, "POST", requestBody({ image: { mimeType: "image/heic", data: imageData } }))).payload.code, "unsupported_image_type");
   assert.equal((await invoke(inputHandler, "POST", requestBody({ image: { mimeType: "image/jpeg", data: "not_base64" } }))).payload.code, "invalid_image");
 
@@ -60,9 +61,9 @@ test("rejects unsupported, malformed and oversized image payloads", async () => 
   assert.equal(providerCalls, 0);
 });
 test("returns stable errors for unavailable provider, client error and method", async () => {
-  assert.equal((await invoke(createAnalyzeSortingHandler({ getApiKey: () => "", rateLimiter: allowLimit }))).payload.code, "provider_unavailable");
+  assert.equal((await invoke(createAnalyzeSortingHandler({ getApiKey: () => "", rateLimiter: allowLimit, analysisRequests: allowAnalysis }))).payload.code, "provider_unavailable");
   const logged = [];
-  const failed = await invoke(createAnalyzeSortingHandler({ getApiKey: () => "mock", rateLimiter: allowLimit, createClient: () => ({ models: { generateContent: async () => { throw new Error("internal"); } } }), logProviderError: (metadata) => logged.push(metadata) }));
+  const failed = await invoke(createAnalyzeSortingHandler({ getApiKey: () => "mock", rateLimiter: allowLimit, analysisRequests: allowAnalysis, createClient: () => ({ models: { generateContent: async () => { throw new Error("internal"); } } }), logProviderError: (metadata) => logged.push(metadata) }));
   assert.equal(failed.payload.code, "analysis_failed");
   assert.equal(failed.statusCode, 502); assert.equal(logged.length, 1); assert.equal(Object.hasOwn(logged[0], "stack"), false);
   assert.equal((await invoke(handlerFor(), "GET")).payload.code, "method_not_allowed");

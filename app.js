@@ -3327,6 +3327,13 @@
   const SORTING_VISION_LIMITS = Object.freeze({ candidates: 3, cautions: 5, labelLength: 40, cautionLength: 100 });
   let sortingVisionRequestSequence = 0;
   let activeSortingVisionRequestId = "";
+  let activeSortingVisionIdempotencyKey = "";
+
+  function createAnalysisIdempotencyKey() {
+    if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+    if (window.crypto?.getRandomValues) { const bytes = new Uint8Array(16); window.crypto.getRandomValues(bytes); return [...bytes].map(value => value.toString(16).padStart(2, "0")).join(""); }
+    return "";
+  }
 
   function createSortingVisionRequestId(prefix = "sorting") {
     sortingVisionRequestSequence += 1;
@@ -3340,6 +3347,7 @@
       schemaVersion: SORTING_VISION_SCHEMA_VERSION,
       requestId,
       sessionId,
+      idempotencyKey: cleanText(input.idempotencyKey),
       locale: cleanText(input.locale) || "ko-KR",
       source: SORTING_VISION_SOURCES.FUTURE_GEMINI,
       imageMetadata: {
@@ -3476,7 +3484,7 @@
     const timeout = window.setTimeout(() => controller.abort(), 14_000);
     try {
       const response = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, signal: controller.signal, body: JSON.stringify({ ...requestMetadata, image: { mimeType: imagePayload.mimeType, data: imagePayload.data, metadata: imagePayload.metadata }, imageMetadata: imagePayload.metadata }) });
-      if (!response.ok) return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: "provider_unavailable", requestId: requestMetadata.requestId };
+      if (!response.ok) { const errorBody = await response.json().catch(() => ({})); return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: cleanText(errorBody?.code) || "provider_unavailable", requestId: requestMetadata.requestId }; }
       const raw = await response.json();
       if (activeSortingVisionRequestId !== requestMetadata.requestId) return { ok: false, state: SORTING_VISION_STATES.IDLE, code: "stale", requestId: requestMetadata.requestId };
       const checked = validateSortingVisionResponse(raw);
@@ -3824,6 +3832,7 @@
   async function classifyImage(image, options = {}) {
     const requestMetadata = createSortingVisionRequestMetadata({
       requestId: options.requestId,
+      idempotencyKey: options.idempotencyKey,
       imageMetadata: options.imageMetadata,
       userContext: options.userContext
     });
@@ -3964,6 +3973,7 @@
 
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     previewUrl = URL.createObjectURL(file);
+    activeSortingVisionIdempotencyKey = createAnalysisIdempotencyKey();
     const session = ++modalSession;
 
     const image = $("#modalPreview");
@@ -3994,6 +4004,7 @@
       if (session !== modalSession) return;
       const draft = await classifyImage(image, {
         imageMetadata: { mimeType: file.type, width: image.naturalWidth, height: image.naturalHeight, byteLength: file.size },
+        idempotencyKey: activeSortingVisionIdempotencyKey,
         userContext: { selectedCorrectionType: currentSortingJudgement?.selectedCorrectionType || "" }
       });
       if (session !== modalSession) return;

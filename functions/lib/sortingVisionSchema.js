@@ -2,6 +2,7 @@
 
 const SCHEMA = "sorting-vision-v1";
 const { MAX_IMAGE_BYTES, validateImage } = require("./imageValidation");
+const { validateIdempotencyKey } = require("./analysisIdempotency");
 const MAX_REQUEST_BYTES = 6*1024*1024;
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const ITEM_TYPES = Object.freeze({
@@ -35,6 +36,7 @@ function validateRequest(body) {
   const requestId = safeText(body.requestId, 80);
   if (body.schemaVersion !== SCHEMA) return { valid: false, code: "invalid_schema", requestId };
   if (!requestId || !safeText(body.sessionId, 100) || !safeText(body.locale, 20)) return { valid: false, code: "invalid_request", requestId };
+  if (!validateIdempotencyKey(body.idempotencyKey)) return { valid: false, code: "invalid_idempotency_key", requestId };
   if (body.source !== "future_gemini") return { valid: false, code: "invalid_request", requestId };
   const image = body.image || {};
   if (!ALLOWED_IMAGE_TYPES.has(image.mimeType)) return { valid: false, code: "unsupported_image_type", requestId };

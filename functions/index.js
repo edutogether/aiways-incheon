@@ -7,14 +7,16 @@ const { createListSortingRecordsHandler, createResolveSortingRecordHandler } = r
 const { getApps, initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { createGlobalRateLimiter } = require("./lib/globalRateLimit");
+const { createAnalysisIdempotency } = require("./lib/analysisIdempotency");
 const geminiApiKey = defineSecret("GEMINI_API_KEY");
 if (!getApps().length) initializeApp();
 const db = getFirestore();
 const rateLimiter = createGlobalRateLimiter({ db, serverTimestamp: () => FieldValue.serverTimestamp() });
+const analysisRequests = createAnalysisIdempotency({ db, serverTimestamp: () => FieldValue.serverTimestamp(), model: "gemini-3.5-flash-lite" });
 exports.analyzeSortingImage = onRequest({
   region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 30, minInstances: 0, maxInstances: 2, concurrency: 1,
   secrets: [geminiApiKey], cors: false
-}, createAnalyzeSortingHandler({ getApiKey: () => geminiApiKey.value(), rateLimiter }));
+}, createAnalyzeSortingHandler({ getApiKey: () => geminiApiKey.value(), rateLimiter, analysisRequests }));
 const recordStore = {
   async createOrGet(actorId, idempotencyKey, record, response) {
     const actor = db.collection("actors").doc(actorId);

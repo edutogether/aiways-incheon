@@ -113,6 +113,7 @@ function createAnalyzeSortingHandler(dependencies = {}) {
   const createClient = dependencies.createClient || createGeminiClient;
   const logProviderError = dependencies.logProviderError || ((metadata) => logger.write({ severity: "ERROR", ...metadata }));
   const rateLimiter = dependencies.rateLimiter || { check: async () => ({ allowed: false, outcome: "unavailable" }) };
+  const analysisRequests = dependencies.analysisRequests || { claimAnalysisRequest: async () => ({ state: "unavailable" }), completeAnalysisRequest: async () => false, failAnalysisRequest: async () => false };
   const logRateLimit = dependencies.logRateLimit || ((metadata) => logger.write({ severity: "INFO", ...metadata }));
   return async (req, res) => {
     if (!applyCors(req, res)) return res.status(403).json(errorResponse("invalid_request"));
@@ -120,23 +121,32 @@ function createAnalyzeSortingHandler(dependencies = {}) {
     if (req.method !== "POST") return res.status(405).json(errorResponse("method_not_allowed"));
     const requestCheck = validateRequest(req.body);
     if (!requestCheck.valid) return res.status(["payload_too_large", "image_too_large", "image_dimensions_too_large"].includes(requestCheck.code) ? 413 : 400).json(errorResponse(requestCheck.code, requestCheck.requestId));
+    const claim = await analysisRequests.claimAnalysisRequest(req.body.idempotencyKey);
+    if (claim.state === "completed") return res.status(200).json(claim.result);
+    if (claim.state === "processing") { res.set("Retry-After", "1"); return res.status(409).json({ ...errorResponse("request_in_progress", requestCheck.requestId), retryAfterSeconds: 1 }); }
+    if (claim.state === "expired") return res.status(409).json(errorResponse("request_expired", requestCheck.requestId));
+    if (claim.state === "failed") return res.status(claim.httpStatus || 503).json(errorResponse(claim.errorCode || "protection_unavailable", requestCheck.requestId));
+    if (claim.state !== "claimed") return res.status(503).json(errorResponse("protection_unavailable", requestCheck.requestId));
     const limit = await rateLimiter.check("analyzeSortingImage");
     logRateLimit({ functionName: "analyzeSortingImage", requestId: requestCheck.requestId, outcome: limit.outcome, retryAfterSeconds: limit.retryAfterSeconds || 0 });
     if (!limit.allowed) {
-      if (limit.outcome === "unavailable") return res.status(503).json(errorResponse("protection_unavailable", requestCheck.requestId));
+      if (limit.outcome === "unavailable") { await analysisRequests.failAnalysisRequest(req.body.idempotencyKey,"protection_unavailable",503); return res.status(503).json(errorResponse("protection_unavailable", requestCheck.requestId)); }
       res.set("Retry-After", String(limit.retryAfterSeconds));
+      await analysisRequests.failAnalysisRequest(req.body.idempotencyKey,"rate_limit_exceeded",429,new Date(Date.now()+limit.retryAfterSeconds*1000));
       return res.status(429).json({ ...errorResponse("rate_limit_exceeded", requestCheck.requestId), retryAfterSeconds: limit.retryAfterSeconds });
     }
     let apiKey = "";
     try { apiKey = getApiKey() || ""; } catch { apiKey = ""; }
-    if (!apiKey) return res.status(503).json(errorResponse("provider_unavailable", requestCheck.requestId));
+    if (!apiKey) { await analysisRequests.failAnalysisRequest(req.body.idempotencyKey,"provider_unavailable",503); return res.status(503).json(errorResponse("provider_unavailable", requestCheck.requestId)); }
     try {
       const rawResponse = await analyzeWithGemini(createClient(apiKey), req.body);
       const responseCheck = validateResponse(rawResponse, requestCheck.requestId);
-      if (!responseCheck.valid) return res.status(502).json(errorResponse("invalid_model_response", requestCheck.requestId));
+      if (!responseCheck.valid) { await analysisRequests.failAnalysisRequest(req.body.idempotencyKey,"invalid_model_response",502); return res.status(502).json(errorResponse("invalid_model_response", requestCheck.requestId)); }
+      if (!await analysisRequests.completeAnalysisRequest(req.body.idempotencyKey,responseCheck.normalized)) return res.status(503).json(errorResponse("protection_unavailable", requestCheck.requestId));
       return res.status(200).json(responseCheck.normalized);
     } catch (error) {
       logProviderError(createSafeProviderErrorMeta(error, requestCheck.requestId));
+      await analysisRequests.failAnalysisRequest(req.body.idempotencyKey,"analysis_failed",502);
       return res.status(502).json(errorResponse("analysis_failed", requestCheck.requestId));
     }
   };

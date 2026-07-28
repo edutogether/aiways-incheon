@@ -1,8 +1,8 @@
 "use strict";
 
 const SCHEMA = "sorting-vision-v1";
-const MAX_IMAGE_BYTES = 1_500_000;
-const MAX_REQUEST_BYTES = 2_000_000;
+const { MAX_IMAGE_BYTES, validateImage } = require("./imageValidation");
+const MAX_REQUEST_BYTES = 6*1024*1024;
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const ITEM_TYPES = Object.freeze({
   "pet-bottle": "pet-bottle", "plastic-cup": "plastic-cup", "paper-cup": "paper-cup",
@@ -42,6 +42,7 @@ function validateRequest(body) {
   if (Buffer.byteLength(JSON.stringify(body), "utf8") > MAX_REQUEST_BYTES) return { valid: false, code: "image_too_large", requestId };
   const byteLength = decodedByteLength(image.data);
   if (byteLength > MAX_IMAGE_BYTES) return { valid: false, code: "image_too_large", requestId };
+  const imageCheck=validateImage(image.data,image.mimeType); if(!imageCheck.ok)return {valid:false,code:imageCheck.code,requestId};
   const metadata = image.metadata || body.imageMetadata || {};
   if (Number(metadata.byteLength) > MAX_IMAGE_BYTES) return { valid: false, code: "image_too_large", requestId };
   if (!Number.isInteger(metadata.byteLength) || metadata.byteLength < 1 || Math.abs(metadata.byteLength - byteLength) > 2) return { valid: false, code: "invalid_image", requestId };

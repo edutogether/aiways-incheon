@@ -4,9 +4,9 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { createAnalyzeSortingHandler, redactProviderMessage, classifyProviderError, createSafeProviderErrorMeta } = require("../lib/sortingVision");
 
-const imageData = Buffer.from("aiways-image").toString("base64");
+const imageData = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADElEQVR42mNk+M/wHwAF/gL+QKQe2QAAAABJRU5ErkJggg==", "base64").toString("base64");
 function requestBody(overrides = {}) {
-  return { schemaVersion: "sorting-vision-v1", requestId: "test-request", sessionId: "test-session", locale: "ko-KR", source: "future_gemini", image: { mimeType: "image/jpeg", data: imageData }, imageMetadata: { mimeType: "image/jpeg", width: 12, height: 8, byteLength: Buffer.from(imageData, "base64").length }, userContext: {}, ...overrides };
+  return { schemaVersion: "sorting-vision-v1", requestId: "test-request", sessionId: "test-session", locale: "ko-KR", source: "future_gemini", image: { mimeType: "image/png", data: imageData }, imageMetadata: { mimeType: "image/png", width: 1, height: 1, byteLength: Buffer.from(imageData, "base64").length }, userContext: {}, ...overrides };
 }
 function responseBody(overrides = {}) {
   return { schemaVersion: "sorting-vision-v1", requestId: "test-request", provider: "future_gemini", objectCandidates: [{ label: "페트병", itemId: "pet-bottle", objectType: "pet-bottle", confidenceBand: "high" }], materialCandidates: [{ label: "PET", confidenceBand: "medium" }], visibleCautions: ["내용물을 비우세요"], uncertainty: "low", needsUserCheck: true, ...overrides };

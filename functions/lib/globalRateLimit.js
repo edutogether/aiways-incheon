@@ -6,6 +6,7 @@ const RATE_LIMITS = Object.freeze({
   saveSortingRecord: { perMinute: 60 },
   listSortingRecords: { perMinute: 120 },
   resolveSortingRecord: { perMinute: 60 }
+  ,redeemEdu2gPass: { perMinute: 5 }, getEdu2gSession: { perMinute: 60 }, listEdu2gTrustedDevices: { perMinute: 60 }, revokeEdu2gTrustedDevice: { perMinute: 20 }
 });
 
 function getUtcBuckets(now = new Date()) {

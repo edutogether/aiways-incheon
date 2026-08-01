@@ -7,9 +7,14 @@ const { createSaveSortingRecordHandler } = require("./lib/sortingRecord");
 const { createListSortingRecordsHandler, createResolveSortingRecordHandler } = require("./lib/sortingRecordQuery");
 const { getApps, initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+const { getAuth } = require("firebase-admin/auth");
 const { createGlobalRateLimiter } = require("./lib/globalRateLimit");
 const { createAnalysisIdempotency } = require("./lib/analysisIdempotency");
+const { createEdu2gPassRegistry } = require("./lib/edu2gPassRegistry");
+const { createEdu2gDeviceAccess } = require("./lib/edu2gDeviceAccess");
+const { createFirestoreDeviceStore, createEdu2gHandlers } = require("./lib/edu2gPassHandlers");
 const geminiApiKey = defineSecret("GEMINI_API_KEY");
+const edu2gPassRegistrySecret = defineSecret("EDU2G_PASS_REGISTRY_JSON");
 if (!getApps().length) initializeApp();
 const db = getFirestore();
 const rateLimiter = createGlobalRateLimiter({ db, serverTimestamp: () => FieldValue.serverTimestamp() });
@@ -43,3 +48,13 @@ const queryStore = {
 };
 exports.listSortingRecords=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createListSortingRecordsHandler({store:queryStore,allowTestActor:process.env.FUNCTIONS_EMULATOR==="true",rateLimiter,logAppCheck}));
 exports.resolveSortingRecord=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createResolveSortingRecordHandler({store:queryStore,allowTestActor:process.env.FUNCTIONS_EMULATOR==="true",serverTimestamp:()=>FieldValue.serverTimestamp(),rateLimiter,logAppCheck}));
+const edu2gHandlers = createEdu2gHandlers({
+  registry: createEdu2gPassRegistry({ getSecret: () => edu2gPassRegistrySecret.value() }),
+  access: createEdu2gDeviceAccess({ auth: getAuth(), db, serverTimestamp: () => FieldValue.serverTimestamp() }),
+  store: createFirestoreDeviceStore({ db, serverTimestamp: () => FieldValue.serverTimestamp() }), rateLimiter, logAppCheck
+});
+const edu2gOptions = { region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false };
+exports.redeemEdu2gPass = onRequest({ ...edu2gOptions, secrets: [edu2gPassRegistrySecret] }, edu2gHandlers.redeem);
+exports.getEdu2gSession = onRequest(edu2gOptions, edu2gHandlers.session);
+exports.listEdu2gTrustedDevices = onRequest(edu2gOptions, edu2gHandlers.list);
+exports.revokeEdu2gTrustedDevice = onRequest(edu2gOptions, edu2gHandlers.revoke);

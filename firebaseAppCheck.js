@@ -5,7 +5,7 @@
   function debugMode() { const host=location.hostname; return (host === "localhost" || host === "127.0.0.1") && new URLSearchParams(location.search).get("appcheck-debug") === "1"; }
   async function initializeAIWaysAppCheck() {
     if (appCheckPromise) return appCheckPromise;
-    appCheckPromise = (async () => { if (debugMode()) self.FIREBASE_APPCHECK_DEBUG_TOKEN = true; const [{ initializeApp }, { initializeAppCheck, ReCaptchaEnterpriseProvider, getToken }] = await Promise.all([import("https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js"), import("https://www.gstatic.com/firebasejs/11.10.0/firebase-app-check.js")]); const app=initializeApp(config); const appCheck=initializeAppCheck(app,{provider:new ReCaptchaEnterpriseProvider(siteKey),isTokenAutoRefreshEnabled:true}); return { appCheck, getToken }; })();
+    appCheckPromise = (async () => { if (debugMode()) self.FIREBASE_APPCHECK_DEBUG_TOKEN = true; const [{ initializeApp }, { initializeAppCheck, ReCaptchaEnterpriseProvider, getToken }] = await Promise.all([import("https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js"), import("https://www.gstatic.com/firebasejs/11.10.0/firebase-app-check.js")]); const app=initializeApp(config); const appCheck=initializeAppCheck(app,{provider:new ReCaptchaEnterpriseProvider(siteKey),isTokenAutoRefreshEnabled:true}); return { app, appCheck, getToken }; })();
     return appCheckPromise;
   }
   async function getAIWaysAppCheckToken() { try { const value=await initializeAIWaysAppCheck(); const token=await value.getToken(value.appCheck,false); return token?.token || ""; } catch { return ""; } }

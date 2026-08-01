@@ -4,7 +4,8 @@ const fs = require("node:fs");
 const http = require("node:http");
 const path = require("node:path");
 
-const root = path.resolve(__dirname, "..", "..");
+const root = path.resolve(process.env.AIWAYS_STATIC_ROOT || path.resolve(__dirname, "..", ".."));
+const port = Number(process.env.AIWAYS_STATIC_PORT || 8001);
 const types = { ".css": "text/css; charset=utf-8", ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".png": "image/png", ".svg": "image/svg+xml" };
 http.createServer((request, response) => {
   const url = new URL(request.url, "http://127.0.0.1");
@@ -16,4 +17,4 @@ http.createServer((request, response) => {
     response.writeHead(200, { "Content-Type": types[path.extname(file)] || "application/octet-stream" });
     response.end(content);
   });
-}).listen(8001, "127.0.0.1");
+}).listen(port, "127.0.0.1");

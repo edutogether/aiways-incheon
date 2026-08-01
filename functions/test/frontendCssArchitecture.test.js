@@ -21,7 +21,7 @@ const report = {
   uniqueViewportConditions: [...new Set(media)].length,
   maxSelectorDefinitions: Math.max(...Object.values(duplicateSelectors)),
   important: (css.match(/!important/g) || []).length,
-  fixedHeightDeclarations: (css.match(/(?<!line-)\bheight\s*:/g) || []).length,
+  fixedHeightDeclarations: (css.match(/(?<!line-|control-)\bheight\s*:/g) || []).length,
   maxHeightDeclarations: (css.match(/\bmax-height\s*:/g) || []).length,
   minWidthDeclarations: (declarationCss.match(/\bmin-width\s*:/g) || []).length,
   nowrapDeclarations: (css.match(/white-space\s*:\s*nowrap/g) || []).length,

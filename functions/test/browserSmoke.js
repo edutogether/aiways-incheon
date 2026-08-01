@@ -23,6 +23,10 @@ async function evaluate(page, expression) { return (await page.send("Runtime.eva
     return { endpoint: contract.futureProvider ? 'available' : 'missing', fallback: fallback.code, noStoredImage: !Object.keys(localStorage).some(key => /base64|image|photo/i.test(String(localStorage.getItem(key) || ''))), sortingScripts: ['tensorflow','mobilenet','teachable'].map(word => [...document.scripts].some(script => script.src.toLowerCase().includes(word))) };
   })()`);
   page.close();
-  if (rows.some((row) => row.html !== row.client || row.body !== row.client || !row.tm || !row.sorting) || result.fallback !== "analysis_failed") throw new Error(JSON.stringify({ rows, result }));
+  const brokenViewport = rows.find((row) => row.html !== row.client || row.body !== row.client || !row.tm || !row.sorting);
+  if (brokenViewport) throw new Error(`viewport contract failed: ${JSON.stringify(brokenViewport)}`);
+  if (result.endpoint !== "available") throw new Error("endpoint contract failed: futureProvider unavailable");
+  if (result.fallback !== "app_check_unavailable") throw new Error(`fallback contract failed: ${result.fallback}`);
+  if (!result.noStoredImage) throw new Error("privacy contract failed: image-like localStorage value detected");
   process.stdout.write(JSON.stringify({ rows, result }) + "\n");
 })().catch((error) => { process.stderr.write(`${error.message}\n`); process.exitCode = 1; });

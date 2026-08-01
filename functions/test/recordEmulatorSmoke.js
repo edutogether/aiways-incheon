@@ -1,35 +1,30 @@
 "use strict";
+
 const assert = require("node:assert/strict");
 process.env.FIRESTORE_EMULATOR_HOST = process.env.FIRESTORE_EMULATOR_HOST || "127.0.0.1:8080";
 const { getApps, initializeApp } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
+
 if (!getApps().length) initializeApp({ projectId: "demo-aiways-incheon" });
+
+async function post(url, body) {
+  const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  return { status: response.status, body: await response.json() };
+}
+
 async function main() {
+  const base = "http://127.0.0.1:5001/demo-aiways-incheon/asia-northeast3";
   const payload = { schemaVersion: "sorting-record-v1", status: "completed", provider: "future_gemini", analysis: { objectCandidates: [{ label: "PET bottle", itemId: "pet-bottle", objectType: "pet-bottle", confidenceBand: "high" }], materialCandidates: [{ label: "plastic", confidenceBand: "medium" }], visibleCautions: [] }, checklist: [{ id: "empty", label: "Empty container", checked: true }], userDecision: { selectedItemId: "pet-bottle", action: "recorded", userConfirmed: true }, hold: null, idempotencyKey: "stage6-emulator-key-0001", actorId: "emulator-test-actor" };
-  const url = "http://127.0.0.1:5001/demo-aiways-incheon/asia-northeast3/saveSortingRecord";
-  const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-  const result = await response.json();
-  assert.equal(response.status, 201); assert.equal(result.status, "completed");
-  const doc = await getFirestore().doc(`actors/emulator-test-actor/records/${result.recordId}`).get();
-  assert.equal(doc.exists, true); assert.equal(doc.data().schemaVersion, "sorting-record-v1");
-  assert.equal(doc.data().expireAt.toDate().getTime() - doc.data().createdAt.toDate().getTime() > 89 * 24 * 60 * 60 * 1000, true);
-  const duplicate = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-  assert.equal(duplicate.status, 200);
-  const heldPayload = { ...payload, status: "held", idempotencyKey: "stage6-emulator-key-0002", userDecision: { selectedItemId: "pet-bottle", action: "held", userConfirmed: true }, hold: { recommended: true, reasons: ["Check local rule"] } };
-  const heldResponse = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(heldPayload) });
-  const held = await heldResponse.json();
-  assert.equal(heldResponse.status, 201); assert.equal(held.status, "held");
-  assert.equal((await getFirestore().doc(`actors/emulator-test-actor/records/${held.recordId}`).get()).data().hold.recommended, true);
-  const listUrl = "http://127.0.0.1:5001/demo-aiways-incheon/asia-northeast3/listSortingRecords";
-  const resolveUrl = "http://127.0.0.1:5001/demo-aiways-incheon/asia-northeast3/resolveSortingRecord";
-  const listed = await fetch(listUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actorId: "emulator-test-actor", statusFilter: "held" }) });
-  const listedBody = await listed.json(); assert.equal(listed.status, 200); assert.equal(listedBody.records.length, 1); assert.equal(listedBody.records[0].recordId, held.recordId);
-  const resolveBody = { actorId: "emulator-test-actor", recordId: held.recordId, idempotencyKey: "stage6-resolve-key-0001", resolutionType: "confirmed_after_review", userDecision: { selectedItemId: "pet-bottle", action: "recorded", userConfirmed: true }, checklist: [{ id: "empty", label: "Empty container", checked: true }] };
-  const resolved = await fetch(resolveUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(resolveBody) }); assert.equal(resolved.status, 200);
-  const resolvedDoc = (await getFirestore().doc(`actors/emulator-test-actor/records/${held.recordId}`).get()).data(); assert.equal(resolvedDoc.status, "completed"); assert.equal(resolvedDoc.hold.recommended, true); assert.ok(resolvedDoc.resolvedAt); assert.equal(resolvedDoc.expireAt.toDate().getTime() > 0, true);
-  assert.equal((await fetch(resolveUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(resolveBody) })).status, 200);
+  for (const [name, body] of [["saveSortingRecord", payload], ["listSortingRecords", {}], ["resolveSortingRecord", {}]]) {
+    const result = await post(`${base}/${name}`, body);
+    assert.equal(result.status, 401);
+    assert.equal(result.body.code, "app_check_missing");
+  }
+  const records = await getFirestore().collection("actors").doc("emulator-test-actor").collection("records").get();
+  assert.equal(records.empty, true);
   const directWrite = await fetch("http://127.0.0.1:8080/v1/projects/demo-aiways-incheon/databases/(default)/documents/actors/emulator-test-actor/records/direct-client-write", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fields: { status: { stringValue: "completed" } } }) });
   assert.equal(directWrite.ok, false, "default-deny Firestore Rules must reject direct client writes");
-  process.stdout.write("Firestore Emulator record smoke test passed\n");
+  process.stdout.write("Firestore Emulator App Check enforcement smoke test passed\n");
 }
+
 main().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });

@@ -8,7 +8,7 @@ function payload(overrides = {}) {
 }
 function setup(options = {}) {
   const db = new Map();
-  const handler = createSaveSortingRecordHandler({ allowTestActor: options.allowTestActor ?? true, now: () => new Date("2026-07-28T00:00:00.000Z"), serverTimestamp: () => "SERVER_TIMESTAMP", rateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) }, store: { async createOrGet(actor, key, record, response) { const existing = db.get(`${actor}:${key}`); if (existing) return { ...existing, duplicate: true }; const value = { recordId: `server-${db.size + 1}`, status: record.status, ...response, duplicate: false, record }; db.set(`${actor}:${key}`, value); return value; } } });
+  const handler = createSaveSortingRecordHandler({ appCheck: async () => ({ status: "valid" }), allowTestActor: options.allowTestActor ?? true, now: () => new Date("2026-07-28T00:00:00.000Z"), serverTimestamp: () => "SERVER_TIMESTAMP", rateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) }, store: { async createOrGet(actor, key, record, response) { const existing = db.get(`${actor}:${key}`); if (existing) return { ...existing, duplicate: true }; const value = { recordId: `server-${db.size + 1}`, status: record.status, ...response, duplicate: false, record }; db.set(`${actor}:${key}`, value); return value; } } });
   return { db, handler };
 }
 async function call(handler, body) {

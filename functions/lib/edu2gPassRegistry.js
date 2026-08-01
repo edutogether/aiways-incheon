@@ -15,11 +15,14 @@ function validDisplayName(value) {
   return typeof value === "string" && value.length >= 1 && value.length <= 80 && !/[\u0000-\u001f\u007f]/u.test(value);
 }
 
+function passDigest(value) {
+  return crypto.createHash("sha256").update(String(value), "utf8").digest();
+}
+
 function safeEqual(left, right) {
-  const a = Buffer.from(left, "utf8");
-  const b = Buffer.from(right, "utf8");
-  if (a.length !== b.length) return false;
-  return crypto.timingSafeEqual(a, b);
+  // SHA-256 digests always have the same fixed length, including when the
+  // original normalized values had different lengths.
+  return crypto.timingSafeEqual(passDigest(left), passDigest(right));
 }
 
 function parseEdu2gPassRegistry(raw, { maxPassLength = MAX_PASS_LENGTH } = {}) {
@@ -48,12 +51,12 @@ function createEdu2gPassRegistry({ getSecret = () => "", compare = safeEqual, ma
       try { registry = parseEdu2gPassRegistry(getSecret(), { maxPassLength }); } catch { return { ok: false, code: "invalid_pass" }; }
       let matched = null;
       for (const entry of registry.passes) {
-        const equal = compare(normalized, entry.pass);
-        if (equal && entry.enabled) matched = entry;
+      const equal = compare(normalized, entry.pass);
+      if (equal) matched = entry;
       }
-      return matched ? { ok: true, actor: { actorId: matched.actorId, displayName: matched.displayName, maxDevices: matched.maxDevices } } : { ok: false, code: "invalid_pass" };
+  return matched?.enabled ? { ok: true, actor: { actorId: matched.actorId, displayName: matched.displayName, maxDevices: matched.maxDevices } } : { ok: false, code: "invalid_pass" };
     }
   };
 }
 
-module.exports = { MAX_PASS_LENGTH, MAX_DEVICES, normalizePass, validDisplayName, safeEqual, parseEdu2gPassRegistry, createEdu2gPassRegistry };
+module.exports = { MAX_PASS_LENGTH, MAX_DEVICES, normalizePass, validDisplayName, passDigest, safeEqual, parseEdu2gPassRegistry, createEdu2gPassRegistry };

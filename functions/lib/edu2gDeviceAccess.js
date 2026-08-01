@@ -1,6 +1,7 @@
 "use strict";
 
 const UID = /^[A-Za-z0-9_-]{1,128}$/;
+const MANAGEMENT_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function extractBearer(req) {
   const value = req?.headers?.authorization ?? req?.headers?.Authorization;
@@ -41,7 +42,7 @@ function createEdu2gDeviceAccess({ auth, db, serverTimestamp = () => new Date() 
         const device = deviceSnap.exists ? deviceSnap.data() || {} : null;
         if (!device) return failure("access_state_invalid", 503);
         if (device.status === "revoked") return failure("device_revoked", 403);
-        if (device.status !== "active" || device.uid !== uid) return failure("access_state_invalid", 503);
+        if (device.status !== "active" || device.uid !== uid || !MANAGEMENT_ID.test(device.managementId || "")) return failure("access_state_invalid", 503);
         await Promise.all([bindingRef.update({ lastSeenAt: serverTimestamp() }), deviceRef.update({ lastSeenAt: serverTimestamp() })]);
         return { ok: true, actorId: binding.actorId, uid, actor: actorSnap.data(), device };
       } catch { return failure("access_state_invalid", 503); }
@@ -49,4 +50,4 @@ function createEdu2gDeviceAccess({ auth, db, serverTimestamp = () => new Date() 
   };
 }
 
-module.exports = { UID, extractBearer, createEdu2gDeviceAccess };
+module.exports = { UID, MANAGEMENT_ID, extractBearer, createEdu2gDeviceAccess };

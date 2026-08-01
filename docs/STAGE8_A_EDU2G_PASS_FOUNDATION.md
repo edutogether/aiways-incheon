@@ -30,7 +30,7 @@ Secret 이름은 `EDU2G_PASS_REGISTRY_JSON`이며 registry schema는 version 1�
 - Secret이 비어 있거나 JSON/schema가 잘못되면 `invalid_pass`로 fail closed 한다.
 - 비교 전 PASS는 NFKC normalize, trim, 연속 공백 축소, 대문자화한다.
 - 최대 길이, 중복 normalized PASS, 중복 actorId, actorId 형식, 표시 이름 제어문자, maxDevices 오류를 거부한다.
-- 비교는 일정 시간 비교를 사용하며 PASS나 해시를 기록하지 않는다.
+- normalize된 입력과 registry PASS는 SHA-256의 고정 길이 digest로 만든 뒤 일정 시간 비교한다. 모든 registry 항목을 끝까지 비교하며 PASS, digest, 길이를 기록하지 않는다.
 
 ## Firestore 구조와 5대 제한
 
@@ -49,6 +49,8 @@ edu2gDeviceBindings/{uid}
 
 redeem은 Firestore transaction에서 binding, actor, device를 읽어 같은 actor/active 기기의 재등록은 idempotent 성공으로 처리한다. 다른 actor binding은 차단하고, activeDeviceCount가 5이면 여섯 번째 등록을 거부한다. 새 binding·trusted device·counter 증가는 같은 transaction에서 수행한다.
 
+각 trusted device에는 서버 생성 UUIDv4 `managementId`가 있다. 이는 Firebase UID나 인증 token이 아닌 기기 관리 전용 불투명 식별자다. 목록은 UID를 절대 반환하지 않고 `managementId`, 표시값, platform, status, 시간, currentDevice만 반환한다. revoke는 `targetManagementId`만 받고 현재 actor의 trusted device 하위 컬렉션에서만 조회한다. 없는 값·다른 actor 값은 같은 not_found로 처리하며, managementId가 누락되거나 중복인 손상 문서는 fail closed 한다.
+
 PASS, ID token, App Check token, 이메일, 전화번호, 실명, 학교명, browser fingerprint, IP 원문, 전체 user-agent는 저장하지 않는다. deviceLabel/platform은 제어문자·HTML·과도한 길이가 없는 짧은 표시값만 허용한다.
 
 ## Endpoint 계약
@@ -64,9 +66,20 @@ missing/invalid App Check와 missing/invalid ID token은 보호 계층에서 막
 
 ## Emulator 검증
 
-`firebase.json`에는 Auth Emulator 9099만 추가했다. Functions/Firestore 기존 port와 demo project 설정은 보존했다. `demo-aiways-incheon` emulator에서 익명 signup과 새 endpoint의 App Check missing 401 gate를 검증했다. production Auth 사용자·Firestore·Secret·Function에는 접근하지 않았다.
+`firebase.json`에는 Auth Emulator 9099만 추가했다. Functions/Firestore 기존 port와 demo project 설정은 보존했다.
 
-단위 테스트는 registry parsing/normalization, auth resolver fail-closed, 등록·재등록, 1~5/여섯 번째 제한, actor 재바인딩 차단, 목록·revoke, OPTIONS/CORS/body/rate-limit, frontend Auth 계약을 다룬다.
+- **HTTP gate smoke**: `demo-aiways-incheon` Auth Emulator 익명 signup과 새 endpoint의 App Check missing 401 gate만 검증한다. 이 smoke는 전체 device transaction 검증이 아니다.
+- **Auth·Firestore transaction integration**: 실제 Auth Emulator ID token을 Admin Auth로 verify하고, 실제 Firestore Emulator transaction과 실제 registry/access/store 모듈을 사용한다. 1~5 등록, 동시 두 등록 중 하나만 성공하는 여섯 번째 차단, 재등록, 재바인딩 차단, session/list, UID 없는 managementId 목록, cross-actor revoke 차단, revoke/idempotent revoke, revoke 뒤 access 차단, 민감값 비저장을 검증한다. 생성 문서는 테스트 종료 시 삭제한다.
+
+production Auth 사용자·Firestore·Secret·Function에는 접근하지 않았다.
+
+단위 테스트는 registry parsing/normalization/digest 비교, auth resolver fail-closed, managementId, 등록·재등록, 1~5/여섯 번째 제한, actor 재바인딩 차단, 목록·revoke, OPTIONS/CORS/body/rate-limit, frontend Auth 계약을 다룬다.
+
+## Rate limit 운영 위험
+
+현재 `redeemEdu2gPass`의 분당 5회 제한은 서비스 전체 합산 global limiter다. 비용 보호에는 유효하지만, 공격자가 다섯 번을 소모해 다른 beta 사용자를 일시 차단할 수 있다. Stage 8-D 배포 전에는 UID별 실패 제한(UID 원문 로그 금지), 전역 비용 보호 제한, 두 제한의 분리와 fail-closed 동작을 별도 설계·검증해야 한다.
+
+이번 단계에서는 기존 네 Functions의 limiter 계약을 보존하기 위해 불완전한 UID별 limiter를 추가하지 않았다. 이는 Stage 8-D 전 blocker다.
 
 ## 아직 하지 않은 작업
 

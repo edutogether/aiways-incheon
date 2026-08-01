@@ -3,10 +3,12 @@
 const { UID } = require("./edu2gDeviceAccess");
 const { MAX_DEVICES } = require("./edu2gPassRegistry");
 const { observeAppCheck } = require("./appCheckProtection");
+const { randomUUID } = require("node:crypto");
 
 const ORIGIN = /^(https:\/\/edutogether\.github\.io|http:\/\/(localhost|127\.0\.0\.1)(:\d+)?)$/;
 const LABEL = /^[^\u0000-\u001f\u007f<>]{1,48}$/u;
 const PLATFORM = /^[^\u0000-\u001f\u007f<>]{1,32}$/u;
+const MANAGEMENT_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function response(res, status, body) { return res.status(status).json(body); }
 function allowedOrigin(req, res) {
@@ -37,7 +39,7 @@ async function protect(req, res, functionName, dependencies) {
   return access;
 }
 
-function createFirestoreDeviceStore({ db, serverTimestamp = () => new Date() }) {
+function createFirestoreDeviceStore({ db, serverTimestamp = () => new Date(), createManagementId = randomUUID }) {
   const actorRef = actorId => db.collection("actors").doc(actorId);
   return {
     async redeem({ uid, actor }) {
@@ -49,7 +51,7 @@ function createFirestoreDeviceStore({ db, serverTimestamp = () => new Date() }) 
         if (bindingSnap.exists) {
           const binding = bindingSnap.data() || {};
           if (binding.actorId !== actor.actorId) return { code: "device_already_bound" };
-          if (binding.status !== "active" || !deviceSnap.exists || deviceSnap.data()?.status !== "active" || !actorSnap.exists || actorSnap.data()?.status !== "active") return { code: "device_already_bound" };
+          if (binding.status !== "active" || !deviceSnap.exists || deviceSnap.data()?.status !== "active" || !MANAGEMENT_ID.test(deviceSnap.data()?.managementId || "") || !actorSnap.exists || actorSnap.data()?.status !== "active") return { code: "access_state_invalid" };
           return { ok: true, alreadyRegistered: true, actor: actorSnap.data(), device: deviceSnap.data() };
         }
         const current = actorSnap.exists ? actorSnap.data() || {} : null;
@@ -57,8 +59,11 @@ function createFirestoreDeviceStore({ db, serverTimestamp = () => new Date() }) 
         const activeDeviceCount = Number(current?.activeDeviceCount || 0);
         if (!Number.isInteger(activeDeviceCount) || activeDeviceCount < 0) return { code: "access_state_invalid" };
         if (activeDeviceCount >= MAX_DEVICES) return { code: "device_limit_reached" };
+        let managementId = "";
+        for (let attempt = 0; attempt < 4; attempt += 1) { const candidate = createManagementId(); if (!MANAGEMENT_ID.test(candidate || "")) return { code: "access_state_invalid" }; const collision = await tx.get(userActorRef.collection("trustedDevices").where("managementId", "==", candidate).limit(1)); if (collision.empty) { managementId = candidate; break; } }
+        if (!managementId) return { code: "access_state_invalid" };
         const now = serverTimestamp(); const actorData = current || { plan: "closed_beta", status: "active", displayName: actor.displayName, maxDevices: MAX_DEVICES, activeDeviceCount: 0, createdAt: now };
-        const device = { uid, status: "active", deviceLabel: actor.deviceLabel, platform: actor.platform, createdAt: now, lastSeenAt: now };
+        const device = { uid, managementId, status: "active", deviceLabel: actor.deviceLabel, platform: actor.platform, createdAt: now, lastSeenAt: now };
         tx.set(userActorRef, { ...actorData, displayName: actor.displayName, maxDevices: MAX_DEVICES, activeDeviceCount: activeDeviceCount + 1, updatedAt: now }, { merge: true });
         tx.create(deviceRef, device); tx.create(bindingRef, { actorId: actor.actorId, status: "active", createdAt: now, lastSeenAt: now });
         return { ok: true, alreadyRegistered: false, actor: { ...actorData, activeDeviceCount: activeDeviceCount + 1 }, device };
@@ -67,10 +72,15 @@ function createFirestoreDeviceStore({ db, serverTimestamp = () => new Date() }) 
     async session(access) { return { actor: access.actor, device: access.device }; },
     async list(access) {
       const snap = await actorRef(access.actorId).collection("trustedDevices").get();
-      return snap.docs.map(doc => ({ key: doc.id === access.uid ? "current" : `device-${doc.id.slice(-6)}`, currentDevice: doc.id === access.uid, ...doc.data() }));
+      const rows = snap.docs.map(doc => ({ currentDevice: doc.id === access.uid, ...doc.data() }));
+      if (rows.some(row => !MANAGEMENT_ID.test(row.managementId || ""))) throw new Error("access_state_invalid");
+      return rows.map(({ uid, revokedByUid, ...row }) => row);
     },
-    async revoke(access, targetUid) {
-      const actor = actorRef(access.actorId); const deviceRef = actor.collection("trustedDevices").doc(targetUid); const bindingRef = db.collection("edu2gDeviceBindings").doc(targetUid);
+    async revoke(access, targetManagementId) {
+      if (!MANAGEMENT_ID.test(targetManagementId || "")) return { code: "not_found" };
+      const actor = actorRef(access.actorId); const matches = await actor.collection("trustedDevices").where("managementId", "==", targetManagementId).limit(2).get();
+      if (matches.empty || matches.size !== 1) return { code: "not_found" };
+      const deviceRef = matches.docs[0].ref; const targetUid = deviceRef.id; const bindingRef = db.collection("edu2gDeviceBindings").doc(targetUid);
       return db.runTransaction(async tx => {
         const [actorSnap, deviceSnap, bindingSnap] = await Promise.all([tx.get(actor), tx.get(deviceRef), tx.get(bindingRef)]);
         if (!deviceSnap.exists || !bindingSnap.exists || bindingSnap.data()?.actorId !== access.actorId) return { code: "not_found" };
@@ -96,9 +106,9 @@ function createEdu2gHandlers(dependencies) {
     return response(res, 200, { ok: true, displayName: result.actor.displayName, deviceLabel: result.device.deviceLabel, activeDeviceCount: result.actor.activeDeviceCount, maxDevices: MAX_DEVICES, alreadyRegistered: !!result.alreadyRegistered });
   };
   const session = async (req, res) => { if (!baseGuard(req, res, [])) return; const access = await protect(req, res, "getEdu2gSession", dependencies); if (!access) return; const value = await dependencies.store.session(access); return response(res, 200, { ok: true, displayName: value.actor.displayName, plan: value.actor.plan, deviceLabel: value.device.deviceLabel, activeDeviceCount: value.actor.activeDeviceCount, maxDevices: value.actor.maxDevices, status: value.device.status }); };
-  const list = async (req, res) => { if (!baseGuard(req, res, [])) return; const access = await protect(req, res, "listEdu2gTrustedDevices", dependencies); if (!access) return; const rows = await dependencies.store.list(access); return response(res, 200, { ok: true, devices: rows.map(({ uid, revokedByUid, ...row }) => row) }); };
-  const revoke = async (req, res) => { if (!baseGuard(req, res, ["targetDeviceUid", "confirm"])) return; const access = await protect(req, res, "revokeEdu2gTrustedDevice", dependencies); if (!access) return; const body = req.body || {}; if (!UID.test(body.targetDeviceUid || "") || body.confirm !== true) return response(res, 400, { ok: false, code: "invalid_request" }); const value = await dependencies.store.revoke(access, body.targetDeviceUid); if (!value.ok) return response(res, value.code === "not_found" ? 404 : 503, { ok: false, code: value.code }); return response(res, 200, { ok: true, alreadyRevoked: !!value.alreadyRevoked, activeDeviceCount: value.activeDeviceCount }); };
+  const list = async (req, res) => { if (!baseGuard(req, res, [])) return; const access = await protect(req, res, "listEdu2gTrustedDevices", dependencies); if (!access) return; try { const rows = await dependencies.store.list(access); return response(res, 200, { ok: true, devices: rows }); } catch { return response(res, 503, { ok: false, code: "access_state_invalid" }); } };
+  const revoke = async (req, res) => { if (!baseGuard(req, res, ["targetManagementId", "confirm"])) return; const access = await protect(req, res, "revokeEdu2gTrustedDevice", dependencies); if (!access) return; const body = req.body || {}; if (!MANAGEMENT_ID.test(body.targetManagementId || "") || body.confirm !== true) return response(res, 400, { ok: false, code: "invalid_request" }); const value = await dependencies.store.revoke(access, body.targetManagementId); if (!value.ok) return response(res, value.code === "not_found" ? 404 : 503, { ok: false, code: value.code }); return response(res, 200, { ok: true, alreadyRevoked: !!value.alreadyRevoked, activeDeviceCount: value.activeDeviceCount }); };
   return { redeem, session, list, revoke };
 }
 
-module.exports = { ORIGIN, LABEL, PLATFORM, createFirestoreDeviceStore, createEdu2gHandlers };
+module.exports = { ORIGIN, LABEL, PLATFORM, MANAGEMENT_ID, createFirestoreDeviceStore, createEdu2gHandlers };

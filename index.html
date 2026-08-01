@@ -10,14 +10,11 @@
     />
     <link rel="icon" type="image/png" href="./assets/brand/aiways-logo.png" />
     <link rel="stylesheet" href="./style.css" />
-    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
     <script defer src="./firebaseAppCheck.js"></script>
+    <script defer src="./aiRuntimeLoader.js"></script>
     <script defer src="./app.js"></script>
   </head>
   <body class="is-dashboard-preparing">
-    <!-- COMMON_FINAL_FIX_START -->
     <header class="site-header">
       <a class="brand" href="#dashboard" aria-label="AI Ways Incheon dashboard">
         <span class="brand-mark"><img src="./assets/brand/aiways-logo.png" alt="AI Ways Incheon" /></span>
@@ -34,10 +31,8 @@
         <a href="#resources">자료실</a>
       </nav>
     </header>
-    <!-- COMMON_FINAL_FIX_END -->
 
     <main class="snap-root">
-      <!-- PAGE_FINAL_FIX_01_DASHBOARD_START -->
       <section class="scene dashboard-scene" id="dashboard" data-nav="대시보드">
         <div class="hero-copy">
           <p class="eyebrow">학생의 버리는 순간을 읽는 자원순환 분석 엔진</p>
@@ -255,9 +250,7 @@
           </article>
         </div>
       </section>
-      <!-- PAGE_FINAL_FIX_01_DASHBOARD_END -->
 
-      <!-- PAGE_FINAL_FIX_02_PROJECT_START -->
       <section class="scene project-scene" id="project" data-nav="프로젝트">
         <div class="project-intro">
           <p class="eyebrow">Project Frame</p>
@@ -276,9 +269,7 @@
           <article><span>03</span><h3>우리 학교 UX를 직접 개선하다</h3><p>3초 판단, 보류함, 대시보드를 학교 안 실천으로 연결합니다.</p></article>
         </div>
       </section>
-      <!-- PAGE_FINAL_FIX_02_PROJECT_END -->
 
-      <!-- PAGE_FINAL_FIX_03_CURRICULUM_START -->
       <section class="scene curriculum-scene" id="curriculum" data-nav="교육과정">
         <div class="scene-copy">
           <p class="eyebrow">Curriculum-based Learning Design</p>
@@ -312,9 +303,7 @@
           </section>
         </div>
       </section>
-      <!-- PAGE_FINAL_FIX_03_CURRICULUM_END -->
 
-      <!-- PAGE_FINAL_FIX_04_HAH_START -->
       <section class="scene hah-scene" id="hah" data-nav="H-A-H">
         <div class="scene-copy center-copy">
           <p class="eyebrow">H-A-H Learning Loop</p>
@@ -328,9 +317,7 @@
         </div>
         <p class="callout">AI는 최종 정답을 확정하지 않습니다. AI는 1차 판단을 제안하고, 학생은 학교 기준과 오염 여부를 다시 확인합니다.</p>
       </section>
-      <!-- PAGE_FINAL_FIX_04_HAH_END -->
 
-      <!-- PAGE_FINAL_FIX_05_FLOW_START -->
       <section class="scene flow-scene" id="flow" data-nav="차시흐름">
         <div class="scene-copy">
           <p class="eyebrow">8-Lesson Journey + Experience + Diffusion</p>
@@ -348,9 +335,7 @@
           <a class="flow-card" href="#resources"><span>Experience · Diffusion</span><h3>살아있는 데이터<br />아카이빙과 확산 및 공유</h3><p>대시보드 활용으로<br />살아있는 실천 데이터를 아카이빙하고,<br />공유하여 확산합니다.</p><em>체험하기</em></a>
         </div>
       </section>
-      <!-- PAGE_FINAL_FIX_05_FLOW_END -->
 
-      <!-- PAGE_FINAL_FIX_06_GALLERY_START -->
       <section class="scene gallery-scene" id="gallery" data-nav="갤러리">
         <div class="scene-copy">
           <p class="eyebrow">Student Outputs</p>
@@ -379,9 +364,7 @@
           </aside>
         </div>
       </section>
-      <!-- PAGE_FINAL_FIX_06_GALLERY_END -->
 
-      <!-- PAGE_FINAL_FIX_07_SORTING_START -->
       <section class="scene sorting-scene" id="sorting" data-nav="3초판단">
         <div class="scene-copy">
           <p class="eyebrow">Output · 3-Second Sorting Helper App</p>
@@ -496,9 +479,7 @@
           </article>
         </div>
       </section>
-      <!-- PAGE_FINAL_FIX_07_SORTING_END -->
 
-      <!-- PAGE_FINAL_FIX_08_RESOURCES_START -->
       <section class="scene resources-scene" id="resources" data-nav="자료실">
         <div class="scene-copy center-copy">
           <p class="eyebrow">Resources</p>
@@ -524,7 +505,6 @@
           <p>같이교육 · 강서희 · 원나연</p>
         </div>
       </section>
-      <!-- PAGE_FINAL_FIX_08_RESOURCES_END -->
     </main>
 
     <dialog class="ai-modal" id="aiModal">

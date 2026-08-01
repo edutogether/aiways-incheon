@@ -3816,11 +3816,12 @@
   }
 
   async function loadTeachableMachineModel(modelUrl) {
-    if (!modelUrl || !window.tmImage) return null;
+    if (!modelUrl || !window.AIWaysAiRuntime) return null;
     let baseUrl = cleanText(modelUrl);
     baseUrl = baseUrl.replace(/\/(model|metadata)\.json(?:\?.*)?$/i, "/");
     baseUrl = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
-    return window.tmImage.load(baseUrl + "model.json", baseUrl + "metadata.json");
+    const runtime = await window.AIWaysAiRuntime.loadTeachableMachine();
+    return runtime.load(baseUrl + "model.json", baseUrl + "metadata.json");
   }
 
   function sortingVisionConfidenceBand(confidence) {
@@ -3851,17 +3852,19 @@
         teachableMachineModelPromise = null;
       }
     }
-    if (window.mobilenet) {
-      try {
-        if (!mobileNetModelPromise) mobileNetModelPromise = window.mobilenet.load();
+    try {
+      if (!mobileNetModelPromise) {
+        mobileNetModelPromise = window.AIWaysAiRuntime?.loadMobileNet().then(runtime => runtime.load());
+      }
+      if (mobileNetModelPromise) {
         const model = await mobileNetModelPromise;
         const top = (await model.classify(image))?.[0];
         if (top) hints.push(createSortingVisionHint({ label: top.className, itemId: judgementKeyFromVisualLabel(top.className) }, SORTING_VISION_SOURCES.MOBILENET, {
           provider: "mobilenet", rawConfidence: top.probability, confidenceBand: sortingVisionConfidenceBand(top.probability), requestId: requestMetadata.requestId
         }));
-      } catch {
-        mobileNetModelPromise = null;
       }
+    } catch {
+      mobileNetModelPromise = null;
     }
     try {
       const imagePayload = await prepareSortingVisionImage(image);
@@ -3983,7 +3986,7 @@
     image.src = previewUrl;
     currentDraft = {
       input_type: "image",
-      ai_engine: window.mobilenet ? "mobilenet" : "fallback",
+      ai_engine: "mobilenet_hint",
       ai_raw_label: "pending",
       ai_confidence: 0,
       mapped_item: "분석 중",

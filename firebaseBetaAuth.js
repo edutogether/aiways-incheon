@@ -19,8 +19,8 @@
     })();
     return authPromise;
   }
-  async function getEdu2gDeviceSession() { const { auth } = await getBetaAuth(); const user = auth.currentUser; if (!user) throw new Error("anonymous_auth_unavailable"); return { uid: user.uid, idToken: await user.getIdToken() }; }
-  async function getEdu2gProtectedHeaders() { const session = await getEdu2gDeviceSession(); const appCheck = await window.AIWaysAppCheck?.getAIWaysAppCheckHeaders?.(); if (!appCheck) return null; return { ...appCheck, Authorization: `Bearer ${session.idToken}` }; }
+  async function getEdu2gDeviceSession({ forceRefresh = false } = {}) { const { auth } = await getBetaAuth(); const user = auth.currentUser; if (!user) throw new Error("anonymous_auth_unavailable"); return { uid: user.uid, idToken: await user.getIdToken(!!forceRefresh) }; }
+  async function getEdu2gProtectedHeaders({ forceRefresh = false } = {}) { const session = await getEdu2gDeviceSession({ forceRefresh }); const appCheck = await window.AIWaysAppCheck?.getAIWaysAppCheckHeaders?.(); if (!appCheck) return null; return { ...appCheck, Authorization: `Bearer ${session.idToken}` }; }
   async function clearEdu2gDeviceSession() { const { auth, signOut } = await getBetaAuth(); await signOut(auth); authPromise = null; }
   window.AIWaysBetaAuth = { getBetaAuth, getEdu2gDeviceSession, getEdu2gProtectedHeaders, clearEdu2gDeviceSession, emulatorRequested };
 })();

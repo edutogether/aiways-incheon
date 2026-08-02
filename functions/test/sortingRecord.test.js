@@ -4,11 +4,11 @@ const assert = require("node:assert/strict");
 const { createSaveSortingRecordHandler } = require("../lib/sortingRecord");
 
 function payload(overrides = {}) {
-  return { schemaVersion: "sorting-record-v1", status: "completed", provider: "future_gemini", model: "gemini-3.5-flash-lite", analysis: { objectCandidates: [{ label: "PET bottle", itemId: "pet-bottle", objectType: "pet-bottle", confidenceBand: "high" }], materialCandidates: [{ label: "plastic", confidenceBand: "medium" }], visibleCautions: [] }, checklist: [{ id: "empty", label: "Empty container", checked: true }], userDecision: { selectedItemId: "pet-bottle", action: "recorded", userConfirmed: true }, hold: null, idempotencyKey: "stage6-idempotency-key-0001", actorId: "stage6-test-actor", ...overrides };
+  return { schemaVersion: "sorting-record-v1", status: "completed", provider: "future_gemini", model: "gemini-3.5-flash-lite", analysis: { objectCandidates: [{ label: "PET bottle", itemId: "pet-bottle", objectType: "pet-bottle", confidenceBand: "high" }], materialCandidates: [{ label: "plastic", confidenceBand: "medium" }], visibleCautions: [] }, checklist: [{ id: "empty", label: "Empty container", checked: true }], userDecision: { selectedItemId: "pet-bottle", action: "recorded", userConfirmed: true }, hold: null, idempotencyKey: "stage6-idempotency-key-0001", ...overrides };
 }
 function setup(options = {}) {
   const db = new Map();
-  const handler = createSaveSortingRecordHandler({ appCheck: async () => ({ status: "valid" }), allowTestActor: options.allowTestActor ?? true, now: () => new Date("2026-07-28T00:00:00.000Z"), serverTimestamp: () => "SERVER_TIMESTAMP", rateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) }, store: { async createOrGet(actor, key, record, response) { const existing = db.get(`${actor}:${key}`); if (existing) return { ...existing, duplicate: true }; const value = { recordId: `server-${db.size + 1}`, status: record.status, ...response, duplicate: false, record }; db.set(`${actor}:${key}`, value); return value; } } });
+  const handler = createSaveSortingRecordHandler({ appCheck: async () => ({ status: "valid" }), access: options.access || { resolve: async () => ({ ok: true, actorId: "actor_test" }) }, actorRateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) }, now: () => new Date("2026-07-28T00:00:00.000Z"), serverTimestamp: () => "SERVER_TIMESTAMP", rateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) }, store: { async createOrGet(actor, key, record, response) { const existing = db.get(`${actor}:${key}`); if (existing) return { ...existing, duplicate: true }; const value = { recordId: `server-${db.size + 1}`, status: record.status, ...response, duplicate: false, record }; db.set(`${actor}:${key}`, value); return value; } } });
   return { db, handler };
 }
 async function call(handler, body) {
@@ -27,8 +27,8 @@ test("stores completed and held records with server timestamps and idempotency",
   assert.equal(held.status, 201);
 });
 test("rejects untrusted production actor and invalid or sensitive fields", async () => {
-  const { handler } = setup({ allowTestActor: false });
-  assert.equal((await call(handler, payload())).status, 503);
+  const { handler } = setup({ access: { resolve: async () => ({ ok: false, httpStatus: 403, code: "actor_unavailable" }) } });
+  assert.equal((await call(handler, payload())).status, 403);
   const testHandler = setup().handler;
   const cases = [payload({ status: "other" }), payload({ schemaVersion: "bad" }), payload({ userDecision: { selectedItemId: "pet-bottle", action: "recorded", userConfirmed: false } }), payload({ status: "held", userDecision: { selectedItemId: "pet-bottle", action: "held", userConfirmed: true }, hold: null }), payload({ analysis: { ...payload().analysis, objectCandidates: Array(4).fill(payload().analysis.objectCandidates[0]) } }), payload({ checklist: Array(21).fill(payload().checklist[0]) }), payload({ imageUrl: "https://example.invalid" }), payload({ analysis: { ...payload().analysis, rawResponse: "forbidden" } }), payload({ prompt: "forbidden" })];
   for (const item of cases) assert.equal((await call(testHandler, item)).status, 400);

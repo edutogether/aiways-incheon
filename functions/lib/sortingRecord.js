@@ -6,6 +6,7 @@ const MAX_BODY_BYTES = 24 * 1024;
 const FORBIDDEN_KEY = /(?:image|base64|data:image|url|authorization|api[_-]?key|secret|prompt|raw.*response|email|name|access.*code)/i;
 const ALLOWED_ORIGIN = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
 const { observeAppCheck } = require("./appCheckProtection");
+const { protectActorRequest } = require("./protectedActor");
 
 function reject(code) { return { valid: false, code }; }
 function cleanText(value, max = 200) {
@@ -24,7 +25,7 @@ function applyCors(req, res) {
     res.set("Access-Control-Allow-Origin", origin);
     res.set("Vary", "Origin");
     res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.set("Access-Control-Allow-Headers", "Content-Type, X-Firebase-AppCheck");
+    res.set("Access-Control-Allow-Headers", "Content-Type, X-Firebase-AppCheck, Authorization");
   }
   return true;
 }
@@ -46,7 +47,7 @@ function normalizeChecklist(value) {
 }
 function validateRecordRequest(body) {
   if (!body || typeof body !== "object" || Array.isArray(body) || hasForbiddenKey(body)) return reject("invalid_request");
-  const allowed = new Set(["schemaVersion", "status", "provider", "model", "appVersion", "sourceSchemaVersion", "analysis", "checklist", "userDecision", "hold", "idempotencyKey", "actorId"]);
+  const allowed = new Set(["schemaVersion", "status", "provider", "model", "appVersion", "sourceSchemaVersion", "analysis", "checklist", "userDecision", "hold", "idempotencyKey"]);
   if (Object.keys(body).some((key) => !allowed.has(key))) return reject("unknown_field");
   if (body.schemaVersion !== SCHEMA_VERSION || !["completed", "held"].includes(body.status)) return reject("invalid_schema");
   const provider = cleanText(body.provider, 80);
@@ -86,7 +87,7 @@ function validateRecordRequest(body) {
     ...(cleanText(body.sourceSchemaVersion, 80) ? { sourceSchemaVersion: cleanText(body.sourceSchemaVersion, 80) } : {}),
     analysis: { objectCandidates, materialCandidates, visibleCautions }, checklist,
     userDecision: { selectedItemId, ...(selectedCorrectionType ? { selectedCorrectionType } : {}), action, userConfirmed: true },
-    hold: normalizedHold, idempotencyKey, testActorId: cleanText(body.actorId, 80)
+    hold: normalizedHold, idempotencyKey
   } };
 }
 function createSaveSortingRecordHandler(dependencies = {}) {
@@ -94,30 +95,21 @@ function createSaveSortingRecordHandler(dependencies = {}) {
   const logger = dependencies.logger || (() => {});
   const serverTimestamp = dependencies.serverTimestamp || (() => now());
   const store = dependencies.store;
-  const rateLimiter = dependencies.rateLimiter || { check: async () => ({ allowed: false, outcome: "unavailable" }) };
-  const appCheck = dependencies.appCheck || (options => observeAppCheck(options.req,options));
   return async (req, res) => {
     if (!applyCors(req, res)) return res.status(403).json({ ok: false, code: "invalid_origin" });
     if (req.method === "OPTIONS") return res.status(204).send("");
     if (req.method !== "POST") return res.status(405).json({ ok: false, code: "method_not_allowed" });
-    const observed=await appCheck({req,functionName:"saveSortingRecord",logger:dependencies.logAppCheck}); if(observed.httpStatus)return res.status(observed.httpStatus).json({ok:false,code:observed.code});
+    const protectedActor = await protectActorRequest({ req, functionName: "saveSortingRecord", access: dependencies.access, appCheck: dependencies.appCheck, globalRateLimiter: dependencies.rateLimiter, actorRateLimiter: dependencies.actorRateLimiter, logAppCheck: dependencies.logAppCheck });
+    if (!protectedActor.ok) { if (protectedActor.retryAfterSeconds) res.set("Retry-After", String(protectedActor.retryAfterSeconds)); return res.status(protectedActor.httpStatus).json({ ok: false, code: protectedActor.code, ...(protectedActor.retryAfterSeconds ? { retryAfterSeconds: protectedActor.retryAfterSeconds } : {}) }); }
     const bodyBytes = req.rawBody?.length ?? Buffer.byteLength(JSON.stringify(req.body || {}));
     if (bodyBytes > MAX_BODY_BYTES) return res.status(413).json({ ok: false, code: "request_too_large" });
     const checked = validateRecordRequest(req.body);
     if (!checked.valid) { logger({ validationCode: checked.code }); return res.status(400).json({ ok: false, code: checked.code }); }
-    const actorId = dependencies.allowTestActor ? checked.value.testActorId : "";
-    if (!actorId) return res.status(503).json({ ok: false, code: "actor_not_resolved" });
-    const limit = await rateLimiter.check("saveSortingRecord");
-    if (!limit.allowed) {
-      if (limit.outcome === "unavailable") return res.status(503).json({ ok: false, code: "protection_unavailable" });
-      res.set("Retry-After", String(limit.retryAfterSeconds));
-      return res.status(429).json({ ok: false, code: "rate_limit_exceeded", retryAfterSeconds: limit.retryAfterSeconds });
-    }
+    const actorId = protectedActor.actorId;
     const createdAt = now();
     const expireAt = new Date(createdAt.getTime() + 90 * DAY_MS);
     const record = { ...checked.value, actorId, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), expireAt };
     delete record.idempotencyKey;
-    delete record.testActorId;
     const result = await store.createOrGet(actorId, checked.value.idempotencyKey, record, { createdAt: createdAt.toISOString(), expireAt: expireAt.toISOString() });
     logger({ recordId: result.recordId, status: result.status, provider: record.provider, schemaVersion: SCHEMA_VERSION, duplicate: result.duplicate === true });
     return res.status(result.duplicate ? 200 : 201).json({ recordId: result.recordId, status: result.status, createdAt: result.createdAt, expireAt: result.expireAt, schemaVersion: SCHEMA_VERSION, duplicate: result.duplicate === true });

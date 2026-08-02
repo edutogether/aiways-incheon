@@ -36,6 +36,8 @@ async function protect(req, res, functionName, dependencies) {
   if (!access.ok) { response(res, access.httpStatus, { ok: false, code: access.code }); return null; }
   const limit = await dependencies.rateLimiter.check(functionName);
   if (!limit?.allowed) { response(res, limit?.outcome === "unavailable" ? 503 : 429, { ok: false, code: limit?.outcome === "unavailable" ? "protection_unavailable" : "rate_limited" }); return null; }
+  const scoped = await dependencies.actorRateLimiter?.check?.(functionName, functionName === "redeemEdu2gPass" ? access.uid : access.actorId);
+  if (scoped && !scoped.allowed) { response(res, scoped.outcome === "unavailable" ? 503 : 429, { ok: false, code: scoped.outcome === "unavailable" ? "protection_unavailable" : "rate_limited" }); return null; }
   return access;
 }
 

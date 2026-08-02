@@ -18,9 +18,10 @@ async function invoke(handler, method = "POST", body = requestBody()) {
   return result;
 }
 const allowLimit = { check: async () => ({ allowed: true, outcome: "allowed" }) };
+const allowAccess = { resolve: async () => ({ ok: true, actorId: "actor_test" }) };
 const allowAnalysis = { claimAnalysisRequest: async () => ({ state: "claimed" }), completeAnalysisRequest: async () => true, failAnalysisRequest: async () => true };
 const validAppCheck = async () => ({ status: "valid" });
-function handlerFor(response = responseBody()) { return createAnalyzeSortingHandler({ appCheck: validAppCheck, getApiKey: () => "mock", rateLimiter: allowLimit, analysisRequests: allowAnalysis, createClient: () => ({ models: { generateContent: async () => ({ text: JSON.stringify(response) }) } }) }); }
+function handlerFor(response = responseBody()) { return createAnalyzeSortingHandler({ appCheck: validAppCheck, access: allowAccess, actorRateLimiter: allowLimit, getApiKey: () => "mock", rateLimiter: allowLimit, analysisRequests: allowAnalysis, createClient: () => ({ models: { generateContent: async () => ({ text: JSON.stringify(response) }) } }) }); }
 
 test("returns validated observation candidates without raw model content", async () => {
   const result = await invoke(handlerFor());
@@ -41,7 +42,7 @@ test("rejects invalid schema, unknown item, type mismatch, long and HTML candida
 });
 test("rejects unsupported, malformed and oversized image payloads", async () => {
   let providerCalls = 0;
-  const inputHandler = createAnalyzeSortingHandler({ appCheck: validAppCheck, getApiKey: () => "mock", rateLimiter: allowLimit, analysisRequests: allowAnalysis, createClient: () => ({ models: { generateContent: async () => { providerCalls += 1; throw new Error("provider should not be called"); } } }) });
+  const inputHandler = createAnalyzeSortingHandler({ appCheck: validAppCheck, access: allowAccess, actorRateLimiter: allowLimit, getApiKey: () => "mock", rateLimiter: allowLimit, analysisRequests: allowAnalysis, createClient: () => ({ models: { generateContent: async () => { providerCalls += 1; throw new Error("provider should not be called"); } } }) });
   assert.equal((await invoke(inputHandler, "POST", requestBody({ image: { mimeType: "image/heic", data: imageData } }))).payload.code, "unsupported_image_type");
   assert.equal((await invoke(inputHandler, "POST", requestBody({ image: { mimeType: "image/jpeg", data: "not_base64" } }))).payload.code, "invalid_image");
 
@@ -62,9 +63,9 @@ test("rejects unsupported, malformed and oversized image payloads", async () => 
   assert.equal(providerCalls, 0);
 });
 test("returns stable errors for unavailable provider, client error and method", async () => {
-  assert.equal((await invoke(createAnalyzeSortingHandler({ appCheck: validAppCheck, getApiKey: () => "", rateLimiter: allowLimit, analysisRequests: allowAnalysis }))).payload.code, "provider_unavailable");
+  assert.equal((await invoke(createAnalyzeSortingHandler({ appCheck: validAppCheck, access: allowAccess, actorRateLimiter: allowLimit, getApiKey: () => "", rateLimiter: allowLimit, analysisRequests: allowAnalysis }))).payload.code, "provider_unavailable");
   const logged = [];
-  const failed = await invoke(createAnalyzeSortingHandler({ appCheck: validAppCheck, getApiKey: () => "mock", rateLimiter: allowLimit, analysisRequests: allowAnalysis, createClient: () => ({ models: { generateContent: async () => { throw new Error("internal"); } } }), logProviderError: (metadata) => logged.push(metadata) }));
+  const failed = await invoke(createAnalyzeSortingHandler({ appCheck: validAppCheck, access: allowAccess, actorRateLimiter: allowLimit, getApiKey: () => "mock", rateLimiter: allowLimit, analysisRequests: allowAnalysis, createClient: () => ({ models: { generateContent: async () => { throw new Error("internal"); } } }), logProviderError: (metadata) => logged.push(metadata) }));
   assert.equal(failed.payload.code, "analysis_failed");
   assert.equal(failed.statusCode, 502); assert.equal(logged.length, 1); assert.equal(Object.hasOwn(logged[0], "stack"), false);
   assert.equal((await invoke(handlerFor(), "GET")).payload.code, "method_not_allowed");

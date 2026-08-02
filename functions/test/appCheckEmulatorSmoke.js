@@ -24,6 +24,7 @@ async function call(appCheck) {
   let claim = 0;
   const h = createAnalyzeSortingHandler({
     appCheck,
+    access: { resolve: async () => ({ok: true, actorId: "actor_smoke"}) },
     logAppCheck: () => {},
     getApiKey: () => "mock",
     rateLimiter: {
@@ -32,6 +33,7 @@ async function call(appCheck) {
         return {allowed: true, outcome: "allowed"};
       }
     },
+    actorRateLimiter: { check: async () => ({allowed: true, outcome: "allowed"}) },
     analysisRequests: {
       claimAnalysisRequest: async () => {
         claim += 1;

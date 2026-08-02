@@ -1,0 +1,322 @@
+[
+  {
+    "file": "screenshots/390x844/01-dashboard.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/390x844/02-project.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/390x844/03-curriculum.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/390x844/04-hah.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/390x844/05-flow.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/390x844/06-gallery.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/390x844/07-sorting.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/390x844/08-resources.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/768x1024/01-dashboard.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/768x1024/02-project.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/768x1024/03-curriculum.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/768x1024/04-hah.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/768x1024/05-flow.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/768x1024/06-gallery.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/768x1024/07-sorting.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/768x1024/08-resources.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1024x768/01-dashboard.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1024x768/02-project.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1024x768/03-curriculum.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1024x768/04-hah.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1024x768/05-flow.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1024x768/06-gallery.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1024x768/07-sorting.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1024x768/08-resources.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1366x768/01-dashboard.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1366x768/02-project.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1366x768/03-curriculum.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1366x768/04-hah.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1366x768/05-flow.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1366x768/06-gallery.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1366x768/07-sorting.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1366x768/08-resources.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1920x1080/01-dashboard.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1920x1080/02-project.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1920x1080/03-curriculum.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1920x1080/04-hah.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1920x1080/05-flow.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1920x1080/06-gallery.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1920x1080/07-sorting.webp",
+    "value": false
+  },
+  {
+    "file": "screenshots/1920x1080/08-resources.webp",
+    "value": false
+  },
+  {
+    "file": "states/sorting/390x844/idle.webp",
+    "value": false
+  },
+  {
+    "file": "states/sorting/390x844/camera-file-ready.webp",
+    "value": false
+  },
+  {
+    "file": "states/sorting/390x844/analyzing.webp",
+    "value": false
+  },
+  {
+    "file": "states/sorting/390x844/result.webp",
+    "value": true
+  },
+  {
+    "file": "states/sorting/390x844/checklist-incomplete.webp",
+    "value": true
+  },
+  {
+    "file": "states/sorting/390x844/completed.webp",
+    "value": true
+  },
+  {
+    "file": "states/sorting/390x844/held.webp",
+    "value": false
+  },
+  {
+    "file": "states/sorting/390x844/recent-records.webp",
+    "value": false
+  },
+  {
+    "file": "states/sorting/390x844/analysis-error.webp",
+    "value": true
+  },
+  {
+    "file": "states/sorting/390x844/rate-limited.webp",
+    "value": true
+  },
+  {
+    "file": "states/sorting/1366x768/idle.webp",
+    "value": false
+  },
+  {
+    "file": "states/sorting/1366x768/camera-file-ready.webp",
+    "value": false
+  },
+  {
+    "file": "states/sorting/1366x768/analyzing.webp",
+    "value": false
+  },
+  {
+    "file": "states/sorting/1366x768/result.webp",
+    "value": false
+  },
+  {
+    "file": "states/sorting/1366x768/checklist-incomplete.webp",
+    "value": false
+  },
+  {
+    "file": "states/sorting/1366x768/completed.webp",
+    "value": false
+  },
+  {
+    "file": "states/sorting/1366x768/held.webp",
+    "value": false
+  },
+  {
+    "file": "states/sorting/1366x768/recent-records.webp",
+    "value": false
+  },
+  {
+    "file": "states/sorting/1366x768/analysis-error.webp",
+    "value": false
+  },
+  {
+    "file": "states/sorting/1366x768/rate-limited.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/390x844/unregistered.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/390x844/redeeming.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/390x844/registered.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/390x844/trusted-devices.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/390x844/other-device-revoke-confirm.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/390x844/current-device-revoke-confirm.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/390x844/device-limit.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/390x844/temporary-error.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/1366x768/unregistered.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/1366x768/redeeming.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/1366x768/registered.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/1366x768/trusted-devices.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/1366x768/other-device-revoke-confirm.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/1366x768/current-device-revoke-confirm.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/1366x768/device-limit.webp",
+    "value": false
+  },
+  {
+    "file": "states/edu2g/1366x768/temporary-error.webp",
+    "value": false
+  },
+  {
+    "file": "zoom/dashboard-200pct.webp",
+    "value": false
+  },
+  {
+    "file": "zoom/sorting-idle-200pct.webp",
+    "value": false
+  },
+  {
+    "file": "zoom/sorting-result-200pct.webp",
+    "value": false
+  },
+  {
+    "file": "zoom/edu2g-registered-200pct.webp",
+    "value": false
+  }
+]

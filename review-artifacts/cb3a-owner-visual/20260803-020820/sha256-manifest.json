@@ -1,0 +1,398 @@
+﻿[
+    {
+        "file":  "contact-sheets/1024x768-all-sections.webp",
+        "sha256":  "42F7DE0293A4FE7D1EA3E886264D2179325EC8D568F1D91B2E49990820EBA519"
+    },
+    {
+        "file":  "contact-sheets/1366x768-all-sections.webp",
+        "sha256":  "C8DD98F4990A0C7D9B4EA0DD773DF1C4BB1692E65D56A938F3772662BE530EDF"
+    },
+    {
+        "file":  "contact-sheets/1920x1080-all-sections.webp",
+        "sha256":  "80EB2D5FB581A3DDA0BDC477EE4C7A511C5E21A4495B963B09FDF92272DDDC99"
+    },
+    {
+        "file":  "contact-sheets/390x844-all-sections.webp",
+        "sha256":  "FF8CA593845491F63AB98D24A0488207C9477E22BFAAD1CD4C265AFBE11F397F"
+    },
+    {
+        "file":  "contact-sheets/768x1024-all-sections.webp",
+        "sha256":  "7C146D23A48425C5016201B788D11FEF97D5C94524C9FC6C03B47AD33C0983EA"
+    },
+    {
+        "file":  "contact-sheets/dashboard-all-viewports.webp",
+        "sha256":  "58DA472C3C4F0EDF371CED65A2E97C9D35D0E2C6F6775A349068753485006689"
+    },
+    {
+        "file":  "contact-sheets/edu2g-1366x768.webp",
+        "sha256":  "213B7172D6F3F6E6123A10AAD0C7578DDF6D51F7532DAC239605F94B497CCD34"
+    },
+    {
+        "file":  "contact-sheets/edu2g-390x844.webp",
+        "sha256":  "213B7172D6F3F6E6123A10AAD0C7578DDF6D51F7532DAC239605F94B497CCD34"
+    },
+    {
+        "file":  "contact-sheets/owner-priority.webp",
+        "sha256":  "BE0CEF3F78CC2C6FD2E563E565D5F2DE91F1C2EB467AA09C53F24D4051AEF594"
+    },
+    {
+        "file":  "contact-sheets/sorting-1366x768.webp",
+        "sha256":  "6698D464B47FAC2B79B5121076C80C656EE3EC712B97D5942D70566407A4266C"
+    },
+    {
+        "file":  "contact-sheets/sorting-390x844.webp",
+        "sha256":  "6698D464B47FAC2B79B5121076C80C656EE3EC712B97D5942D70566407A4266C"
+    },
+    {
+        "file":  "gallery.md",
+        "sha256":  "F30D88179FB4A12DFD2C34A55400A8B81294252A396E931FBAA7EF05798EC90D"
+    },
+    {
+        "file":  "manifest.json",
+        "sha256":  "3B0570AF546CDA153941C5F0C671EEFD4EA88A772618FB4273504DBA4D8E76FF"
+    },
+    {
+        "file":  "reports/accessibility-hints.json",
+        "sha256":  "94050CCD101721CA3F61D3AEF1C1A92504D5D6C4CA62DE89C8B1ECD2C0C55133"
+    },
+    {
+        "file":  "reports/capture-matrix.json",
+        "sha256":  "71E81F0705F2B9F158613F08D86607CC04925C599D822F4C1EEB7A5D14AC9CDD"
+    },
+    {
+        "file":  "reports/console-report.json",
+        "sha256":  "BC17F96CFAF21914E490BD8FFFFC46EB098CDBA8BA91DEADB999F7735472C8D5"
+    },
+    {
+        "file":  "reports/overflow-report.json",
+        "sha256":  "FA907DD4076F8E5F9521845723E960D846122AE775FF113F3A032B824FCFF16A"
+    },
+    {
+        "file":  "reports/request-report.json",
+        "sha256":  "BC17F96CFAF21914E490BD8FFFFC46EB098CDBA8BA91DEADB999F7735472C8D5"
+    },
+    {
+        "file":  "screenshots/1024x768/01-dashboard.webp",
+        "sha256":  "A9D5DEE50852AA03D5F10CF69152B9267FEE0B94E91BBA3779E62EF4970EFB87"
+    },
+    {
+        "file":  "screenshots/1024x768/02-project.webp",
+        "sha256":  "B1D3AAC45265AF46EC76CDB554F275F10FBD89A876FA1D13D033BA448B615A4D"
+    },
+    {
+        "file":  "screenshots/1024x768/03-curriculum.webp",
+        "sha256":  "60A733C802D3987C55D41B464CDA8328516B120B4158AA28E0E7EEDE667031EA"
+    },
+    {
+        "file":  "screenshots/1024x768/04-hah.webp",
+        "sha256":  "CD0B99C71924FBDADCFDEA07CF67D06A1E98DFB3B62BEFFA2F224A788E5632DB"
+    },
+    {
+        "file":  "screenshots/1024x768/05-flow.webp",
+        "sha256":  "0C3EE0E19D5AC33572BEDCEF144BE88648F64B1042B9F54F44ABCB771CFE53BF"
+    },
+    {
+        "file":  "screenshots/1024x768/06-gallery.webp",
+        "sha256":  "4F768E4219AC3438EB95EDA96023F0A126CDCC87F5A0082B5285F7AA1FE8B49F"
+    },
+    {
+        "file":  "screenshots/1024x768/07-sorting.webp",
+        "sha256":  "BCD9589B0DBCEF1A9747D6BBD495D3F0F439842F9BCBA6AC0A03E68952CBF895"
+    },
+    {
+        "file":  "screenshots/1024x768/08-resources.webp",
+        "sha256":  "FE0871C52F4B7687AC29F69AF5D29A636F5DE209918138F6B6AAF8DC5A2B4623"
+    },
+    {
+        "file":  "screenshots/1366x768/01-dashboard.webp",
+        "sha256":  "69A8FB3478E2565911805D51560B1A62333A5B332FCCB012B992CF9BEC3BAC1D"
+    },
+    {
+        "file":  "screenshots/1366x768/02-project.webp",
+        "sha256":  "1AA9C72141B7C821692742E57C43278FEE086FA7CF0EA8693D265382150F00E5"
+    },
+    {
+        "file":  "screenshots/1366x768/03-curriculum.webp",
+        "sha256":  "C5865B97AAD4BC4E144FA35D9308D8C80374160AC1923434B74A6BFE5BE6FB79"
+    },
+    {
+        "file":  "screenshots/1366x768/04-hah.webp",
+        "sha256":  "A80FAB2A225E7541EFF73DD2292E95D52520040DB1A11CC08A00B427FEE13F2D"
+    },
+    {
+        "file":  "screenshots/1366x768/05-flow.webp",
+        "sha256":  "81E8E31BE993452E018E553FEC287775B8D57B218533E2E6F9D8B83E380BB37B"
+    },
+    {
+        "file":  "screenshots/1366x768/06-gallery.webp",
+        "sha256":  "101A94C5D46AEA626B88BE79A324F659072094010FF59913C98BE981AFCB8885"
+    },
+    {
+        "file":  "screenshots/1366x768/07-sorting.webp",
+        "sha256":  "4CADCF868FF4A07DAD1ECF55F04ACF1A6DD96B76109E5881C3953CA5D1A97804"
+    },
+    {
+        "file":  "screenshots/1366x768/08-resources.webp",
+        "sha256":  "C96957B73E401A2749C1FA7D49E8085B51AAF1AE63A0A7A01095DCF0FFDEF4B2"
+    },
+    {
+        "file":  "screenshots/1920x1080/01-dashboard.webp",
+        "sha256":  "E834FCD2049C85F0C9AD39A83D529FE9D6B7FAEB92B754E5FB8FCD6BB6147E62"
+    },
+    {
+        "file":  "screenshots/1920x1080/02-project.webp",
+        "sha256":  "B028296D39245B54E117C0EB1032F37346D47449CB367383DD5764369FEEE354"
+    },
+    {
+        "file":  "screenshots/1920x1080/03-curriculum.webp",
+        "sha256":  "66FF2F844ED3FE3819FC1277EE2B899E4F35F45EFC4AA4222CDBC06D4DC2D7DC"
+    },
+    {
+        "file":  "screenshots/1920x1080/04-hah.webp",
+        "sha256":  "037B0D45178CB71E98C16BDA31C07B64445196C088921A47AB97C709C4C7EC46"
+    },
+    {
+        "file":  "screenshots/1920x1080/05-flow.webp",
+        "sha256":  "CEB281D830CE51F82B058603B24944194B0AF747C27375A892283C33C840D00A"
+    },
+    {
+        "file":  "screenshots/1920x1080/06-gallery.webp",
+        "sha256":  "B782741A97F2E669485E545CCACF4257EB04A2B692D87D278E9BEFA30DC25E66"
+    },
+    {
+        "file":  "screenshots/1920x1080/07-sorting.webp",
+        "sha256":  "BF14FCA97EED385A154325DDE77DF3CDFD82ED2F46742C7307506B5E01553403"
+    },
+    {
+        "file":  "screenshots/1920x1080/08-resources.webp",
+        "sha256":  "2CB7F1A7C29676093542C886961EBBE128BF78BA114EDF04F465B65D6F7B68B1"
+    },
+    {
+        "file":  "screenshots/390x844/01-dashboard.webp",
+        "sha256":  "5B5821752BC2067658256A5A7AA2E6D731CE67C7792807048989E0A2EDF76041"
+    },
+    {
+        "file":  "screenshots/390x844/02-project.webp",
+        "sha256":  "4F38A3150CF5FE0ABF24A280B26E578C377326B7162314DE84B320D215024D1B"
+    },
+    {
+        "file":  "screenshots/390x844/03-curriculum.webp",
+        "sha256":  "21D7B249F93B89E19A91B704A390B53A9DC4BC3B7DA581AA440F726FBD2D3D9B"
+    },
+    {
+        "file":  "screenshots/390x844/04-hah.webp",
+        "sha256":  "8DE89776D4FC5AE817457132EC4252D4B532B919E8AE337AFB4C327E22EC0557"
+    },
+    {
+        "file":  "screenshots/390x844/05-flow.webp",
+        "sha256":  "FB428F5C513C8F882665B2E90CC55BF95466F29A028656BCADCA8AA13A5F22A9"
+    },
+    {
+        "file":  "screenshots/390x844/06-gallery.webp",
+        "sha256":  "B2FD9619725A3534E0E1A6139C30E706E94E0B1DEB80B4EFCD5BBC7D24405359"
+    },
+    {
+        "file":  "screenshots/390x844/07-sorting.webp",
+        "sha256":  "8902A3D571134AAB80087B58E4F47504CC04E65C3942B31B2FF974EE9E2EEE4C"
+    },
+    {
+        "file":  "screenshots/390x844/08-resources.webp",
+        "sha256":  "0E17A6921BA5FE1F5A3B847D90D4EBEDE6A50F866D91A2E259BFAD0F2F0B0780"
+    },
+    {
+        "file":  "screenshots/768x1024/01-dashboard.webp",
+        "sha256":  "3300481E74E26DF73BA6BBFBDC3FE1C5B42040CD35A1C5B9EEFC06817FA46CE4"
+    },
+    {
+        "file":  "screenshots/768x1024/02-project.webp",
+        "sha256":  "9866C2ABA5FD3AD5BAFD017B4462B947C02CE022C3E5F801EEB28C21338AFB87"
+    },
+    {
+        "file":  "screenshots/768x1024/03-curriculum.webp",
+        "sha256":  "BCD6D6C7CD5A56D3960EE6E61AECC01ED9CF7452556BE4E5BE7B67AB67EC6B9F"
+    },
+    {
+        "file":  "screenshots/768x1024/04-hah.webp",
+        "sha256":  "3F37475A920DFB3C0C7F7B049CC340553925F1FF56B0C378D4DE74C1792C042A"
+    },
+    {
+        "file":  "screenshots/768x1024/05-flow.webp",
+        "sha256":  "8EC4380504680159EBB5D170467F7EA83D583753AE9E398F075686E74D1E85D1"
+    },
+    {
+        "file":  "screenshots/768x1024/06-gallery.webp",
+        "sha256":  "2E226ECDB64B6AC551E877A9E0BCE7BF724CF56CE2FD0D2CE650767F92609BE2"
+    },
+    {
+        "file":  "screenshots/768x1024/07-sorting.webp",
+        "sha256":  "673679694AA2B8DF16DEE73F58081F917615AA463424D4FF45804F992B3CE2F6"
+    },
+    {
+        "file":  "screenshots/768x1024/08-resources.webp",
+        "sha256":  "20070912B9947521CE3041ADFBBE86C08EB68260BB13FE9AE6F1F66042292EB5"
+    },
+    {
+        "file":  "source-state.json",
+        "sha256":  "A67D526DF0CC0136C3D5836D1E4EE60388961C02127E655FEA1F0E182CAE774E"
+    },
+    {
+        "file":  "states/edu2g/1366x768/current-device-revoke-confirm.webp",
+        "sha256":  "2EAD7C5E37A2507730D48BA3CF26C6CA8D35BBFBD9BA9E7B7DE7F3BB88008344"
+    },
+    {
+        "file":  "states/edu2g/1366x768/device-limit.webp",
+        "sha256":  "4D2912F6F00AC0151BB60E53C9E95DC0D4D39A49B8E3887C0213AC3C837A0DFE"
+    },
+    {
+        "file":  "states/edu2g/1366x768/other-device-revoke-confirm.webp",
+        "sha256":  "166424B5BE12FB37AC1C0CAF66B618BE7580F1BE4D356DAD2206C375A054353E"
+    },
+    {
+        "file":  "states/edu2g/1366x768/redeeming.webp",
+        "sha256":  "0F53FF5ED55A94BB15FF484A33D6D9FF0913854AD97C5455F229C470F08964BB"
+    },
+    {
+        "file":  "states/edu2g/1366x768/registered.webp",
+        "sha256":  "62A8B4ED789BB590D3DFB6FE0B59C7A501D8761564C80D193D76634A627CF908"
+    },
+    {
+        "file":  "states/edu2g/1366x768/temporary-error.webp",
+        "sha256":  "9BD98AE7D5E5B2DF68BC2779BF333DB014796B7311FED02DE61298FA70B74C63"
+    },
+    {
+        "file":  "states/edu2g/1366x768/trusted-devices.webp",
+        "sha256":  "ECD91F5AE6709D6141D9F1D5A70B389EF7F694316471B5B797913C5E013CD55E"
+    },
+    {
+        "file":  "states/edu2g/1366x768/unregistered.webp",
+        "sha256":  "E277DD03886C7824F33F0B994C4AD0338D98D2FB6597F7C87FDF353AEC8C33DA"
+    },
+    {
+        "file":  "states/edu2g/390x844/current-device-revoke-confirm.webp",
+        "sha256":  "FA673CBF41DB24059020FC40FAB6FD11322276B418E4D37D8E556647EBEF10ED"
+    },
+    {
+        "file":  "states/edu2g/390x844/device-limit.webp",
+        "sha256":  "6874DD5C566AC669BBE7B29F093EDD000F9C7735F741FAE09A73C88B4B16EA77"
+    },
+    {
+        "file":  "states/edu2g/390x844/other-device-revoke-confirm.webp",
+        "sha256":  "4EEBA2B3655AB7E795FCDB7EF9859F7B3B4260CCC509608B2BEE881A86F98741"
+    },
+    {
+        "file":  "states/edu2g/390x844/redeeming.webp",
+        "sha256":  "765E795BD86E11B9E88AC74C2477BEB65B1D70AE05753D1E181C935E5A695581"
+    },
+    {
+        "file":  "states/edu2g/390x844/registered.webp",
+        "sha256":  "362E35DAB0C49E0BBF6D82D503E253526287387FA550DF5EF5BFED5E0B372ED6"
+    },
+    {
+        "file":  "states/edu2g/390x844/temporary-error.webp",
+        "sha256":  "BBF9A5C8EA2EACD913E00FF65E2EC61E6422AA0656E9FF5FC378DF28951DF47B"
+    },
+    {
+        "file":  "states/edu2g/390x844/trusted-devices.webp",
+        "sha256":  "3AEF74397FA51C2A2CC004481F244DD79BCD26EAE471AF1D28C6BF808F5A46AF"
+    },
+    {
+        "file":  "states/edu2g/390x844/unregistered.webp",
+        "sha256":  "3A9149268C0297BF1557F4402887F6773134B962C50A4C50A3C69077E0CBD26A"
+    },
+    {
+        "file":  "states/sorting/1366x768/analysis-error.webp",
+        "sha256":  "84A2D893A3F278FD09CBF64BAB1D9A10F21DF311E9D875869E9D92A711B0905D"
+    },
+    {
+        "file":  "states/sorting/1366x768/analyzing.webp",
+        "sha256":  "594FA0C3BF27D2A13D8FD854A33784E2D86427331EA1ED369B1804085FD2A489"
+    },
+    {
+        "file":  "states/sorting/1366x768/camera-file-ready.webp",
+        "sha256":  "4CADCF868FF4A07DAD1ECF55F04ACF1A6DD96B76109E5881C3953CA5D1A97804"
+    },
+    {
+        "file":  "states/sorting/1366x768/checklist-incomplete.webp",
+        "sha256":  "4D37BD1DA5007B45D37C8D85F7CC92C3F0F55D21D184E3B4899B29C1446E60BC"
+    },
+    {
+        "file":  "states/sorting/1366x768/completed.webp",
+        "sha256":  "25D21CF216CCB181958F637D3A6B2AA04C6B3F9BFBAD6FB58B0572DCB0F7E9B2"
+    },
+    {
+        "file":  "states/sorting/1366x768/held.webp",
+        "sha256":  "40D0FC0733C173B3D6E8A8C16CA2AFFC4EC04D826BBDD031096DA414222C76E5"
+    },
+    {
+        "file":  "states/sorting/1366x768/idle.webp",
+        "sha256":  "4CADCF868FF4A07DAD1ECF55F04ACF1A6DD96B76109E5881C3953CA5D1A97804"
+    },
+    {
+        "file":  "states/sorting/1366x768/rate-limited.webp",
+        "sha256":  "2628B7674C1DED93EE6EB7E4B394A6ED10DF3EE5BC4533EA40B3CF82751E0C26"
+    },
+    {
+        "file":  "states/sorting/1366x768/recent-records.webp",
+        "sha256":  "BA68B78A84FF739029371DC28AC4625B115D6474D81917EB66587D355381CEAF"
+    },
+    {
+        "file":  "states/sorting/1366x768/result.webp",
+        "sha256":  "25D21CF216CCB181958F637D3A6B2AA04C6B3F9BFBAD6FB58B0572DCB0F7E9B2"
+    },
+    {
+        "file":  "states/sorting/390x844/analysis-error.webp",
+        "sha256":  "E7CBE305048829206B498A97A4121962A27C8CC73F9C4DE845D100578D1C81BD"
+    },
+    {
+        "file":  "states/sorting/390x844/analyzing.webp",
+        "sha256":  "7CA959A8B5F2B1BBE527773DB8F2C864B45A1E5C21CE51A7130B20202115E7A7"
+    },
+    {
+        "file":  "states/sorting/390x844/camera-file-ready.webp",
+        "sha256":  "8902A3D571134AAB80087B58E4F47504CC04E65C3942B31B2FF974EE9E2EEE4C"
+    },
+    {
+        "file":  "states/sorting/390x844/checklist-incomplete.webp",
+        "sha256":  "08E53E9282B5B214351F94195E44633DA938F0A4C774A08A18D01EF1B339D971"
+    },
+    {
+        "file":  "states/sorting/390x844/completed.webp",
+        "sha256":  "3656F5238004055199073237C23C87C9430781D6F71E886480D02E668150A3A7"
+    },
+    {
+        "file":  "states/sorting/390x844/held.webp",
+        "sha256":  "76ABD10BD13F303BBC5FDD90094027F2EE34455293F78EFBD2AA85D7A1FF567F"
+    },
+    {
+        "file":  "states/sorting/390x844/idle.webp",
+        "sha256":  "8902A3D571134AAB80087B58E4F47504CC04E65C3942B31B2FF974EE9E2EEE4C"
+    },
+    {
+        "file":  "states/sorting/390x844/rate-limited.webp",
+        "sha256":  "22C5F4359F31C08B924BFC5264FE216A0FFA1972CEBF812933FB5386DF467F2B"
+    },
+    {
+        "file":  "states/sorting/390x844/recent-records.webp",
+        "sha256":  "07EFE9DF65B7AC93660078372ECE76E287B404523E853C9D55F8396894814743"
+    },
+    {
+        "file":  "states/sorting/390x844/result.webp",
+        "sha256":  "E7CBE305048829206B498A97A4121962A27C8CC73F9C4DE845D100578D1C81BD"
+    },
+    {
+        "file":  "zoom/dashboard-200pct.webp",
+        "sha256":  "F0EB23C94BB62EAC4AF421E4E83C7F5E20EF42088DB67636A6C16602FABA9D56"
+    },
+    {
+        "file":  "zoom/edu2g-registered-200pct.webp",
+        "sha256":  "97C60FE9B6B3D107D42ABC2A5EFC958F212D9796E58A8AC73AA0A78838F71067"
+    },
+    {
+        "file":  "zoom/sorting-idle-200pct.webp",
+        "sha256":  "F06B627EC90D9AB327ACB287CB3D721A957F2049CB6F3FFF1BBF519B8C2181D7"
+    },
+    {
+        "file":  "zoom/sorting-result-200pct.webp",
+        "sha256":  "D91642D75F142A921FAC7EA17380932B6C5B02838763781C3A9A49556F644A43"
+    }
+]

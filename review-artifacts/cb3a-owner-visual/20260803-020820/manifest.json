@@ -1,0 +1,119 @@
+﻿{
+    "schemaVersion":  1,
+    "generatedAt":  "2026-08-02T17:15:19.5581380Z",
+    "sourceBranch":  "feature/closed-beta-v1",
+    "sourceHead":  "11c981574620b4fd6caf1ce89137c7013243a18d",
+    "sourceWorkingTreeDirty":  true,
+    "changedFiles":  [
+                         {
+                             "status":  " M",
+                             "path":  "functions/package.json",
+                             "sha256":  "2B408D8D9F605C33CBF2773C9BBB09942470FB4E8D6A7DF6D57873604A90D3C8"
+                         },
+                         {
+                             "status":  " M",
+                             "path":  "index.html",
+                             "sha256":  "62E765891F9A492C56A5A9334BF63D4B3499B13C13E036C9928849DE04734BEA"
+                         },
+                         {
+                             "status":  "??",
+                             "path":  "functions/test/cb3CaptureEvidence.js",
+                             "sha256":  "AE4596376DD74F440E77183A431EF195A12552530C3C29EEDF9E72FB82D99364"
+                         },
+                         {
+                             "status":  "??",
+                             "path":  "functions/test/cb3ExtraCaptures.js",
+                             "sha256":  "44BE485D1963501482025D1038B6F62E153E7686D86E2F06D2007759B54CE3F9"
+                         },
+                         {
+                             "status":  "??",
+                             "path":  "functions/test/cb3FrontendContract.test.js",
+                             "sha256":  "1238168C76D166580D91DB01993EB6CA5887DEF4CA05B00338E132BD657F8691"
+                         },
+                         {
+                             "status":  "??",
+                             "path":  "functions/test/cb3aContactSheet.js",
+                             "sha256":  "F00A1F2429F9B7F2DDEF7659223F6FB2791AA0F45A621A68C26188EB7CDC5840"
+                         },
+                         {
+                             "status":  "??",
+                             "path":  "functions/test/cb3aHistoricalCapture.js",
+                             "sha256":  "49A0CE803CB170AEE85532D7E156B4D872BF90E8FC80733A279A5A2D592AB770"
+                         },
+                         {
+                             "status":  "??",
+                             "path":  "styles/cb3.css",
+                             "sha256":  "52165E93E1E1ECA1A79F03258E1CA2AD2C03F900F7403A41481C8D4B138AB3EE"
+                         },
+                         {
+                             "status":  "??",
+                             "path":  "styles/cb3a.css",
+                             "sha256":  "9DF33CADB67CD491AD2CADA42142B37AD5B97B6A85A9A92CEC90D195E7092365"
+                         },
+                         {
+                             "status":  "??",
+                             "path":  "styles/visual-tuner.css",
+                             "sha256":  "FAD64322027132F548017ED556506EF5C1B33E6866E012C75743A3E607F084AC"
+                         },
+                         {
+                             "status":  "??",
+                             "path":  "visualTuner.js",
+                             "sha256":  "7A89DB98DCBC60F6F028B10E8EE11983AEC5491959B02FE0A9A31ACCBA5499C8"
+                         }
+                     ],
+    "serverUrl":  "http://127.0.0.1:8120/",
+    "capturePort":  8120,
+    "browser":  "Chromium via Chrome DevTools Protocol localhost:9239",
+    "viewports":  [
+                      "390x844",
+                      "768x1024",
+                      "1024x768",
+                      "1366x768",
+                      "1920x1080"
+                  ],
+    "sections":  [
+                     "dashboard",
+                     "project",
+                     "curriculum",
+                     "hah",
+                     "flow",
+                     "gallery",
+                     "sorting",
+                     "resources"
+                 ],
+    "sectionMatrixCount":  40,
+    "sortingStates":  [
+                          "idle",
+                          "camera-file-ready",
+                          "analyzing",
+                          "result",
+                          "checklist-incomplete",
+                          "completed",
+                          "held",
+                          "recent-records",
+                          "analysis-error",
+                          "rate-limited"
+                      ],
+    "sortingCaptureCount":  20,
+    "edu2gStates":  [
+                        "unregistered",
+                        "redeeming",
+                        "registered",
+                        "trusted-devices",
+                        "other-device-revoke-confirm",
+                        "current-device-revoke-confirm",
+                        "device-limit",
+                        "temporary-error"
+                    ],
+    "edu2gCaptureCount":  16,
+    "zoomCaptureCount":  4,
+    "contactSheetCount":  11,
+    "consoleErrorTotal":  0,
+    "failedRequestTotal":  0,
+    "productionApiRequestTotal":  0,
+    "horizontalOverflowTotal":  0,
+    "mocksUsed":  true,
+    "realPassTokenUserDataUsed":  0,
+    "reviewBranch":  "review/cb3a-owner-visual-20260803-020820",
+    "reviewCommitSHA":  "pending-at-generation"
+}

@@ -1,0 +1,2646 @@
+[
+  {
+    "file": "screenshots/390x844/01-dashboard.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/#dashboard",
+    "selector": "#dashboard",
+    "capturedAt": "2026-08-02T17:12:18.513Z",
+    "scrollX": 0,
+    "scrollY": 30,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 358,
+      "height": 1808,
+      "bottom": 1888
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 4,
+    "sha256": "5b5821752bc2067658256a5a7aa2e6d731ce67c7792807048989e0a2edf76041"
+  },
+  {
+    "file": "screenshots/390x844/02-project.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/#project",
+    "selector": "#project",
+    "capturedAt": "2026-08-02T17:12:19.039Z",
+    "scrollX": 0,
+    "scrollY": 1838,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 358,
+      "height": 1179,
+      "bottom": 1259
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 4,
+    "sha256": "4f38a3150cf5fe0abf24a280b26e578c377326b7162314de84b320d215024d1b"
+  },
+  {
+    "file": "screenshots/390x844/03-curriculum.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/#curriculum",
+    "selector": "#curriculum",
+    "capturedAt": "2026-08-02T17:12:19.567Z",
+    "scrollX": 0,
+    "scrollY": 3017,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 358,
+      "height": 2075,
+      "bottom": 2155
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 4,
+    "sha256": "21d7b249f93b89e19a91b704a390b53a9dc4bc3b7da581aa440f726fbd2d3d9b"
+  },
+  {
+    "file": "screenshots/390x844/04-hah.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/#hah",
+    "selector": "#hah",
+    "capturedAt": "2026-08-02T17:12:20.088Z",
+    "scrollX": 0,
+    "scrollY": 5092,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 358,
+      "height": 1513,
+      "bottom": 1593
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 4,
+    "sha256": "8de89776d4fc5ae817457132ec4252d4b532b919e8ae337afb4c327e22ec0557"
+  },
+  {
+    "file": "screenshots/390x844/05-flow.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/#flow",
+    "selector": "#flow",
+    "capturedAt": "2026-08-02T17:12:20.598Z",
+    "scrollX": 0,
+    "scrollY": 6605,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 358,
+      "height": 2497,
+      "bottom": 2577
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 4,
+    "sha256": "fb428f5c513c8f882665b2e90cc55bf95466f29a028656bcadca8aa13a5f22a9"
+  },
+  {
+    "file": "screenshots/390x844/06-gallery.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/#gallery",
+    "selector": "#gallery",
+    "capturedAt": "2026-08-02T17:12:21.100Z",
+    "scrollX": 0,
+    "scrollY": 9102,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 358,
+      "height": 2190,
+      "bottom": 2270
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 4,
+    "sha256": "b2fd9619725a3534e0e1a6139c30e706e94e0b1deb80b4efcd5bbc7d24405359"
+  },
+  {
+    "file": "screenshots/390x844/07-sorting.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/#sorting",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:21.643Z",
+    "scrollX": 0,
+    "scrollY": 11292,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 358,
+      "height": 2996,
+      "bottom": 3076
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 4,
+    "sha256": "8902a3d571134aab80087b58e4f47504cc04e65c3942b31b2ff974ee9e2eee4c"
+  },
+  {
+    "file": "screenshots/390x844/08-resources.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/#resources",
+    "selector": "#resources",
+    "capturedAt": "2026-08-02T17:12:22.167Z",
+    "scrollX": 0,
+    "scrollY": 14288,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 358,
+      "height": 2393,
+      "bottom": 2473
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 4,
+    "sha256": "0e17a6921ba5fe1f5a3b847d90d4ebede6a50f866d91a2e259bfad0f2f0b0780"
+  },
+  {
+    "file": "screenshots/768x1024/01-dashboard.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "url": "http://127.0.0.1:8120/#dashboard",
+    "selector": "#dashboard",
+    "capturedAt": "2026-08-02T17:12:23.623Z",
+    "scrollX": 0,
+    "scrollY": 31,
+    "scrollWidth": 753,
+    "clientWidth": 753,
+    "overflow": false,
+    "sectionRect": {
+      "x": 26,
+      "y": 87,
+      "width": 701,
+      "height": 1105,
+      "bottom": 1192
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 6,
+    "sha256": "3300481e74e26df73ba6bbfbdc3fe1c5b42040cd35a1c5b9eefc06817fa46ce4"
+  },
+  {
+    "file": "screenshots/768x1024/02-project.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "url": "http://127.0.0.1:8120/#project",
+    "selector": "#project",
+    "capturedAt": "2026-08-02T17:12:24.188Z",
+    "scrollX": 0,
+    "scrollY": 1136,
+    "scrollWidth": 753,
+    "clientWidth": 753,
+    "overflow": false,
+    "sectionRect": {
+      "x": 26,
+      "y": 87,
+      "width": 701,
+      "height": 991,
+      "bottom": 1077
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 6,
+    "sha256": "9866c2aba5fd3ad5bafd017b4462b947c02ce022c3e5f801eeb28c21338afb87"
+  },
+  {
+    "file": "screenshots/768x1024/03-curriculum.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "url": "http://127.0.0.1:8120/#curriculum",
+    "selector": "#curriculum",
+    "capturedAt": "2026-08-02T17:12:24.733Z",
+    "scrollX": 0,
+    "scrollY": 2127,
+    "scrollWidth": 753,
+    "clientWidth": 753,
+    "overflow": false,
+    "sectionRect": {
+      "x": 26,
+      "y": 86,
+      "width": 701,
+      "height": 1249,
+      "bottom": 1335
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 6,
+    "sha256": "bcd6d6c7cd5a56d3960ee6e61aecc01ed9cf7452556be4e5be7b67ab67ec6b9f"
+  },
+  {
+    "file": "screenshots/768x1024/04-hah.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "url": "http://127.0.0.1:8120/#hah",
+    "selector": "#hah",
+    "capturedAt": "2026-08-02T17:12:25.292Z",
+    "scrollX": 0,
+    "scrollY": 3376,
+    "scrollWidth": 753,
+    "clientWidth": 753,
+    "overflow": false,
+    "sectionRect": {
+      "x": 26,
+      "y": 86,
+      "width": 701,
+      "height": 1140,
+      "bottom": 1226
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 6,
+    "sha256": "3f37475a920dfb3c0c7f7b049cc340553925f1ff56b0c378d4de74c1792c042a"
+  },
+  {
+    "file": "screenshots/768x1024/05-flow.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "url": "http://127.0.0.1:8120/#flow",
+    "selector": "#flow",
+    "capturedAt": "2026-08-02T17:12:25.870Z",
+    "scrollX": 0,
+    "scrollY": 4515,
+    "scrollWidth": 753,
+    "clientWidth": 753,
+    "overflow": false,
+    "sectionRect": {
+      "x": 26,
+      "y": 87,
+      "width": 701,
+      "height": 1312,
+      "bottom": 1399
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 6,
+    "sha256": "8ec4380504680159ebb5d170467f7ea83d583753ae9e398f075686e74d1e85d1"
+  },
+  {
+    "file": "screenshots/768x1024/06-gallery.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "url": "http://127.0.0.1:8120/#gallery",
+    "selector": "#gallery",
+    "capturedAt": "2026-08-02T17:12:26.446Z",
+    "scrollX": 0,
+    "scrollY": 5827,
+    "scrollWidth": 753,
+    "clientWidth": 753,
+    "overflow": false,
+    "sectionRect": {
+      "x": 26,
+      "y": 87,
+      "width": 701,
+      "height": 1046,
+      "bottom": 1133
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 6,
+    "sha256": "2e226ecdb64b6ac551e877a9e0bce7bf724cf56ce2fd0d2ce650767f92609be2"
+  },
+  {
+    "file": "screenshots/768x1024/07-sorting.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "url": "http://127.0.0.1:8120/#sorting",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:27.014Z",
+    "scrollX": 0,
+    "scrollY": 6874,
+    "scrollWidth": 753,
+    "clientWidth": 753,
+    "overflow": false,
+    "sectionRect": {
+      "x": 26,
+      "y": 86,
+      "width": 701,
+      "height": 2222,
+      "bottom": 2308
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 6,
+    "sha256": "673679694aa2b8df16dee73f58081f917615aa463424d4ff45804f992b3ce2f6"
+  },
+  {
+    "file": "screenshots/768x1024/08-resources.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "url": "http://127.0.0.1:8120/#resources",
+    "selector": "#resources",
+    "capturedAt": "2026-08-02T17:12:27.566Z",
+    "scrollX": 0,
+    "scrollY": 9084,
+    "scrollWidth": 753,
+    "clientWidth": 753,
+    "overflow": false,
+    "sectionRect": {
+      "x": 26,
+      "y": 98,
+      "width": 701,
+      "height": 925,
+      "bottom": 1024
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 6,
+    "sha256": "20070912b9947521ce3041adfbbe86c08eb68260bb13fe9ae6f1f66042292eb5"
+  },
+  {
+    "file": "screenshots/1024x768/01-dashboard.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#dashboard",
+    "selector": "#dashboard",
+    "capturedAt": "2026-08-02T17:12:28.931Z",
+    "scrollX": 0,
+    "scrollY": 31,
+    "scrollWidth": 1009,
+    "clientWidth": 1009,
+    "overflow": false,
+    "sectionRect": {
+      "x": 35,
+      "y": 87,
+      "width": 939,
+      "height": 1445,
+      "bottom": 1531
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 8,
+    "sha256": "a9d5dee50852aa03d5f10cf69152b9267fee0b94e91bba3779e62ef4970efb87"
+  },
+  {
+    "file": "screenshots/1024x768/02-project.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#project",
+    "selector": "#project",
+    "capturedAt": "2026-08-02T17:12:29.486Z",
+    "scrollX": 0,
+    "scrollY": 1476,
+    "scrollWidth": 1009,
+    "clientWidth": 1009,
+    "overflow": false,
+    "sectionRect": {
+      "x": 35,
+      "y": 86,
+      "width": 939,
+      "height": 820,
+      "bottom": 906
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 8,
+    "sha256": "b1d3aac45265af46ec76cdb554f275f10fbd89a876fa1d13d033ba448b615a4d"
+  },
+  {
+    "file": "screenshots/1024x768/03-curriculum.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#curriculum",
+    "selector": "#curriculum",
+    "capturedAt": "2026-08-02T17:12:30.063Z",
+    "scrollX": 0,
+    "scrollY": 2296,
+    "scrollWidth": 1009,
+    "clientWidth": 1009,
+    "overflow": false,
+    "sectionRect": {
+      "x": 35,
+      "y": 86,
+      "width": 939,
+      "height": 1039,
+      "bottom": 1125
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 8,
+    "sha256": "60a733c802d3987c55d41b464cda8328516b120b4158aa28e0e7eede667031ea"
+  },
+  {
+    "file": "screenshots/1024x768/04-hah.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#hah",
+    "selector": "#hah",
+    "capturedAt": "2026-08-02T17:12:30.619Z",
+    "scrollX": 0,
+    "scrollY": 3335,
+    "scrollWidth": 1009,
+    "clientWidth": 1009,
+    "overflow": false,
+    "sectionRect": {
+      "x": 35,
+      "y": 86,
+      "width": 939,
+      "height": 864,
+      "bottom": 950
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 8,
+    "sha256": "cd0b99c71924fbdadcfdea07cf67d06a1e98dfb3b62beffa2f224a788e5632db"
+  },
+  {
+    "file": "screenshots/1024x768/05-flow.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#flow",
+    "selector": "#flow",
+    "capturedAt": "2026-08-02T17:12:31.167Z",
+    "scrollX": 0,
+    "scrollY": 4199,
+    "scrollWidth": 1009,
+    "clientWidth": 1009,
+    "overflow": false,
+    "sectionRect": {
+      "x": 35,
+      "y": 86,
+      "width": 939,
+      "height": 1285,
+      "bottom": 1372
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 8,
+    "sha256": "0c3ee0e19d5ac33572bedcef144be88648f64b1042b9f54f44abcb771cfe53bf"
+  },
+  {
+    "file": "screenshots/1024x768/06-gallery.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#gallery",
+    "selector": "#gallery",
+    "capturedAt": "2026-08-02T17:12:31.713Z",
+    "scrollX": 0,
+    "scrollY": 5484,
+    "scrollWidth": 1009,
+    "clientWidth": 1009,
+    "overflow": false,
+    "sectionRect": {
+      "x": 35,
+      "y": 87,
+      "width": 939,
+      "height": 1107,
+      "bottom": 1194
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 8,
+    "sha256": "4f768e4219ac3438eb95eda96023f0a126cdcc87f5a0082b5285f7aa1fe8b49f"
+  },
+  {
+    "file": "screenshots/1024x768/07-sorting.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#sorting",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:32.291Z",
+    "scrollX": 0,
+    "scrollY": 6591,
+    "scrollWidth": 1009,
+    "clientWidth": 1009,
+    "overflow": false,
+    "sectionRect": {
+      "x": 35,
+      "y": 87,
+      "width": 939,
+      "height": 2270,
+      "bottom": 2357
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 8,
+    "sha256": "bcd9589b0dbcef1a9747d6bbd495d3f0f439842f9bcba6ac0a03e68952cbf895"
+  },
+  {
+    "file": "screenshots/1024x768/08-resources.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#resources",
+    "selector": "#resources",
+    "capturedAt": "2026-08-02T17:12:32.862Z",
+    "scrollX": 0,
+    "scrollY": 8861,
+    "scrollWidth": 1009,
+    "clientWidth": 1009,
+    "overflow": false,
+    "sectionRect": {
+      "x": 35,
+      "y": 87,
+      "width": 939,
+      "height": 967,
+      "bottom": 1054
+    },
+    "headerRect": {
+      "height": 118,
+      "bottom": 118
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 8,
+    "sha256": "fe0871c52f4b7687ac29f69af5d29a636f5de209918138f6b6aaf8dc5a2b4623"
+  },
+  {
+    "file": "screenshots/1366x768/01-dashboard.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#dashboard",
+    "selector": "#dashboard",
+    "capturedAt": "2026-08-02T17:12:34.306Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 70,
+      "width": 1258,
+      "height": 699,
+      "bottom": 770
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 10,
+    "sha256": "69a8fb3478e2565911805d51560b1a62333a5b332fccb012b992cf9bec3bac1d"
+  },
+  {
+    "file": "screenshots/1366x768/02-project.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#project",
+    "selector": "#project",
+    "capturedAt": "2026-08-02T17:12:34.898Z",
+    "scrollX": 0,
+    "scrollY": 683,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 87,
+      "width": 1258,
+      "height": 774,
+      "bottom": 861
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 10,
+    "sha256": "1aa9c72141b7c821692742e57c43278fee086fa7cf0ea8693d265382150f00e5"
+  },
+  {
+    "file": "screenshots/1366x768/03-curriculum.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#curriculum",
+    "selector": "#curriculum",
+    "capturedAt": "2026-08-02T17:12:35.484Z",
+    "scrollX": 0,
+    "scrollY": 1457,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 87,
+      "width": 1258,
+      "height": 925,
+      "bottom": 1011
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 10,
+    "sha256": "c5865b97aad4bc4e144fa35d9308d8c80374160ac1923434b74a6bfe5be6fb79"
+  },
+  {
+    "file": "screenshots/1366x768/04-hah.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#hah",
+    "selector": "#hah",
+    "capturedAt": "2026-08-02T17:12:36.074Z",
+    "scrollX": 0,
+    "scrollY": 2382,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 86,
+      "width": 1258,
+      "height": 980,
+      "bottom": 1067
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 10,
+    "sha256": "a80fab2a225e7541eff73dd2292e95d52520040db1a11cc08a00b427fee13f2d"
+  },
+  {
+    "file": "screenshots/1366x768/05-flow.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#flow",
+    "selector": "#flow",
+    "capturedAt": "2026-08-02T17:12:36.679Z",
+    "scrollX": 0,
+    "scrollY": 3362,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 87,
+      "width": 1258,
+      "height": 995,
+      "bottom": 1082
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 10,
+    "sha256": "81e8e31be993452e018e553fec287775b8d57b218533e2e6f9d8b83e380bb37b"
+  },
+  {
+    "file": "screenshots/1366x768/06-gallery.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#gallery",
+    "selector": "#gallery",
+    "capturedAt": "2026-08-02T17:12:37.258Z",
+    "scrollX": 0,
+    "scrollY": 4358,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 86,
+      "width": 1258,
+      "height": 1008,
+      "bottom": 1094
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 10,
+    "sha256": "101a94c5d46aea626b88be79a324f659072094010ff59913c98be981afcb8885"
+  },
+  {
+    "file": "screenshots/1366x768/07-sorting.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#sorting",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:37.854Z",
+    "scrollX": 0,
+    "scrollY": 5366,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 86,
+      "width": 1258,
+      "height": 1921,
+      "bottom": 2007
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 10,
+    "sha256": "4cadcf868ff4a07dad1ecf55f04acf1a6dd96b76109e5881c3953ca5d1a97804"
+  },
+  {
+    "file": "screenshots/1366x768/08-resources.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/#resources",
+    "selector": "#resources",
+    "capturedAt": "2026-08-02T17:12:38.437Z",
+    "scrollX": 0,
+    "scrollY": 7287,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 86,
+      "width": 1258,
+      "height": 1054,
+      "bottom": 1140
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 10,
+    "sha256": "c96957b73e401a2749c1fa7d49e8085b51aaf1ae63a0a7a01095dcf0ffdef4b2"
+  },
+  {
+    "file": "screenshots/1920x1080/01-dashboard.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "url": "http://127.0.0.1:8120/#dashboard",
+    "selector": "#dashboard",
+    "capturedAt": "2026-08-02T17:12:39.963Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 1905,
+    "clientWidth": 1905,
+    "overflow": false,
+    "sectionRect": {
+      "x": 64,
+      "y": 70,
+      "width": 1777,
+      "height": 1026,
+      "bottom": 1097
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 12,
+    "sha256": "e834fcd2049c85f0c9ad39a83d529fe9d6b7faeb92b754e5fb8fcd6bb6147e62"
+  },
+  {
+    "file": "screenshots/1920x1080/02-project.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "url": "http://127.0.0.1:8120/#project",
+    "selector": "#project",
+    "capturedAt": "2026-08-02T17:12:40.632Z",
+    "scrollX": 0,
+    "scrollY": 1010,
+    "scrollWidth": 1905,
+    "clientWidth": 1905,
+    "overflow": false,
+    "sectionRect": {
+      "x": 64,
+      "y": 87,
+      "width": 1777,
+      "height": 987,
+      "bottom": 1073
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 12,
+    "sha256": "b028296d39245b54e117c0eb1032f37346d47449cb367383dd5764369feee354"
+  },
+  {
+    "file": "screenshots/1920x1080/03-curriculum.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "url": "http://127.0.0.1:8120/#curriculum",
+    "selector": "#curriculum",
+    "capturedAt": "2026-08-02T17:12:41.328Z",
+    "scrollX": 0,
+    "scrollY": 1997,
+    "scrollWidth": 1905,
+    "clientWidth": 1905,
+    "overflow": false,
+    "sectionRect": {
+      "x": 64,
+      "y": 86,
+      "width": 1777,
+      "height": 880,
+      "bottom": 966
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 12,
+    "sha256": "66ff2f844ed3fe3819fc1277ee2b899e4f35f45efc4aa4222cdbc06d4dc2d7dc"
+  },
+  {
+    "file": "screenshots/1920x1080/04-hah.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "url": "http://127.0.0.1:8120/#hah",
+    "selector": "#hah",
+    "capturedAt": "2026-08-02T17:12:42.020Z",
+    "scrollX": 0,
+    "scrollY": 2877,
+    "scrollWidth": 1905,
+    "clientWidth": 1905,
+    "overflow": false,
+    "sectionRect": {
+      "x": 64,
+      "y": 86,
+      "width": 1777,
+      "height": 1136,
+      "bottom": 1222
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 12,
+    "sha256": "037b0d45178cb71e98c16bda31c07b64445196c088921a47ab97c709c4c7ec46"
+  },
+  {
+    "file": "screenshots/1920x1080/05-flow.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "url": "http://127.0.0.1:8120/#flow",
+    "selector": "#flow",
+    "capturedAt": "2026-08-02T17:12:42.718Z",
+    "scrollX": 0,
+    "scrollY": 4013,
+    "scrollWidth": 1905,
+    "clientWidth": 1905,
+    "overflow": false,
+    "sectionRect": {
+      "x": 64,
+      "y": 86,
+      "width": 1777,
+      "height": 880,
+      "bottom": 966
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 12,
+    "sha256": "ceb281d830ce51f82b058603b24944194b0af747c27375a892283c33c840d00a"
+  },
+  {
+    "file": "screenshots/1920x1080/06-gallery.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "url": "http://127.0.0.1:8120/#gallery",
+    "selector": "#gallery",
+    "capturedAt": "2026-08-02T17:12:43.383Z",
+    "scrollX": 0,
+    "scrollY": 4893,
+    "scrollWidth": 1905,
+    "clientWidth": 1905,
+    "overflow": false,
+    "sectionRect": {
+      "x": 64,
+      "y": 86,
+      "width": 1777,
+      "height": 1078,
+      "bottom": 1164
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 12,
+    "sha256": "b782741a97f2e669485e545ccacf4257eb04a2b692d87d278e9befa30dc25e66"
+  },
+  {
+    "file": "screenshots/1920x1080/07-sorting.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "url": "http://127.0.0.1:8120/#sorting",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:44.045Z",
+    "scrollX": 0,
+    "scrollY": 5971,
+    "scrollWidth": 1905,
+    "clientWidth": 1905,
+    "overflow": false,
+    "sectionRect": {
+      "x": 64,
+      "y": 86,
+      "width": 1777,
+      "height": 1964,
+      "bottom": 2050
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 12,
+    "sha256": "bf14fca97eed385a154325dde77df3cdfd82ed2f46742c7307506b5e01553403"
+  },
+  {
+    "file": "screenshots/1920x1080/08-resources.webp",
+    "kind": "section",
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "url": "http://127.0.0.1:8120/#resources",
+    "selector": "#resources",
+    "capturedAt": "2026-08-02T17:12:44.714Z",
+    "scrollX": 0,
+    "scrollY": 7934,
+    "scrollWidth": 1905,
+    "clientWidth": 1905,
+    "overflow": false,
+    "sectionRect": {
+      "x": 64,
+      "y": 87,
+      "width": 1777,
+      "height": 1152,
+      "bottom": 1238
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 12,
+    "sha256": "2cb7f1a7c29676093542c886961ebbe128bf78ba114edf04f465b65d6f7b68b1"
+  },
+  {
+    "file": "states/sorting/390x844/idle.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:46.038Z",
+    "scrollX": 0,
+    "scrollY": 11292,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 358,
+      "height": 2996,
+      "bottom": 3076
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 14,
+    "sha256": "8902a3d571134aab80087b58e4f47504cc04e65c3942b31b2ff974ee9e2eee4c"
+  },
+  {
+    "file": "states/sorting/390x844/camera-file-ready.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:46.552Z",
+    "scrollX": 0,
+    "scrollY": 11292,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 358,
+      "height": 2996,
+      "bottom": 3076
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 14,
+    "sha256": "8902a3d571134aab80087b58e4f47504cc04e65c3942b31b2ff974ee9e2eee4c"
+  },
+  {
+    "file": "states/sorting/390x844/analyzing.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:47.099Z",
+    "scrollX": 0,
+    "scrollY": 11292,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 358,
+      "height": 1821,
+      "bottom": 1901
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 13,
+    "failed": 0,
+    "console": 0,
+    "prod": 14,
+    "sha256": "7ca959a8b5f2b1bbe527773db8f2c864b45a1e5c21ce51a7130b20202115e7a7"
+  },
+  {
+    "file": "states/sorting/390x844/result.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:47.672Z",
+    "scrollX": 0,
+    "scrollY": 10894,
+    "scrollWidth": 523,
+    "clientWidth": 390,
+    "overflow": true,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 475,
+      "height": 1995,
+      "bottom": 2075
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 13,
+    "failed": 0,
+    "console": 0,
+    "prod": 14,
+    "sha256": "e7cbe305048829206b498a97a4121962a27c8cc73f9c4de845d100578d1c81bd"
+  },
+  {
+    "file": "states/sorting/390x844/checklist-incomplete.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:48.192Z",
+    "scrollX": 0,
+    "scrollY": 10894,
+    "scrollWidth": 523,
+    "clientWidth": 390,
+    "overflow": true,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 475,
+      "height": 1996,
+      "bottom": 2077
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 13,
+    "failed": 0,
+    "console": 0,
+    "prod": 14,
+    "sha256": "08e53e9282b5b214351f94195e44633da938f0a4c774a08a18d01ef1b339d971"
+  },
+  {
+    "file": "states/sorting/390x844/completed.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:48.727Z",
+    "scrollX": 0,
+    "scrollY": 10894,
+    "scrollWidth": 523,
+    "clientWidth": 390,
+    "overflow": true,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 475,
+      "height": 1995,
+      "bottom": 2075
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 13,
+    "failed": 0,
+    "console": 0,
+    "prod": 14,
+    "sha256": "3656f5238004055199073237c23c87c9430781d6f71e886480d02e668150a3a7"
+  },
+  {
+    "file": "states/sorting/390x844/held.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#holdList",
+    "capturedAt": "2026-08-02T17:12:49.322Z",
+    "scrollX": 0,
+    "scrollY": 12737,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 33,
+      "y": 0,
+      "width": 324,
+      "height": 5385,
+      "bottom": 5385
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 13,
+    "failed": 0,
+    "console": 0,
+    "prod": 14,
+    "sha256": "76abd10bd13f303bbc5fdd90094027f2ee34455293f78efbd2aa85d7a1ff567f"
+  },
+  {
+    "file": "states/sorting/390x844/recent-records.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "[data-panel=\"stats\"]",
+    "capturedAt": "2026-08-02T17:12:49.849Z",
+    "scrollX": 0,
+    "scrollY": 12295,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 33,
+      "y": 0,
+      "width": 324,
+      "height": 1674,
+      "bottom": 1674
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 13,
+    "failed": 0,
+    "console": 0,
+    "prod": 14,
+    "sha256": "07efe9df65b7ac93660078372ece76e287b404523e853c9d55f8396894814743"
+  },
+  {
+    "file": "states/sorting/390x844/analysis-error.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:50.395Z",
+    "scrollX": 0,
+    "scrollY": 10894,
+    "scrollWidth": 523,
+    "clientWidth": 390,
+    "overflow": true,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 475,
+      "height": 1995,
+      "bottom": 2075
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 13,
+    "failed": 0,
+    "console": 0,
+    "prod": 14,
+    "sha256": "e7cbe305048829206b498a97a4121962a27c8cc73f9c4de845d100578d1c81bd"
+  },
+  {
+    "file": "states/sorting/390x844/rate-limited.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:50.930Z",
+    "scrollX": 0,
+    "scrollY": 10894,
+    "scrollWidth": 523,
+    "clientWidth": 390,
+    "overflow": true,
+    "sectionRect": {
+      "x": 16,
+      "y": 80,
+      "width": 475,
+      "height": 3188,
+      "bottom": 3269
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 14,
+    "sha256": "22c5f4359f31c08b924bfc5264fe216a0ffa1972cebf812933fb5386df467f2b"
+  },
+  {
+    "file": "states/sorting/1366x768/idle.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:52.315Z",
+    "scrollX": 0,
+    "scrollY": 5366,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 86,
+      "width": 1258,
+      "height": 1921,
+      "bottom": 2007
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 16,
+    "sha256": "4cadcf868ff4a07dad1ecf55f04acf1a6dd96b76109e5881c3953ca5d1a97804"
+  },
+  {
+    "file": "states/sorting/1366x768/camera-file-ready.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:52.919Z",
+    "scrollX": 0,
+    "scrollY": 5366,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 86,
+      "width": 1258,
+      "height": 1921,
+      "bottom": 2007
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 16,
+    "sha256": "4cadcf868ff4a07dad1ecf55f04acf1a6dd96b76109e5881c3953ca5d1a97804"
+  },
+  {
+    "file": "states/sorting/1366x768/analyzing.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:53.496Z",
+    "scrollX": 0,
+    "scrollY": 5366,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 86,
+      "width": 1258,
+      "height": 903,
+      "bottom": 990
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 13,
+    "failed": 0,
+    "console": 0,
+    "prod": 16,
+    "sha256": "594fa0c3bf27d2a13d8fd854a33784e2d86427331ea1ed369b1804085fd2a489"
+  },
+  {
+    "file": "states/sorting/1366x768/result.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:54.104Z",
+    "scrollX": 0,
+    "scrollY": 5366,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 86,
+      "width": 1258,
+      "height": 1104,
+      "bottom": 1190
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 13,
+    "failed": 0,
+    "console": 0,
+    "prod": 16,
+    "sha256": "25d21cf216ccb181958f637d3a6b2aa04c6b3f9bfbad6fb58b0572dcb0f7e9b2"
+  },
+  {
+    "file": "states/sorting/1366x768/checklist-incomplete.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:54.711Z",
+    "scrollX": 0,
+    "scrollY": 5366,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 86,
+      "width": 1258,
+      "height": 1105,
+      "bottom": 1192
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 13,
+    "failed": 0,
+    "console": 0,
+    "prod": 16,
+    "sha256": "4d37bd1da5007b45d37c8d85f7cc92c3f0f55d21d184e3b4899b29c1446e60bc"
+  },
+  {
+    "file": "states/sorting/1366x768/completed.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:55.311Z",
+    "scrollX": 0,
+    "scrollY": 5366,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 86,
+      "width": 1258,
+      "height": 1104,
+      "bottom": 1190
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 13,
+    "failed": 0,
+    "console": 0,
+    "prod": 16,
+    "sha256": "25d21cf216ccb181958f637d3a6b2aa04c6b3f9bfbad6fb58b0572dcb0f7e9b2"
+  },
+  {
+    "file": "states/sorting/1366x768/held.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#holdList",
+    "capturedAt": "2026-08-02T17:12:55.903Z",
+    "scrollX": 0,
+    "scrollY": 6009,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 449,
+      "y": 0,
+      "width": 456,
+      "height": 5552,
+      "bottom": 5551
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 13,
+    "failed": 0,
+    "console": 0,
+    "prod": 16,
+    "sha256": "40d0fc0733c173b3d6e8a8c16ca2affc4ec04d826bbdd031096da414222c76e5"
+  },
+  {
+    "file": "states/sorting/1366x768/recent-records.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "[data-panel=\"stats\"]",
+    "capturedAt": "2026-08-02T17:12:56.511Z",
+    "scrollX": 0,
+    "scrollY": 5662,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 449,
+      "y": 0,
+      "width": 456,
+      "height": 1655,
+      "bottom": 1655
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 13,
+    "failed": 0,
+    "console": 0,
+    "prod": 16,
+    "sha256": "ba68b78a84ff739029371dc28ac4625b115d6474d81917eb66587d355381ceaf"
+  },
+  {
+    "file": "states/sorting/1366x768/analysis-error.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:57.117Z",
+    "scrollX": 0,
+    "scrollY": 5366,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 86,
+      "width": 1258,
+      "height": 1104,
+      "bottom": 1190
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 13,
+    "failed": 0,
+    "console": 0,
+    "prod": 16,
+    "sha256": "84a2d893a3f278fd09cbf64bab1d9a10f21df311e9d875869e9d92a711b0905d"
+  },
+  {
+    "file": "states/sorting/1366x768/rate-limited.webp",
+    "kind": "sorting",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:12:57.690Z",
+    "scrollX": 0,
+    "scrollY": 5366,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 86,
+      "width": 1258,
+      "height": 1104,
+      "bottom": 1190
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 13,
+    "failed": 0,
+    "console": 0,
+    "prod": 16,
+    "sha256": "2628b7674c1ded93ee6eb7e4b394a6ed10df3ee5bc4533ea40b3cf82751e0c26"
+  },
+  {
+    "file": "states/edu2g/390x844/unregistered.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:12:59.055Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 19,
+      "y": 323,
+      "width": 352,
+      "height": 198,
+      "bottom": 521
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 18,
+    "sha256": "3a9149268c0297bf1557f4402887f6773134b962c50a4c50a3c69077e0cbd26a"
+  },
+  {
+    "file": "states/edu2g/390x844/redeeming.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:12:59.579Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 19,
+      "y": 323,
+      "width": 352,
+      "height": 198,
+      "bottom": 521
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 18,
+    "sha256": "765e795bd86e11b9e88ac74c2477beb65b1d70ae05753d1e181c935e5a695581"
+  },
+  {
+    "file": "states/edu2g/390x844/registered.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:13:00.109Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 19,
+      "y": 323,
+      "width": 352,
+      "height": 198,
+      "bottom": 521
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 18,
+    "sha256": "362e35dab0c49e0bbf6d82d503e253526287387fa550df5ef5bfed5e0b372ed6"
+  },
+  {
+    "file": "states/edu2g/390x844/trusted-devices.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:13:00.614Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 19,
+      "y": 287,
+      "width": 352,
+      "height": 270,
+      "bottom": 557
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 18,
+    "sha256": "3aef74397fa51c2a2cc004481f244dd79bcd26eae471af1d28c6bf808f5a46af"
+  },
+  {
+    "file": "states/edu2g/390x844/other-device-revoke-confirm.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:13:01.139Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 19,
+      "y": 323,
+      "width": 352,
+      "height": 198,
+      "bottom": 521
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 18,
+    "sha256": "4eeba2b3655ab7e795fcdb7ef9859f7b3b4260ccc509608b2bee881a86f98741"
+  },
+  {
+    "file": "states/edu2g/390x844/current-device-revoke-confirm.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:13:01.644Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 19,
+      "y": 323,
+      "width": 352,
+      "height": 198,
+      "bottom": 521
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 18,
+    "sha256": "fa673cbf41db24059020fc40fab6fd11322276b418e4d37d8e556647ebef10ed"
+  },
+  {
+    "file": "states/edu2g/390x844/device-limit.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:13:02.160Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 19,
+      "y": 323,
+      "width": 352,
+      "height": 198,
+      "bottom": 521
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 18,
+    "sha256": "6874dd5c566ac669bbe7b29f093edd000f9c7735f741fae09a73c88b4b16ea77"
+  },
+  {
+    "file": "states/edu2g/390x844/temporary-error.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:13:02.660Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "overflow": false,
+    "sectionRect": {
+      "x": 19,
+      "y": 323,
+      "width": 352,
+      "height": 198,
+      "bottom": 521
+    },
+    "headerRect": {
+      "height": 110,
+      "bottom": 110
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 18,
+    "sha256": "bbf9a5c8ea2eacd913e00ff65e2ec61e6422aa0656e9ff5fc378df28951df47b"
+  },
+  {
+    "file": "states/edu2g/1366x768/unregistered.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:13:04.080Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 404,
+      "y": 273,
+      "width": 544,
+      "height": 223,
+      "bottom": 495
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 20,
+    "sha256": "e277dd03886c7824f33f0b994c4ad0338d98d2fb6597f7c87fdf353aec8c33da"
+  },
+  {
+    "file": "states/edu2g/1366x768/redeeming.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:13:04.653Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 404,
+      "y": 273,
+      "width": 544,
+      "height": 223,
+      "bottom": 495
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 20,
+    "sha256": "0f53ff5ed55a94bb15ff484a33d6d9ff0913854ad97c5455f229c470f08964bb"
+  },
+  {
+    "file": "states/edu2g/1366x768/registered.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:13:05.232Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 404,
+      "y": 273,
+      "width": 544,
+      "height": 223,
+      "bottom": 495
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 20,
+    "sha256": "62a8b4ed789bb590d3dfb6fe0b59c7a501d8761564c80d193d76634a627cf908"
+  },
+  {
+    "file": "states/edu2g/1366x768/trusted-devices.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:13:05.800Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 404,
+      "y": 233,
+      "width": 544,
+      "height": 303,
+      "bottom": 535
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 20,
+    "sha256": "ecd91f5ae6709d6141d9f1d5a70b389ef7f694316471b5b797913c5e013cd55e"
+  },
+  {
+    "file": "states/edu2g/1366x768/other-device-revoke-confirm.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:13:06.367Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 404,
+      "y": 273,
+      "width": 544,
+      "height": 223,
+      "bottom": 495
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 20,
+    "sha256": "166424b5be12fb37ac1c0caf66b618be7580f1be4d356dad2206c375a054353e"
+  },
+  {
+    "file": "states/edu2g/1366x768/current-device-revoke-confirm.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:13:06.959Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 404,
+      "y": 273,
+      "width": 544,
+      "height": 223,
+      "bottom": 495
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 20,
+    "sha256": "2ead7c5e37a2507730d48ba3cf26c6ca8d35bbfbd9ba9e7b7de7f3bb88008344"
+  },
+  {
+    "file": "states/edu2g/1366x768/device-limit.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:13:07.565Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 404,
+      "y": 273,
+      "width": 544,
+      "height": 223,
+      "bottom": 495
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 20,
+    "sha256": "4d2912f6f00ac0151bb60e53c9e95dc0d4d39a49b8e3887c0213ac3c837a0dfe"
+  },
+  {
+    "file": "states/edu2g/1366x768/temporary-error.webp",
+    "kind": "edu2g",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:13:08.139Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 404,
+      "y": 273,
+      "width": 544,
+      "height": 223,
+      "bottom": 495
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 20,
+    "sha256": "9bd98ae7d5e5b2df68bc2779bf333db014796b7311fed02de61298fa70b74c63"
+  },
+  {
+    "file": "zoom/dashboard-200pct.webp",
+    "kind": "zoom",
+    "viewport": {
+      "width": 1366,
+      "height": 768,
+      "zoom": 200
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#dashboard",
+    "capturedAt": "2026-08-02T17:13:09.518Z",
+    "scrollX": 0,
+    "scrollY": 0,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 70,
+      "width": 1258,
+      "height": 699,
+      "bottom": 770
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 22,
+    "sha256": "f0eb23c94bb62eac4af421e4e83c7f5e20ef42088db67636a6c16602faba9d56"
+  },
+  {
+    "file": "zoom/sorting-idle-200pct.webp",
+    "kind": "zoom",
+    "viewport": {
+      "width": 1366,
+      "height": 768,
+      "zoom": 200
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "#sorting",
+    "capturedAt": "2026-08-02T17:13:10.096Z",
+    "scrollX": 0,
+    "scrollY": 4982,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 46,
+      "y": 470,
+      "width": 1258,
+      "height": 1921,
+      "bottom": 2391
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 92,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 22,
+    "sha256": "f06b627ec90d9ab327acb287cb3d721a957f2049cb6f3fff1bbf519b8c2181d7"
+  },
+  {
+    "file": "zoom/sorting-result-200pct.webp",
+    "kind": "zoom",
+    "viewport": {
+      "width": 1366,
+      "height": 768,
+      "zoom": 200
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": "[data-sorting-result]",
+    "capturedAt": "2026-08-02T17:13:10.684Z",
+    "scrollX": 0,
+    "scrollY": 5868,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 449,
+      "y": 384,
+      "width": 473,
+      "height": 1185,
+      "bottom": 1569
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 22,
+    "sha256": "d91642d75f142a921fac7ea17380932b6c5b02838763781c3a9a49556f644a43"
+  },
+  {
+    "file": "zoom/edu2g-registered-200pct.webp",
+    "kind": "zoom",
+    "viewport": {
+      "width": 1366,
+      "height": 768,
+      "zoom": 200
+    },
+    "url": "http://127.0.0.1:8120/",
+    "selector": ".edu2g-beta-dialog",
+    "capturedAt": "2026-08-02T17:13:11.269Z",
+    "scrollX": 0,
+    "scrollY": 5868,
+    "scrollWidth": 1351,
+    "clientWidth": 1351,
+    "overflow": false,
+    "sectionRect": {
+      "x": 404,
+      "y": 273,
+      "width": 544,
+      "height": 223,
+      "bottom": 495
+    },
+    "headerRect": {
+      "height": 70,
+      "bottom": 70
+    },
+    "smallTextCount": 90,
+    "touchTargetUnder44": 21,
+    "failed": 0,
+    "console": 0,
+    "prod": 22,
+    "sha256": "97c60fe9b6b3d107d42abc2a5efc958f212d9796e58a8ac73aa0a78838f71067"
+  }
+]

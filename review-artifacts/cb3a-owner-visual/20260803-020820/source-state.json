@@ -1,0 +1,74 @@
+﻿{
+    "branch":  "feature/closed-beta-v1",
+    "head":  "11c981574620b4fd6caf1ce89137c7013243a18d",
+    "upstream":  "origin/feature/closed-beta-v1",
+    "aheadBehind":  "0\t0",
+    "status":  [
+                   " M functions/package.json",
+                   " M index.html",
+                   "?? functions/test/cb3CaptureEvidence.js",
+                   "?? functions/test/cb3ExtraCaptures.js",
+                   "?? functions/test/cb3FrontendContract.test.js",
+                   "?? functions/test/cb3aContactSheet.js",
+                   "?? functions/test/cb3aHistoricalCapture.js",
+                   "?? styles/",
+                   "?? visualTuner.js"
+               ],
+    "nameStatus":  [
+                       "M\tfunctions/package.json",
+                       "M\tindex.html"
+                   ],
+    "stat":  [
+                 " functions/package.json | 4 ++--",
+                 " index.html             | 4 ++++",
+                 " 2 files changed, 6 insertions(+), 2 deletions(-)"
+             ],
+    "files":  [
+                  {
+                      "status":  " M",
+                      "path":  "functions/package.json",
+                      "sha256":  "2B408D8D9F605C33CBF2773C9BBB09942470FB4E8D6A7DF6D57873604A90D3C8"
+                  },
+                  {
+                      "status":  " M",
+                      "path":  "index.html",
+                      "sha256":  "62E765891F9A492C56A5A9334BF63D4B3499B13C13E036C9928849DE04734BEA"
+                  },
+                  {
+                      "status":  "??",
+                      "path":  "functions/test/cb3CaptureEvidence.js",
+                      "sha256":  "AE4596376DD74F440E77183A431EF195A12552530C3C29EEDF9E72FB82D99364"
+                  },
+                  {
+                      "status":  "??",
+                      "path":  "functions/test/cb3ExtraCaptures.js",
+                      "sha256":  "44BE485D1963501482025D1038B6F62E153E7686D86E2F06D2007759B54CE3F9"
+                  },
+                  {
+                      "status":  "??",
+                      "path":  "functions/test/cb3FrontendContract.test.js",
+                      "sha256":  "1238168C76D166580D91DB01993EB6CA5887DEF4CA05B00338E132BD657F8691"
+                  },
+                  {
+                      "status":  "??",
+                      "path":  "functions/test/cb3aContactSheet.js",
+                      "sha256":  "F00A1F2429F9B7F2DDEF7659223F6FB2791AA0F45A621A68C26188EB7CDC5840"
+                  },
+                  {
+                      "status":  "??",
+                      "path":  "functions/test/cb3aHistoricalCapture.js",
+                      "sha256":  "49A0CE803CB170AEE85532D7E156B4D872BF90E8FC80733A279A5A2D592AB770"
+                  },
+                  {
+                      "status":  "??",
+                      "path":  "styles/",
+                      "sha256":  null
+                  },
+                  {
+                      "status":  "??",
+                      "path":  "visualTuner.js",
+                      "sha256":  "7A89DB98DCBC60F6F028B10E8EE11983AEC5491959B02FE0A9A31ACCBA5499C8"
+                  }
+              ]
+}
+

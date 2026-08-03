@@ -1,0 +1,9 @@
+"use strict";
+const fs = require("node:fs");
+const http = require("node:http");
+const WebSocket = require("ws");
+const [url, output] = process.argv.slice(2);
+if (!url || !output) throw new Error("Usage: cb3aContactSheet <url> <output>");
+function request(path, method = "GET") { return new Promise((resolve, reject) => { const req = http.request({ hostname: "127.0.0.1", port: 9239, path, method }, res => { let body = ""; res.on("data", chunk => body += chunk); res.on("end", () => resolve(JSON.parse(body))); }); req.on("error", reject); req.end(); }); }
+function connect(url) { return new Promise((resolve, reject) => { const socket = new WebSocket(url); let id = 0; const pending = new Map(); socket.on("open", () => resolve({ send(method, params = {}) { return new Promise((done, fail) => { const messageId = ++id; pending.set(messageId, { done, fail }); socket.send(JSON.stringify({ id: messageId, method, params })); }); }, close: () => socket.close() })); socket.on("message", raw => { const message = JSON.parse(raw); if (!pending.has(message.id)) return; const item = pending.get(message.id); pending.delete(message.id); message.error ? item.fail(message.error) : item.done(message.result); }); socket.on("error", reject); }); }
+(async () => { const target = await request(`/json/new?${encodeURIComponent(url)}`, "PUT"); const page = await connect(target.webSocketDebuggerUrl); await page.send("Page.enable"); await page.send("Emulation.setDeviceMetricsOverride", { width: 1500, height: 480, deviceScaleFactor: 1, mobile: false }); await page.send("Page.navigate", { url }); await new Promise(resolve => setTimeout(resolve, 500)); const shot = await page.send("Page.captureScreenshot", { format: "png", captureBeyondViewport: true }); fs.writeFileSync(output, Buffer.from(shot.data, "base64")); page.close(); })().catch(error => { process.stderr.write(`${error.message}\n`); process.exitCode = 1; });

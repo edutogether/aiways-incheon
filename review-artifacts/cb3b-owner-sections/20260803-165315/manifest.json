@@ -1,0 +1,251 @@
+{
+  "sourceBranch": "wip/cb3b-frontend-handoff-20260803",
+  "sourceHead": "3f19845821010ba77464d0ada78a64be6f0e4f4e",
+  "toolingBranch": "tooling/cb3-visual-review-20260803",
+  "toolingHead": "5588cb34d488004e1697185960f6ff9ee7c26f6e",
+  "captures": [
+    {
+      "file": "dashboard-390.webp",
+      "viewport": [
+        390,
+        844
+      ],
+      "selector": "#dashboard",
+      "bytes": 38506,
+      "sha256": "8d4f8a8ee6e335b071b45bd8c9086a00ad743847407f64cdb53387168d3f4777"
+    },
+    {
+      "file": "project-390.webp",
+      "viewport": [
+        390,
+        844
+      ],
+      "selector": "#project",
+      "bytes": 32640,
+      "sha256": "f828b73434876f0b6dcf7a6289de233a523983b29a46d4429812f2add0ff001a"
+    },
+    {
+      "file": "curriculum-390.webp",
+      "viewport": [
+        390,
+        844
+      ],
+      "selector": "#curriculum",
+      "bytes": 39900,
+      "sha256": "a2901c7928aec438cadc19b8d1f62ff0598791002d3879751f973a32278863d6"
+    },
+    {
+      "file": "hah-390.webp",
+      "viewport": [
+        390,
+        844
+      ],
+      "selector": "#hah",
+      "bytes": 28602,
+      "sha256": "86d6e1b8b8ff38efa448c998260f3df628ec98c9737b586c47b6a37f4a4b2261"
+    },
+    {
+      "file": "flow-390.webp",
+      "viewport": [
+        390,
+        844
+      ],
+      "selector": "#flow",
+      "bytes": 24806,
+      "sha256": "280ee58bba861732ea65f94be49a6f11abefa27be6ae6ae4312df3ee127d3e61"
+    },
+    {
+      "file": "gallery-390.webp",
+      "viewport": [
+        390,
+        844
+      ],
+      "selector": "#gallery",
+      "bytes": 34560,
+      "sha256": "c050c3d98423c64099355df8833802dd6050a4a20ac1ceabc50cf4c8ca8be3cd"
+    },
+    {
+      "file": "sorting-390.webp",
+      "viewport": [
+        390,
+        844
+      ],
+      "selector": "#sorting",
+      "bytes": 24140,
+      "sha256": "bed9e64bb82a6880b24c2128c08b805fd247a313e6c5957dd4d8cb7bc5e44c9a"
+    },
+    {
+      "file": "resources-390.webp",
+      "viewport": [
+        390,
+        844
+      ],
+      "selector": "#resources",
+      "bytes": 29704,
+      "sha256": "aa4ec2b4e30d749ca7a61c3b0bc07c767b3388bef4e45984ce054929121696e3"
+    },
+    {
+      "file": "dashboard-1024.webp",
+      "viewport": [
+        1024,
+        768
+      ],
+      "selector": "#dashboard",
+      "bytes": 53910,
+      "sha256": "14980bdf7ddca473483bc56870154c2d70e645ecfb6d2a35607ba2df9fc72923"
+    },
+    {
+      "file": "project-1024.webp",
+      "viewport": [
+        1024,
+        768
+      ],
+      "selector": "#project",
+      "bytes": 31800,
+      "sha256": "94c993526270f2cb6d30f59569857066de1f695563525de96171645a7ddd045b"
+    },
+    {
+      "file": "curriculum-1024.webp",
+      "viewport": [
+        1024,
+        768
+      ],
+      "selector": "#curriculum",
+      "bytes": 52932,
+      "sha256": "5d37e7a67bf7a9a63ae7ce722a5610043024bc82d87a7425a2f2b26298875f74"
+    },
+    {
+      "file": "hah-1024.webp",
+      "viewport": [
+        1024,
+        768
+      ],
+      "selector": "#hah",
+      "bytes": 65034,
+      "sha256": "77c4684da2b538ffa5bcc6dd8ec0fb910a9ce4b7d23afe0776d6d983933dd19a"
+    },
+    {
+      "file": "flow-1024.webp",
+      "viewport": [
+        1024,
+        768
+      ],
+      "selector": "#flow",
+      "bytes": 42736,
+      "sha256": "394ffc033e9069082abed3efff39901b17342847612f29a37036b8738850072d"
+    },
+    {
+      "file": "gallery-1024.webp",
+      "viewport": [
+        1024,
+        768
+      ],
+      "selector": "#gallery",
+      "bytes": 24960,
+      "sha256": "0a17ca48b005c16618cbb87809d2dd9e14829b5167a48e908382ead8b7a7dbe8"
+    },
+    {
+      "file": "sorting-1024.webp",
+      "viewport": [
+        1024,
+        768
+      ],
+      "selector": "#sorting",
+      "bytes": 48394,
+      "sha256": "4b0fa5c8b10889af4fa1b4408813eb5516def85bcbd16a1ef310bdcaf6c2ed57"
+    },
+    {
+      "file": "resources-1024.webp",
+      "viewport": [
+        1024,
+        768
+      ],
+      "selector": "#resources",
+      "bytes": 43782,
+      "sha256": "8caf42224b4333c4057e2f5d46460820ffff6db95a66794936d10a7f84236a8b"
+    },
+    {
+      "file": "dashboard-1366.webp",
+      "viewport": [
+        1366,
+        768
+      ],
+      "selector": "#dashboard",
+      "bytes": 87944,
+      "sha256": "202a8bc0cdb04837e75700d4fc982eb574233d7c58b0e2151f01e5b892883610"
+    },
+    {
+      "file": "project-1366.webp",
+      "viewport": [
+        1366,
+        768
+      ],
+      "selector": "#project",
+      "bytes": 50208,
+      "sha256": "505719796bcb846460aed78a60e196cc8301eccfba1b066248571aa671ad9530"
+    },
+    {
+      "file": "curriculum-1366.webp",
+      "viewport": [
+        1366,
+        768
+      ],
+      "selector": "#curriculum",
+      "bytes": 64420,
+      "sha256": "c1bf7a362452c11b860ce88a610731f44e2329d4b2460649130e17089c035492"
+    },
+    {
+      "file": "hah-1366.webp",
+      "viewport": [
+        1366,
+        768
+      ],
+      "selector": "#hah",
+      "bytes": 45892,
+      "sha256": "5df5a83a329a75f0d1e0a34707073b5b369be7a4009a771b884b0b995b3b6194"
+    },
+    {
+      "file": "flow-1366.webp",
+      "viewport": [
+        1366,
+        768
+      ],
+      "selector": "#flow",
+      "bytes": 62686,
+      "sha256": "7e4ccf7117b0b757ad337bf61fdfbb30ae461d9a39daf6f3ade0ea8bb4243c25"
+    },
+    {
+      "file": "gallery-1366.webp",
+      "viewport": [
+        1366,
+        768
+      ],
+      "selector": "#gallery",
+      "bytes": 72394,
+      "sha256": "30e589789c311e2a5448f846ec1dfcaf404f21a8d7e0d5f69be417635b506c1f"
+    },
+    {
+      "file": "sorting-1366.webp",
+      "viewport": [
+        1366,
+        768
+      ],
+      "selector": "#sorting",
+      "bytes": 95218,
+      "sha256": "e557243b4d91f158f6daa584b4e65710063f374e777d7a6ae4300c7969e54782"
+    },
+    {
+      "file": "resources-1366.webp",
+      "viewport": [
+        1366,
+        768
+      ],
+      "selector": "#resources",
+      "bytes": 49948,
+      "sha256": "68f34fd038601f1e7348eb57966495d6324200534186d7217d8e4f4c3fdfba0b"
+    }
+  ],
+  "consoleErrors": 0,
+  "productionRequests": 0,
+  "horizontalOverflow": 0
+}

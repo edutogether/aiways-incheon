@@ -1,0 +1,25 @@
+{
+  "totalObservedFailedRequests": 17,
+  "requiredFailedRequests": 0,
+  "unexpectedExternalFailures": 0,
+  "expectedExternalAuthBlocks": 17,
+  "productionRequests": 0,
+  "groups": [
+    {
+      "classification": "expected_external_auth_block",
+      "host": "www.google.com",
+      "pathPrefix": "/recaptcha/enterprise",
+      "resourceType": "Document",
+      "failureReason": "net::ERR_ABORTED",
+      "requestCount": 1
+    },
+    {
+      "classification": "expected_external_auth_block",
+      "host": "www.google.com",
+      "pathPrefix": "/recaptcha/enterprise",
+      "resourceType": "Fetch",
+      "failureReason": "net::ERR_ABORTED",
+      "requestCount": 16
+    }
+  ]
+}

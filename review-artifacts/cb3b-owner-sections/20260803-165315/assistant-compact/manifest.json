@@ -1,0 +1,62 @@
+{
+  "compact": [
+    {
+      "file": "1024-sections-1-compact.jpg",
+      "bytes": 8511,
+      "sha256": "352df9a0f749fff438786dfb5d04f2899e6dc438ab91cf6d13a213275e1f42bc",
+      "base64": "1024-sections-1-compact.jpg.b64",
+      "base64Bytes": 11348,
+      "roundTrip": true
+    },
+    {
+      "file": "1024-sections-2-compact.jpg",
+      "bytes": 9073,
+      "sha256": "4eb2e925723e3bd522d7a3e97ec9e77ff5f1fad52aa1beeb47efea8a0920fe3f",
+      "base64": "1024-sections-2-compact.jpg.b64",
+      "base64Bytes": 12100,
+      "roundTrip": true
+    },
+    {
+      "file": "1366-sections-1-compact.jpg",
+      "bytes": 8911,
+      "sha256": "b397e8046e9dc2bba715a322c1e1eaadbfde1b128061795ca4e9b0607ea5ae32",
+      "base64": "1366-sections-1-compact.jpg.b64",
+      "base64Bytes": 11884,
+      "roundTrip": true
+    },
+    {
+      "file": "1366-sections-2-compact.jpg",
+      "bytes": 8506,
+      "sha256": "b2db70abbe13396739e18ef2ccdeb01330be24b227e57154d7d9e610eefcf4a1",
+      "base64": "1366-sections-2-compact.jpg.b64",
+      "base64Bytes": 11344,
+      "roundTrip": true
+    },
+    {
+      "file": "390-sections-1-compact.jpg",
+      "bytes": 7034,
+      "sha256": "b27067427c261ceb72bce02356edc412ad71699bf81dcc880e0b0b32454b9a6a",
+      "base64": "390-sections-1-compact.jpg.b64",
+      "base64Bytes": 9380,
+      "roundTrip": true
+    },
+    {
+      "file": "390-sections-2-compact.jpg",
+      "bytes": 6939,
+      "sha256": "61c4e436e558b731891812d87958ebc5cfce521f48d1ca9400b438c16f72dde2",
+      "base64": "390-sections-2-compact.jpg.b64",
+      "base64Bytes": 9252,
+      "roundTrip": true
+    }
+  ],
+  "dom": {
+    "states": 24,
+    "networkRuns": [
+      16,
+      17
+    ],
+    "consoleErrors": 0,
+    "blockingFailures": 0
+  },
+  "originalArtifactIntegrity": "pass"
+}

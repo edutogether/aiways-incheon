@@ -1,3 +1,7 @@
+[Assistant compact visual review](assistant-compact/README.md)
+[DOM visual summary](assistant-compact/dom-visual-summary.md)
+[DOM visual JSON](assistant-compact/dom-visual-report.json)
+
 # CB-3B OWNER SECTION REVIEW
 
 ## Source

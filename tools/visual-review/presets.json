@@ -1,0 +1,11 @@
+{
+  "smoke": { "captures": [
+    { "name": "dashboard-1366", "width": 1366, "height": 768, "selector": "#dashboard" },
+    { "name": "dashboard-390", "width": 390, "height": 844, "selector": "#dashboard" },
+    { "name": "project-1366", "width": 1366, "height": 768, "selector": "#project" },
+    { "name": "flow-1366", "width": 1366, "height": 768, "selector": "#flow" },
+    { "name": "sorting-390", "width": 390, "height": 844, "selector": "#sorting" },
+    { "name": "resources-390", "width": 390, "height": 844, "selector": "#resources" }
+  ] },
+  "sections": { "sections": ["dashboard", "project", "curriculum", "hah", "flow", "gallery", "sorting", "resources"], "viewports": [[390, 844], [1024, 768], [1366, 768]] }
+}

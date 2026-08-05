@@ -56,8 +56,11 @@ const compactArgs = values => (values || []).map(value => redact(value.value ?? 
       if (!state.selector) throw new Error(`SELECTOR_MISSING: ${spec.selector}`);
       if (!state.sticky) throw new Error("HEADER_NOT_STICKY");
       if (state.overflow) throw new Error(`HORIZONTAL_OVERFLOW: ${spec.name}, ${state.overflow}px`);
-      await browser.send("Runtime.evaluate", { expression: `document.querySelector(${JSON.stringify(spec.selector)}).scrollIntoView({block:'start'})` });
-      await sleep(350);
+      const position = await browser.send("Runtime.evaluate", { returnByValue: true, expression: `(()=>{const target=document.querySelector(${JSON.stringify(spec.selector)});const root=document.documentElement;const rootBehavior=root.style.scrollBehavior;const bodyBehavior=document.body.style.scrollBehavior;root.style.scrollBehavior='auto';document.body.style.scrollBehavior='auto';target.scrollIntoView({block:'start',inline:'nearest',behavior:'instant'});root.style.scrollBehavior=rootBehavior;document.body.style.scrollBehavior=bodyBehavior;const rect=target.getBoundingClientRect();return{scrollY:window.scrollY,targetTop:rect.top,headerHeight:document.querySelector('header')?.getBoundingClientRect().height||0}})()` });
+      await sleep(100);
+      const targetPosition = position.result.value;
+      if (spec.name !== "dashboard-1366" && targetPosition.targetTop < targetPosition.headerHeight) throw new Error(`SECTION_POSITION_INVALID: ${spec.name}, top=${targetPosition.targetTop}, header=${targetPosition.headerHeight}`);
+      add({ kind: "frame_position", host: "LOCAL", path: "LOCAL", resourceType: "Document", text: `selector=${spec.selector}; scrollY=${targetPosition.scrollY}; targetTop=${targetPosition.targetTop}; headerHeight=${targetPosition.headerHeight}` });
       const image = await browser.send("Page.captureScreenshot", { format: "webp", quality: 88 });
       const file = path.join(captureDir, `${spec.name}.webp`);
       fs.writeFileSync(file, Buffer.from(image.data, "base64"));

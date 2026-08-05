@@ -1,20 +1,19 @@
 "use strict";
 const test = require("node:test"), assert = require("node:assert/strict");
-const { MAX_DEVICES, normalizePass, passDigest, safeEqual, parseEdu2gPassRegistry, createEdu2gPassRegistry } = require("../lib/edu2gPassRegistry");
-const registry = passes => JSON.stringify({ version: 1, passes });
-const entry = (pass = "TEST-PASS-ALPHA", extra = {}) => ({ pass, actorId: "actor_alpha", displayName: "테스트 사용자", enabled: true, maxDevices: MAX_DEVICES, ...extra });
+const { MAX_DEVICES, normalizeLoginId, parseEdu2gPassRegistry, createEdu2gPassRegistry } = require("../lib/edu2gPassRegistry");
+const registry = participants => JSON.stringify({ version: 2, participants });
+const entry = (loginId = "student alpha", extra = {}) => ({ actorId: "actor_alpha", loginId, displayName: "참가자 A", enabled: true, maxDevices: MAX_DEVICES, ...extra });
 
-test("valid registry normalizes synthetic PASS without returning it", async () => {
-  const service = createEdu2gPassRegistry({ getSecret: () => registry([entry()]) });
-  const result = await service.redeem("  test-pass-alpha  ");
-  assert.equal(normalizePass(" a\u3000b "), "A B"); assert.equal(result.ok, true); assert.equal(result.actor.actorId, "actor_alpha");
-  assert.equal(JSON.stringify(result).includes("TEST-PASS"), false);
+test("approved login IDs use NFKC, collapsed whitespace and case-insensitive matching", async () => {
+  const service = createEdu2gPassRegistry({ getSecret: () => registry([entry(" Student\u3000Alpha ", { aliases: ["alpha-id"] })]) });
+  assert.equal(normalizeLoginId(" Student\u3000Alpha "), "student alpha");
+  assert.deepEqual(await service.identify("STUDENT alpha"), { ok: true, actor: { actorId: "actor_alpha", displayName: "참가자 A", maxDevices: 5 } });
+  assert.equal((await service.identify("alpha-id")).ok, true);
 });
-test("malformed schema, version, duplicates and invalid device limits fail closed", () => {
-  for (const value of ["{", registry([]), JSON.stringify({ version: 2, passes: [entry()] }), registry([entry(), entry("TEST-PASS-BETA")]), registry([entry(), entry("TEST-PASS-BETA", { actorId: "actor_alpha" })]), registry([entry(undefined, { maxDevices: 4 })])]) assert.throws(() => parseEdu2gPassRegistry(value), /invalid_registry/);
+test("PASS and password fields are rejected by the participant registry schema", () => {
+  for (const value of ["{", registry([]), JSON.stringify({ version: 1, participants: [entry()] }), registry([entry(), entry("other", { actorId: "actor_alpha" })]), registry([entry(), entry("STUDENT ALPHA", { actorId: "actor_beta" })]), registry([entry(undefined, { maxDevices: 4 })]), JSON.stringify({ version: 2, participants: [{ ...entry(), pass: "forbidden" }] })]) assert.throws(() => parseEdu2gPassRegistry(value), /invalid_registry/);
 });
-test("disabled, unknown and oversized values have the same invalid PASS response", async () => {
-  const service = createEdu2gPassRegistry({ getSecret: () => registry([entry("TEST-PASS-ALPHA", { enabled: false })]), maxPassLength: 32 });
-  for (const value of ["TEST-PASS-ALPHA", "TEST-PASS-UNKNOWN", "X".repeat(33)]) assert.deepEqual(await service.redeem(value), { ok: false, code: "invalid_pass" });
+test("unapproved, disabled and oversized names return the same non-sensitive rejection", async () => {
+  const service = createEdu2gPassRegistry({ getSecret: () => registry([entry("student alpha", { enabled: false })]), maxLoginIdLength: 32 });
+  for (const value of ["student alpha", "unknown", "X".repeat(33)]) assert.deepEqual(await service.identify(value), { ok: false, code: "login_not_approved" });
 });
-test("PASS comparison uses fixed-length SHA-256 digests for every input length", () => { assert.equal(passDigest("A").length, 32); assert.equal(passDigest("A much longer value").length, 32); assert.equal(safeEqual("A", "A"), true); assert.equal(safeEqual("A", "A much longer value"), false); });

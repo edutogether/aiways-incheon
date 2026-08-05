@@ -22,7 +22,7 @@
 1. Firebase Console에서 `ai-ways-incheon` 프로젝트·번호·결제·필수 API가 일치하고, Cloud Functions (2nd gen), Cloud Run, Cloud Build, Artifact Registry, Secret Manager, Firestore, Firebase Authentication, reCAPTCHA Enterprise 사용 가능 상태인지 확인한다.
 2. Firebase Authentication에서 익명 로그인 제공자가 활성화되어 있고 `edutogether.github.io`가 승인된 도메인인지 확인한다.
 3. Firebase App Check에서 웹 앱 ID `1:367235994253:web:9f4b82ca9d8e5a1ca0c8c4`, reCAPTCHA Enterprise 제공자, Cloud Functions 보호 상태가 운영 정책과 일치하는지 확인한다. 서버는 모든 보호 함수에서 App Check 토큰을 직접 검증하므로 누락·무효 토큰은 통과하면 안 된다.
-4. `GEMINI_API_KEY`와 `EDU2G_PASS_REGISTRY_JSON`은 이름과 사용 가능한 활성 버전만 확인한다. 값, PASS 원문, 인증 토큰은 표시·기록·교체하지 않는다. 레지스트리는 활성 상태의 서로 다른 actor 5명과 actor당 `maxDevices: 5` 계약을 만족해야 한다.
+4. `GEMINI_API_KEY`와 `EDU2G_PASS_REGISTRY_JSON`은 이름과 사용 가능한 활성 버전만 확인한다. 값, 인증 토큰은 표시·기록·교체하지 않는다. 두 번째 Secret은 비밀번호·초대 코드·PASS 저장소가 아니라 승인된 참가자 레지스트리다. `version: 2`, `participants` 배열, 각 참가자의 `actorId`, `loginId`, 익명화된 `displayName`, `enabled`, `maxDevices: 5`를 사용하며 선택적 `aliases`도 같은 정규화·중복 금지 규칙을 따른다. 입력은 NFKC 정규화 후 앞뒤 공백을 제거하고 연속 공백을 하나로 합친 뒤 영문 대소문자를 구분하지 않는다.
 5. Firestore 데이터베이스가 존재하고 `records(status ASC, createdAt DESC)` 인덱스가 `READY`가 될 때까지 다음 단계로 진행하지 않는다.
 6. GitHub Pages가 정적 파일을 `https://edutogether.github.io`로 제공하며, 로컬 전용 `auth-emulator=1`, `appcheck-debug=1`, `visual-review=1` 경로가 운영 URL에 포함되지 않는지 확인한다.
 

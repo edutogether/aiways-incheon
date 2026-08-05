@@ -37,3 +37,19 @@
   @media (max-width:47.99rem) { :root { --scene-inline-space:1rem; --scene-block-space:4rem; --header-size:4rem; }.site-header { gap:.35rem .45rem; }.brand { font-size:.94rem; }.brand-mark { inline-size:2.2rem; block-size:2.2rem; }.edu2g-beta-trigger { min-block-size:2.5rem; }.responsive-nav-trigger { min-block-size:2.5rem; padding-inline:.65rem; }.dashboard-scene { padding-block-start:2.4rem; }.dashboard-scene h1 { font-size:clamp(3.05rem,14.5vw,4.55rem); }.hero-description { font-size:.94rem; }.hero-fixed-line { display:inline; }.dashboard-grid,.project-cards,.subject-grid,.hah-grid,.flow-grid,.gallery-stage,.gallery-grid,.resource-grid { grid-template-columns:1fr; }.dashboard-grid>.panel { min-block-size:auto; }.landfill-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }.chart-wrap { grid-template-columns:minmax(0,1fr) minmax(6.3rem,.5fr); }.panel-head h2 { font-size:1.1rem; }.project-scene,.curriculum-scene,.hah-scene,.flow-scene,.gallery-scene,.sorting-scene,.resources-scene { min-block-size:auto; }.hah-grid .panel:nth-child(2) { transform:none; }.standards-grid { grid-template-columns:1fr; }.gallery-detail { min-block-size:22rem; position:static; }.sorting-features,.upload-actions.sorting-upload,.hold-board-shell { grid-template-columns:1fr; }.app-tabs { grid-template-columns:repeat(2,minmax(0,1fr)); }.sorting-mode-switch { grid-template-columns:1fr; }.upload-actions.sorting-upload button { min-block-size:8.7rem; }.resource-grid a:first-child { min-block-size:0; }.flow-card:nth-child(4n) { margin-block-start:0; } }
   @media (max-width:22.5rem) { .brand>span:last-child { font-size:.82rem; }.main-nav a { padding-inline:.52rem; font-size:.76rem; }.dashboard-scene h1 { font-size:3rem; }.chart-wrap { grid-template-columns:1fr; grid-template-areas:"title" "chart" "status" "progress"; }.landfill-status-card { min-block-size:6.4rem; } }
 }
+
+/* Closed-beta learners use a deliberately lighter application surface on
+   phones; the desktop presentation language above remains untouched. */
+@media (max-width:47.99rem) {
+  body { color:#202124; background:#f8fafd; }
+  body::before { background:linear-gradient(180deg,#fff,transparent 18rem); }
+  .site-header { background:#fff; border-block-end-color:#e8eaed; }
+  .brand,.main-nav a { color:#174ea6; }
+  .dashboard-scene,.sorting-scene { background:transparent; }
+  .dashboard-grid>.panel,.sorting-app,.quick-result,.sorting-features article { color:#202124; background:#fff; border-color:#e8eaed; box-shadow:0 2px 8px rgb(60 64 67 / 14%); }
+  .hero-description,.upload-panel>p,.sorting-features p { color:#5f6368; }
+  .app-tabs { background:#f8fafd; border-block-end-color:#e8eaed; }
+  .app-tabs button { color:#5f6368; }
+  .app-tabs button.is-active { color:#1a73e8; background:#e8f0fe; box-shadow:inset 0 -2px #1a73e8; }
+  .upload-actions.sorting-upload button { color:#174ea6; border-color:#d2e3fc; background:#f8fafd; }
+}

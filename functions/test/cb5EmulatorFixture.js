@@ -93,15 +93,15 @@ async function setupCb5DeviceMatrix() {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
-  const passes = actorKeys.map((key, index) => ({
-    pass: `CB5-PASS-${index}`,
+  const participants = actorKeys.map((key, index) => ({
+    loginId: `cb5 participant ${index}`,
     actorId: `cb5_actor_${key}`,
     displayName: `CB5 ${key}`,
     enabled: true,
     maxDevices: 5,
   }));
   const registry = createEdu2gPassRegistry({
-    getSecret: () => JSON.stringify({ version: 1, passes }),
+    getSecret: () => JSON.stringify({ version: 2, participants }),
   });
   const store = createFirestoreDeviceStore({
     db,
@@ -132,22 +132,24 @@ async function setupCb5DeviceMatrix() {
     users.push(group);
     for (let deviceIndex = 0; deviceIndex < 5; deviceIndex += 1) {
       const response = await call(handlers.redeem, group[deviceIndex].token, {
-        pass: `CB5-PASS-${actorIndex}`,
+        loginId: `cb5 participant ${actorIndex}`,
         deviceLabel: `${actorKeys[actorIndex]}${deviceIndex + 1}`,
         platform: "web",
+        confirm: true,
       });
       assert.equal(response.statusCode, 200);
     }
     const sixth = await call(handlers.redeem, group[5].token, {
-      pass: `CB5-PASS-${actorIndex}`,
+      loginId: `cb5 participant ${actorIndex}`,
       deviceLabel: `${actorKeys[actorIndex]}6`,
       platform: "web",
+      confirm: true,
     });
     assert.equal(sixth.statusCode, 409);
   }
 
   await assertActiveDeviceMatrix({ db });
-  return { app, auth, db, access, handlers, users, actorKeys, passes };
+  return { app, auth, db, access, handlers, users, actorKeys, participants };
 }
 
 async function assertActiveDeviceMatrix({ db }) {
@@ -190,9 +192,10 @@ async function revokeAndReplaceDevice(fixture, actorIndex) {
   assert.equal(
     (
       await call(handlers.redeem, users[actorIndex][5].token, {
-        pass: `CB5-PASS-${actorIndex}`,
+        loginId: `cb5 participant ${actorIndex}`,
         deviceLabel: `${actorKeys[actorIndex]}6`,
         platform: "web",
+        confirm: true,
       })
     ).statusCode,
     200,

@@ -44,7 +44,19 @@ async function protect(req, res, functionName, dependencies) {
 function createFirestoreDeviceStore({ db, serverTimestamp = () => new Date(), createManagementId = randomUUID }) {
   const actorRef = actorId => db.collection("actors").doc(actorId);
   return {
-    async redeem({ uid, actor }) {
+    async prepare({ uid, actor }) {
+      const bindingSnap = await db.collection("edu2gDeviceBindings").doc(uid).get();
+      if (bindingSnap.exists && bindingSnap.data()?.actorId !== actor.actorId) return { code: "device_already_bound" };
+      if (bindingSnap.exists && bindingSnap.data()?.status === "active") return { ok: true, alreadyRegistered: true };
+      const actorSnap = await actorRef(actor.actorId).get(); const current = actorSnap.exists ? actorSnap.data() || {} : null;
+      if (current && (current.status !== "active" || current.plan !== "closed_beta" || current.maxDevices !== MAX_DEVICES)) return { code: "actor_unavailable" };
+      const activeDeviceCount = Number(current?.activeDeviceCount || 0);
+      if (!Number.isInteger(activeDeviceCount) || activeDeviceCount < 0) return { code: "access_state_invalid" };
+      if (activeDeviceCount < MAX_DEVICES) return { ok: true, requiresDeviceConfirmation: true, activeDeviceCount };
+      const devices = await actorRef(actor.actorId).collection("trustedDevices").where("status", "==", "active").get();
+      return { code: "device_limit_reached", devices: devices.docs.map(doc => { const data = doc.data() || {}; return { managementId: data.managementId, deviceLabel: data.deviceLabel, platform: data.platform }; }) };
+    },
+    async redeem({ uid, actor, replaceManagementId = "" }) {
       const bindingRef = db.collection("edu2gDeviceBindings").doc(uid);
       const userActorRef = actorRef(actor.actorId);
       const deviceRef = userActorRef.collection("trustedDevices").doc(uid);
@@ -60,15 +72,22 @@ function createFirestoreDeviceStore({ db, serverTimestamp = () => new Date(), cr
         if (current && (current.status !== "active" || current.plan !== "closed_beta" || current.maxDevices !== MAX_DEVICES)) return { code: "actor_unavailable" };
         const activeDeviceCount = Number(current?.activeDeviceCount || 0);
         if (!Number.isInteger(activeDeviceCount) || activeDeviceCount < 0) return { code: "access_state_invalid" };
-        if (activeDeviceCount >= MAX_DEVICES) return { code: "device_limit_reached" };
+        let replacement = null;
+        if (activeDeviceCount >= MAX_DEVICES) {
+          if (!MANAGEMENT_ID.test(replaceManagementId || "")) return { code: "device_limit_reached" };
+          const matches = await tx.get(userActorRef.collection("trustedDevices").where("managementId", "==", replaceManagementId).limit(2));
+          if (matches.empty || matches.size !== 1 || matches.docs[0].data()?.status !== "active") return { code: "device_limit_reached" };
+          replacement = matches.docs[0];
+        }
         let managementId = "";
         for (let attempt = 0; attempt < 4; attempt += 1) { const candidate = createManagementId(); if (!MANAGEMENT_ID.test(candidate || "")) return { code: "access_state_invalid" }; const collision = await tx.get(userActorRef.collection("trustedDevices").where("managementId", "==", candidate).limit(1)); if (collision.empty) { managementId = candidate; break; } }
         if (!managementId) return { code: "access_state_invalid" };
-        const now = serverTimestamp(); const actorData = current || { plan: "closed_beta", status: "active", displayName: actor.displayName, maxDevices: MAX_DEVICES, activeDeviceCount: 0, createdAt: now };
+        const now = serverTimestamp(); const nextCount = activeDeviceCount - (replacement ? 1 : 0) + 1; const actorData = current || { plan: "closed_beta", status: "active", displayName: actor.displayName, maxDevices: MAX_DEVICES, activeDeviceCount: 0, createdAt: now };
         const device = { uid, managementId, status: "active", deviceLabel: actor.deviceLabel, platform: actor.platform, createdAt: now, lastSeenAt: now };
-        tx.set(userActorRef, { ...actorData, displayName: actor.displayName, maxDevices: MAX_DEVICES, activeDeviceCount: activeDeviceCount + 1, updatedAt: now }, { merge: true });
+        if (replacement) { const oldUid = replacement.id; tx.update(replacement.ref, { status: "revoked", revokedAt: now, revokedByUid: uid, lastSeenAt: now }); tx.update(db.collection("edu2gDeviceBindings").doc(oldUid), { status: "revoked", revokedAt: now }); }
+        tx.set(userActorRef, { ...actorData, displayName: actor.displayName, maxDevices: MAX_DEVICES, activeDeviceCount: nextCount, updatedAt: now }, { merge: true });
         tx.create(deviceRef, device); tx.create(bindingRef, { actorId: actor.actorId, status: "active", createdAt: now, lastSeenAt: now });
-        return { ok: true, alreadyRegistered: false, actor: { ...actorData, activeDeviceCount: activeDeviceCount + 1 }, device };
+        return { ok: true, alreadyRegistered: false, actor: { ...actorData, activeDeviceCount: nextCount }, device };
       });
     },
     async session(access) { return { actor: access.actor, device: access.device }; },
@@ -98,12 +117,14 @@ function createFirestoreDeviceStore({ db, serverTimestamp = () => new Date(), cr
 
 function createEdu2gHandlers(dependencies) {
   const redeem = async (req, res) => {
-    if (!baseGuard(req, res, ["pass", "deviceLabel", "platform"])) return;
+    if (!baseGuard(req, res, ["loginId", "deviceLabel", "platform", "confirm", "replaceManagementId"])) return;
     const access = await protect(req, res, "redeemEdu2gPass", dependencies); if (!access) return;
     const body = req.body || {};
-    if (typeof body.pass !== "string" || !LABEL.test(body.deviceLabel || "") || !PLATFORM.test(body.platform || "")) return response(res, 400, { ok: false, code: "invalid_request" });
-    const match = await dependencies.registry.redeem(body.pass); if (!match.ok) return response(res, 403, { ok: false, code: "invalid_pass" });
-    const result = await dependencies.store.redeem({ uid: access.uid, actor: { ...match.actor, deviceLabel: body.deviceLabel, platform: body.platform } });
+    if (typeof body.loginId !== "string" || typeof body.confirm !== "boolean" || (body.replaceManagementId !== undefined && !MANAGEMENT_ID.test(body.replaceManagementId || "")) || !LABEL.test(body.deviceLabel || "") || !PLATFORM.test(body.platform || "")) return response(res, 400, { ok: false, code: "invalid_request" });
+    const match = await dependencies.registry.identify(body.loginId); if (!match.ok) return response(res, 403, { ok: false, code: "login_not_approved" });
+    const actor = { ...match.actor, deviceLabel: body.deviceLabel, platform: body.platform };
+    if (!body.confirm) { const prepared = await dependencies.store.prepare({ uid: access.uid, actor }); if (!prepared.ok) return response(res, prepared.code === "device_limit_reached" || prepared.code === "device_already_bound" ? 409 : 503, { ok: false, code: prepared.code, devices: prepared.devices }); return response(res, 200, { ok: true, displayName: actor.displayName, maxDevices: MAX_DEVICES, ...prepared }); }
+    const result = await dependencies.store.redeem({ uid: access.uid, actor, replaceManagementId: body.replaceManagementId || "" });
     if (!result.ok) return response(res, result.code === "device_limit_reached" ? 409 : result.code === "device_already_bound" ? 409 : 503, { ok: false, code: result.code });
     return response(res, 200, { ok: true, displayName: result.actor.displayName, deviceLabel: result.device.deviceLabel, activeDeviceCount: result.actor.activeDeviceCount, maxDevices: MAX_DEVICES, alreadyRegistered: !!result.alreadyRegistered });
   };

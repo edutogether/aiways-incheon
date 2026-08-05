@@ -80,7 +80,8 @@ async function capture(page, name, selector) {
     const client = Object.freeze({
       getSession: async () => ({ ok: false, status: 401, code: "device_not_registered", data: null }),
       listTrustedDevices: async () => ({ ok: false, status: 401, code: "device_not_registered", data: null }),
-      redeemPass: async () => ({ ok: false, status: 401, code: "invalid_pass", data: null }),
+      requestAccess: async () => ({ ok: false, status: 401, code: "login_not_approved", data: null }),
+      confirmDeviceRegistration: async () => ({ ok: false, status: 401, code: "login_not_approved", data: null }),
       revokeTrustedDevice: async () => ({ ok: false, status: 401, code: "device_not_registered", data: null }),
       request: async () => ({ ok: false, status: 401, code: "device_not_registered", data: null }),
       getPlatformLabel: () => "Visual fixture",

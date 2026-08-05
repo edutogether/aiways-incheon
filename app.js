@@ -2939,10 +2939,11 @@
           <em>${escapeHtml(item.status || "기준 확인 필요")}</em>
           <span>${escapeHtml(item.reason || holdCandidateFor(item.name))}</span>
           <small>${escapeHtml(item.candidate || holdCandidateFor(item.name))}</small>
+          ${item.remoteRecordId && item.status === "보류" ? `<div class="hold-checks" aria-label="추가 확인 항목">${(item.judgement?.checklist || []).map((check, index) => `<button type="button" data-hold-check="${item.id}:${index}" aria-pressed="${check.checked === true}">${check.checked === true ? "✓ " : ""}${escapeHtml(check.label || "확인 항목")}</button>`).join("")}</div>` : ""}
         </div>
         <time>${escapeHtml(item.time)}</time>
         <div class="hold-card-actions">
-          <button type="button" data-resolve-hold="${item.id}">해결 완료👍</button>
+          ${item.remoteRecordId && item.status === "보류" ? `<button type="button" data-resolve-hold="${item.id}">추가 확인 후 해결</button>` : ""}
         </div>
       </li>
     `).join("");
@@ -2969,12 +2970,12 @@
   }
 
   async function loadFirestoreEmulatorHolds() {
-    if (!isFirestoreEmulatorStorageMode()) return false;
+    const client = window.AIWaysEdu2gClient;
+    if (!client?.listSortingRecords || client.visualReviewRequested?.()) return false;
     try {
-      const tokenHeaders=await appCheckHeaders(); if(!tokenHeaders)return false; const response = await fetch(FIRESTORE_EMULATOR_LIST_URL, { method: "POST", headers: { "Content-Type": "application/json", ...tokenHeaders }, body: JSON.stringify({ actorId: FIRESTORE_EMULATOR_ACTOR_ID, pageSize: 20, statusFilter: "held" }) });
-      const body = await response.json();
-      if (!response.ok || !Array.isArray(body.records)) return false;
-      const remote = body.records.map(record => ({ id: `firestore-${record.recordId}`, remoteRecordId: record.recordId, name: cleanText(record.analysis?.objectCandidates?.[0]?.label) || "판단 보류 물건", reason: cleanText(record.hold?.reasons?.[0]) || "기준 확인 필요", status: "테스트 서버 보류", candidate: cleanText(record.provider), judgement: { checklist: Array.isArray(record.checklist) ? record.checklist : [], userDecision: record.userDecision || {} }, time: cleanText(record.createdAt).replace("T", " ").slice(0, 16), synced: true }));
+      const response = await client.listSortingRecords({ pageSize: 20, statusFilter: "all" });
+      if (!response.ok || !Array.isArray(response.data?.records)) return false;
+      const remote = response.data.records.map(record => ({ id: `firestore-${record.recordId}`, remoteRecordId: record.recordId, name: cleanText(record.analysis?.objectCandidates?.[0]?.label) || "판단 기록", reason: cleanText(record.hold?.reasons?.[0]) || "사용자 최종 판단 기록", status: record.status === "held" ? "보류" : record.resolvedAt ? "재확인 완료" : "배출 완료", candidate: cleanText(record.provider) === "future_gemini" ? "AI 사진 분석 참고 후보" : "사용자 확인 기록", judgement: { checklist: Array.isArray(record.checklist) ? record.checklist : [], userDecision: record.userDecision || {} }, time: cleanText(record.updatedAt || record.createdAt).replace("T", " ").slice(0, 16), synced: true }));
       sortingHoldItems = [...remote, ...sortingHoldItems.filter(item => !item.remoteRecordId)];
       renderSortingHolds();
       return true;
@@ -2982,13 +2983,14 @@
   }
 
   async function resolveFirestoreEmulatorHold(item) {
-    if (!isFirestoreEmulatorStorageMode() || !item?.remoteRecordId) return false;
+    const client = window.AIWaysEdu2gClient;
+    if (!client?.resolveSortingRecord || client.visualReviewRequested?.() || !item?.remoteRecordId) return false;
     const checklist = Array.isArray(item.judgement?.checklist) ? item.judgement.checklist : [];
     if (!checklist.length || checklist.some(check => !check.checked)) return false;
     const userDecision = item.judgement?.userDecision;
     if (!userDecision?.userConfirmed) return false;
-    const tokenHeaders=await appCheckHeaders(); if(!tokenHeaders)return false; const response = await fetch(FIRESTORE_EMULATOR_RESOLVE_URL, { method: "POST", headers: { "Content-Type": "application/json", ...tokenHeaders }, body: JSON.stringify({ actorId: FIRESTORE_EMULATOR_ACTOR_ID, recordId: item.remoteRecordId, idempotencyKey: item.__resolveKey || (item.__resolveKey = createFirestoreIdempotencyKey()), resolutionType: "confirmed_after_review", userDecision: { selectedItemId: userDecision.selectedItemId, action: "recorded", userConfirmed: true }, checklist }) });
-    return response.ok;
+    const response = await client.resolveSortingRecord({ recordId: item.remoteRecordId, idempotencyKey: item.__resolveKey || (item.__resolveKey = createFirestoreIdempotencyKey()), resolutionType: "confirmed_after_review", userDecision: { userConfirmed: true }, checklist });
+    return response.ok === true;
   }
 
   function recordPayloadFromDecision(decision, status, idempotencyKey) {
@@ -3039,6 +3041,7 @@
   async function logSortingPractice(item, decision = null) {
     const remote = await appendSortingDecisionRecord(recordForSortingItem(item, false), decision, "completed");
     if (remote.saved) recordSortingPracticeLocally(item, true);
+    if (remote.saved) loadFirestoreEmulatorHolds();
     const guidance = $("[data-quick-guidance]");
     if (guidance) guidance.textContent = remote.saved
       ? `${item.label} 기록을 보호된 클라우드 기록에 저장했어요.`
@@ -3052,6 +3055,7 @@
     if (remote.saved) {
       addSortingHoldLocally(cleaned, reason, true, decision);
       if (decision) saveSortingDecisionV2(decision, "held");
+      loadFirestoreEmulatorHolds();
     }
     return remote;
   }
@@ -3278,6 +3282,13 @@
     });
 
     $("#holdList")?.addEventListener("click", async event => {
+      const checkButton = event.target.closest("[data-hold-check]");
+      if (checkButton) {
+        const [id, indexText] = checkButton.dataset.holdCheck.split(":");
+        const check = sortingHoldItems.find(entry => entry.id === id)?.judgement?.checklist?.[Number(indexText)];
+        if (check) { check.checked = !check.checked; renderSortingHolds(); }
+        return;
+      }
       const button = event.target.closest("[data-resolve-hold]");
       if (!button) return;
       const id = button.dataset.resolveHold;

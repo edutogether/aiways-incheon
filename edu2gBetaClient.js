@@ -3,7 +3,7 @@
 (() => {
   const REGION = "asia-northeast3";
   const EMULATOR_PROJECT = "demo-aiways-incheon";
-  const ALLOWED = new Set(["redeemEdu2gPass", "getEdu2gSession", "listEdu2gTrustedDevices", "revokeEdu2gTrustedDevice", "analyzeSortingImage", "saveSortingRecord"]);
+  const ALLOWED = new Set(["redeemEdu2gPass", "getEdu2gSession", "listEdu2gTrustedDevices", "revokeEdu2gTrustedDevice", "analyzeSortingImage", "saveSortingRecord", "listSortingRecords", "resolveSortingRecord"]);
   const LOCAL = new Set(["localhost", "127.0.0.1"]);
 
   function usingEmulator() {
@@ -63,6 +63,8 @@
     listTrustedDevices: () => request("listEdu2gTrustedDevices"),
     revokeTrustedDevice: ({ targetManagementId }) => request("revokeEdu2gTrustedDevice", { targetManagementId, confirm: true }),
     analyzeSortingImage: (payload) => request("analyzeSortingImage", payload),
-    saveSortingRecord: (payload) => request("saveSortingRecord", payload)
+    saveSortingRecord: (payload) => request("saveSortingRecord", payload),
+    listSortingRecords: ({ pageSize = 20, cursor = "", statusFilter = "all" } = {}) => request("listSortingRecords", { pageSize, ...(cursor ? { cursor } : {}), statusFilter }),
+    resolveSortingRecord: (payload) => request("resolveSortingRecord", payload)
   };
 })();

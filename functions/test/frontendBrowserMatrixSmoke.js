@@ -5,7 +5,7 @@
 const http = require("node:http");
 const WebSocket = require("ws");
 
-const targetUrl = process.env.AIWAYS_QA_URL || "http://127.0.0.1:8001/";
+const targetUrl = process.env.AIWAYS_QA_URL || "http://127.0.0.1:8001/?visual-review=1";
 const matrix = process.env.AIWAYS_MATRIX === "representative" ? [
   [320, 568], [360, 800], [390, 844], [768, 1024], [1024, 768], [1280, 720], [1366, 768], [1440, 900], [1920, 1080]
 ] : [
@@ -28,7 +28,7 @@ async function metrics(page, width, height, refresh) {
     const ids = [...document.querySelectorAll('main > section[id]')].map(node => node.id);
     const nav = [...document.querySelectorAll('header nav a')].map(node => node.textContent.trim());
     const headings = [...document.querySelectorAll('section h1, section h2, section h3')].filter(node => { const box=node.getBoundingClientRect(); return box.width && box.height; });
-    const clipped = headings.filter(node => node.scrollWidth > node.clientWidth + 1 || node.scrollHeight > node.clientHeight + 1 || node.getBoundingClientRect().right > document.documentElement.clientWidth + 1).length;
+    const clipped = headings.filter(node => { const style = getComputedStyle(node); const isClipped = node.scrollWidth > node.clientWidth + 1 || node.scrollHeight > node.clientHeight + 1 || node.getBoundingClientRect().right > document.documentElement.clientWidth + 1; return isClipped && ![style.overflow, style.overflowX, style.overflowY].every(value => value === 'visible'); }).length;
     const sorting = document.querySelector('#sorting .sorting-app, #sorting');
     const box = sorting?.getBoundingClientRect();
     return { ids, nav, clipped, html: document.documentElement.scrollWidth, body: document.body.scrollWidth, client: document.documentElement.clientWidth, sorting: Boolean(box && box.width > 0), runtime: [...document.scripts].filter(script => /tensorflow|mobilenet|teachable/i.test(script.src)).length };

@@ -108,7 +108,7 @@ function createSaveSortingRecordHandler(dependencies = {}) {
     const actorId = protectedActor.actorId;
     const createdAt = now();
     const expireAt = new Date(createdAt.getTime() + 90 * DAY_MS);
-    const record = { ...checked.value, actorId, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), expireAt };
+    const record = { ...checked.value, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), expireAt };
     delete record.idempotencyKey;
     const result = await store.createOrGet(actorId, checked.value.idempotencyKey, record, { createdAt: createdAt.toISOString(), expireAt: expireAt.toISOString() });
     logger({ recordId: result.recordId, status: result.status, provider: record.provider, schemaVersion: SCHEMA_VERSION, duplicate: result.duplicate === true });

@@ -11,7 +11,8 @@ const { createEdu2gDeviceAccess } = require("../lib/edu2gDeviceAccess");
 const { createFirestoreDeviceStore, createEdu2gHandlers } = require("../lib/edu2gPassHandlers");
 
 const projectId = process.env.GCLOUD_PROJECT || "demo-aiways-incheon";
-function request(path, body) { return new Promise((resolve, reject) => { const req = http.request({ hostname: "127.0.0.1", port: 9099, path, method: "POST", headers: { "Content-Type": "application/json" } }, res => { let data = ""; res.on("data", chunk => data += chunk); res.on("end", () => resolve({ status: res.statusCode, body: JSON.parse(data || "{}") })); }); req.on("error", reject); req.end(JSON.stringify(body)); }); }
+const authEmulator = new URL(`http://${process.env.FIREBASE_AUTH_EMULATOR_HOST || "127.0.0.1:9099"}`);
+function request(path, body) { return new Promise((resolve, reject) => { const req = http.request({ hostname: authEmulator.hostname, port: authEmulator.port, path, method: "POST", headers: { "Content-Type": "application/json" } }, res => { let data = ""; res.on("data", chunk => data += chunk); res.on("end", () => resolve({ status: res.statusCode, body: JSON.parse(data || "{}") })); }); req.on("error", reject); req.end(JSON.stringify(body)); }); }
 function response() { return { set() { return this; }, status(value) { this.statusCode = value; return this; }, json(value) { this.body = value; return this; }, send() { return this; } }; }
 function call(handler, token, body) { const res = response(); return handler({ method: "POST", headers: { origin: "http://localhost:5173", "content-type": "application/json", authorization: `Bearer ${token}` }, body }, res).then(() => res); }
 

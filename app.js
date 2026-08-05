@@ -3007,49 +3007,53 @@
       analysis: { objectCandidates, materialCandidates, visibleCautions }, checklist,
       userDecision: { selectedItemId: cleanText(decision?.selectedItemId).slice(0, 40), ...(cleanText(decision?.selectedCorrectionType).slice(0, 80) ? { selectedCorrectionType: cleanText(decision.selectedCorrectionType).slice(0, 80) } : {}), action, userConfirmed: true },
       hold: status === "held" ? { recommended: true, reasons: (Array.isArray(decision?.hold?.reasons) ? decision.hold.reasons : []).slice(0, 5).map(value => cleanText(value).slice(0, 200)).filter(Boolean) } : null,
-      appVersion: "clean-2026-07", sourceSchemaVersion: cleanText(decision?.schemaVersion).slice(0, 80), idempotencyKey, actorId: FIRESTORE_EMULATOR_ACTOR_ID
+      appVersion: "clean-2026-08", sourceSchemaVersion: cleanText(decision?.schemaVersion).slice(0, 80), idempotencyKey
     };
   }
 
   async function persistSortingRecordRemote(decision, status) {
-    if (!isFirestoreEmulatorStorageMode() || !decision) return { attempted: false, saved: null };
+    const client = window.AIWaysEdu2gClient;
+    if (!decision || !client?.saveSortingRecord || client.visualReviewRequested?.()) return { attempted: false, saved: false, status: 0, code: "auth_invalid" };
     const existing = decision.__firestoreIdempotencyKey || createFirestoreIdempotencyKey();
     decision.__firestoreIdempotencyKey = existing;
     if (pendingFirestoreRecordSave?.key === existing) return pendingFirestoreRecordSave.promise;
-    const tokenHeaders=await appCheckHeaders(); if(!tokenHeaders)return {attempted:false,saved:false,status:0,code:"app_check_unavailable"}; const promise = fetch(FIRESTORE_EMULATOR_SAVE_URL, { method: "POST", headers: { "Content-Type": "application/json", ...tokenHeaders }, body: JSON.stringify(recordPayloadFromDecision(decision, status, existing)) })
-      .then(async response => ({ attempted: true, saved: response.ok, status: response.status }))
-      .catch(() => ({ attempted: true, saved: false, status: 0 }));
+    const promise = client.saveSortingRecord(recordPayloadFromDecision(decision, status, existing))
+      .then(response => ({ attempted: true, saved: response.ok === true, status: response.status || 0, code: response.code || "invalid_response", duplicate: response.data?.duplicate === true }))
+      .catch(() => ({ attempted: true, saved: false, status: 0, code: "network_error" }));
     pendingFirestoreRecordSave = { key: existing, promise };
     try { return await promise; } finally { if (pendingFirestoreRecordSave?.key === existing) pendingFirestoreRecordSave = null; }
   }
 
   async function appendSortingDecisionRecord(record, decision, status) {
     const remote = await persistSortingRecordRemote(decision, status);
-    if (remote.attempted) {
+    if (remote.saved) {
       const nextRecords = localRecords();
       nextRecords.push({ ...record, timestamp: new Date().toISOString(), local_time: new Date().toLocaleString("ko-KR") });
       writeJson(STORAGE_RECORDS, nextRecords);
       applyDashboard(allStoredRecords());
-      return remote.saved;
+      return remote;
     }
-    return appendRecord(record);
+    return remote;
   }
 
   async function logSortingPractice(item, decision = null) {
-    const saved = await appendSortingDecisionRecord(recordForSortingItem(item, false), decision, "completed");
-    recordSortingPracticeLocally(item, saved);
+    const remote = await appendSortingDecisionRecord(recordForSortingItem(item, false), decision, "completed");
+    if (remote.saved) recordSortingPracticeLocally(item, true);
     const guidance = $("[data-quick-guidance]");
-    if (guidance) guidance.textContent = isFirestoreEmulatorStorageMode()
-      ? (saved ? `${item.label} 테스트 기록을 로컬 저장소와 테스트 서버에 저장했어요.` : `${item.label} 기록은 로컬에 저장했어요. 테스트 서버 저장은 다시 시도할 수 있어요.`)
-      : `${item.label} 실천이 Google Sheets 기록과 통계에 반영되었습니다. CO2 ${item.carbonSaved}g 저감으로 계산했어요.`;
-    return saved;
+    if (guidance) guidance.textContent = remote.saved
+      ? `${item.label} 기록을 보호된 클라우드 기록에 저장했어요.`
+      : "기록을 저장하지 못했습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요.";
+    return remote;
   }
 
   async function addSortingHold(name, reason = "기준 확인 필요", decision = null) {
     const cleaned = cleanText(name) || "판단 보류 물건";
-    const saved = await appendSortingDecisionRecord(recordForSortingItem({ label: cleaned, category: "기준 확인 필요" }, true, cleaned), decision, "held");
-    addSortingHoldLocally(cleaned, reason, saved, decision);
-    if (decision) saveSortingDecisionV2(decision, "held");
+    const remote = await appendSortingDecisionRecord(recordForSortingItem({ label: cleaned, category: "기준 확인 필요" }, true, cleaned), decision, "held");
+    if (remote.saved) {
+      addSortingHoldLocally(cleaned, reason, true, decision);
+      if (decision) saveSortingDecisionV2(decision, "held");
+    }
+    return remote;
   }
 
   function pickQuizSet() {
@@ -3478,25 +3482,18 @@
   }
 
   async function requestSortingVisionHint({ requestMetadata, imagePayload }) {
-    const endpoint = getSortingVisionEndpoint();
-    if (!endpoint) return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: "provider_not_connected", requestId: requestMetadata.requestId };
-    if (!imagePayload || !window.fetch) return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: "image_prepare_failed", requestId: requestMetadata.requestId };
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 14_000);
+    const client = window.AIWaysEdu2gClient;
+    if (!client?.analyzeSortingImage || client.visualReviewRequested?.()) return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: "auth_invalid", requestId: requestMetadata.requestId };
+    if (!imagePayload) return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: "image_prepare_failed", requestId: requestMetadata.requestId };
     try {
-      const tokenHeaders=await appCheckHeaders(); if(!tokenHeaders)return {ok:false,state:SORTING_VISION_STATES.UNAVAILABLE,code:"app_check_unavailable",requestId:requestMetadata.requestId}; const response = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json", ...tokenHeaders }, signal: controller.signal, body: JSON.stringify({ ...requestMetadata, image: { mimeType: imagePayload.mimeType, data: imagePayload.data, metadata: imagePayload.metadata }, imageMetadata: imagePayload.metadata }) });
-      if (!response.ok) { const errorBody = await response.json().catch(() => ({})); return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: cleanText(errorBody?.code) || "provider_unavailable", requestId: requestMetadata.requestId }; }
-      const raw = await response.json();
+      const response = await client.analyzeSortingImage({ ...requestMetadata, image: { mimeType: imagePayload.mimeType, data: imagePayload.data, metadata: imagePayload.metadata }, imageMetadata: imagePayload.metadata });
+      if (!response.ok) return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: cleanText(response.code) || "provider_unavailable", requestId: requestMetadata.requestId };
+      const raw = response.data;
       if (activeSortingVisionRequestId !== requestMetadata.requestId) return { ok: false, state: SORTING_VISION_STATES.IDLE, code: "stale", requestId: requestMetadata.requestId };
       const checked = validateSortingVisionResponse(raw);
       if (!checked.valid || checked.sanitizedValue.requestId !== requestMetadata.requestId) return { ok: false, state: SORTING_VISION_STATES.INVALID_RESPONSE, code: "invalid_response", requestId: requestMetadata.requestId };
       return { ok: true, state: checked.sanitizedValue.uncertainty === "high" || checked.sanitizedValue.needsUserCheck ? SORTING_VISION_STATES.UNCERTAIN : SORTING_VISION_STATES.SUCCESS, value: checked.sanitizedValue, requestId: requestMetadata.requestId };
-    } catch (error) {
-      const code = error?.name === "AbortError" ? "timeout" : "analysis_failed";
-      return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code, requestId: requestMetadata.requestId };
-    } finally {
-      window.clearTimeout(timeout);
-    }
+    } catch { return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: "analysis_failed", requestId: requestMetadata.requestId }; }
   }
 
   const sortingVisionProviders = Object.freeze({
@@ -3605,6 +3602,7 @@
       hold: { recommended: isAmbiguous, reasons: [...item.holdReasons] },
       imageHints: options.imageHints || [],
       liveGemini: options.liveGemini === true,
+      analysisCode: cleanText(options.analysisCode),
       selectedCorrectionType: options.selectedCorrectionType || "",
       createdAt,
       timestamp: createdAt
@@ -3641,6 +3639,7 @@
     container.innerHTML = `
       <header class="judgement-result-head"><p>AI가 확인할 항목을 제안합니다.</p><strong>${item.emoji} ${escapeHtml(item.label)}</strong><span>최종 배출 판단은 사용자가 결정합니다.</span></header>
       ${liveGemini ? `<aside class="judgement-gemini-live" aria-label="Google Gemini live analysis"><strong>Google Gemini 분석 결과</strong><span>AI 사진 분석 참고 후보 · Live 분석 · Firebase Functions 연결</span><small>분석 엔진: Google Gemini · 서버 연결: Firebase Functions · 결과 출처: future_gemini · 최종 판단: 사용자</small></aside>` : ""}
+      <p class="judgement-action-status" data-judgement-action-status role="status" aria-live="polite">${safeResult.analysisCode ? "사진 분석 참고 후보를 받지 못했습니다. 기본 확인 항목으로 계속할 수 있습니다." : ""}</p>
       <details class="judgement-details judgement-candidate-block" open><summary>물체 후보</summary><div class="judgement-chip-row">${objectChips}</div></details>
       <details class="judgement-details judgement-candidate-block" open><summary>재질 후보</summary><div class="judgement-chip-row">${materialChips}</div></details>
       ${safeResult.imageHints.length ? `<p class="judgement-image-hint">${escapeHtml(safeResult.imageHints.join(" · "))}</p>` : ""}
@@ -3768,18 +3767,26 @@
       if (!action || !currentSortingJudgement) return;
       if (action.disabled || action.dataset.pending === "true") return;
       action.dataset.pending = "true";
+      const status = result.querySelector("[data-judgement-action-status]");
+      const setActionStatus = message => { if (status) status.textContent = message; };
       const decision = currentSortingJudgement;
       const legacyItem = { label: decision.item.label, emoji: decision.item.emoji, category: decision.item.category, carbonSaved: decision.item.carbonSaved };
       try {
         if (action.dataset.judgementAction === "record") {
-          await logSortingPractice(legacyItem, decision);
-          if (!saveSortingDecisionV2(decision, "recorded")) action.textContent = "저장 공간을 확인해 주세요";
+          setActionStatus("보호된 클라우드 기록에 저장하는 중입니다.");
+          const remote = await logSortingPractice(legacyItem, decision);
+          if (remote.saved) {
+            saveSortingDecisionV2(decision, "recorded");
+            setActionStatus(remote.duplicate ? "이미 저장된 요청입니다. 기존 기록을 사용합니다." : "배출 기록을 보호된 클라우드 기록에 저장했습니다.");
+          } else setActionStatus(window.AIWaysEdu2gClient?.errorMessageFor?.(remote.code) || "기록을 저장하지 못했습니다. 다시 시도해 주세요.");
         } else if (action.dataset.judgementAction === "decide") {
           saveSortingDecisionV2(decision, "user_confirmed");
           renderJudgementResult({ ...decision, hold: { ...decision.hold, recommended: false } }, result);
         } else {
           const reason = decision.hold.reasons[0] || "확인 항목 또는 지역 기준 확인 필요";
-          await addSortingHold(decision.item.label, reason, decision);
+          setActionStatus("보류 기록을 보호된 클라우드 기록에 저장하는 중입니다.");
+          const remote = await addSortingHold(decision.item.label, reason, decision);
+          setActionStatus(remote.saved ? (remote.duplicate ? "이미 저장된 요청입니다. 기존 보류 기록을 사용합니다." : "보류 기록을 보호된 클라우드 기록에 저장했습니다.") : (window.AIWaysEdu2gClient?.errorMessageFor?.(remote.code) || "보류 기록을 저장하지 못했습니다. 다시 시도해 주세요."));
         }
       } finally {
         action.dataset.pending = "false";
@@ -3841,6 +3848,7 @@
     activeSortingVisionRequestId = requestMetadata.requestId;
     const hints = [];
     let liveGemini = false;
+    let analysisCode = "";
     if (teachableMachineModelPromise) {
       try {
         const model = await teachableMachineModelPromise;
@@ -3874,9 +3882,9 @@
         remote.value.objectCandidates.forEach(candidate => hints.push(createSortingVisionHint(candidate, SORTING_VISION_SOURCES.FUTURE_GEMINI, {
           provider: "future_gemini", confidenceBand: candidate.confidenceBand, requestId: requestMetadata.requestId, schemaVersion: remote.value.schemaVersion
         })));
-      }
+      } else if (!remote.ok) analysisCode = remote.code || "analysis_failed";
     } catch {
-      // A local model or rule-based result remains available when advisory analysis cannot run.
+      analysisCode = "analysis_failed";
     }
     const mergedHints = mergeSortingVisionHints(hints);
     const topHint = mergedHints[0];
@@ -3887,6 +3895,7 @@
       judgementKey: topHint?.itemId || "hold",
       confidence: topHint?.rawConfidence ?? null,
       liveGemini,
+      analysisCode,
       ruleBased: !topHint,
       requestMetadata,
       state: topHint ? (mergedHints.length > 1 ? SORTING_VISION_STATES.UNCERTAIN : SORTING_VISION_STATES.SUCCESS) : SORTING_VISION_STATES.UNAVAILABLE
@@ -4035,6 +4044,7 @@
         confidence: draft.confidence,
         imageHints: draft.hints.map(hint => `${hint.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : hint.source === "future_gemini" ? "AI 사진 분석 참고 후보" : "사진 기반 참고 후보"}: ${hint.label}`),
         liveGemini: draft.liveGemini,
+        analysisCode: draft.analysisCode,
         delay: 0
       });
     };

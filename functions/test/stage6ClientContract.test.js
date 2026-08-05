@@ -28,8 +28,9 @@ test("builds completed and held payloads from the allowlist only", () => {
   const completed = recordPayloadFromDecision(decision, "completed", "stage6-client-key-0001");
   const held = recordPayloadFromDecision(decision, "held", "stage6-client-key-0002");
   assert.match(FIRESTORE_EMULATOR_SAVE_URL, /demo-aiways-incheon\/asia-northeast3\/saveSortingRecord$/);
-  assert.deepEqual(Object.keys(completed).sort(), ["actorId", "analysis", "appVersion", "checklist", "hold", "idempotencyKey", "provider", "schemaVersion", "sourceSchemaVersion", "status", "userDecision"].sort());
+  assert.deepEqual(Object.keys(completed).sort(), ["analysis", "appVersion", "checklist", "hold", "idempotencyKey", "provider", "schemaVersion", "sourceSchemaVersion", "status", "userDecision"].sort());
   assert.equal(completed.status, "completed"); assert.equal(completed.hold, null); assert.equal(completed.checklist.length, 1);
   assert.equal(completed.analysis.objectCandidates[0].image, undefined);
+  assert.equal(Object.hasOwn(completed, "actorId"), false);
   assert.equal(held.status, "held"); assert.equal(held.hold.recommended, true);
 });

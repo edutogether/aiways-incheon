@@ -2,7 +2,7 @@
 
 const http = require("node:http");
 const WebSocket = require("ws");
-const targetUrl = "http://127.0.0.1:8001/";
+const targetUrl = "http://127.0.0.1:8001/?visual-review=1";
 const viewports = [[1366, 768], [1024, 768], [820, 1180], [768, 1024], [430, 932], [390, 844], [360, 740]];
 function request(path, method = "GET") { return new Promise((resolve, reject) => { const req = http.request({ hostname: "127.0.0.1", port: 9239, path, method }, (res) => { let data = ""; res.on("data", (chunk) => data += chunk); res.on("end", () => resolve(JSON.parse(data))); }); req.on("error", reject); req.end(); }); }
 function connect(url) { return new Promise((resolve, reject) => { const socket = new WebSocket(url); let id = 0; const pending = new Map(); socket.on("open", () => resolve({ send(method, params = {}) { return new Promise((done, fail) => { const messageId = ++id; pending.set(messageId, { done, fail }); socket.send(JSON.stringify({ id: messageId, method, params })); }); }, close: () => socket.close() })); socket.on("message", (message) => { const packet = JSON.parse(message); if (packet.id && pending.has(packet.id)) { const item = pending.get(packet.id); pending.delete(packet.id); packet.error ? item.fail(packet.error) : item.done(packet.result); } }); socket.on("error", reject); }); }
@@ -26,7 +26,7 @@ async function evaluate(page, expression) { return (await page.send("Runtime.eva
   const brokenViewport = rows.find((row) => row.html !== row.client || row.body !== row.client || !row.tm || !row.sorting);
   if (brokenViewport) throw new Error(`viewport contract failed: ${JSON.stringify(brokenViewport)}`);
   if (result.endpoint !== "available") throw new Error("endpoint contract failed: futureProvider unavailable");
-  if (result.fallback !== "app_check_unavailable") throw new Error(`fallback contract failed: ${result.fallback}`);
+  if (result.fallback !== "auth_invalid") throw new Error(`fallback contract failed: ${result.fallback}`);
   if (!result.noStoredImage) throw new Error("privacy contract failed: image-like localStorage value detected");
   process.stdout.write(JSON.stringify({ rows, result }) + "\n");
 })().catch((error) => { process.stderr.write(`${error.message}\n`); process.exitCode = 1; });

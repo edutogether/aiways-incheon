@@ -1,4 +1,4 @@
-﻿name: AI Ways Design Capture
+name: AI Ways Design Capture
 on:
   push:
     branches: [chore/design-capture-20260806]
@@ -8,6 +8,8 @@ permissions:
 jobs:
   capture:
     runs-on: ubuntu-latest
+    env:
+      CAPTURE_OUTPUT: ${{ github.workspace }}/AIWays_Before_After_Design_20260806
     steps:
       - uses: actions/checkout@v4
         with: {path: workflow}
@@ -21,7 +23,18 @@ jobs:
         working-directory: workflow/tools/design-capture
       - run: npx playwright install --with-deps chromium
         working-directory: workflow/tools/design-capture
-      - run: node capture.mjs ../../versions/previous ../../versions/current ../../AIWays_Before_After_Design_20260806
+      - run: node capture.mjs "$GITHUB_WORKSPACE/versions/previous" "$GITHUB_WORKSPACE/versions/current" "$CAPTURE_OUTPUT"
         working-directory: workflow/tools/design-capture
+      - name: Validate capture output
+        run: |
+          test -d "$CAPTURE_OUTPUT"
+          test -f "$CAPTURE_OUTPUT/05_inventory/capture-inventory.csv"
+          test -f "$CAPTURE_OUTPUT/05_inventory/README.md"
+          test "$(find "$CAPTURE_OUTPUT/01_previous" -name '*.png' -size +0c | wc -l)" -ge 1
+          test "$(find "$CAPTURE_OUTPUT/02_current" -name '*.png' -size +0c | wc -l)" -ge 1
+          test "$(find "$CAPTURE_OUTPUT" -name '*.png' -size 0c | wc -l)" -eq 0
       - uses: actions/upload-artifact@v4
-        with: {name: AIWays_Before_After_Design_20260806, path: AIWays_Before_After_Design_20260806}
+        with:
+          name: AIWays_Before_After_Design_20260806
+          path: ${{ github.workspace }}/AIWays_Before_After_Design_20260806
+          if-no-files-found: error

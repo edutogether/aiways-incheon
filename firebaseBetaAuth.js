@@ -5,7 +5,9 @@
 (() => {
   let authPromise = null;
   function emulatorRequested() { const query = new URLSearchParams(location.search); return (location.hostname === "localhost" || location.hostname === "127.0.0.1") && query.get("auth-emulator") === "1"; }
+  function visualReviewRequested() { const query = new URLSearchParams(location.search); return (location.hostname === "localhost" || location.hostname === "127.0.0.1") && query.get("visual-review") === "1"; }
   async function getBetaAuth() {
+    if (visualReviewRequested()) throw new Error("visual_review_auth_isolated");
     if (authPromise) return authPromise;
     authPromise = (async () => {
       const base = await window.AIWaysAppCheck?.initializeAIWaysAppCheck?.();
@@ -22,5 +24,5 @@
   async function getEdu2gDeviceSession({ forceRefresh = false } = {}) { const { auth } = await getBetaAuth(); const user = auth.currentUser; if (!user) throw new Error("anonymous_auth_unavailable"); return { uid: user.uid, idToken: await user.getIdToken(!!forceRefresh) }; }
   async function getEdu2gProtectedHeaders({ forceRefresh = false } = {}) { const session = await getEdu2gDeviceSession({ forceRefresh }); const appCheck = await window.AIWaysAppCheck?.getAIWaysAppCheckHeaders?.(); if (!appCheck) return null; return { ...appCheck, Authorization: `Bearer ${session.idToken}` }; }
   async function clearEdu2gDeviceSession() { const { auth, signOut } = await getBetaAuth(); await signOut(auth); authPromise = null; }
-  window.AIWaysBetaAuth = { getBetaAuth, getEdu2gDeviceSession, getEdu2gProtectedHeaders, clearEdu2gDeviceSession, emulatorRequested };
+  window.AIWaysBetaAuth = { getBetaAuth, getEdu2gDeviceSession, getEdu2gProtectedHeaders, clearEdu2gDeviceSession, emulatorRequested, visualReviewRequested };
 })();

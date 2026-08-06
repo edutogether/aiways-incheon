@@ -7,6 +7,7 @@
   const mobileNav = document.querySelector(".mobile-quick-nav");
   const mobileTitle = document.querySelector("[data-mobile-shell-title]");
   const mobileState = document.querySelector("[data-mobile-shell-state]");
+  const mobileHomeState = document.querySelector("[data-mobile-home-status]");
   const trigger = document.createElement("button");
   trigger.type = "button"; trigger.className = "responsive-nav-trigger";
   trigger.setAttribute("aria-expanded", "false"); trigger.setAttribute("aria-controls", "responsive-main-nav");
@@ -37,11 +38,19 @@
     mobileState.textContent = detail.message;
     mobileState.dataset.state = detail.state || "notice";
     mobileState.hidden = !detail.message;
+    if (mobileHomeState) {
+      mobileHomeState.textContent = detail.message;
+      mobileHomeState.dataset.state = detail.state || "notice";
+      mobileHomeState.setAttribute("role", detail.state === "error" ? "alert" : "status");
+      mobileHomeState.hidden = !detail.message;
+    }
   };
   window.addEventListener("hashchange", syncMobileShell);
   mobileNav?.addEventListener("click", () => window.setTimeout(syncMobileShell, 0));
   window.addEventListener("offline", () => setMobileShellState({ state: "offline", message: "오프라인 상태입니다. 연결되면 다시 동기화합니다." }));
-  window.addEventListener("online", () => { if (mobileState) { mobileState.hidden = true; mobileState.textContent = ""; } });
+  window.addEventListener("online", () => {
+    [mobileState, mobileHomeState].filter(Boolean).forEach(element => { element.hidden = true; element.textContent = ""; });
+  });
   window.addEventListener("aiways:mobile-shell-state", event => setMobileShellState(event.detail));
   syncMobileShell();
 })();

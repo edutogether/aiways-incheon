@@ -88,3 +88,36 @@
 @media (min-width:64rem) {
   .mobile-shell-bar,.mobile-shell-state { display:none; }
 }
+
+/* M2 HOME keeps the live dashboard data, but gives phones a concise D+C card view. */
+.mobile-home-summary,.mobile-home-status { display:none; }
+@media (max-width:63.99rem) {
+  .sorting-scene { order:initial; }
+  .mobile-home-summary { display:block; margin:0; color:#5f6368; font-size:.92rem; line-height:1.55; }
+  .dashboard-scene { display:block; padding-block:1.35rem 2.25rem; }
+  .dashboard-scene .hero-copy { gap:.75rem; padding:0; }
+  .dashboard-scene .eyebrow { color:#1a73e8; font-size:.68rem; }
+  .dashboard-scene h1 { max-inline-size:10ch; color:#202124; font-size:clamp(2.15rem,10.5vw,3.2rem); line-height:1.04; letter-spacing:-.055em; }
+  .dashboard-scene .hero-description,.dashboard-scene .hero-actions { display:none; }
+  .mobile-home-status { display:block; margin:1rem 0 0; padding:.68rem .78rem; border:1px solid #d2e3fc; border-radius:.75rem; color:#174ea6; background:#f8fafd; font-size:.82rem; line-height:1.45; }
+  .mobile-home-status[hidden] { display:none; }
+  .mobile-home-status[data-state="offline"],.mobile-home-status[data-state="error"] { color:#a50e0e; border-color:#f6aea9; background:#fce8e6; }
+  .dashboard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:1fr; gap:.75rem; margin-block-start:1.3rem; }
+  .dashboard-grid>.panel { display:flex; min-block-size:0; padding:.9rem; gap:.65rem; align-items:flex-start; border-color:#e8eaed; background:#fff; box-shadow:0 2px 8px rgb(60 64 67 / 14%); }
+  .dashboard-grid>.panel .panel-head { display:block; }
+  .dashboard-grid>.panel .panel-head p,.dashboard-grid>.panel .select-line,.school-panel .school-visuals,.landfill-panel .chart-wrap,.class-panel .confusion,.class-panel .rank-note,.upload-panel .upload-actions,.upload-panel small { display:none; }
+  .dashboard-grid>.panel .panel-head h2 { color:#202124; font-size:.88rem; line-height:1.32; }
+  .dashboard-grid>.panel .kpi-row,.dashboard-grid>.panel .class-kpis,.dashboard-grid>.panel .landfill-metrics { display:block; margin:0; }
+  .dashboard-grid>.panel .kpi-row>div:not(:first-child),.dashboard-grid>.panel .class-kpis>div:not(:first-child),.dashboard-grid>.panel .landfill-metrics>div:not(:first-child) { display:none; }
+  .dashboard-grid>.panel .kpi-row>div,.dashboard-grid>.panel .class-kpis>div,.dashboard-grid>.panel .landfill-metrics>div { min-block-size:0; padding:0; background:transparent; }
+  .school-panel .kpi-row strong { color:#0b57d0; font-size:clamp(2rem,10vw,2.8rem); line-height:1; }
+  .dashboard-grid>.panel .kpi-row span,.dashboard-grid>.panel .class-kpis span,.dashboard-grid>.panel .landfill-metrics span { display:block; margin-block-start:.32rem; color:#5f6368; font-size:.72rem; line-height:1.35; }
+  .landfill-panel .landfill-actions { display:none; }
+  .landfill-panel .landfill-metrics strong,.class-panel .class-kpis strong { color:#202124; font-size:clamp(1.45rem,7vw,2rem); line-height:1.08; }
+  .upload-panel>p { margin:0; color:#5f6368; font-size:.76rem; line-height:1.45; }
+  .upload-panel::after { content:"3초 판단"; inline-size:100%; margin-block-start:auto; color:#0b57d0; font-size:1rem; font-weight:850; white-space:nowrap; }
+  .mobile-quick-nav a::before { display:block; margin-block-end:.14rem; font-size:.9rem; line-height:1; }
+  .mobile-quick-nav a[href="#dashboard"]::before { content:"⌂"; }
+  .mobile-quick-nav a[href="#ranking"]::before { content:"★"; }
+  .mobile-quick-nav a[href="#landfill"]::before { content:"◒"; }
+}

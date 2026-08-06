@@ -38,12 +38,20 @@
         <a href="#sorting">3초판단</a>
         <a href="#resources">자료실</a>
       </nav>
-      <div class="mobile-quick-nav" role="navigation" aria-label="모바일 주요 진입">
-        <a href="#dashboard">대시보드</a>
-        <a href="#ranking">랭킹</a>
-        <a href="#landfill">매립지 확인</a>
+      <div class="mobile-shell-bar" aria-label="모바일 작업 바로가기">
+        <div class="mobile-shell-context" aria-live="polite">
+          <span>현재 화면</span>
+          <strong data-mobile-shell-title>대시보드</strong>
+        </div>
+        <a class="mobile-shell-primary" href="#sorting">3초 판단</a>
       </div>
+      <p class="mobile-shell-state" data-mobile-shell-state role="status" hidden></p>
     </header>
+    <nav class="mobile-quick-nav" aria-label="모바일 주요 진입">
+      <a href="#dashboard">대시보드</a>
+      <a href="#ranking">랭킹</a>
+      <a href="#landfill">매립지 확인</a>
+    </nav>
 
     <main class="snap-root">
       <section class="scene dashboard-scene" id="dashboard" data-nav="대시보드">

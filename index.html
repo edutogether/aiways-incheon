@@ -38,6 +38,11 @@
         <a href="#sorting">3초판단</a>
         <a href="#resources">자료실</a>
       </nav>
+      <div class="mobile-quick-nav" role="navigation" aria-label="모바일 주요 진입">
+        <a href="#dashboard">대시보드</a>
+        <a href="#ranking">랭킹</a>
+        <a href="#landfill">매립지 확인</a>
+      </div>
     </header>
 
     <main class="snap-root">
@@ -97,7 +102,7 @@
             </div>
           </article>
 
-          <article class="panel landfill-panel" data-source-url="https://www.data.go.kr/tcs/dss/selectDataSetList.do?dType=API&amp;keyword=%EC%88%98%EB%8F%84%EA%B6%8C%EB%A7%A4%EB%A6%BD%EC%A7%80%20%EB%B0%98%EC%9E%85">
+          <article class="panel landfill-panel" id="landfill" data-source-url="https://www.data.go.kr/tcs/dss/selectDataSetList.do?dType=API&amp;keyword=%EC%88%98%EB%8F%84%EA%B6%8C%EB%A7%A4%EB%A6%BD%EC%A7%80%20%EB%B0%98%EC%9E%85">
             <div class="panel-head">
               <div>
                 <p>공식 관리 지표 구조 참고</p>
@@ -188,7 +193,7 @@
             </div>
           </article>
 
-          <article class="panel class-panel">
+          <article class="panel class-panel" id="ranking">
             <div class="panel-head">
               <div>
                 <p>Class Resource Dashboard</p>

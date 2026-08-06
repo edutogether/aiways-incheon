@@ -1,20 +1,19 @@
 name: AI Ways Design Capture
-on:
-  push:
-    branches: [chore/design-capture-20260806]
-  workflow_dispatch:
-permissions:
-  contents: read
+on: {push: {branches: [chore/design-capture-20260806]}, workflow_dispatch: {}}
+permissions: {contents: read}
 jobs:
   capture:
     runs-on: ubuntu-latest
-    env:
-      CAPTURE_OUTPUT: ${{ github.workspace }}/AIWays_Before_After_Design_20260806
+    env: {CAPTURE_OUTPUT: ${{ github.workspace }}/AIWays_True_PreRefactor_Candidates_20260806}
     steps:
       - uses: actions/checkout@v4
         with: {path: workflow}
       - uses: actions/checkout@v4
-        with: {ref: bf97d593bf5ed93fe00d2799035d86fa253e293b, path: versions/previous}
+        with: {ref: ca826721b7744a99010f0d7927e927776501d23f, path: versions/candidate-a}
+      - uses: actions/checkout@v4
+        with: {ref: 0bb24435422651a482838a2119f55a4502196e69, path: versions/candidate-b}
+      - uses: actions/checkout@v4
+        with: {ref: 741206db6255b6c4db58696d818d07149c909390, path: versions/candidate-c}
       - uses: actions/checkout@v4
         with: {ref: cc9390c8be1236efc2850bd77c1eb5ecf4127a96, path: versions/current}
       - uses: actions/setup-node@v4
@@ -23,18 +22,8 @@ jobs:
         working-directory: workflow/tools/design-capture
       - run: npx playwright install --with-deps chromium
         working-directory: workflow/tools/design-capture
-      - run: node capture.mjs "$GITHUB_WORKSPACE/versions/previous" "$GITHUB_WORKSPACE/versions/current" "$CAPTURE_OUTPUT"
+      - run: node capture.mjs "$GITHUB_WORKSPACE/versions" "$CAPTURE_OUTPUT"
         working-directory: workflow/tools/design-capture
-      - name: Validate capture output
-        run: |
-          test -d "$CAPTURE_OUTPUT"
-          test -f "$CAPTURE_OUTPUT/05_inventory/capture-inventory.csv"
-          test -f "$CAPTURE_OUTPUT/05_inventory/README.md"
-          test "$(find "$CAPTURE_OUTPUT/01_previous" -name '*.png' -size +0c | wc -l)" -ge 1
-          test "$(find "$CAPTURE_OUTPUT/02_current" -name '*.png' -size +0c | wc -l)" -ge 1
-          test "$(find "$CAPTURE_OUTPUT" -name '*.png' -size 0c | wc -l)" -eq 0
+      - run: test -f "$CAPTURE_OUTPUT/06_inventory/capture-inventory.csv"; test -f "$CAPTURE_OUTPUT/06_inventory/README.md"; test "$(find "$CAPTURE_OUTPUT" -name '*.png' -size +0c | wc -l)" -ge 9; test "$(find "$CAPTURE_OUTPUT/05_contact_sheets" -name 'compare-all-*.png' | wc -l)" -eq 5
       - uses: actions/upload-artifact@v4
-        with:
-          name: AIWays_Before_After_Design_20260806
-          path: ${{ github.workspace }}/AIWays_Before_After_Design_20260806
-          if-no-files-found: error
+        with: {name: AIWays_True_PreRefactor_Candidates_20260806, path: '${{ github.workspace }}/AIWays_True_PreRefactor_Candidates_20260806', if-no-files-found: error}

@@ -2772,10 +2772,12 @@
     renderSortingStats();
   }
 
-  function addSortingHoldLocally(name, reason = "기준 확인 필요", saved = true, decision = null) {
+  function addSortingHoldLocally(name, reason = "기준 확인 필요", saved = true, decision = null, localRecordId = "", remoteRecordId = "") {
     const cleaned = cleanText(name) || "판단 보류 물건";
     sortingHoldItems.unshift({
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      id: localRecordId || Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      localRecordId: localRecordId || "",
+      remoteRecordId: remoteRecordId || "",
       name: cleaned,
       reason,
       status: "회의 안건 대기",
@@ -2786,6 +2788,7 @@
         materialCandidates: decision.materialCandidates,
         visibleCautions: decision.visibleCautions,
         checklist: decision.checklist,
+        userDecision: { userConfirmed: true },
         recommendation: decision.recommendation,
         holdReasons: decision.hold?.reasons || [],
         selectedCorrectionType: decision.selectedCorrectionType || ""
@@ -2941,11 +2944,11 @@
           <em>${escapeHtml(item.status || "기준 확인 필요")}</em>
           <span>${escapeHtml(item.reason || holdCandidateFor(item.name))}</span>
           <small>${escapeHtml(item.candidate || holdCandidateFor(item.name))}</small>
-          ${item.remoteRecordId && item.status === "보류" ? `<div class="hold-checks" aria-label="추가 확인 항목">${(item.judgement?.checklist || []).map((check, index) => `<button type="button" data-hold-check="${item.id}:${index}" aria-pressed="${check.checked === true}">${check.checked === true ? "✓ " : ""}${escapeHtml(check.label || "확인 항목")}</button>`).join("")}</div>` : ""}
+          ${(item.remoteRecordId || item.localRecordId) && item.status === "보류" ? `<div class="hold-checks" aria-label="추가 확인 항목">${(item.judgement?.checklist || []).map((check, index) => `<button type="button" data-hold-check="${item.id}:${index}" aria-pressed="${check.checked === true}">${check.checked === true ? "✓ " : ""}${escapeHtml(check.label || "확인 항목")}</button>`).join("")}</div>` : ""}
         </div>
         <time>${escapeHtml(item.time)}</time>
         <div class="hold-card-actions">
-          ${item.remoteRecordId && item.status === "보류" ? `<button type="button" data-resolve-hold="${item.id}">추가 확인 후 해결</button>` : ""}
+          ${(item.remoteRecordId || item.localRecordId) && item.status === "보류" ? `<button type="button" data-resolve-hold="${item.id}">추가 확인 후 해결</button>` : ""}
         </div>
       </li>
     `).join("");
@@ -2957,6 +2960,8 @@
   const FIRESTORE_EMULATOR_LIST_URL = `http://127.0.0.1:5001/${FIRESTORE_EMULATOR_PROJECT_ID}/asia-northeast3/listSortingRecords`;
   const FIRESTORE_EMULATOR_RESOLVE_URL = `http://127.0.0.1:5001/${FIRESTORE_EMULATOR_PROJECT_ID}/asia-northeast3/resolveSortingRecord`;
   let pendingFirestoreRecordSave = null;
+  let localSortingSyncActive = false;
+  let localSortingSyncBlocked = false;
   async function appCheckHeaders() { return window.AIWaysAppCheck?.getAIWaysAppCheckHeaders?.() || null; }
 
   function isFirestoreEmulatorStorageMode(locationLike = window.location) {
@@ -3015,51 +3020,122 @@
     };
   }
 
-  async function persistSortingRecordRemote(decision, status) {
+  async function persistSortingRecordRemote(decision, status, clientRecordId = "") {
     const client = window.AIWaysEdu2gClient;
     if (!decision || !client?.saveSortingRecord || client.visualReviewRequested?.()) return { attempted: false, saved: false, status: 0, code: "auth_invalid" };
-    const existing = decision.__firestoreIdempotencyKey || createFirestoreIdempotencyKey();
+    const existing = clientRecordId || decision.__firestoreIdempotencyKey || createFirestoreIdempotencyKey();
     decision.__firestoreIdempotencyKey = existing;
     if (pendingFirestoreRecordSave?.key === existing) return pendingFirestoreRecordSave.promise;
     const promise = client.saveSortingRecord(recordPayloadFromDecision(decision, status, existing))
-      .then(response => ({ attempted: true, saved: response.ok === true, status: response.status || 0, code: response.code || "invalid_response", duplicate: response.data?.duplicate === true }))
+      .then(response => ({ attempted: true, saved: response.ok === true, status: response.status || 0, code: response.code || "invalid_response", duplicate: response.data?.duplicate === true, serverRecordId: cleanText(response.data?.recordId) }))
       .catch(() => ({ attempted: true, saved: false, status: 0, code: "network_error" }));
     pendingFirestoreRecordSave = { key: existing, promise };
     try { return await promise; } finally { if (pendingFirestoreRecordSave?.key === existing) pendingFirestoreRecordSave = null; }
   }
 
+  function localDecisionRecord(decision, status, record) {
+    const clientRecordId = decision?.__localRecordId || createFirestoreIdempotencyKey();
+    if (decision) decision.__localRecordId = clientRecordId;
+    return { clientRecordId, decision: status === "held" ? "held" : "completed", status, category: cleanText(record?.category || decision?.item?.category || "학생 확인").slice(0, 200), displayLabel: cleanText(record?.mapped_item || record?.ai_raw_label || decision?.item?.label || "판단 기록").slice(0, 200), source: cleanText(decision?.provider || decision?.source || "local_rule").slice(0, 80), analysisMode: cleanText(decision?.selectedItemId || decision?.key || "local-item").slice(0, 40), syncStatus: "pending" };
+  }
+
+  function decisionFromLocalRecord(record) {
+    const itemId = cleanText(record.analysisMode || "local-item").slice(0, 40) || "local-item";
+    const label = cleanText(record.displayLabel || "판단 기록").slice(0, 200) || "판단 기록";
+    const category = cleanText(record.category || "학생 확인").slice(0, 200) || "학생 확인";
+    const held = record.status === "held";
+    return { provider: cleanText(record.source || "local_rule"), selectedItemId: itemId, objectCandidates: [{ label, itemId, objectType: itemId, confidenceBand: "unknown" }], materialCandidates: [{ label: category, confidenceBand: "unknown" }], visibleCautions: [], checklist: [], hold: held ? { recommended: true, reasons: [] } : null };
+  }
+
+  async function syncOneLocalSortingRecord(localRecord, decision = null) {
+    const status = localRecord.status === "resolved" ? "completed" : localRecord.status;
+    const remote = await persistSortingRecordRemote(decision || decisionFromLocalRecord(localRecord), status, localRecord.clientRecordId);
+    if (!remote.saved) {
+      const error = new Error(remote.code || "sync-failed");
+      error.status = remote.status || 0;
+      if (remote.status === 403) localSortingSyncBlocked = true;
+      throw error;
+    }
+    return { serverRecordId: remote.serverRecordId || localRecord.serverRecordId || "" };
+  }
+
+  async function syncPendingLocalSortingRecords() {
+    if (!localSortingStore || localSortingSyncActive || localSortingSyncBlocked || !navigator.onLine) return [];
+    localSortingSyncActive = true;
+    try { return await localSortingStore.syncPendingSortingRecords(record => syncOneLocalSortingRecord(record)); }
+    catch { return []; }
+    finally { localSortingSyncActive = false; }
+  }
+
   async function appendSortingDecisionRecord(record, decision, status) {
-    const remote = await persistSortingRecordRemote(decision, status);
-    if (remote.saved) {
-      const nextRecords = localRecords();
-      nextRecords.push({ ...record, timestamp: new Date().toISOString(), local_time: new Date().toLocaleString("ko-KR") });
+    if (!localSortingStore) return { attempted: false, saved: false, localSaved: false, code: "local_storage_unavailable" };
+    let local;
+    try { local = await localSortingStore.saveLocalSortingRecord(localDecisionRecord(decision, status, record)); }
+    catch { return { attempted: false, saved: false, localSaved: false, code: "local_storage_failed" }; }
+    const nextRecords = localRecords();
+    if (!nextRecords.some(item => item.clientRecordId === local.clientRecordId)) {
+      nextRecords.push({ ...record, clientRecordId: local.clientRecordId, timestamp: new Date().toISOString(), local_time: new Date().toLocaleString("ko-KR") });
       writeJson(STORAGE_RECORDS, nextRecords);
       applyDashboard(allStoredRecords());
-      return remote;
     }
-    return remote;
+    let remote = { attempted: false, saved: false, status: 0, code: "network_error" };
+    try {
+      const result = await syncOneLocalSortingRecord(local, decision);
+      await localSortingStore.updateLocalSortingRecord(local.clientRecordId, { syncStatus: "synced", serverRecordId: result.serverRecordId, syncedAt: new Date().toISOString() });
+      remote = { attempted: true, saved: true, serverRecordId: result.serverRecordId };
+    } catch (error) {
+      await localSortingStore.updateLocalSortingRecord(local.clientRecordId, { syncStatus: "failed", lastSyncErrorCode: error?.status === 403 ? "app-check-permission-denied" : "sync-failed" });
+      if (error?.status === 403) localSortingSyncBlocked = true;
+    }
+    if (!remote.saved) syncPendingLocalSortingRecords();
+    return { ...remote, localSaved: true, clientRecordId: local.clientRecordId };
   }
 
   async function logSortingPractice(item, decision = null) {
     const remote = await appendSortingDecisionRecord(recordForSortingItem(item, false), decision, "completed");
-    if (remote.saved) recordSortingPracticeLocally(item, true);
+    if (remote.localSaved) recordSortingPracticeLocally(item, remote.saved);
     if (remote.saved) loadFirestoreEmulatorHolds();
     const guidance = $("[data-quick-guidance]");
     if (guidance) guidance.textContent = remote.saved
       ? `${item.label} 기록을 보호된 클라우드 기록에 저장했어요.`
-      : "기록을 저장하지 못했습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요.";
+      : remote.localSaved ? "기기에 저장됨 · 네트워크 연결 후 자동으로 전송됩니다." : "기기 저장을 완료하지 못했습니다. 다시 시도해 주세요.";
     return remote;
   }
 
   async function addSortingHold(name, reason = "기준 확인 필요", decision = null) {
     const cleaned = cleanText(name) || "판단 보류 물건";
     const remote = await appendSortingDecisionRecord(recordForSortingItem({ label: cleaned, category: "기준 확인 필요" }, true, cleaned), decision, "held");
-    if (remote.saved) {
-      addSortingHoldLocally(cleaned, reason, true, decision);
+    if (remote.localSaved) {
+      addSortingHoldLocally(cleaned, reason, remote.saved, decision, remote.clientRecordId, remote.serverRecordId);
       if (decision) saveSortingDecisionV2(decision, "held");
       loadFirestoreEmulatorHolds();
     }
     return remote;
+  }
+
+  async function recoverLocalSortingRecords() {
+    if (!localSortingStore) return [];
+    const records = await localSortingStore.listLocalSortingRecords();
+    records.filter(record => record.status === "held").forEach(record => {
+      if (!sortingHoldItems.some(item => item.localRecordId === record.clientRecordId)) addSortingHoldLocally(record.displayLabel, "기기에 저장된 판단 보류", record.syncStatus === "synced", null, record.clientRecordId, record.serverRecordId || "");
+    });
+    renderSortingHolds();
+    return records;
+  }
+
+  async function resolveLocalSortingHold(item) {
+    if (!item?.localRecordId || !localSortingStore) return false;
+    const resolved = await localSortingStore.resolveLocalHeldRecord(item.localRecordId);
+    item.status = "재확인 완료";
+    item.synced = false;
+    renderSortingHolds();
+    if (item.remoteRecordId) {
+      try {
+        const remote = await resolveFirestoreEmulatorHold(item);
+        if (remote) await localSortingStore.updateLocalSortingRecord(resolved.clientRecordId, { syncStatus: "synced", syncedAt: new Date().toISOString() });
+      } catch { /* local resolution remains durable */ }
+    } else syncPendingLocalSortingRecords();
+    return true;
   }
 
   function pickQuizSet() {
@@ -3265,6 +3341,8 @@
     renderSortingStats();
     renderSortingHolds();
     loadFirestoreEmulatorHolds();
+    recoverLocalSortingRecords().then(() => syncPendingLocalSortingRecords());
+    window.addEventListener("online", () => syncPendingLocalSortingRecords());
     initHoldEmojiPreview();
     initNestedScrollIsolation();
 
@@ -3295,18 +3373,26 @@
       if (!button) return;
       const id = button.dataset.resolveHold;
       const item = sortingHoldItems.find(entry => entry.id === id);
-      if (item?.remoteRecordId) {
+      if (item?.localRecordId) {
         if (button.dataset.pending === "true") return;
         button.dataset.pending = "true";
         button.disabled = true;
         try {
-          if (await resolveFirestoreEmulatorHold(item)) await loadFirestoreEmulatorHolds();
+          await resolveLocalSortingHold(item);
         } finally { button.disabled = false; button.dataset.pending = "false"; }
         return;
       }
       sortingHoldItems = sortingHoldItems.filter(item => item.id !== id);
       saveSortingHolds();
       renderSortingHolds();
+    });
+
+    $("#exportSortingCsvButton")?.addEventListener("click", async () => {
+      const status = $("#sortingCsvStatus");
+      const records = localSortingStore ? await localSortingStore.listLocalSortingRecords() : [];
+      if (!records.length) { if (status) status.textContent = "내보낼 기기 저장 기록이 없습니다."; return; }
+      window.AIWaysSortingLocalStore?.downloadSortingRecordsCsv(records);
+      if (status) status.textContent = "기기 저장 기록을 CSV로 내보냈습니다.";
     });
 
     $("#quizStartButton")?.addEventListener("click", startSortingQuiz);
@@ -3652,7 +3738,7 @@
     container.innerHTML = `
       <header class="judgement-result-head"><p>AI가 확인할 항목을 제안합니다.</p><strong>${item.emoji} ${escapeHtml(item.label)}</strong><span>최종 배출 판단은 사용자가 결정합니다.</span></header>
       ${liveGemini ? `<aside class="judgement-gemini-live" aria-label="Google Gemini live analysis"><strong>Google Gemini 분석 결과</strong><span>AI 사진 분석 참고 후보 · Live 분석 · Firebase Functions 연결</span><small>분석 엔진: Google Gemini · 서버 연결: Firebase Functions · 결과 출처: future_gemini · 최종 판단: 사용자</small></aside>` : ""}
-      <p class="judgement-action-status" data-judgement-action-status role="status" aria-live="polite">${safeResult.analysisCode ? "사진 분석 참고 후보를 받지 못했습니다. 기본 확인 항목으로 계속할 수 있습니다." : ""}</p>
+      <p class="judgement-action-status" data-judgement-action-status role="status" aria-live="polite">${safeResult.analysisCode ? "AI 분석을 사용할 수 없어 직접 선택 모드로 전환했습니다." : ""}</p>
       <details class="judgement-details judgement-candidate-block" open><summary>물체 후보</summary><div class="judgement-chip-row">${objectChips}</div></details>
       <details class="judgement-details judgement-candidate-block" open><summary>재질 후보</summary><div class="judgement-chip-row">${materialChips}</div></details>
       ${safeResult.imageHints.length ? `<p class="judgement-image-hint">${escapeHtml(safeResult.imageHints.join(" · "))}</p>` : ""}
@@ -3660,7 +3746,7 @@
       <section class="judgement-checklist"><h4>배출 전 체크리스트</h4><div>${checklistHtml}</div></section>
       <section class="judgement-recommendation ${completed ? "is-ready" : "is-hold"}"><strong>${completed ? "잘했어요. 배출 준비가 완료됐습니다." : needsHold ? "지금 확정하지 않아도 됩니다. 확인이 필요한 물건으로 보류함에 저장할까요?" : "확인 항목을 마친 뒤 사용자가 최종 판단합니다."}</strong><span>${escapeHtml(item.primaryFlow)}</span></section>
       <section class="judgement-corrections"><span>AI가 항목을 잘못 읽었다면 바로 고쳐 주세요.</span><div>${correctionButtons}</div></section>
-      <div class="quick-action-row judgement-actions"><button type="button" data-judgement-action="record" ${completed && !safeResult.hold.recommended ? "" : "disabled"}>배출 기록 남기기</button><button type="button" data-judgement-action="decide" ${completed ? "" : "disabled"}>확인 후 결정하기</button><button type="button" data-judgement-action="hold">보류함에 저장</button></div>`;
+      <div class="quick-action-row judgement-actions"><button type="button" data-judgement-action="record" ${completed && !safeResult.hold.recommended ? "" : "disabled"}>배출 기록 남기기</button><button type="button" data-judgement-action="decide" ${completed ? "" : "disabled"}>확인 후 결정하기</button><button type="button" data-judgement-action="hold">보류함에 저장</button><button type="button" data-next-sorting-item>다음 물건</button></div>`;
     const holdAction = container?.querySelector('[data-judgement-action="hold"]');
     if (holdAction) holdAction.disabled = !needsHold;
   }
@@ -3777,6 +3863,8 @@
         return;
       }
       const action = event.target.closest("[data-judgement-action]");
+      const nextItem = event.target.closest("[data-next-sorting-item]");
+      if (nextItem) { resetThreeSecondAppUiState(); $("[data-upload=\"camera\"]")?.focus(); return; }
       if (!action || !currentSortingJudgement) return;
       if (action.disabled || action.dataset.pending === "true") return;
       action.dataset.pending = "true";
@@ -3786,20 +3874,20 @@
       const legacyItem = { label: decision.item.label, emoji: decision.item.emoji, category: decision.item.category, carbonSaved: decision.item.carbonSaved };
       try {
         if (action.dataset.judgementAction === "record") {
-          setActionStatus("보호된 클라우드 기록에 저장하는 중입니다.");
+          setActionStatus("기기에 저장하는 중입니다.");
           const remote = await logSortingPractice(legacyItem, decision);
-          if (remote.saved) {
+          if (remote.localSaved) {
             saveSortingDecisionV2(decision, "recorded");
-            setActionStatus(remote.duplicate ? "이미 저장된 요청입니다. 기존 기록을 사용합니다." : "배출 기록을 보호된 클라우드 기록에 저장했습니다.");
-          } else setActionStatus(window.AIWaysEdu2gClient?.errorMessageFor?.(remote.code) || "기록을 저장하지 못했습니다. 다시 시도해 주세요.");
+            setActionStatus(remote.saved ? (remote.duplicate ? "기기에 저장됨 · 기존 클라우드 기록을 사용합니다." : "기기에 저장됨 · 클라우드 기록에 전송했습니다.") : "기기에 저장됨 · 네트워크 연결 후 자동으로 전송됩니다.");
+          } else setActionStatus("기기 저장을 완료하지 못했습니다. 다시 시도해 주세요.");
         } else if (action.dataset.judgementAction === "decide") {
           saveSortingDecisionV2(decision, "user_confirmed");
           renderJudgementResult({ ...decision, hold: { ...decision.hold, recommended: false } }, result);
         } else {
           const reason = decision.hold.reasons[0] || "확인 항목 또는 지역 기준 확인 필요";
-          setActionStatus("보류 기록을 보호된 클라우드 기록에 저장하는 중입니다.");
+          setActionStatus("기기에 보류 기록을 저장하는 중입니다.");
           const remote = await addSortingHold(decision.item.label, reason, decision);
-          setActionStatus(remote.saved ? (remote.duplicate ? "이미 저장된 요청입니다. 기존 보류 기록을 사용합니다." : "보류 기록을 보호된 클라우드 기록에 저장했습니다.") : (window.AIWaysEdu2gClient?.errorMessageFor?.(remote.code) || "보류 기록을 저장하지 못했습니다. 다시 시도해 주세요."));
+          setActionStatus(remote.localSaved ? (remote.saved ? "기기에 저장됨 · 보류 기록을 전송했습니다." : "기기에 저장됨 · 네트워크 연결 후 자동으로 전송됩니다.") : "기기 저장을 완료하지 못했습니다. 다시 시도해 주세요.");
         }
       } finally {
         action.dataset.pending = "false";

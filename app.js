@@ -2780,7 +2780,7 @@
       remoteRecordId: remoteRecordId || "",
       name: cleaned,
       reason,
-      status: "회의 안건 대기",
+      status: "보류",
       candidate: holdCandidateFor(cleaned),
       judgement: decision ? {
         source: decision.source,

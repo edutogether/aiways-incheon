@@ -21,6 +21,8 @@
   const SORTING_STATS_KEY = "aiways_main_sorting_stats_v1";
   const SORTING_HOLD_KEY = "aiways_main_sorting_hold_v1";
   const SORTING_DECISIONS_V2_KEY = "aiways_sorting_decisions_v2";
+  const localSortingStore = window.AIWaysSortingLocalStore?.createSortingLocalStore?.();
+  window.AIWaysLocalSortingPersistence = { persistSortingDecisionLocally: input => localSortingStore?.saveLocalSortingRecord(input), listPendingSortingRecords: () => localSortingStore?.listPendingSortingRecords(), syncPendingSortingRecords: syncOne => localSortingStore?.syncPendingSortingRecords(syncOne), resolveLocalHeldRecord: (id, patch) => localSortingStore?.resolveLocalHeldRecord(id, patch), buildSortingRecordsCsv: records => window.AIWaysSortingLocalStore?.buildSortingRecordsCsv(records) };
 
   const BASE_DASHBOARD = {
     schoolObserved: 244,

@@ -17,6 +17,13 @@ test("caches by skill, version and base URL while preserving version entries", a
   const first = await runtime.loadTeachableSkillModel(skill("a", 1), options), hit = await runtime.loadTeachableSkillModel(skill("a", 1), options), second = await runtime.loadTeachableSkillModel(skill("a", 2), options);
   assert.equal(loads, 2); assert.equal(first.cacheKey, hit.cacheKey); assert.notEqual(first.cacheKey, second.cacheKey);
 });
+test("uses the browser AI runtime through the default model loader", async () => {
+  runtime.clearTeachableSkillCache(); let loads = 0;
+  global.AIWaysAiRuntime = { loadTeachableMachine: async () => ({ load: async () => { loads += 1; return model([]); } }) };
+  const loaded = await runtime.loadTeachableSkillModel(skill("default-loader"), { fetcher: fetcher({ labels: ["병", "캔", "종이"] }) });
+  assert.equal(loads, 1); assert.equal(typeof loaded.model.predict, "function");
+  delete global.AIWaysAiRuntime;
+});
 test("returns ordered top three supporting evidence without a final decision", async () => {
   runtime.clearTeachableSkillCache(); const result = await runtime.runSupportingSkillInference("session-image", skill("top"), { fetcher: fetcher({ labels: ["병", "캔", "종이"] }), modelLoader: async () => model([{ className: "종이", probability: 0.2 }, { className: "병", probability: 0.9 }, { className: "캔", probability: 0.5 }, { className: "기타", probability: 0.1 }]) }), context = runtime.buildSkillEvidenceContext([result]);
   assert.equal(result.status, "success"); assert.deepEqual(result.predictions.map(value => value.label), ["병", "캔", "종이"]); assert.equal(context.role, "supporting_skill_only"); assert.equal(Object.hasOwn(context, "decision"), false);

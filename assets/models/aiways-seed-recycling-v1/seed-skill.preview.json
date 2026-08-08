@@ -1,0 +1,16 @@
+{
+  "skillId": "aiways_seed_recycling_v1",
+  "name": "AI Ways Seed 분리수거 Skill",
+  "description": "PLASTIC, METAL, PAPER 분류를 참고 정보로 제공하는 Seed Teachable Machine Skill입니다.",
+  "modelType": "teachable_machine_image",
+  "modelBaseUrl": "https://edutogether.github.io/aiways-incheon/assets/models/aiways-seed-recycling-v1/",
+  "version": 1,
+  "classes": ["PLASTIC", "METAL", "PAPER"],
+  "visibility": "class",
+  "enabled": true,
+  "createdByScope": {
+    "schoolId": "",
+    "grade": "",
+    "className": ""
+  }
+}

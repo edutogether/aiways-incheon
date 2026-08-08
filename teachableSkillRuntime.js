@@ -1,8 +1,8 @@
 (function(root, factory) {
-  const api = factory(root.AIWaysClassroomSkillRegistry);
+  const api = factory(root, root.AIWaysClassroomSkillRegistry);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.AIWaysTeachableSkillRuntime = api;
-})(typeof window !== "undefined" ? window : globalThis, function(registryApi) {
+})(typeof window !== "undefined" ? window : globalThis, function(root, registryApi) {
   "use strict";
   const cache = new Map();
   const MAX_ACTIVE_SKILLS = 3;

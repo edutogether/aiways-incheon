@@ -1,0 +1,11 @@
+{
+  "tfjsVersion": "4.22.0",
+  "tmVersion": "seed-compatible-1",
+  "packageVersion": "0.8.5",
+  "labels": [
+    "PLASTIC",
+    "METAL",
+    "PAPER"
+  ],
+  "imageSize": 64
+}

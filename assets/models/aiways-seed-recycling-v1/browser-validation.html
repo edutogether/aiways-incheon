@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Ways Seed Skill browser validation</title>
+  <script defer src="../../../classroomSkillRegistry.js"></script>
+  <script defer src="../../../teachableSkillRuntime.js"></script>
+  <script defer src="../../../aiRuntimeLoader.js"></script>
+</head>
+<body>
+  <main>
+    <h1>AI Ways Seed Skill browser validation</h1>
+    <pre id="result" aria-live="polite">pending</pre>
+    <img id="E07" src="./holdout-fixtures/E07_plastic_cup.jpg" alt="E07 plastic cup">
+    <img id="M05" src="./holdout-fixtures/M05_crushed_can.jpg" alt="M05 crushed can">
+    <img id="M08" src="./holdout-fixtures/M08_discarded_paper_cup.jpg" alt="M08 discarded paper cup">
+  </main>
+  <script>
+    (() => {
+      const expectedBase = "https://edutogether.github.io/aiways-incheon/assets/models/aiways-seed-recycling-v1/";
+      const localBase = new URL("./", window.location.href).href;
+      const skill = {
+        skillId: "aiways_seed_recycling_v1",
+        name: "AI Ways Seed 분리수거 Skill",
+        modelType: "teachable_machine_image",
+        modelBaseUrl: expectedBase,
+        version: 1,
+        classes: ["PLASTIC", "METAL", "PAPER"],
+        visibility: "class",
+        enabled: true,
+        createdByScope: { schoolId: "", grade: "", className: "" }
+      };
+      const resultNode = document.querySelector("#result");
+      const errors = [];
+      window.addEventListener("error", event => errors.push(String(event.error?.message || event.message || "error")));
+      window.addEventListener("unhandledrejection", event => errors.push(String(event.reason?.message || event.reason || "unhandledrejection")));
+      function write(value) { resultNode.textContent = JSON.stringify(value, null, 2); }
+      function mapAssetUrl(value) {
+        const url = String(value instanceof Request ? value.url : value);
+        return url.startsWith(expectedBase) ? `${localBase}${url.slice(expectedBase.length)}` : url;
+      }
+      async function loadImage(id) {
+        const image = document.getElementById(id);
+        if (image.complete && image.naturalWidth) return image;
+        await new Promise((resolve, reject) => { image.addEventListener("load", resolve, { once: true }); image.addEventListener("error", reject, { once: true }); });
+        return image;
+      }
+      async function run() {
+        const nativeFetch = window.fetch.bind(window);
+        const requests = [];
+        window.fetch = async (input, init) => {
+          const requestedUrl = String(input instanceof Request ? input.url : input);
+          const mappedUrl = mapAssetUrl(input);
+          const response = await nativeFetch(mappedUrl, init);
+          if (requestedUrl.startsWith(expectedBase) || mappedUrl.startsWith(localBase)) requests.push({ requestedUrl, mappedUrl, status: response.status });
+          return response;
+        };
+        const preflight = await Promise.all(["model.json", "metadata.json", "weights.bin"].map(async file => {
+          const response = await window.fetch(`${localBase}${file}`, { credentials: "omit" });
+          return { file, status: response.status, ok: response.ok };
+        }));
+        const runtime = window.AIWaysTeachableSkillRuntime;
+        const preview = await window.AIWaysClassroomSkillRegistry.previewTeachableMachineModel(expectedBase, window.fetch);
+        const previewRegistry = window.AIWaysClassroomSkillRegistry.createRegistry();
+        const registered = previewRegistry.registerSkill({ ...skill, description: "Seed browser validation fixture", modelVersion: preview.modelVersion }).skill;
+        runtime.clearTeachableSkillCache();
+        const first = await runtime.loadTeachableSkillModel(skill, { fetcher: window.fetch });
+        const fetchCountAfterFirst = requests.length;
+        const second = await runtime.loadTeachableSkillModel(skill, { fetcher: window.fetch });
+        const inferences = [];
+        for (const id of ["E07", "M05", "M08"]) {
+          const image = await loadImage(id);
+          const evidence = await runtime.runSupportingSkillInference(image, skill, { fetcher: window.fetch });
+          inferences.push({ id, status: evidence.status, top1: evidence.topPrediction, top3: evidence.predictions, latencyMs: evidence.inferenceLatencyMs, error: evidence.error || null });
+        }
+        const supportingEvidence = runtime.buildSkillEvidenceContext([await runtime.runSupportingSkillInference(await loadImage("E07"), skill, { fetcher: window.fetch })]);
+        write({
+          status: "success",
+          expectedBase,
+          localBase,
+          preflight,
+          seedSkillPreview: { modelBaseUrl: preview.modelBaseUrl, classes: preview.classes, modelVersion: preview.modelVersion, enabled: registered.status === "enabled", visibility: registered.visibility },
+          labels: first.labels,
+          registryLabelsMatch: first.registryLabelsMatch,
+          cacheHit: first === second && requests.length === fetchCountAfterFirst,
+          modelRequests: requests,
+          inferences,
+          supportingEvidence,
+          consoleOrPageErrors: errors
+        });
+      }
+      window.addEventListener("load", () => run().catch(error => write({ status: "error", error: String(error?.message || error), consoleOrPageErrors: errors })));
+    })();
+  </script>
+</body>
+</html>

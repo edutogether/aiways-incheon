@@ -6,7 +6,7 @@ const path = require("node:path");
 
 const root = path.resolve(process.env.AIWAYS_STATIC_ROOT || path.resolve(__dirname, "..", ".."));
 const port = Number(process.env.AIWAYS_STATIC_PORT || 8001);
-const types = { ".css": "text/css; charset=utf-8", ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".png": "image/png", ".svg": "image/svg+xml" };
+const types = { ".bin": "application/octet-stream", ".css": "text/css; charset=utf-8", ".html": "text/html; charset=utf-8", ".jpg": "image/jpeg", ".js": "text/javascript; charset=utf-8", ".json": "application/json; charset=utf-8", ".png": "image/png", ".svg": "image/svg+xml" };
 http.createServer((request, response) => {
   const url = new URL(request.url, "http://127.0.0.1");
   const relative = (url.pathname === "/" ? "index.html" : decodeURIComponent(url.pathname).replace(/^\/+/, ""));

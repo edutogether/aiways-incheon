@@ -24,10 +24,48 @@
   const localSortingStore = window.AIWaysSortingLocalStore?.createSortingLocalStore?.();
   window.AIWaysLocalSortingPersistence = { persistSortingDecisionLocally: input => localSortingStore?.saveLocalSortingRecord(input), listPendingSortingRecords: () => localSortingStore?.listPendingSortingRecords(), syncPendingSortingRecords: syncOne => localSortingStore?.syncPendingSortingRecords(syncOne), resolveLocalHeldRecord: (id, patch) => localSortingStore?.resolveLocalHeldRecord(id, patch), buildSortingRecordsCsv: records => window.AIWaysSortingLocalStore?.buildSortingRecordsCsv(records) };
   const classroomSkillRegistry = window.AIWaysClassroomSkillRegistry?.createRegistry?.();
+  let teachableSkillRuntime = window.AIWaysTeachableSkillRuntime;
+  let teachableSkillRuntimePromise = null;
+  function loadTeachableSkillRuntime() {
+    if (teachableSkillRuntime?.getSupportingSkillEvidence) return Promise.resolve(teachableSkillRuntime);
+    if (teachableSkillRuntimePromise) return teachableSkillRuntimePromise;
+    teachableSkillRuntimePromise = new Promise((resolve, reject) => {
+      const existing = document.querySelector('script[data-aiways-supporting-skill-runtime]');
+      const script = existing || document.createElement("script");
+      const finish = () => {
+        teachableSkillRuntime = window.AIWaysTeachableSkillRuntime;
+        teachableSkillRuntime?.getSupportingSkillEvidence ? resolve(teachableSkillRuntime) : reject(new Error("Supporting skill runtime is unavailable"));
+      };
+      script.addEventListener("load", finish, { once: true });
+      script.addEventListener("error", () => reject(new Error("Supporting skill runtime failed to load")), { once: true });
+      if (!existing) {
+        script.async = true;
+        script.src = "./teachableSkillRuntime.js";
+        script.dataset.aiwaysSupportingSkillRuntime = "true";
+        document.head.append(script);
+      }
+    }).catch(error => {
+      teachableSkillRuntimePromise = null;
+      throw error;
+    });
+    return teachableSkillRuntimePromise;
+  }
+  const AIWAYS_SEED_SKILL = Object.freeze({
+    skillId: "aiways_seed_recycling_v1",
+    name: "AI Ways Seed 분리수거 Skill",
+    description: "PLASTIC, METAL, PAPER 분류를 참고 정보로 제공하는 Seed Teachable Machine Skill입니다.",
+    modelType: "teachable_machine_image",
+    modelBaseUrl: "https://edutogether.github.io/aiways-incheon/assets/models/aiways-seed-recycling-v1/",
+    modelVersion: "layers-model",
+    version: 1,
+    classes: ["PLASTIC", "METAL", "PAPER"],
+    visibility: "class",
+    enabled: true
+  });
   window.AIWaysClassroomSkillFoundation = {
     registry: classroomSkillRegistry,
-    getSupportingSkillEvidence: window.AIWaysClassroomSkillRegistry?.getSupportingSkillEvidence,
-    buildSkillEvidenceContext: window.AIWaysClassroomSkillRegistry?.buildSkillEvidenceContext
+    getSupportingSkillEvidence: (...args) => loadTeachableSkillRuntime().then(runtime => runtime.getSupportingSkillEvidence(...args)),
+    buildSkillEvidenceContext: evidence => teachableSkillRuntime?.buildSkillEvidenceContext?.(evidence) || null
   };
 
   const BASE_DASHBOARD = {
@@ -572,6 +610,7 @@
   let currentDraft = null;
   let pendingDecision = null;
   let previewUrl = "";
+  let sessionImageFile = null;
   let modalSession = 0;
   let countUpNextDashboard = false;
   let dashboardIntroActive = false;
@@ -3728,6 +3767,19 @@
     container.innerHTML = `<div class="judgement-scan"><strong>AI 판단 지원을 준비하는 중</strong><span class="quick-scan-meter" aria-hidden="true"><i></i></span><p>${escapeHtml(cleanText(options.label) || "선택한 물건")}의 재질·주의 요소·확인 항목을 정리하고 있습니다.</p></div>`;
   }
 
+  function supportingEvidenceHtml(result) {
+    const evidence = Array.isArray(result?.supportingEvidence) ? result.supportingEvidence.filter(item => item?.status === "success") : [];
+    if (!evidence.length) return "";
+    const comparison = result.skillComparison || compareGeminiAndSkillEvidence("", evidence);
+    const rows = evidence.map(item => {
+      const top = item.topPrediction;
+      const predictions = (item.predictions || []).map(prediction => `${escapeHtml(prediction.label)} ${Math.round(Number(prediction.confidence || 0) * 100)}%`).join(" · ");
+      return `<li><strong>${escapeHtml(item.skillName)} v${escapeHtml(String(item.version))}</strong><span>${escapeHtml(top?.label || "참고 결과 없음")} ${Math.round(Number(top?.confidence || 0) * 100)}%</span><small>Top-3: ${predictions}</small></li>`;
+    }).join("");
+    const signal = comparison.status === "AGREEMENT" || comparison.status === "CONFLICT" ? `<p class="skill-evidence-signal is-${comparison.status.toLowerCase()}">${escapeHtml(comparison.message)}</p>` : `<p class="skill-evidence-signal">${escapeHtml(comparison.message || "학생들이 학습한 보조 모델의 참고 결과입니다.")}</p>`;
+    return `<aside class="judgement-skill-evidence ${comparison.status === "CONFLICT" ? "is-caution" : ""}" aria-label="우리 반이 가르친 AI 참고"><strong>우리 반이 가르친 AI 참고</strong><span>학생들이 학습한 보조 모델의 참고 결과입니다.</span><ul>${rows}</ul>${signal}</aside>`;
+  }
+
   function renderJudgementResult(result, container) {
     const safeResult = result || getJudgementResult("hold");
     const item = safeResult.item || sortingDbV2.hold;
@@ -3750,6 +3802,7 @@
     container.innerHTML = `
       <header class="judgement-result-head"><p>AI가 확인할 항목을 제안합니다.</p><strong>${item.emoji} ${escapeHtml(item.label)}</strong><span>최종 배출 판단은 사용자가 결정합니다.</span></header>
       ${liveGemini ? `<aside class="judgement-gemini-live" aria-label="Google Gemini live analysis"><strong>Google Gemini 분석 결과</strong><span>AI 사진 분석 참고 후보 · Live 분석 · Firebase Functions 연결</span><small>분석 엔진: Google Gemini · 서버 연결: Firebase Functions · 결과 출처: future_gemini · 최종 판단: 사용자</small></aside>` : ""}
+      ${supportingEvidenceHtml(safeResult)}
       <p class="judgement-action-status" data-judgement-action-status role="status" aria-live="polite">${safeResult.analysisCode ? "AI 분석을 사용할 수 없어 직접 선택 모드로 전환했습니다." : ""}</p>
       <details class="judgement-details judgement-candidate-block" open><summary>물체 후보</summary><div class="judgement-chip-row">${objectChips}</div></details>
       <details class="judgement-details judgement-candidate-block" open><summary>재질 후보</summary><div class="judgement-chip-row">${materialChips}</div></details>
@@ -3935,6 +3988,44 @@
     return "hold";
   }
 
+  function classroomSkillScope() {
+    return { schoolId: DATA_CONFIG.currentSchool, grade: DATA_CONFIG.currentGrade, className: DATA_CONFIG.currentClassName };
+  }
+
+  function enabledClassroomSkills() {
+    return classroomSkillRegistry?.listEnabledSkills?.(classroomSkillScope()) || [];
+  }
+
+  function materialFamilyForLabel(label) {
+    const normalized = cleanText(label).toLowerCase();
+    if (/(?:metal|can|캔|알루미늄|철)/.test(normalized)) return "METAL";
+    if (/(?:paper|종이|carton|milk|우유|receipt|영수증)/.test(normalized)) return "PAPER";
+    if (/(?:plastic|pet|bottle|cup|플라스틱|페트|병|컵)/.test(normalized)) return "PLASTIC";
+    return "";
+  }
+
+  function compareGeminiAndSkillEvidence(geminiCandidate, evidence) {
+    const top = (Array.isArray(evidence) ? evidence : []).find(item => item?.status === "success")?.topPrediction;
+    const geminiFamily = materialFamilyForLabel(geminiCandidate?.label || geminiCandidate);
+    const skillFamily = materialFamilyForLabel(top?.label);
+    if (!top) return { status: "NONE", message: "", topPrediction: null, lowConfidence: false };
+    const lowConfidence = Number(top.confidence) < 0.5;
+    if (geminiFamily && skillFamily && geminiFamily === skillFamily) return { status: "AGREEMENT", message: "우리 반이 가르쳐준 모델도 같은 쪽을 보고 있어요. 👀", topPrediction: top, lowConfidence };
+    if (geminiFamily && skillFamily && geminiFamily !== skillFamily) return { status: "CONFLICT", message: "제 생각과 우리 반 모델의 의견이 조금 달라요. 표시된 부분을 한 번 더 확인해볼까요?", topPrediction: top, lowConfidence };
+    return { status: "REFERENCE", message: lowConfidence ? "약한 참고 결과이므로 사진의 재질과 상태를 직접 확인해 주세요." : "우리 반 모델의 참고 결과입니다.", topPrediction: top, lowConfidence };
+  }
+
+  async function collectSupportingSkillEvidence(image, skills) {
+    if (!skills.length) return { evidence: [], context: teachableSkillRuntime?.buildSkillEvidenceContext?.([]) || null, failed: false };
+    try {
+      const runtime = await loadTeachableSkillRuntime();
+      const evidence = await runtime.getSupportingSkillEvidence(image, skills);
+      return { evidence, context: runtime.buildSkillEvidenceContext(evidence), failed: evidence.some(item => item?.status === "error") };
+    } catch {
+      return { evidence: [], context: teachableSkillRuntime.buildSkillEvidenceContext?.([]) || null, failed: true };
+    }
+  }
+
   async function loadTeachableMachineModel(modelUrl) {
     if (!modelUrl || !window.AIWaysAiRuntime) return null;
     let baseUrl = cleanText(modelUrl);
@@ -3960,7 +4051,11 @@
     });
     activeSortingVisionRequestId = requestMetadata.requestId;
     const hints = [];
+    const activeSkills = enabledClassroomSkills();
+    // Supporting skill work starts immediately but is intentionally not awaited by Gemini/Safety.
+    const supportingEvidencePromise = collectSupportingSkillEvidence(image, activeSkills);
     let liveGemini = false;
+    let geminiCandidate = null;
     let analysisCode = "";
     let safety = { safetyLevel:"CAUTION", retakeRecommended:false, directSelectionRecommended:true, reasons:["observer_unavailable"], uxState:"caution" };
     if (teachableMachineModelPromise) {
@@ -3996,6 +4091,7 @@
       if (observer.ok && observer.safety) safety = observer.safety;
       if (remote.ok && activeSortingVisionRequestId === requestMetadata.requestId) {
         liveGemini = true;
+        geminiCandidate = remote.value.objectCandidates?.[0] || null;
         remote.value.objectCandidates.forEach(candidate => hints.push(createSortingVisionHint(candidate, SORTING_VISION_SOURCES.FUTURE_GEMINI, {
           provider: "future_gemini", confidenceBand: candidate.confidenceBand, requestId: requestMetadata.requestId, schemaVersion: remote.value.schemaVersion
         })));
@@ -4016,6 +4112,8 @@
       safety,
       ruleBased: !topHint,
       requestMetadata,
+      activeSkillCount: activeSkills.length,
+      supportingEvidencePromise: supportingEvidencePromise.then(payload => ({ ...payload, comparison: compareGeminiAndSkillEvidence(geminiCandidate, payload.evidence) })),
       state: topHint ? (safety.safetyLevel === "RETAKE" || mergedHints.length > 1 ? SORTING_VISION_STATES.UNCERTAIN : SORTING_VISION_STATES.SUCCESS) : SORTING_VISION_STATES.UNAVAILABLE
     };
   }
@@ -4102,6 +4200,8 @@
   async function handleImage(file) {
     if (!file || !file.type.startsWith("image/")) return;
 
+    // The current tab may retry this File, but it is never persisted.
+    sessionImageFile = file;
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     previewUrl = URL.createObjectURL(file);
     activeSortingVisionIdempotencyKey = createAnalysisIdempotencyKey();
@@ -4164,6 +4264,14 @@
         liveGemini: draft.liveGemini,
         analysisCode: draft.analysisCode,
         delay: 0
+      });
+      draft.supportingEvidencePromise?.then(payload => {
+        if (session !== modalSession || !currentSortingJudgement) return;
+        const currentRequestId = cleanText(currentSortingJudgement.requestId);
+        if (currentRequestId && currentRequestId !== cleanText(draft.requestMetadata?.requestId)) return;
+        const supportingEvidence = Array.isArray(payload?.evidence) ? payload.evidence : [];
+        if (!supportingEvidence.some(item => item?.status === "success")) return;
+        renderJudgementResult({ ...currentSortingJudgement, supportingEvidence, skillEvidenceContext: payload.context, skillComparison: payload.comparison }, $("[data-sorting-result]"));
       });
     };
 
@@ -4482,11 +4590,20 @@
 
   function initClassroomSkills() {
     if (!classroomSkillRegistry) return;
-    const form = $("#classroomSkillForm"), list = $("#classroomSkillList"), preview = $("#classroomSkillPreview"), status = $("#classroomSkillStatus");
+    const form = $("#classroomSkillForm"), list = $("#classroomSkillList"), preview = $("#classroomSkillPreview"), status = $("#classroomSkillStatus"), count = $("#classroomSkillCount"), seedButton = $("#classroomSeedSkillButton");
     let pending = null;
-    const scope = () => ({ schoolId: DATA_CONFIG.currentSchool, grade: DATA_CONFIG.currentGrade, className: DATA_CONFIG.currentClassName });
+    const scope = classroomSkillScope;
+    const offerRetry = message => {
+      status.replaceChildren(document.createTextNode(message + " "));
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.textContent = sessionImageFile ? "다시 분석하기" : "다시 촬영하기";
+      retry.addEventListener("click", () => sessionImageFile ? handleImage(sessionImageFile) : $("[data-upload=\"camera\"]")?.click());
+      status.append(retry);
+    };
     const render = () => {
       const skills = classroomSkillRegistry.listSkills(scope());
+      if (count) count.textContent = `우리 반이 AI에게 가르친 기술 ${skills.length}개`;
       list.replaceChildren();
       if (!skills.length) { const empty = document.createElement("li"); empty.className = "empty-state"; empty.textContent = "아직 우리 반이 가르쳐준 기술이 없어요. 첫 번째 기술을 만들어볼까요? 🎓"; list.append(empty); return; }
       skills.forEach(skill => {
@@ -4497,6 +4614,15 @@
         item.append(copy, toggle); list.append(item);
       });
     };
+    seedButton?.addEventListener("click", () => {
+      try {
+        const exists = classroomSkillRegistry.listSkills(scope()).some(skill => skill.modelBaseUrl === AIWAYS_SEED_SKILL.modelBaseUrl);
+        if (exists) { status.textContent = "AI Ways Seed 분리수거 Skill은 이미 우리 반 참고 기술로 연결되어 있습니다."; return; }
+        const result = classroomSkillRegistry.registerSkill({ ...AIWAYS_SEED_SKILL, ...scope(), createdByScope: scope() });
+        offerRetry(result.announcement.message);
+        render();
+      } catch { status.textContent = "Seed Skill을 연결하지 못했습니다. HTTPS 모델 주소를 다시 확인해 주세요."; }
+    });
     form?.addEventListener("submit", async event => {
       event.preventDefault();
       const name = $("#classroomSkillName")?.value.trim(), description = $("#classroomSkillDescription")?.value.trim(), url = $("#classroomSkillUrl")?.value.trim(), visibility = $("#classroomSkillVisibility")?.value;
@@ -4508,7 +4634,7 @@
         const text = document.createElement("p"); text.textContent = `클래스 ${checked.classes.length}개: ${checked.classes.join(", ")}`;
         const confirm = document.createElement("button"); confirm.type = "button"; confirm.textContent = "이 기술 등록";
         confirm.addEventListener("click", () => {
-          try { const result = classroomSkillRegistry.registerSkill(pending); status.textContent = result.announcement.message; preview.hidden = true; preview.replaceChildren(); form.reset(); pending = null; render(); }
+          try { const result = classroomSkillRegistry.registerSkill(pending); offerRetry(result.announcement.message); preview.hidden = true; preview.replaceChildren(); form.reset(); pending = null; render(); }
           catch (error) { status.textContent = error.message === "skill_model_url_duplicate" ? "같은 반에 이미 등록된 모델 URL입니다. 새 버전은 별도로 기록하세요." : "기술을 등록하지 못했습니다."; }
         });
         preview.append(text, confirm); status.textContent = "미리보기를 확인한 뒤 등록하세요. 이 모델은 아직 추론에 사용되지 않습니다.";

@@ -134,10 +134,18 @@
   .classroom-skill-list { display:grid; gap:.5rem; margin:0; padding:0; list-style:none; }
   .classroom-skill-list li { display:flex; align-items:center; justify-content:space-between; gap:.7rem; padding:.7rem; border:1px solid var(--line-subtle); border-radius:.65rem; }
   .classroom-skill-list small { color:var(--muted); }
+  .classroom-skill-count { margin:0; color:var(--brand-dark); font-size:.82rem; font-weight:800; }
   .quick-result { display: grid; gap: 1rem; padding: 1rem; border: 1px solid var(--line-default); border-radius: var(--radius-small); background: var(--elevated-bg); }
   .quick-result.is-scanning { color: var(--muted); }
   .judgement-result-head, .judgement-details, .judgement-checklist, .judgement-recommendation, .judgement-corrections, .judgement-gemini-live { display: grid; gap: .65rem; padding: 1rem; border-radius: var(--radius-small); background: var(--surface-2); }
   .judgement-candidate-block, .judgement-gemini-live { border: 1px solid color-mix(in srgb, var(--info) 48%, var(--line-subtle)); background: color-mix(in srgb, var(--info) 10%, var(--surface-2)); }
+  .judgement-skill-evidence { display:grid; gap:.5rem; padding:1rem; border:1px solid color-mix(in srgb,var(--brand) 48%,var(--line-subtle)); border-radius:var(--radius-small); background:color-mix(in srgb,var(--brand) 9%,var(--surface-2)); }
+  .judgement-skill-evidence.is-caution { border-color:var(--warning); background:color-mix(in srgb,var(--warning) 10%,var(--surface-2)); }
+  .judgement-skill-evidence ul { display:grid; gap:.35rem; margin:0; padding:0; list-style:none; }
+  .judgement-skill-evidence li { display:grid; gap:.15rem; padding:.55rem .65rem; border:1px solid var(--line-subtle); border-radius:.5rem; background:var(--surface-3); }
+  .judgement-skill-evidence li small,.skill-evidence-signal { color:var(--muted); }
+  .skill-evidence-signal { margin:0; font-weight:700; }
+  .skill-evidence-signal.is-conflict { color:var(--warning); }
   .judgement-checklist, .judgement-corrections { border: 1px solid var(--line-default); }
   .judgement-chip-row, .judgement-corrections > div { display: flex; gap: .5rem; flex-wrap: wrap; }
   .judgement-chip { display: grid; gap: .15rem; padding: .45rem .6rem; border-radius: .5rem; background: var(--surface-3); border: 1px solid var(--line-subtle); }

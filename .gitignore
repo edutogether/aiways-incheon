@@ -1,2 +1,3 @@
 _backups/
 functions/firestore-debug.log
+.aiways-secrets.local

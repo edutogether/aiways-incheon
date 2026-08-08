@@ -23,6 +23,12 @@
   const SORTING_DECISIONS_V2_KEY = "aiways_sorting_decisions_v2";
   const localSortingStore = window.AIWaysSortingLocalStore?.createSortingLocalStore?.();
   window.AIWaysLocalSortingPersistence = { persistSortingDecisionLocally: input => localSortingStore?.saveLocalSortingRecord(input), listPendingSortingRecords: () => localSortingStore?.listPendingSortingRecords(), syncPendingSortingRecords: syncOne => localSortingStore?.syncPendingSortingRecords(syncOne), resolveLocalHeldRecord: (id, patch) => localSortingStore?.resolveLocalHeldRecord(id, patch), buildSortingRecordsCsv: records => window.AIWaysSortingLocalStore?.buildSortingRecordsCsv(records) };
+  const classroomSkillRegistry = window.AIWaysClassroomSkillRegistry?.createRegistry?.();
+  window.AIWaysClassroomSkillFoundation = {
+    registry: classroomSkillRegistry,
+    getSupportingSkillEvidence: window.AIWaysClassroomSkillRegistry?.getSupportingSkillEvidence,
+    buildSkillEvidenceContext: window.AIWaysClassroomSkillRegistry?.buildSkillEvidenceContext
+  };
 
   const BASE_DASHBOARD = {
     schoolObserved: 244,
@@ -4463,6 +4469,47 @@
     });
   }
 
+  function initClassroomSkills() {
+    if (!classroomSkillRegistry) return;
+    const form = $("#classroomSkillForm"), list = $("#classroomSkillList"), preview = $("#classroomSkillPreview"), status = $("#classroomSkillStatus");
+    let pending = null;
+    const scope = () => ({ schoolId: DATA_CONFIG.currentSchool, grade: DATA_CONFIG.currentGrade, className: DATA_CONFIG.currentClassName });
+    const render = () => {
+      const skills = classroomSkillRegistry.listSkills(scope());
+      list.replaceChildren();
+      if (!skills.length) { const empty = document.createElement("li"); empty.className = "empty-state"; empty.textContent = "아직 우리 반이 가르쳐준 기술이 없어요. 첫 번째 기술을 만들어볼까요? 🎓"; list.append(empty); return; }
+      skills.forEach(skill => {
+        const item = document.createElement("li"), copy = document.createElement("span"), title = document.createElement("strong"), detail = document.createElement("small"), toggle = document.createElement("button");
+        title.textContent = skill.name; detail.textContent = `${skill.className} · ${skill.classes.length}개 클래스 · v${skill.version} · ${skill.status === "enabled" ? "활성" : "비활성"}`;
+        copy.append(title, document.createElement("br"), detail); toggle.type = "button"; toggle.textContent = skill.status === "enabled" ? "비활성화" : "활성화";
+        toggle.addEventListener("click", () => { skill.status === "enabled" ? classroomSkillRegistry.disableSkill(skill.skillId) : classroomSkillRegistry.enableSkill(skill.skillId); render(); });
+        item.append(copy, toggle); list.append(item);
+      });
+    };
+    form?.addEventListener("submit", async event => {
+      event.preventDefault();
+      const name = $("#classroomSkillName")?.value.trim(), description = $("#classroomSkillDescription")?.value.trim(), url = $("#classroomSkillUrl")?.value.trim(), visibility = $("#classroomSkillVisibility")?.value;
+      try {
+        status.textContent = "model.json과 metadata.json을 확인하고 있어요.";
+        const checked = await window.AIWaysClassroomSkillRegistry.previewTeachableMachineModel(url);
+        pending = { name, description, visibility, ...scope(), createdByScope: scope(), ...checked };
+        preview.hidden = false; preview.replaceChildren();
+        const text = document.createElement("p"); text.textContent = `클래스 ${checked.classes.length}개: ${checked.classes.join(", ")}`;
+        const confirm = document.createElement("button"); confirm.type = "button"; confirm.textContent = "이 기술 등록";
+        confirm.addEventListener("click", () => {
+          try { const result = classroomSkillRegistry.registerSkill(pending); status.textContent = result.announcement.message; preview.hidden = true; preview.replaceChildren(); form.reset(); pending = null; render(); }
+          catch (error) { status.textContent = error.message === "skill_model_url_duplicate" ? "같은 반에 이미 등록된 모델 URL입니다. 새 버전은 별도로 기록하세요." : "기술을 등록하지 못했습니다."; }
+        });
+        preview.append(text, confirm); status.textContent = "미리보기를 확인한 뒤 등록하세요. 이 모델은 아직 추론에 사용되지 않습니다.";
+      } catch (error) {
+        pending = null; preview.hidden = true; preview.replaceChildren();
+        const messages = { model_url_invalid: "HTTPS Teachable Machine 모델 URL을 입력하세요.", model_url_https_required: "HTTPS URL만 사용할 수 있습니다.", model_url_localhost_forbidden: "localhost 모델 URL은 등록할 수 없습니다.", model_files_unavailable: "model.json 또는 metadata.json을 확인할 수 없습니다.", model_metadata_invalid: "metadata.json의 클래스 라벨을 읽을 수 없습니다.", model_cors_or_network_failed: "모델 파일 접근이 CORS 또는 네트워크 정책으로 차단됐습니다." };
+        status.textContent = messages[error.message] || "모델 주소를 확인할 수 없습니다.";
+      }
+    });
+    render();
+  }
+
   function boot() {
     initNavigation();
     initQuickButtons();
@@ -4471,6 +4518,7 @@
     initGallery();
     initSelectors();
     initUpload();
+    initClassroomSkills();
     initRefreshControls();
     initRankingModal();
     initLandfillSourceLink();

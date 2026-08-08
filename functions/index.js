@@ -3,6 +3,7 @@ const { onRequest } = require("firebase-functions/v2/https");
 const { logger } = require("firebase-functions");
 const { defineSecret } = require("firebase-functions/params");
 const { createAnalyzeSortingHandler } = require("./lib/sortingVision");
+const { createSortingSafetyObserverHandler } = require("./lib/sortingSafetyObserver");
 const { createSaveSortingRecordHandler } = require("./lib/sortingRecord");
 const { createListSortingRecordsHandler, createResolveSortingRecordHandler } = require("./lib/sortingRecordQuery");
 const { getApps, initializeApp } = require("firebase-admin/app");
@@ -26,6 +27,7 @@ exports.analyzeSortingImage = onRequest({
   region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 30, minInstances: 0, maxInstances: 2, concurrency: 1,
   secrets: [geminiApiKey], cors: false
 }, createAnalyzeSortingHandler({ getApiKey: () => geminiApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, analysisRequests, logAppCheck }));
+exports.analyzeSortingSafetyObserver = onRequest({ region:"asia-northeast3", memory:"256MiB", timeoutSeconds:30, minInstances:0, maxInstances:2, concurrency:1, secrets:[geminiApiKey], cors:false }, createSortingSafetyObserverHandler({getApiKey:()=>geminiApiKey.value(),access:deviceAccess,rateLimiter,actorRateLimiter,logAppCheck}));
 const recordStore = {
   async createOrGet(actorId, idempotencyKey, record, response) {
     const actor = db.collection("actors").doc(actorId);

@@ -3601,6 +3601,12 @@
     } catch { return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: "analysis_failed", requestId: requestMetadata.requestId }; }
   }
 
+  async function requestSortingSafetyObserver({ requestMetadata, imagePayload }) {
+    const client = window.AIWaysEdu2gClient;
+    if (!client?.analyzeSortingSafetyObserver || !imagePayload) return { ok:false, safety:{ safetyLevel:"CAUTION", retakeRecommended:false, directSelectionRecommended:true, reasons:["observer_unavailable"], uxState:"caution" } };
+    try { const response=await client.analyzeSortingSafetyObserver({ ...requestMetadata, image:{mimeType:imagePayload.mimeType,data:imagePayload.data,metadata:imagePayload.metadata},imageMetadata:imagePayload.metadata }); if(!response.ok)return {ok:false}; const o=response.data||{}; const retake=o.targetVisibility==="poor"||o.imageQuality==="poor"||o.occlusion==="severe"||(o.multiObject&&o.targetDominance==="low")||(o.backgroundClutter==="high"&&o.targetVisibility!=="clear"); const caution=!retake&&(o.targetVisibility==="partial"||o.backgroundClutter==="medium"||o.deformation||o.contamination||o.multiObject||o.occlusion==="mild"); return {ok:true,value:o,safety:{safetyLevel:retake?"RETAKE":caution?"CAUTION":"SAFE",retakeRecommended:retake,directSelectionRecommended:true,reasons:retake?["image_ambiguity"]:caution?["check_visible_condition"]:[],uxState:retake?"retake":caution?"caution":"safe"}}; } catch { return {ok:false}; }
+  }
+
   const sortingVisionProviders = Object.freeze({
     mobilenet: { source: SORTING_VISION_SOURCES.MOBILENET, enabled: true },
     teachableMachine: { source: SORTING_VISION_SOURCES.TEACHABLE_MACHINE, enabled: true },
@@ -3956,6 +3962,7 @@
     const hints = [];
     let liveGemini = false;
     let analysisCode = "";
+    let safety = { safetyLevel:"CAUTION", retakeRecommended:false, directSelectionRecommended:true, reasons:["observer_unavailable"], uxState:"caution" };
     if (teachableMachineModelPromise) {
       try {
         const model = await teachableMachineModelPromise;
@@ -3983,7 +3990,10 @@
     }
     try {
       const imagePayload = await prepareSortingVisionImage(image);
-      const remote = await sortingVisionProviders.futureGemini.analyze({ requestMetadata, imagePayload });
+      const [recognitionResult, observerResult] = await Promise.allSettled([sortingVisionProviders.futureGemini.analyze({ requestMetadata, imagePayload }), requestSortingSafetyObserver({ requestMetadata, imagePayload })]);
+      const remote = recognitionResult.status === "fulfilled" ? recognitionResult.value : { ok:false, code:"analysis_failed" };
+      const observer = observerResult.status === "fulfilled" ? observerResult.value : { ok:false };
+      if (observer.ok && observer.safety) safety = observer.safety;
       if (remote.ok && activeSortingVisionRequestId === requestMetadata.requestId) {
         liveGemini = true;
         remote.value.objectCandidates.forEach(candidate => hints.push(createSortingVisionHint(candidate, SORTING_VISION_SOURCES.FUTURE_GEMINI, {
@@ -4003,9 +4013,10 @@
       confidence: topHint?.rawConfidence ?? null,
       liveGemini,
       analysisCode,
+      safety,
       ruleBased: !topHint,
       requestMetadata,
-      state: topHint ? (mergedHints.length > 1 ? SORTING_VISION_STATES.UNCERTAIN : SORTING_VISION_STATES.SUCCESS) : SORTING_VISION_STATES.UNAVAILABLE
+      state: topHint ? (safety.safetyLevel === "RETAKE" || mergedHints.length > 1 ? SORTING_VISION_STATES.UNCERTAIN : SORTING_VISION_STATES.SUCCESS) : SORTING_VISION_STATES.UNAVAILABLE
     };
   }
 

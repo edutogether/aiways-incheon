@@ -10,7 +10,11 @@ test("localhost E2E bridge gates and delegates to the full prepared-image flow",
   assert.match(app, /e2eParams\.get\("e2e"\) === "1"/);
   assert.match(app, /window\.__AIWAYS_E2E__ = Object\.freeze/);
   assert.match(app, /async function runPreparedImageFlow\(image, \{ file, session \}\)/);
-  assert.match(app, /analyzePreparedImage: \(preparedImage, options\) => runPreparedImageFlow\(preparedImage, options\)/);
+  assert.match(app, /analyzePreparedImage: \(preparedImage, options = \{\}\) => \{/);
+  assert.match(app, /Object\.hasOwn\(options, "session"\) \? options\.session : modalSession/);
+  assert.match(app, /runPreparedImageFlow\(preparedImage, \{ \.\.\.options, session \}\)/);
+  assert.match(app, /getCurrentSession: \(\) => modalSession/);
+  assert.match(app, /if \(session !== modalSession\) return;/);
   assert.match(app, /image\.onload = \(\) => runPreparedImageFlow\(image, \{ file, session \}\)/);
   const bridgeSource = app.slice(app.indexOf("window.__AIWAYS_E2E__"), app.indexOf("function openModal"));
   assert.doesNotMatch(bridgeSource, /classifyImage\(/);

@@ -4124,7 +4124,11 @@
   const e2eHost = window.location.hostname;
   if ((e2eHost === "localhost" || e2eHost === "127.0.0.1") && e2eParams.get("e2e") === "1") {
     window.__AIWAYS_E2E__ = Object.freeze({
-      analyzePreparedImage: (preparedImage, options) => runPreparedImageFlow(preparedImage, options)
+      analyzePreparedImage: (preparedImage, options = {}) => {
+        const session = Object.hasOwn(options, "session") ? options.session : modalSession;
+        return runPreparedImageFlow(preparedImage, { ...options, session });
+      },
+      getCurrentSession: () => modalSession
     });
   }
 

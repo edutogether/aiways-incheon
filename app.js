@@ -4207,11 +4207,55 @@
     openModal();
   }
 
+  async function runPreparedImageFlow(image, { file, session }) {
+    if (session !== modalSession) return;
+    // The current tab may retry this File, but it is never persisted.
+    sessionImageFile = file;
+    const draft = await classifyImage(image, {
+      imageMetadata: { mimeType: file.type, width: image.naturalWidth, height: image.naturalHeight, byteLength: file.size },
+      idempotencyKey: activeSortingVisionIdempotencyKey,
+      userContext: { selectedCorrectionType: currentSortingJudgement?.selectedCorrectionType || "" }
+    });
+    if (session !== modalSession) return;
+    currentDraft = {
+      input_type: "image",
+      ai_engine: draft.hints?.[0]?.source || (draft.ruleBased ? "fallback-rule" : "mobilenet_hint"),
+      ai_raw_label: draft.item,
+      ai_confidence: draft.ruleBased ? "" : Number(draft.confidence || 0).toFixed(4),
+      mapped_item: draft.item,
+      suggested_category: draft.category,
+      final_decision: draft.category,
+      hold_flag: false
+    };
+
+    showDraftModal(currentDraft, draft.guidance);
+    runThreeSecondJudgement({ key: draft.judgementKey }, {
+      source: "photo",
+      candidateSource: draft.hints?.[0]?.source || "mobilenet_hint",
+      provider: draft.hints?.[0]?.provider || "fallback_rule",
+      schemaVersion: draft.requestMetadata?.schemaVersion,
+      requestId: draft.requestMetadata?.requestId,
+      confidenceBand: draft.hints?.[0]?.confidenceBand,
+      candidateKeys: draft.hints?.map(hint => hint.itemId).filter(Boolean),
+      confidence: draft.confidence,
+      imageHints: draft.hints.map(hint => `${hint.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : hint.source === "future_gemini" ? "AI 사진 분석 참고 후보" : "사진 기반 참고 후보"}: ${hint.label}`),
+      liveGemini: draft.liveGemini,
+      analysisCode: draft.analysisCode,
+      delay: 0
+    });
+    draft.supportingEvidencePromise?.then(payload => {
+      if (session !== modalSession || !currentSortingJudgement) return;
+      const currentRequestId = cleanText(currentSortingJudgement.requestId);
+      if (currentRequestId && currentRequestId !== cleanText(draft.requestMetadata?.requestId)) return;
+      const supportingEvidence = Array.isArray(payload?.evidence) ? payload.evidence : [];
+      if (!supportingEvidence.some(item => item?.status === "success")) return;
+      renderJudgementResult({ ...currentSortingJudgement, supportingEvidence, skillEvidenceContext: payload.context, skillComparison: payload.comparison }, $("[data-sorting-result]"));
+    });
+  }
+
   async function handleImage(file) {
     if (!file || !file.type.startsWith("image/")) return;
 
-    // The current tab may retry this File, but it is never persisted.
-    sessionImageFile = file;
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     previewUrl = URL.createObjectURL(file);
     activeSortingVisionIdempotencyKey = createAnalysisIdempotencyKey();
@@ -4241,49 +4285,7 @@
     setScanning(true);
     openModal();
 
-    image.onload = async () => {
-      if (session !== modalSession) return;
-      const draft = await classifyImage(image, {
-        imageMetadata: { mimeType: file.type, width: image.naturalWidth, height: image.naturalHeight, byteLength: file.size },
-        idempotencyKey: activeSortingVisionIdempotencyKey,
-        userContext: { selectedCorrectionType: currentSortingJudgement?.selectedCorrectionType || "" }
-      });
-      if (session !== modalSession) return;
-      currentDraft = {
-        input_type: "image",
-        ai_engine: draft.hints?.[0]?.source || (draft.ruleBased ? "fallback-rule" : "mobilenet_hint"),
-        ai_raw_label: draft.item,
-        ai_confidence: draft.ruleBased ? "" : Number(draft.confidence || 0).toFixed(4),
-        mapped_item: draft.item,
-        suggested_category: draft.category,
-        final_decision: draft.category,
-        hold_flag: false
-      };
-
-      showDraftModal(currentDraft, draft.guidance);
-      runThreeSecondJudgement({ key: draft.judgementKey }, {
-        source: "photo",
-        candidateSource: draft.hints?.[0]?.source || "mobilenet_hint",
-        provider: draft.hints?.[0]?.provider || "fallback_rule",
-        schemaVersion: draft.requestMetadata?.schemaVersion,
-        requestId: draft.requestMetadata?.requestId,
-        confidenceBand: draft.hints?.[0]?.confidenceBand,
-        candidateKeys: draft.hints?.map(hint => hint.itemId).filter(Boolean),
-        confidence: draft.confidence,
-        imageHints: draft.hints.map(hint => `${hint.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : hint.source === "future_gemini" ? "AI 사진 분석 참고 후보" : "사진 기반 참고 후보"}: ${hint.label}`),
-        liveGemini: draft.liveGemini,
-        analysisCode: draft.analysisCode,
-        delay: 0
-      });
-      draft.supportingEvidencePromise?.then(payload => {
-        if (session !== modalSession || !currentSortingJudgement) return;
-        const currentRequestId = cleanText(currentSortingJudgement.requestId);
-        if (currentRequestId && currentRequestId !== cleanText(draft.requestMetadata?.requestId)) return;
-        const supportingEvidence = Array.isArray(payload?.evidence) ? payload.evidence : [];
-        if (!supportingEvidence.some(item => item?.status === "success")) return;
-        renderJudgementResult({ ...currentSortingJudgement, supportingEvidence, skillEvidenceContext: payload.context, skillComparison: payload.comparison }, $("[data-sorting-result]"));
-      });
-    };
+    image.onload = () => runPreparedImageFlow(image, { file, session });
 
     image.onerror = () => {
       if (session !== modalSession) return;

@@ -219,4 +219,89 @@
   /* D-style hover lift across every restored PC card. */
   .project-cards article, .subject-card, .hah-grid .panel, .flow-card, .gallery-grid article, .resource-grid a, .sorting-features article { transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
   .project-cards article:hover, .subject-card:hover, .hah-grid .panel:hover, .flow-card:hover, .gallery-grid article:hover, .resource-grid a:hover, .sorting-features article:hover { transform:translateY(-.2rem); border-color:rgb(101 234 214 / 48%); box-shadow:0 18px 40px rgb(0 7 20 / 24%); }
+
+  /* ============================================================
+     DASHBOARD fine-tune — round 1 (user pixel review, 2026-08-09).
+     ============================================================ */
+
+  /* 1. Logo mark: the brand icon was designed on white; the teal
+     gradient behind it was swallowing the artwork. */
+  .brand-mark { background:#fff; border-color:rgb(0 0 0 / 10%); box-shadow:0 2px 10px rgb(0 0 0 / 22%); padding:.2rem; }
+
+  /* 2 & 7. Grade/class selects: the base rule `.select-line { grid-column:2;
+     grid-row:1 }` was written for a select nested inside panel-head's own
+     2-col grid, but on school/class-panel the select-line is a DIRECT grid
+     child instead — so that rule was forcing school-panel AND class-panel
+     into an accidental 2-column layout (that's also the real cause of the
+     invisible grade bars in #3 and the clipped "헷갈린 물건" text in #8).
+     Taking the select out of grid flow entirely fixes both the overlap and
+     the phantom column at once. */
+  .school-panel, .class-panel { position:relative; }
+  .school-panel .select-line, .class-panel .select-line { position:absolute; inset-block-start:2.05rem; inset-inline-end:1.1rem; grid-column:auto; grid-row:auto; z-index:2; }
+  .school-panel .panel-head, .class-panel .panel-head { padding-inline-end:4.4rem; }
+  .school-panel .select-line select, .class-panel .select-line select { min-block-size:1.6rem; padding:.2rem .45rem; font-size:.64rem; border-radius:.5rem; }
+
+  /* 3. School panel: narrow fixed kpi column so the grade bars + donuts get
+     the room they need; guarantee the bar track has a real minimum width so
+     it can never collapse to invisible behind the donuts again. */
+  .school-panel { grid-template-columns:minmax(4.6rem,5.6rem) minmax(0,1fr); grid-template-rows:auto minmax(0,1fr); grid-template-areas:"head head" "kpi visual"; }
+  .school-panel .kpi-row { grid-template-columns:1fr; gap:.5rem; }
+  .school-panel .kpi-row > div { padding:.5rem .55rem; }
+  .school-panel .school-visuals { grid-template-columns:minmax(6rem,1fr) auto; gap:.6rem; overflow:hidden; }
+  .school-panel .bar-list > div { grid-template-columns:2.3rem minmax(2.4rem,1fr) 1.5rem; }
+  .school-panel .donut-pair { flex-wrap:nowrap; gap:.4rem; }
+  .school-panel .donut { inline-size:clamp(3.6rem,4.6vw,4.3rem); }
+  .school-panel .donut span { padding-block-start:.85rem; font-size:.62rem; }
+  .school-panel .donut small { font-size:.42rem; }
+
+  /* 4. Landfill: the four metric boxes were letting "16,400t" run into the
+     next box ("-9.4%"); the title/time row needed a hard nowrap so it can
+     never wrap into a second line and crowd itself. */
+  .landfill-metrics > div { padding:.5rem .45rem .5rem .55rem; }
+  .landfill-metrics strong { font-size:clamp(.88rem,1.12vw,1.12rem); white-space:nowrap; }
+  .chart-title-row { flex-wrap:nowrap; gap:.6rem; }
+  .chart-title { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .landfill-time-now { flex:0 0 auto; margin-inline-start:auto; white-space:nowrap; }
+
+  /* 5. Taller chart (bars stretch closer to donut proportions) with the
+     axis numbers pulled toward the panel's true left edge — app.js moved
+     chartLeft/axis font-size/label-x to match; overflow:visible lets the
+     bigger axis numbers spill slightly into the panel's own padding
+     without ever crossing the card's outer edge. */
+  .combo-chart { max-block-size:9.4rem; overflow:visible; }
+  .chart-axis text { font-variant-numeric:tabular-nums; }
+
+  /* 6. Split the single incoming/remaining gauge into two distinct reads:
+     the big number already IS the "총량 대비 반입량" bar's story, and the
+     progress-stack rows just below already chart both metrics separately —
+     so the redundant two-tone bar inside the status card is dropped in
+     favor of a clean second stat line. */
+  .landfill-status-card .landfill-status-gauge { display:none; }
+  .landfill-status-card .landfill-status-footer { grid-template-columns:1fr; gap:.35rem; padding-block-start:.35rem; border-block-start:1px solid rgb(111 212 232 / 14%); }
+
+  /* 8. Class panel: same accidental-column bug as #3 — rebalance so the
+     kpi numbers get a narrow column and 헷갈린 물건 TOP 5 gets the wide one. */
+  .class-panel { grid-template-columns:minmax(4.6rem,5.6rem) minmax(0,1fr); grid-template-rows:auto minmax(0,1fr) auto; grid-template-areas:"head head" "kpi visual" "note note"; }
+  .class-panel .panel-head { grid-area:head; }
+  .class-panel .class-kpis { grid-area:kpi; grid-template-columns:1fr; gap:.5rem; }
+  .class-panel .class-kpis > div { padding:.5rem .55rem; }
+  .class-panel .confusion { grid-area:visual; padding-inline-start:.2rem; }
+  .class-panel .confusion > div { grid-template-columns:2.9rem minmax(0,1fr) 1.5rem; }
+  .class-panel .rank-note { grid-area:note; }
+
+  /* 9. Ranking pill: a touch smaller so it never crowds its own edge. */
+  .rank-note { font-size:.56rem; letter-spacing:-.01em; }
+
+  /* 10. Upload panel: fill the dead space between the description and the
+     buttons with the product's own locked copy (AI suggests, student
+     decides) instead of empty air, and credit Gemini with a text-only
+     badge — no Google brand asset is bundled here without your say-so. */
+  .upload-panel { align-content:start; gap:.85rem; }
+  .upload-panel .upload-highlights { display:grid; gap:.4rem; margin:0; padding:.75rem .85rem; border:1px solid rgb(100 220 235 / 18%); border-radius:1rem; background:rgb(4 24 42 / 55%); }
+  .upload-panel .upload-highlights li { display:flex; gap:.5rem; align-items:flex-start; color:#c9dbe6; font-size:.76rem; line-height:1.45; }
+  .upload-panel .upload-highlights li::before { content:"✓"; flex:0 0 auto; color:#65ead6; font-weight:900; }
+  .upload-actions.upload-card-actions { margin-block-start:auto; }
+  .gemini-credit { display:inline-flex; align-items:center; gap:.4rem; margin-block-start:.1rem; padding:.32rem .75rem; border:1px solid rgb(138 180 255 / 24%); border-radius:999px; background:rgb(66 133 244 / 8%); color:#a9c2ff; font-size:.68rem; font-weight:700; }
+  .gemini-credit svg { inline-size:.8rem; block-size:.8rem; }
+  .upload-panel small { font-size:.72rem; line-height:1.5; }
 }

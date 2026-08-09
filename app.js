@@ -1798,10 +1798,10 @@
 
     const chartDays = landfillDaysForChart(days);
     const ns = "http://www.w3.org/2000/svg";
-    const chartTop = 2;
-    const chartBottom = 204;
-    const chartLeft = 58;
-    const chartRight = 426;
+    const chartTop = 4;
+    const chartBottom = 220;
+    const chartLeft = 40;
+    const chartRight = 442;
     const chartHeight = chartBottom - chartTop;
     const yMin = 15000;
     const yMax = 23000;
@@ -1879,13 +1879,13 @@
     });
 
     const grid = appendSvg(svg, "g", { class: "chart-grid", stroke: "rgba(220,245,255,.15)", "stroke-width": "1" });
-    const yAxis = appendSvg(svg, "g", { class: "chart-axis chart-y-axis", fill: "rgba(220,245,255,.62)", "font-size": "10.6", "font-weight": "760" });
+    const yAxis = appendSvg(svg, "g", { class: "chart-axis chart-y-axis", fill: "rgba(220,245,255,.7)", "font-size": "13.5", "font-weight": "800" });
     ticks.slice().reverse().forEach(tick => {
       const y = Math.round(yScale(tick));
       appendSvg(grid, "path", { d: `M${chartLeft - 8} ${y} H${chartRight + 12}` });
-      appendSvg(yAxis, "text", { class: "y-label", x: "10", y: String(y + 4) }, tickLabel(tick));
+      appendSvg(yAxis, "text", { class: "y-label", x: "2", y: String(y + 4) }, tickLabel(tick));
     });
-    appendSvg(yAxis, "text", { class: "y-zero", x: "18", y: String(chartBottom + 22), "text-anchor": "middle" }, "0");
+    appendSvg(yAxis, "text", { class: "y-zero", x: "10", y: String(chartBottom + 22), "text-anchor": "middle" }, "0");
 
     const linePath = smoothPathFor(points);
     const first = points[0];
@@ -1944,13 +1944,13 @@
       "stroke-dasharray": "7 6",
       "stroke-linecap": "round"
     });
-    appendSvg(averageGroup, "text", { x: String(chartRight + 8), y: String(averageY - 9), "text-anchor": "end" }, "주간 평균");
+    appendSvg(averageGroup, "text", { x: String(chartRight + 8), y: String(averageY - 10), "text-anchor": "end", "font-size": "12.5", "font-weight": "800" }, "주간 평균");
 
-    const xAxis = appendSvg(svg, "g", { class: "chart-axis chart-x-axis", fill: "rgba(220,245,255,.7)", "font-size": "10.4", "font-weight": "760" });
+    const xAxis = appendSvg(svg, "g", { class: "chart-axis chart-x-axis", fill: "rgba(220,245,255,.75)", "font-size": "12.5", "font-weight": "800" });
     points.forEach(point => {
-      const label = appendSvg(xAxis, "text", { class: "x-label", x: String(point.x), y: "213", "text-anchor": "middle" });
+      const label = appendSvg(xAxis, "text", { class: "x-label", x: String(point.x), y: String(chartBottom + 25), "text-anchor": "middle" });
       appendSvg(label, "tspan", { class: "date-label", x: String(point.x), dy: "0" }, point.displayDate);
-      appendSvg(label, "tspan", { class: "weekday-label", x: String(point.x), dy: "16" }, point.weekday);
+      appendSvg(label, "tspan", { class: "weekday-label", x: String(point.x), dy: "17" }, point.weekday);
     });
 
     if (shouldAnimate) {

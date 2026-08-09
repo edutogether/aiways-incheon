@@ -65,6 +65,16 @@
     const read = () => adapter.read();
     const event = (state, type, skill, message) => { const entry = { eventId: makeId("skill_event"), type, title: type === "skill_registered" ? "새 기술을 배웠어요!" : "우리 반 AI 기술 업데이트", message, createdAt: new Date().toISOString(), scope: clone(skill.createdByScope), relatedSkillId: skill.skillId }; state.events.push(entry); return entry; };
     const listSkills = scope => { const skills = read().skills; if (!scope) return clone(skills); const s = sanitizeScope(scope); return clone(skills.filter(skill => skill.schoolId === s.schoolId && (!s.grade || skill.grade === s.grade) && (!s.className || skill.className === s.className))); };
+    const listEnabledSkillsForClassProfile = profile => {
+      if (!profile || typeof profile !== "object") return listSkills().filter(skill => skill.status === "enabled");
+      const scope = sanitizeScope({ schoolId: profile.schoolId, grade: profile.grade, className: profile.className });
+      if (!scope.schoolId || !scope.grade || !scope.className) return listSkills().filter(skill => skill.status === "enabled");
+      return clone(read().skills.filter(skill => skill.status === "enabled" && (
+        skill.visibility === "public" ||
+        (skill.visibility === "school" && skill.schoolId === scope.schoolId) ||
+        (skill.visibility === "class" && skill.schoolId === scope.schoolId && skill.grade === scope.grade && skill.className === scope.className)
+      )));
+    };
     return {
       registerSkill(input) {
         const state = read(); const next = buildSkill(input);
@@ -78,6 +88,7 @@
         state.skills.push(version); const announcement = event(state, "skill_updated", version, `새 기술 버전 ${version.version}을 기록했어요.`); adapter.write(state); return { skill: clone(version), announcement };
       },
       listSkills,
+      listEnabledSkillsForClassProfile,
       getSkill(id) { const found = read().skills.find(skill => skill.skillId === id); return found ? clone(found) : null; },
       enableSkill(id) { return this._setStatus(id, "enabled"); },
       disableSkill(id) { return this._setStatus(id, "disabled"); },

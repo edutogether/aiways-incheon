@@ -92,6 +92,9 @@
   .main-nav a { border-radius:.7rem; font-weight:800; }
   .scene { position:relative; }
   .scene::after { content:""; position:absolute; inset:auto 0 0; block-size:1px; background:linear-gradient(90deg,transparent,rgb(111 212 232 / 18%),transparent); pointer-events:none; }
+  /* D revival Step 1: restore D's decorative scene grid + depth behind the dashboard (PC only). */
+  .dashboard-scene { position:relative; isolation:isolate; }
+  .dashboard-scene::before { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; background:linear-gradient(90deg,rgb(100 234 255 / 5%) 1px,transparent 1px),linear-gradient(180deg,rgb(100 234 255 / 4.5%) 1px,transparent 1px); background-size:88px 88px; mask-image:radial-gradient(circle at 50% 48%,#000,transparent 72%); }
   .dashboard-grid { padding:clamp(.65rem,1vw,1rem); border:1px solid rgb(100 220 235 / 28%); border-radius:1.8rem; background:linear-gradient(145deg,rgb(13 56 84 / 74%),rgb(5 23 39 / 78%)); box-shadow:0 28px 68px rgb(0 7 20 / 28%); }
   .dashboard-grid>.panel { border-color:rgb(100 220 235 / 23%); box-shadow:inset 0 1px rgb(255 255 255 / 3%); }
   .school-panel .panel-head h2 { font-size:clamp(1.1rem,1.48vw,1.42rem); }
@@ -141,4 +144,79 @@
   .mobile-quick-nav a[href="#dashboard"]::before { content:"⌂"; }
   .mobile-quick-nav a[href="#ranking"]::before { content:"★"; }
   .mobile-quick-nav a[href="#landfill"]::before { content:"◒"; }
+}
+
+/* ============================================================
+   D REVIVAL — PC page layouts (min-width:64rem only). Restores
+   PC Visual Master D composition over the closed-beta shell.
+   Mobile (<64rem) is intentionally untouched.
+   PROJECT page → D full-width editorial layout.
+   ============================================================ */
+@media (min-width:64rem) {
+  .project-scene { grid-template-columns:1fr; align-items:start; gap:2.25rem; background:none; }
+  .project-intro { max-inline-size:none; }
+  .project-statement { padding:0; border:0; border-radius:0; background:none; box-shadow:none; }
+  .project-statement h2 { max-inline-size:none; font-size:clamp(3rem,4.85vw,4.9rem); line-height:1.1; font-weight:900; letter-spacing:normal; }
+  .project-scene .eyebrow { inline-size:fit-content; gap:0; padding:.4rem 1.1rem; border:1px solid rgb(94 247 205 / 25%); border-radius:999px; background:rgb(94 247 205 / 9%); box-shadow:inset 0 1px rgb(255 255 255 / 6%); }
+  .project-scene .eyebrow::before { display:none; }
+  .project-cards { grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.9rem; padding:0; }
+  .project-cards::before { display:none; }
+  .project-cards article { display:grid; gap:.55rem; min-block-size:0; padding:1.75rem; border:1px solid rgb(131 224 255 / 18%); border-radius:1.5rem; background:linear-gradient(150deg,rgb(20 52 84 / 34%),rgb(9 27 48 / 30%)); box-shadow:none; }
+  .project-cards article::before { display:none; }
+
+  /* Global: D pill eyebrow everywhere (replaces the cb3a dash label). */
+  .eyebrow { display:inline-flex; align-items:center; inline-size:fit-content; gap:0; padding:.4rem 1.1rem; border:1px solid rgb(94 247 205 / 25%); border-radius:999px; background:rgb(94 247 205 / 9%); box-shadow:inset 0 1px rgb(255 255 255 / 6%); color:#8ff5da; letter-spacing:.08em; }
+  .eyebrow::before { display:none; }
+
+  /* CURRICULUM → D: copy left, subject cards + standards panel right. */
+  .curriculum-scene { grid-template-columns:minmax(0,.71fr) minmax(0,1fr); gap:3.6rem; align-items:start; background:none; }
+  .curriculum-layout { grid-template-columns:1fr; gap:1.125rem; }
+  .curriculum-title { display:grid; gap:.4rem; }
+  .curriculum-title span { display:block; }
+  .subject-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:1.035rem; border:0; }
+  .subject-card { display:flex; flex-direction:column; gap:.5rem; min-block-size:0; padding:1.53rem 1.53rem 2.4rem; border:1px solid rgb(131 224 255 / 18%); border-radius:1.5rem; background:linear-gradient(150deg,rgb(20 58 90 / 55%),rgb(8 27 48 / 52%)); box-shadow:none; }
+  .subject-card em { margin-block-start:auto; }
+  .standards-panel { grid-template-columns:1fr; gap:1.5rem; padding:1.485rem; border:1px solid rgb(105 174 255 / 30%); border-radius:1.5rem; background:rgb(9 34 59 / 64%); box-shadow:none; }
+  .standards-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:.875rem; margin-block-start:0; }
+  .standards-grid article { display:grid; gap:.35rem; padding:.75rem 1rem; border:1px solid rgb(105 174 255 / 30%); border-radius:1rem; background:rgb(79 147 255 / 8%); }
+
+  /* H-A-H → D: centered copy, three bordered glass cards, pill callout. */
+  .hah-scene { grid-template-columns:1fr; gap:1.125rem; text-align:center; background:none; }
+  .hah-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.35rem; align-items:stretch; }
+  .hah-grid .panel { display:block; min-block-size:0; padding:1.5rem; border:1px solid rgb(131 224 255 / 18%); border-radius:1.5rem; background:linear-gradient(150deg,rgb(20 58 90 / 60%),rgb(8 27 48 / 55%)); box-shadow:none; transform:none; text-align:left; }
+  .hah-grid .panel::before { display:none; }
+  .callout { max-inline-size:66rem; margin-inline:auto; padding:.75rem 1.26rem; border:1px solid rgb(102 234 214 / 36%); border-radius:1.25rem; background:rgb(60 211 192 / 8%); }
+
+  /* FLOW → D: copy left, four bordered cards with gaps (no strip / stagger). */
+  .flow-scene { grid-template-columns:minmax(0,.52fr) minmax(0,1fr); gap:1.35rem; background:none; }
+  .flow-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:.84rem 1rem; border:0; }
+  .flow-card { display:flex; flex-direction:column; gap:.625rem; min-block-size:0; margin:0; padding:1.08rem; border:1px solid rgb(76 207 224 / 21%); border-radius:1.375rem; background:linear-gradient(160deg,rgb(13 53 79 / 80%),rgb(7 27 48 / 78%)); box-shadow:none; }
+  .flow-card:nth-child(4n) { margin-block-start:0; }
+
+  /* RESOURCES → D: full-width, even six-up bordered tiles. */
+  .resources-scene { grid-template-columns:1fr; gap:3.6rem; text-align:left; background:none; }
+  .resource-grid { grid-template-columns:repeat(6,minmax(0,1fr)); gap:.75rem; border:0; }
+  .resource-grid a { display:grid; gap:.875rem; min-block-size:0; padding:.9rem; border:1px solid rgb(138 171 195 / 28%); border-radius:1.5rem; background:rgb(11 30 51 / 55%); box-shadow:none; }
+  .resource-grid a:first-child { grid-row:auto; min-block-size:0; background:rgb(11 30 51 / 55%); }
+
+  /* GALLERY → D: copy left, 4-up card grid; detail opens on click (is-detail). */
+  .gallery-scene { grid-template-columns:minmax(0,.56fr) minmax(0,1fr); gap:2.7rem 2.88rem; background:none; }
+  .gallery-stage { display:block; border:0; background:none; box-shadow:none; }
+  .gallery-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:.84rem 1rem; background:transparent; }
+  .gallery-grid article { display:grid; gap:.75rem; min-block-size:0; padding:1.25rem; border:1px solid rgb(126 166 184 / 26%); border-radius:1.5rem; background:linear-gradient(145deg,rgb(16 62 84 / 55%),rgb(8 27 48 / 52%)); box-shadow:none; }
+  .gallery-detail { display:none; min-block-size:0; border:1px solid rgb(126 166 184 / 26%); border-radius:1.5rem; background:linear-gradient(145deg,rgb(16 72 91 / 70%),rgb(7 27 49 / 70%)); }
+  .gallery-stage.is-detail .gallery-grid { display:none; }
+  .gallery-stage.is-detail .gallery-detail { display:grid; }
+
+  /* SORTING → D shell: copy+feature cards left, app card right. Functional DOM
+     (mode switch, class profile, classroom skill, CSV) is preserved as-is. */
+  .sorting-scene { grid-template-columns:minmax(0,.7fr) minmax(0,1fr); gap:2.7rem; background:none; }
+  .sorting-features { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.9rem; }
+  .sorting-features article { min-block-size:0; padding:1.15rem; border:1px solid rgb(107 211 230 / 22%); border-radius:1.25rem; background:linear-gradient(150deg,rgb(16 58 90 / 55%),rgb(8 27 48 / 52%)); }
+  .app-tabs { gap:.625rem; padding:.375rem; border-radius:1.125rem; background:rgb(4 21 37 / 62%); border:0; }
+  .app-tabs button { border-radius:.9rem; }
+
+  /* D-style hover lift across every restored PC card. */
+  .project-cards article, .subject-card, .hah-grid .panel, .flow-card, .gallery-grid article, .resource-grid a, .sorting-features article { transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+  .project-cards article:hover, .subject-card:hover, .hah-grid .panel:hover, .flow-card:hover, .gallery-grid article:hover, .resource-grid a:hover, .sorting-features article:hover { transform:translateY(-.2rem); border-color:rgb(101 234 214 / 48%); box-shadow:0 18px 40px rgb(0 7 20 / 24%); }
 }

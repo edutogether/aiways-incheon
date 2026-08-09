@@ -23,6 +23,8 @@
   const SORTING_DECISIONS_V2_KEY = "aiways_sorting_decisions_v2";
   const localSortingStore = window.AIWaysSortingLocalStore?.createSortingLocalStore?.();
   window.AIWaysLocalSortingPersistence = { persistSortingDecisionLocally: input => localSortingStore?.saveLocalSortingRecord(input), listPendingSortingRecords: () => localSortingStore?.listPendingSortingRecords(), syncPendingSortingRecords: syncOne => localSortingStore?.syncPendingSortingRecords(syncOne), resolveLocalHeldRecord: (id, patch) => localSortingStore?.resolveLocalHeldRecord(id, patch), buildSortingRecordsCsv: records => window.AIWaysSortingLocalStore?.buildSortingRecordsCsv(records) };
+  const classProfileStore = window.AIWaysClassProfileStore?.createClassProfileStore?.();
+  let activeClassProfile = classProfileStore?.loadClassProfile?.() || null;
   const classroomSkillRegistry = window.AIWaysClassroomSkillRegistry?.createRegistry?.();
   let teachableSkillRuntime = window.AIWaysTeachableSkillRuntime;
   let teachableSkillRuntimePromise = null;
@@ -3989,11 +3991,12 @@
   }
 
   function classroomSkillScope() {
+    if (activeClassProfile) return { schoolId: activeClassProfile.schoolId, grade: activeClassProfile.grade, className: activeClassProfile.className };
     return { schoolId: DATA_CONFIG.currentSchool, grade: DATA_CONFIG.currentGrade, className: DATA_CONFIG.currentClassName };
   }
 
   function enabledClassroomSkills() {
-    return classroomSkillRegistry?.listEnabledSkills?.(classroomSkillScope()) || [];
+    return classroomSkillRegistry?.listEnabledSkillsForClassProfile?.(activeClassProfile) || classroomSkillRegistry?.listEnabledSkills?.(classroomSkillScope()) || [];
   }
 
   function materialFamilyForLabel(label) {
@@ -4607,6 +4610,7 @@
   function initClassroomSkills() {
     if (!classroomSkillRegistry) return;
     const form = $("#classroomSkillForm"), list = $("#classroomSkillList"), preview = $("#classroomSkillPreview"), status = $("#classroomSkillStatus"), count = $("#classroomSkillCount"), seedButton = $("#classroomSeedSkillButton");
+    const profileForm = $("#classProfileForm"), profileStatus = $("#classProfileStatus"), profileActions = $("#classProfileActions"), profileChange = $("#classProfileChangeButton"), profileClear = $("#classProfileClearButton");
     let pending = null;
     const scope = classroomSkillScope;
     const offerRetry = message => {
@@ -4618,7 +4622,7 @@
       status.append(retry);
     };
     const render = () => {
-      const skills = classroomSkillRegistry.listSkills(scope());
+      const skills = enabledClassroomSkills();
       if (count) count.textContent = `우리 반이 AI에게 가르친 기술 ${skills.length}개`;
       list.replaceChildren();
       if (!skills.length) { const empty = document.createElement("li"); empty.className = "empty-state"; empty.textContent = "아직 우리 반이 가르쳐준 기술이 없어요. 첫 번째 기술을 만들어볼까요? 🎓"; list.append(empty); return; }
@@ -4630,6 +4634,58 @@
         item.append(copy, toggle); list.append(item);
       });
     };
+    const renderProfile = () => {
+      if (!profileForm || !profileStatus || !profileActions) return;
+      if (!activeClassProfile) {
+        profileForm.hidden = false;
+        profileActions.hidden = true;
+        profileStatus.textContent = "반을 연결하면 우리 반 Skill만 참고용으로 사용합니다.";
+        return;
+      }
+      const modeLabel = activeClassProfile.mode === "class_device" ? " · 공용 기기" : "";
+      profileStatus.textContent = `${activeClassProfile.schoolName} ${activeClassProfile.grade}학년 ${activeClassProfile.className}반과 연결됨${modeLabel}`;
+      profileForm.hidden = true;
+      profileActions.hidden = false;
+      if (profileChange) profileChange.textContent = activeClassProfile.mode === "class_device" ? "공용 기기 반 변경" : "다른 반으로 연결";
+    };
+    const showProfileForm = () => {
+      if (!profileForm) return;
+      profileForm.hidden = false;
+      profileActions.hidden = true;
+      if (activeClassProfile) {
+        $("#classProfileSchoolId").value = activeClassProfile.schoolId;
+        $("#classProfileSchoolName").value = activeClassProfile.schoolName;
+        $("#classProfileGrade").value = activeClassProfile.grade;
+        $("#classProfileClassName").value = activeClassProfile.className;
+        $("#classProfileMode").value = activeClassProfile.mode;
+      }
+    };
+    profileForm?.addEventListener("submit", event => {
+      event.preventDefault();
+      if (!classProfileStore) { profileStatus.textContent = "반 연결 저장소를 준비하지 못했습니다. 기존 분류 기능은 계속 사용할 수 있습니다."; return; }
+      try {
+        activeClassProfile = classProfileStore.saveClassProfile({
+          schoolId: $("#classProfileSchoolId").value,
+          schoolName: $("#classProfileSchoolName").value,
+          grade: $("#classProfileGrade").value,
+          classId: $("#classProfileClassName").value,
+          className: $("#classProfileClassName").value,
+          mode: $("#classProfileMode").value
+        });
+        renderProfile();
+        render();
+      } catch {
+        profileStatus.textContent = "학교, 학년, 반과 연결 방식을 모두 확인해 주세요.";
+      }
+    });
+    profileChange?.addEventListener("click", showProfileForm);
+    profileClear?.addEventListener("click", () => {
+      classProfileStore?.clearClassProfile?.();
+      activeClassProfile = null;
+      profileForm?.reset();
+      renderProfile();
+      render();
+    });
     seedButton?.addEventListener("click", () => {
       try {
         const exists = classroomSkillRegistry.listSkills(scope()).some(skill => skill.modelBaseUrl === AIWAYS_SEED_SKILL.modelBaseUrl);
@@ -4660,6 +4716,7 @@
         status.textContent = messages[error.message] || "모델 주소를 확인할 수 없습니다.";
       }
     });
+    renderProfile();
     render();
   }
 

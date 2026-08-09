@@ -126,6 +126,14 @@
   .tm-model-line input { flex: 1 1 15rem; }
   .classroom-skill-panel { display:grid; gap:.75rem; }
   .classroom-skill-intro { margin:0; color:var(--muted); }
+  .class-profile-panel { display:grid; gap:.65rem; padding:.7rem; border:1px solid var(--line-subtle); border-radius:.65rem; background:var(--surface-2); }
+  .class-profile-status { margin:0; color:var(--brand-dark); font-size:.82rem; font-weight:800; }
+  .class-profile-form { display:grid; gap:.65rem; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .class-profile-form label { display:grid; gap:.35rem; font-size:.86rem; font-weight:800; }
+  .class-profile-form label:nth-child(1), .class-profile-form label:nth-child(2) { grid-column:1 / -1; }
+  .class-profile-form input, .class-profile-form select { inline-size:100%; padding:.7rem .8rem; color:var(--ink); background:var(--elevated-bg); border-color:var(--line-default); }
+  .class-profile-form button { justify-self:start; }
+  .class-profile-actions { display:flex; gap:.5rem; flex-wrap:wrap; }
   .classroom-skill-form { display:grid; gap:.65rem; grid-template-columns:repeat(2,minmax(0,1fr)); }
   .classroom-skill-form label { display:grid; gap:.35rem; font-size:.86rem; font-weight:800; }
   .classroom-skill-form label:nth-child(2), .classroom-skill-form label:nth-child(3) { grid-column:1 / -1; }
@@ -206,6 +214,7 @@
   .caution-state { color: var(--caution); border-color: var(--caution); }
   @keyframes spin { to { transform: rotate(1turn); } }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms; animation-iteration-count: 1; scroll-behavior: auto; transition-duration: 1ms; } }
+  @media (max-width: 34rem) { .class-profile-form { grid-template-columns:1fr; } .class-profile-form label:nth-child(1), .class-profile-form label:nth-child(2) { grid-column:auto; } }
 }
 
 @layer responsive {

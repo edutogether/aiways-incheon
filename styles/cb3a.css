@@ -397,6 +397,7 @@
   .upload-panel .upload-highlights li::before { content:"✓"; flex:0 0 auto; color:#65ead6; font-weight:900; }
   .upload-actions.upload-card-actions { margin-block-start:auto; }
   .gemini-credit { display:inline-flex; align-items:center; gap:.4rem; margin-block-start:.1rem; padding:.32rem .75rem; border:1px solid rgb(138 180 255 / 24%); border-radius:999px; background:rgb(66 133 244 / 8%); color:#a9c2ff; font-size:.68rem; font-weight:700; }
+  .upload-icon,.sorting-upload-icon { inline-size:2.625rem; block-size:2.625rem; }.upload-icon svg,.sorting-upload-icon svg { stroke-width:2.2; }
   .gemini-credit svg { inline-size:.8rem; block-size:.8rem; }
   .upload-panel small { font-size:.64rem; line-height:1.5; font-weight:800; letter-spacing:-.0032em; }
 

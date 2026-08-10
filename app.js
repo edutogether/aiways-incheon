@@ -7,8 +7,10 @@
     window.scrollTo(0, 0);
   });
 
+  let kioskEventTag = "";
+
   const DATA_CONFIG = {
-    appsScriptUrl: "",
+    appsScriptUrl: "https://script.google.com/macros/s/AKfycbykh5VyFwzbA55nLTFNsWlhSoqiFl49JA1o3UUBHHsSOTOC9YaNj_e9rCnwZIEsLKR8/exec",
     seedUrl: "./base-data-seed.tsv",
     currentSchool: "AIWays초",
     currentGrade: "5학년",
@@ -1565,9 +1567,12 @@
   }
 
   function renderClassDashboard(profile, classActual, className, ranking) {
-    const today = profile.today + classActual.length;
-    const classHold = profile.hold + classActual.filter(record => record.hold_flag || cleanText(record.final_decision).includes("보류")).length;
-    const confirmed = profile.converted + classActual.filter(record => !record.hold_flag).length;
+    // profile은 mergeActualIntoClasses()에서 이미 classActual과 동일한 실제
+    // 기록을 today/hold/converted에 반영한 값이다. 여기서 classActual.length를
+    // 다시 더하면 실제 제출 1건이 화면 숫자를 2씩 올리는 이중 집계가 된다.
+    const today = profile.today;
+    const classHold = profile.hold;
+    const confirmed = profile.converted;
 
     setDashboardNumber("[data-today-observed]", today);
     setDashboardNumber("[data-ai-classified]", classHold);
@@ -2333,12 +2338,23 @@
     });
   }
 
+  let dashboardLiveRefreshTimer = 0;
+
+  function startDashboardLiveRefresh() {
+    if (!DATA_CONFIG.appsScriptUrl || dashboardLiveRefreshTimer) return;
+    dashboardLiveRefreshTimer = window.setInterval(() => {
+      if (document.hidden) return;
+      loadRemoteRecords({ skipApplyWhenUnavailable: true });
+    }, 20000);
+  }
+
   async function loadDashboardRows(options = {}) {
     await loadSeedData();
     dashboardDataReady = true;
     if (options.animateIntro) playDashboardIntroForCurrentData();
     else applyDashboard(allStoredRecords());
     await loadRemoteRecords({ skipApplyWhenUnavailable: options.animateIntro });
+    startDashboardLiveRefresh();
     return allStoredRecords();
   }
 
@@ -2363,7 +2379,8 @@
       hold_score: record.hold_flag ? 1 : 0,
       action: record.hold_flag ? "hold" : "confirm",
       image_saved: false,
-      app_version: "clean-2026-07"
+      app_version: "clean-2026-07",
+      ...(kioskEventTag ? { event_channel: kioskEventTag } : {})
     };
 
     let result = DATA_CONFIG.appsScriptUrl ? true : "queued";
@@ -2683,9 +2700,25 @@
     window.addEventListener("scroll", () => scheduleActiveUpdate(110), { passive: true });
     window.addEventListener("wheel", snapByWheel, { passive: false });
 
-    resetToDashboard();
-    window.addEventListener("pageshow", () => requestAnimationFrame(resetToDashboard), { once: true });
-    requestAnimationFrame(resetToDashboard);
+    // Expo kiosk mode: a QR code can carry ?kiosk=5-1 so any visitor's own
+    // phone lands straight on 3초판단 with the demo class pre-selected,
+    // instead of the usual reset-to-dashboard behavior below.
+    const KIOSK_CLASS_MAP = { "5-1": "5학년 1반" };
+    const kioskClassLabel = KIOSK_CLASS_MAP[new URLSearchParams(window.location.search).get("kiosk") || ""];
+
+    if (kioskClassLabel) {
+      kioskEventTag = "expo_kiosk";
+      const classSelect = $("#classSelect");
+      if (classSelect && $$("option", classSelect).some(option => option.value === kioskClassLabel)) {
+        classSelect.value = kioskClassLabel;
+        classSelect.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      navigateToSection("sorting");
+    } else {
+      resetToDashboard();
+      window.addEventListener("pageshow", () => requestAnimationFrame(resetToDashboard), { once: true });
+      requestAnimationFrame(resetToDashboard);
+    }
   }
   // COMMON_FINAL_FIX_END
 

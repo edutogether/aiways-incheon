@@ -190,15 +190,12 @@
                 <label><span>총량 대비 반입량</span><b>0%</b><i><em style="width:0%"></em></i></label>
                 <label><span>잔여 관리 여력</span><b>0%</b><i><em style="width:0%"></em></i></label>
               </div>
-              <aside class="landfill-kpi-module landfill-status-card" aria-label="오늘 반입 상태 요약">
-                <span class="landfill-status-eyebrow">오늘 반입 상태</span>
-                <strong class="landfill-status-value" data-landfill-primary-value>0%</strong>
-                <span class="landfill-status-label">총량 대비 반입량</span>
-                <div class="landfill-status-gauge" aria-hidden="true">
-                  <i class="landfill-gauge-incoming" data-landfill-incoming-gauge style="width:0%"></i>
-                  <i class="landfill-gauge-remaining" data-landfill-remaining-gauge style="width:100%"></i>
+              <aside class="landfill-kpi-module" aria-label="총량 대비 반입량과 잔여 관리 여력">
+                <div class="donut landfill-kpi-ring" style="--pct:0">
+                  <span>0%</span>
+                  <small>총량 대비<br />반입량</small>
                 </div>
-                <div class="landfill-status-footer">
+                <div class="landfill-kpi-legend">
                   <span><i aria-hidden="true"></i>잔여 관리 여력</span>
                   <b data-landfill-secondary-value>0%</b>
                 </div>
@@ -262,6 +259,10 @@
               <li>사진은 저장하지 않고 판단 기록만 남습니다.</li>
             </ul>
             <span class="gemini-credit"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c.6 4.6 5.4 9.4 10 10-4.6.6-9.4 5.4-10 10-.6-4.6-5.4-9.4-10-10 4.6-.6 9.4-5.4 10-10Z" /></svg>Powered by Gemini</span>
+            <div class="qr-invite">
+              <img src="./assets/qr/kiosk-5-1.png" alt="내 폰으로 3초판단 바로 열기 QR코드" loading="lazy" />
+              <p>내 폰으로 QR을 찍으면<br />3초판단을 바로 체험할 수 있어요.</p>
+            </div>
             <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden />
             <input id="uploadInput" type="file" accept="image/*" hidden />
             <div class="upload-actions upload-card-actions">
@@ -407,6 +408,10 @@
             <article><h3>3초 판단 검색</h3><p>우유갑, 영수증, 물티슈처럼 자주 헷갈리는 물건을 빠르게 확인합니다.</p></article>
             <article><h3>OX 퀴즈</h3><p>분리배출 기준을 게임처럼 확인하고 점수로 피드백합니다.</p></article>
             <article><h3>통계 · 보류함</h3><p>사진은 저장하지 않고 판단 결과만 쌓아 회의 안건으로 연결합니다.</p></article>
+          </div>
+          <div class="qr-invite">
+            <img src="./assets/qr/kiosk-5-1.png" alt="내 폰으로 3초판단 바로 열기 QR코드" loading="lazy" />
+            <p>내 폰으로 QR을 찍으면<br />3초판단을 바로 체험할 수 있어요.</p>
           </div>
         </div>
         <div class="sorting-layout">

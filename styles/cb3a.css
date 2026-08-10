@@ -174,8 +174,8 @@
   .curriculum-title { display:grid; gap:.4rem; }
   .curriculum-title span { display:block; }
   .subject-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:1.035rem; border:0; }
-  .subject-card { display:flex; flex-direction:column; gap:.5rem; min-block-size:0; padding:1.53rem 1.53rem 2.4rem; border:1px solid rgb(131 224 255 / 18%); border-radius:1.5rem; background:linear-gradient(150deg,rgb(20 58 90 / 55%),rgb(8 27 48 / 52%)); box-shadow:none; }
-  .subject-card em { margin-block-start:auto; }
+  .subject-card { position:relative; display:flex; flex-direction:column; gap:.5rem; min-block-size:0; padding:1.53rem 1.53rem 4rem; border:1px solid rgb(131 224 255 / 18%); border-radius:1.5rem; background:linear-gradient(150deg,rgb(20 58 90 / 55%),rgb(8 27 48 / 52%)); box-shadow:none; }
+  .subject-card em { position:absolute; inset-inline-end:1.125rem; inset-block-end:1.125rem; margin-block-start:0; }
   .standards-panel { grid-template-columns:1fr; gap:1.5rem; padding:1.485rem; border:1px solid rgb(105 174 255 / 30%); border-radius:1.5rem; background:rgb(9 34 59 / 64%); box-shadow:none; }
   .standards-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:.875rem; margin-block-start:0; }
   .standards-grid article { display:grid; gap:.35rem; padding:.75rem 1rem; border:1px solid rgb(105 174 255 / 30%); border-radius:1rem; background:rgb(79 147 255 / 8%); }
@@ -185,6 +185,8 @@
   .hah-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.35rem; align-items:stretch; }
   .hah-grid .panel { display:block; min-block-size:0; padding:1.5rem; border:1px solid rgb(131 224 255 / 18%); border-radius:1.5rem; background:linear-gradient(150deg,rgb(20 58 90 / 60%),rgb(8 27 48 / 55%)); box-shadow:none; transform:none; text-align:left; }
   .hah-grid .panel::before { display:none; }
+  /* D's number badge is a 50px rounded square (18px radius), not a circle. */
+  .hah-grid .panel>span { inline-size:3.125rem; block-size:3.125rem; margin-block-end:.875rem; border-radius:1.125rem; background:linear-gradient(135deg,#5ef7cd,#5a9dff); color:#07111b; }
   .callout { max-inline-size:66rem; margin-inline:auto; padding:.75rem 1.26rem; border:1px solid rgb(102 234 214 / 36%); border-radius:1.25rem; background:rgb(60 211 192 / 8%); }
 
   /* FLOW → D: copy left, four bordered cards with gaps (no strip / stagger). */
@@ -192,6 +194,9 @@
   .flow-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:.84rem 1rem; border:0; }
   .flow-card { display:flex; flex-direction:column; gap:.625rem; min-block-size:0; margin:0; padding:1.08rem; border:1px solid rgb(76 207 224 / 21%); border-radius:1.375rem; background:linear-gradient(160deg,rgb(13 53 79 / 80%),rgb(7 27 48 / 78%)); box-shadow:none; }
   .flow-card:nth-child(4n) { margin-block-start:0; }
+  /* D renders the step label and "수업자료" tag as pill chips, not plain text. */
+  .flow-card span { display:inline-flex; inline-size:auto; justify-self:start; align-self:flex-start; padding:.4375rem .8125rem; border:1px solid rgb(94 247 205 / 32%); border-radius:999px; color:#5ef7cd; background:rgb(94 247 205 / 8%); font-size:clamp(.72rem,.66vw,.88rem); line-height:1; }
+  .flow-card em { align-self:flex-end; margin-block-start:auto; display:inline-flex; inline-size:max-content; min-block-size:2.125rem; align-items:center; justify-content:center; padding:0 .875rem; border-radius:999px; color:#07111c; background:linear-gradient(135deg,#5ef7cd,#64eaff); font-weight:870; font-size:.82rem; }
 
   /* RESOURCES → D: full-width, even six-up bordered tiles. */
   .resources-scene { grid-template-columns:1fr; gap:3.6rem; text-align:left; background:none; }
@@ -203,7 +208,10 @@
   .gallery-scene { grid-template-columns:minmax(0,.56fr) minmax(0,1fr); gap:2.7rem 2.88rem; background:none; }
   .gallery-stage { display:block; border:0; background:none; box-shadow:none; }
   .gallery-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:.84rem 1rem; background:transparent; }
-  .gallery-grid article { display:grid; gap:.75rem; min-block-size:0; padding:1.25rem; border:1px solid rgb(126 166 184 / 26%); border-radius:1.5rem; background:linear-gradient(145deg,rgb(16 62 84 / 55%),rgb(8 27 48 / 52%)); box-shadow:none; }
+  .gallery-grid article { position:relative; overflow:hidden; display:grid; align-content:center; justify-items:center; gap:.75rem; min-block-size:16.875rem; padding:1.25rem; border:1px solid rgb(126 166 184 / 26%); border-radius:1.5rem; background:linear-gradient(145deg,rgb(16 62 84 / 55%),rgb(8 27 48 / 52%)); box-shadow:none; text-align:center; }
+  /* D pins the "바로가기" button to the card's bottom-right corner as a pill. */
+  .gallery-grid article button { position:absolute; inset-inline-end:1.125rem; inset-block-end:1.125rem; min-block-size:2.375rem; padding:0 1rem; border-radius:999px; border:1px solid rgb(94 247 205 / 28%); color:#06111c; background:linear-gradient(135deg,#5ef7cd,#64eaff); }
+  .gallery-grid article>span { color:inherit; font-weight:400; font-size:.78rem; }
   .gallery-detail { display:none; min-block-size:0; border:1px solid rgb(126 166 184 / 26%); border-radius:1.5rem; background:linear-gradient(145deg,rgb(16 72 91 / 70%),rgb(7 27 49 / 70%)); }
   .gallery-stage.is-detail .gallery-grid { display:none; }
   .gallery-stage.is-detail .gallery-detail { display:grid; }
@@ -212,8 +220,10 @@
      (mode switch, class profile, classroom skill, CSV) is preserved as-is. */
   .sorting-scene { grid-template-columns:minmax(0,.7fr) minmax(0,1fr); gap:2.7rem; background:none; }
   .sorting-features { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.9rem; }
-  .sorting-features article { min-block-size:0; padding:1.15rem; border:1px solid rgb(107 211 230 / 22%); border-radius:1.25rem; background:linear-gradient(150deg,rgb(16 58 90 / 55%),rgb(8 27 48 / 52%)); }
-  .app-tabs { gap:.625rem; padding:.375rem; border-radius:1.125rem; background:rgb(4 21 37 / 62%); border:0; }
+  .sorting-features article { min-block-size:0; padding:1.375rem; border:1px solid rgb(107 211 230 / 22%); border-radius:1.125rem; background:linear-gradient(150deg,rgb(16 58 90 / 55%),rgb(8 27 48 / 52%)); }
+  .sorting-features h3 { font-size:1rem; }
+  .sorting-features p { font-size:.82rem; }
+  .app-tabs { gap:.625rem; padding:.375rem; border-radius:1.125rem; background:rgb(4 21 37 / 62%); border:1px solid rgb(94 247 205 / 16%); }
   .app-tabs button { border-radius:.9rem; }
 
   /* D-style hover lift across every restored PC card. */
@@ -276,8 +286,25 @@
      progress-stack rows just below already chart both metrics separately —
      so the redundant two-tone bar inside the status card is dropped in
      favor of a clean second stat line. */
-  .landfill-status-card .landfill-status-gauge { display:none; }
-  .landfill-status-card .landfill-status-footer { grid-template-columns:1fr; gap:.35rem; padding-block-start:.35rem; border-block-start:1px solid rgb(111 212 232 / 14%); }
+  /* Landfill status → D's dual-ring donut (was a status-card + two gauge bars,
+     which is why app.js's already-built updateLandfillDonuts()/.landfill-kpi-ring
+     donut code was silently dead — the HTML no longer had a matching element). */
+  .landfill-kpi-module { grid-area:status; min-inline-size:0; display:grid; justify-items:center; align-content:center; gap:.45rem; padding:.4rem 0; }
+  /* inline-size/block-size, the span margin-block-start and the small margin-block-end
+     below are tuned together for THIS 5.5rem ring. Resizing the ring without
+     re-checking those two margins (via real getBoundingClientRect measurement,
+     not eyeballing) will silently reintroduce text overlap. */
+  .landfill-kpi-ring { position:relative; isolation:isolate; inline-size:5.5rem; block-size:5.5rem; flex:0 0 auto; aspect-ratio:1; grid-template-rows:1fr; align-content:stretch; background:conic-gradient(#5ef7cd calc(var(--pct) * 1%), rgb(109 143 181 / 18%) 0); box-shadow:0 0 18px rgb(94 247 205 / 13%), inset 0 0 18px rgb(255 255 255 / 4.5%); }
+  .landfill-kpi-ring::before, .landfill-kpi-ring::after { content:""; position:absolute; border-radius:inherit; pointer-events:none; }
+  .landfill-kpi-ring::before { z-index:-1; inset:18%; background:conic-gradient(#ad8cff 32.7%, rgb(126 116 177 / 22%) 0); box-shadow:0 0 12px rgb(173 140 255 / 10%); }
+  .landfill-kpi-ring::after { z-index:-1; inset:34%; background:radial-gradient(circle at 36% 28%, rgb(33 64 102 / 98%), #0a1830 72%); box-shadow:inset 0 0 0 1px rgb(173 214 255 / 8%); }
+  .landfill-kpi-ring > span, .landfill-kpi-ring > small { position:relative; z-index:1; grid-area:1 / 1; text-align:center; }
+  .landfill-kpi-ring > span { align-self:center; padding:0; margin-block-start:-.8125rem; color:#f3fffe; font-size:.86rem; font-weight:950; line-height:1; text-shadow:0 0 12px rgb(94 247 205 / 22%); }
+  .landfill-kpi-ring > small { align-self:end; padding:0; max-inline-size:3.6rem; margin-block-end:17%; color:rgb(219 241 249 / 76%); font-size:.42rem; font-weight:850; line-height:1.15; }
+  .landfill-kpi-legend { inline-size:min(100%,8.3rem); min-inline-size:0; display:flex; align-items:center; justify-content:space-between; gap:.4rem; padding:.4rem .55rem; border:1px solid rgb(173 140 255 / 26%); border-radius:999px; color:rgb(226 218 255 / 86%); background:linear-gradient(135deg,rgb(173 140 255 / 13%),rgb(100 169 255 / 5.5%)); font-size:.54rem; font-weight:850; white-space:nowrap; }
+  .landfill-kpi-legend span { min-inline-size:0; display:inline-flex; align-items:center; gap:.3rem; }
+  .landfill-kpi-legend i { inline-size:.4rem; block-size:.4rem; flex:0 0 auto; border-radius:999px; background:#ad8cff; box-shadow:0 0 9px rgb(173 140 255 / 62%); }
+  .landfill-kpi-legend b { color:#f2edff; font-size:.68rem; font-variant-numeric:tabular-nums; }
 
   /* 8. Class panel: same accidental-column bug as #3 — rebalance so the
      kpi numbers get a narrow column and 헷갈린 물건 TOP 5 gets the wide one. */
@@ -304,4 +331,10 @@
   .gemini-credit { display:inline-flex; align-items:center; gap:.4rem; margin-block-start:.1rem; padding:.32rem .75rem; border:1px solid rgb(138 180 255 / 24%); border-radius:999px; background:rgb(66 133 244 / 8%); color:#a9c2ff; font-size:.68rem; font-weight:700; }
   .gemini-credit svg { inline-size:.8rem; block-size:.8rem; }
   .upload-panel small { font-size:.72rem; line-height:1.5; }
+
+  /* QR invite: dashboard upload panel + sorting page, same asset/behavior. */
+  .qr-invite { display:flex; align-items:center; gap:.7rem; padding:.55rem .75rem; border:1px solid rgb(100 220 235 / 20%); border-radius:1rem; background:rgb(4 24 42 / 45%); }
+  .qr-invite img { flex:0 0 auto; inline-size:4.6rem; block-size:4.6rem; border-radius:.6rem; }
+  .qr-invite p { margin:0; color:#a9c2d6; font-size:.72rem; font-weight:700; line-height:1.4; }
+  .sorting-features + .qr-invite { margin-block-start:.9rem; }
 }

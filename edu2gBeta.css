@@ -10,6 +10,9 @@
   .edu2g-beta-content, .edu2g-beta-form, .edu2g-beta-session, .edu2g-beta-devices, .edu2g-beta-device { display: grid; gap: .75rem; }
   .edu2g-beta-description, .edu2g-beta-session p, .edu2g-beta-device p, .edu2g-beta-loading { color: var(--text-secondary); }
   .edu2g-beta-form input { inline-size: 100%; min-inline-size: 0; padding-inline: .8rem; color: var(--text-primary); background: var(--elevated-bg); border-color: var(--line-default); }
+  .edu2g-beta-device-name-row { display: flex; align-items: center; gap: .55rem; }
+  .edu2g-beta-device-icon { display: grid; place-items: center; flex: 0 0 auto; inline-size: 2.75rem; block-size: 2.75rem; color: var(--text-secondary); background: var(--elevated-bg); border: 1px solid var(--line-default); border-radius: var(--radius-small); }
+  .edu2g-beta-device-name-row input { flex: 1 1 auto; }
   .edu2g-beta-button { min-block-size: 2.75rem; padding-inline: 1rem; border: 1px solid var(--line-default); border-radius: var(--radius-small); font-weight: 800; }
   .edu2g-beta-button-primary { color: var(--canvas-bg); background: var(--accent-primary); border-color: var(--accent-primary); }
   .edu2g-beta-button-secondary { color: var(--text-primary); background: var(--surface-2); }

@@ -8,6 +8,32 @@
   const validLoginId = value => value.normalize("NFKC").trim().replace(/\s+/gu, " ").length > 0;
   const statusCopy = key => ({ booting: "연결 확인 중", unregistered: "클베 접속", registered: "클베 연결됨", temporary_error: "연결 확인 필요", access_error: "연결 확인 필요" }[key] || "클베 접속");
   function setMode(mode) { state.mode = mode; }
+  const DEVICE_NAME_MAX = 12;
+  const truncateDeviceName = value => Array.from(value).slice(0, DEVICE_NAME_MAX).join("");
+  function detectDeviceKind() {
+    const ua = navigator.userAgent || "";
+    if (/ipad/i.test(ua) || (/android/i.test(ua) && !/mobile/i.test(ua))) return "tablet";
+    if (/android|iphone|ipod|mobile/i.test(ua) || navigator.userAgentData?.mobile === true) return "mobile";
+    return "desktop";
+  }
+  function defaultDeviceName() {
+    const kind = detectDeviceKind();
+    const platform = client().getPlatformLabel();
+    const byKind = { mobile: platform === "iOS" ? "iPhone" : `${platform} 휴대폰`, tablet: platform === "iOS" ? "iPad" : `${platform} 태블릿`, desktop: `${platform} PC` };
+    return truncateDeviceName(byKind[kind] || "현재 기기");
+  }
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  function svgEl(tag, attrs) { const node = document.createElementNS(SVG_NS, tag); Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value)); return node; }
+  const DEVICE_KIND_SHAPES = {
+    mobile: [["rect", { x: 7, y: 2, width: 10, height: 20, rx: 2 }], ["line", { x1: 11, y1: 18, x2: 13, y2: 18 }]],
+    tablet: [["rect", { x: 3, y: 4, width: 18, height: 16, rx: 2 }], ["line", { x1: 11, y1: 17, x2: 13, y2: 17 }]],
+    desktop: [["rect", { x: 3, y: 4, width: 18, height: 13, rx: 1.5 }], ["line", { x1: 8, y1: 20, x2: 16, y2: 20 }], ["line", { x1: 12, y1: 17, x2: 12, y2: 20 }]],
+  };
+  function deviceKindIcon(kind) {
+    const svg = svgEl("svg", { viewBox: "0 0 24 24", width: "18", height: "18", fill: "none", stroke: "currentColor", "stroke-width": "1.8" });
+    (DEVICE_KIND_SHAPES[kind] || DEVICE_KIND_SHAPES.desktop).forEach(([tag, attrs]) => svg.append(svgEl(tag, attrs)));
+    return svg;
+  }
   function build() {
     const header = document.querySelector(".site-header"); if (!header) return null;
     const trigger = document.createElement("button"); trigger.type = "button"; trigger.className = "edu2g-beta-trigger"; trigger.setAttribute("aria-haspopup", "dialog"); trigger.textContent = statusCopy("booting");
@@ -32,11 +58,16 @@
     renderSession(root);
   }
   function renderLogin(root) {
-    const intro = document.createElement("p"); intro.className = "edu2g-beta-description"; text(intro, "운영자가 안내한 이름 또는 아이디를 입력하세요. 비밀번호와 초대 코드는 사용하지 않습니다.");
+    const intro = document.createElement("p"); intro.className = "edu2g-beta-description"; text(intro, "관리자가 안내한 시크릿 코드를 입력하세요.");
     const form = document.createElement("form"); form.className = "edu2g-beta-form"; form.noValidate = true;
-    const loginLabel = document.createElement("label"), login = document.createElement("input"); loginLabel.htmlFor = "edu2g-beta-login"; text(loginLabel, "이름 또는 아이디"); login.id = "edu2g-beta-login"; login.name = "edu2g-login"; login.type = "text"; login.autocomplete = "username"; login.placeholder = "이름 또는 아이디"; login.maxLength = 80;
-    const deviceNameLabel = document.createElement("label"), label = document.createElement("input"); deviceNameLabel.htmlFor = "edu2g-beta-device-label"; text(deviceNameLabel, "기기 이름"); label.id = "edu2g-beta-device-label"; label.type = "text"; label.maxLength = 48; label.autocomplete = "off"; label.value = "현재 기기";
-    const help = document.createElement("p"); help.className = "edu2g-beta-help"; text(help, `현재 플랫폼: ${client().getPlatformLabel()} · 기기 이름은 48자 이내`); const submit = button("접속 확인", () => form.requestSubmit(), "primary"); submit.type = "submit"; const feedback = document.createElement("div"); feedback.className = "edu2g-beta-feedback"; feedback.setAttribute("aria-live", "polite"); form.append(loginLabel, login, deviceNameLabel, label, help, submit, feedback); root.append(intro, form);
+    const loginLabel = document.createElement("label"), login = document.createElement("input"); loginLabel.htmlFor = "edu2g-beta-login"; text(loginLabel, "시크릿 코드"); login.id = "edu2g-beta-login"; login.name = "edu2g-login"; login.type = "text"; login.autocomplete = "username"; login.placeholder = "당신의 시크릿 코드를 입력하세요"; login.maxLength = 80;
+    const deviceNameLabel = document.createElement("label"), deviceNameRow = document.createElement("div"), deviceIcon = document.createElement("span"), label = document.createElement("input");
+    deviceNameLabel.htmlFor = "edu2g-beta-device-label"; text(deviceNameLabel, "기기 이름");
+    deviceNameRow.className = "edu2g-beta-device-name-row";
+    deviceIcon.className = "edu2g-beta-device-icon"; deviceIcon.setAttribute("aria-hidden", "true"); deviceIcon.append(deviceKindIcon(detectDeviceKind()));
+    label.id = "edu2g-beta-device-label"; label.type = "text"; label.maxLength = DEVICE_NAME_MAX; label.autocomplete = "off"; label.value = defaultDeviceName();
+    deviceNameRow.append(deviceIcon, label);
+    const help = document.createElement("p"); help.className = "edu2g-beta-help"; text(help, `기기 이름은 한글 ${DEVICE_NAME_MAX}자 이내로 직접 바꿀 수 있어요`); const submit = button("접속 확인", () => form.requestSubmit(), "primary"); submit.type = "submit"; const feedback = document.createElement("div"); feedback.className = "edu2g-beta-feedback"; feedback.setAttribute("aria-live", "polite"); form.append(loginLabel, login, deviceNameLabel, deviceNameRow, help, submit, feedback); root.append(intro, form);
     form.addEventListener("submit", async event => { event.preventDefault(); const loginId = login.value, deviceLabel = label.value.trim(); feedback.replaceChildren(); if (!validLoginId(loginId)) { feedback.append(showError("login_not_approved")); login.focus(); return; } if (!validLabel(deviceLabel)) { feedback.append(showError("invalid_request")); label.focus(); return; } state.pending = { loginId, deviceLabel, platform: client().getPlatformLabel() }; setMode("requesting"); render(); const result = await client().requestAccess(state.pending); if (!result.ok) { if (result.code === "device_limit_reached" && Array.isArray(result.data?.devices)) { state.devices = result.data.devices; setMode("replace_device"); render(); return; } setMode("access_error"); render(); ui.content.append(showError(result.code)); return; } if (result.data?.alreadyRegistered) { await restore(); render(); return; } setMode("confirm_device"); render(); });
   }
   async function register(replaceManagementId = "") { setMode(replaceManagementId ? "replacing" : "registering"); render(); const result = await client().confirmDeviceRegistration({ ...state.pending, replaceManagementId }); if (!result.ok) { if (result.code === "device_limit_reached" && Array.isArray(result.data?.devices)) { state.devices = result.data.devices; setMode("replace_device"); render(); return; } setMode("access_error"); render(); ui.content.append(showError(result.code)); return; } state.session = result.data; state.pending = null; setMode("registered"); setTrigger("registered"); announce("이 기기가 등록되어 앱에 연결되었습니다."); render(); }

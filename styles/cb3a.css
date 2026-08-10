@@ -319,7 +319,7 @@
      below are tuned together for THIS 5.5rem ring. Resizing the ring without
      re-checking those two margins (via real getBoundingClientRect measurement,
      not eyeballing) will silently reintroduce text overlap. */
-  .landfill-kpi-ring { position:relative; isolation:isolate; inline-size:5.5rem; block-size:5.5rem; flex:0 0 auto; aspect-ratio:1; grid-template-rows:1fr; align-content:stretch; background:conic-gradient(#5ef7cd calc(var(--pct) * 1%), rgb(109 143 181 / 18%) 0); box-shadow:0 0 18px rgb(94 247 205 / 13%), inset 0 0 18px rgb(255 255 255 / 4.5%); }
+  .landfill-kpi-ring { position:relative; isolation:isolate; inline-size:clamp(6.75rem,8.4vw,8.5rem); block-size:clamp(6.75rem,8.4vw,8.5rem); flex:0 0 auto; aspect-ratio:1; grid-template-rows:1fr; align-content:stretch; background:conic-gradient(#5ef7cd calc(var(--pct) * 1%), rgb(109 143 181 / 18%) 0); box-shadow:0 0 18px rgb(94 247 205 / 13%), inset 0 0 18px rgb(255 255 255 / 4.5%); }
   .landfill-kpi-ring::before, .landfill-kpi-ring::after { content:""; position:absolute; border-radius:inherit; pointer-events:none; }
   .landfill-kpi-ring::before { z-index:-1; inset:18%; background:conic-gradient(#ad8cff 32.7%, rgb(126 116 177 / 22%) 0); box-shadow:0 0 12px rgb(173 140 255 / 10%); }
   .landfill-kpi-ring::after { z-index:-1; inset:34%; background:radial-gradient(circle at 36% 28%, rgb(33 64 102 / 98%), #0a1830 72%); box-shadow:inset 0 0 0 1px rgb(173 214 255 / 8%); }

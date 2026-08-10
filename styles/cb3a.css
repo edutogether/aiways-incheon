@@ -260,9 +260,16 @@
   .school-panel .school-visuals { grid-template-columns:minmax(6rem,1fr) auto; gap:.6rem; overflow:hidden; }
   .school-panel .bar-list > div { grid-template-columns:2.3rem minmax(2.4rem,1fr) 1.5rem; }
   .school-panel .donut-pair { flex-wrap:nowrap; gap:.4rem; }
-  .school-panel .donut { inline-size:clamp(3.6rem,4.6vw,4.3rem); }
-  .school-panel .donut span { padding-block-start:.85rem; font-size:.62rem; }
-  .school-panel .donut small { font-size:.42rem; }
+  /* D's donut is a RING with a hollow center (radial-gradient masks out the
+     middle so the conic-gradient only shows as an outer band), not a solid
+     pie slice. The old base .donut relies on a small per-child dark circle
+     instead, which leaves almost no room for the label -> this D-revival
+     override replaces the fill technique entirely for this context. */
+  .school-panel .donut { inline-size:clamp(4.6rem,6vw,5.5rem); block-size:clamp(4.6rem,6vw,5.5rem); grid-template-rows:1fr; align-content:stretch; background:radial-gradient(circle at center,#0b1c2d 56%,transparent 57%),conic-gradient(#4fe4cf calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 .875rem rgb(255 255 255 / 6%),0 0 .875rem rgb(79 228 207 / 12%); }
+  .school-panel .donut.violet { background:radial-gradient(circle at center,#0b1c2d 56%,transparent 57%),conic-gradient(#ad8cff calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 .875rem rgb(255 255 255 / 6%),0 0 .875rem rgb(173 140 255 / 12%); }
+  .school-panel .donut>* { background:none; }
+  .school-panel .donut span { align-self:center; padding:0; margin-block-start:-.55rem; font-size:.68rem; }
+  .school-panel .donut small { align-self:end; padding:0; margin-block-end:14%; max-inline-size:3.4rem; font-size:.46rem; line-height:1.1; }
 
   /* 4. Landfill: the four metric boxes were letting "16,400t" run into the
      next box ("-9.4%"); the title/time row needed a hard nowrap so it can

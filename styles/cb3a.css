@@ -281,7 +281,7 @@
   /* D itself only shows the full logo at 52px (illegible at that size,
      verified live) - enlarging beyond D here is a deliberate legibility
      improvement, not a mismatch. Full original logo file, not a crop. */
-  .brand-mark { inline-size:auto; block-size:3.9rem; overflow:visible; background:transparent; border:0; box-shadow:none; padding:0; }.brand-mark img { inline-size:auto; block-size:100%; object-fit:contain; }.brand>span:not(.brand-mark) { display:none; }
+  .brand-mark { inline-size:3.75rem; block-size:3.75rem; overflow:hidden; background:#fff; border-color:rgb(0 0 0 / 10%); box-shadow:0 2px 10px rgb(0 0 0 / 22%); padding:.32rem; }.brand-mark img { inline-size:100%; block-size:100%; object-fit:contain; }
   .ai-modal { inline-size:min(65rem,calc(100vw - 2.25rem)); border-radius:1.75rem; background:#071326; border-color:rgb(100 234 255 / 25%); }
 
   /* 2 & 7. Grade/class selects: the base rule `.select-line { grid-column:2;

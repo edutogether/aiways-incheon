@@ -175,7 +175,8 @@
   .curriculum-title span { display:block; }
   .subject-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:1.035rem; border:0; }
   .subject-card { position:relative; display:flex; flex-direction:column; gap:.5rem; min-block-size:0; padding:1.53rem 1.53rem 4rem; border:1px solid rgb(131 224 255 / 18%); border-radius:1.5rem; background:linear-gradient(150deg,rgb(20 58 90 / 55%),rgb(8 27 48 / 52%)); box-shadow:none; }
-  .subject-card em { position:absolute; inset-inline-end:1.125rem; inset-block-end:1.125rem; margin-block-start:0; }
+  .subject-card em { position:absolute; inset-inline-end:1.125rem; inset-block-end:1.125rem; margin-block-start:0; opacity:0; transform:translateY(.5rem); transition:opacity .18s,transform .18s; }
+  .subject-card:hover em, .subject-card:focus-within em { opacity:1; transform:none; }
   .standards-panel { grid-template-columns:1fr; gap:1.5rem; padding:1.485rem; border:1px solid rgb(105 174 255 / 30%); border-radius:1.5rem; background:rgb(9 34 59 / 64%); box-shadow:none; }
   .standards-panel>div:first-child { display:flex; justify-content:space-between; align-items:baseline; gap:1rem; }
   .standards-panel>div:first-child p { color:#9eb3c7; font-size:1rem; }
@@ -202,7 +203,8 @@
   .flow-card:nth-child(4n) { margin-block-start:0; }
   /* D renders the step label and "수업자료" tag as pill chips, not plain text. */
   .flow-card span { display:inline-flex; inline-size:auto; justify-self:start; align-self:flex-start; padding:.4375rem .8125rem; border:1px solid rgb(94 247 205 / 32%); border-radius:999px; color:#5ef7cd; background:rgb(94 247 205 / 8%); font-size:clamp(.72rem,.66vw,.88rem); line-height:1; }
-  .flow-card em { align-self:flex-end; margin-block-start:auto; display:inline-flex; inline-size:max-content; min-block-size:2.125rem; align-items:center; justify-content:center; padding:0 .875rem; border-radius:999px; color:#07111c; background:linear-gradient(135deg,#5ef7cd,#64eaff); font-weight:870; font-size:.82rem; }
+  .flow-card em { align-self:flex-end; margin-block-start:auto; display:inline-flex; inline-size:max-content; min-block-size:2.125rem; align-items:center; justify-content:center; padding:0 .875rem; border-radius:999px; color:#07111c; background:linear-gradient(135deg,#5ef7cd,#64eaff); font-weight:870; font-size:.82rem; opacity:0; transform:translateY(.5rem); transition:opacity .18s,transform .18s; }
+  .flow-card:hover em, .flow-card:focus-within em { opacity:1; transform:none; }
 
   /* RESOURCES → D: full-width, even six-up bordered tiles. */
   .resources-scene { grid-template-columns:1fr; gap:3.6rem; text-align:left; background:none; }
@@ -216,7 +218,8 @@
   .gallery-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:.84rem 1rem; background:transparent; }
   .gallery-grid article { position:relative; overflow:hidden; display:grid; align-content:center; justify-items:center; gap:.75rem; min-block-size:16.875rem; padding:1.25rem; border:1px solid rgb(126 166 184 / 26%); border-radius:1.5rem; background:linear-gradient(145deg,rgb(16 62 84 / 55%),rgb(8 27 48 / 52%)); box-shadow:none; text-align:center; }
   /* D pins the "바로가기" button to the card's bottom-right corner as a pill. */
-  .gallery-grid article button { position:absolute; inset-inline-end:1.125rem; inset-block-end:1.125rem; min-block-size:2.375rem; padding:0 1rem; border-radius:999px; border:1px solid rgb(94 247 205 / 28%); color:#06111c; background:linear-gradient(135deg,#5ef7cd,#64eaff); }
+  .gallery-grid article button { position:absolute; inset-inline-end:1.125rem; inset-block-end:1.125rem; min-block-size:2.375rem; padding:0 1rem; border-radius:999px; border:1px solid rgb(94 247 205 / 28%); color:#06111c; background:linear-gradient(135deg,#5ef7cd,#64eaff); opacity:0; transform:translateY(.5rem); transition:opacity .18s,transform .18s; }
+  .gallery-grid article:hover button, .gallery-grid article:focus-within button { opacity:1; transform:none; }
   .gallery-grid article>span { color:inherit; font-weight:400; font-size:.78rem; }
   .gallery-detail { display:none; min-block-size:0; border:1px solid rgb(126 166 184 / 26%); border-radius:1.5rem; background:linear-gradient(145deg,rgb(16 72 91 / 70%),rgb(7 27 49 / 70%)); }
   .gallery-stage.is-detail .gallery-grid { display:none; }

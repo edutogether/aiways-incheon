@@ -24,7 +24,16 @@ D 파일을 다시 뒤지지 말고 이 문서 값을 그대로 쓴다. 여기 �
 | `.scene-copy h2` (project 제외 전 페이지 공용 제목) | `clamp(2.35rem,4.4vw,7.15rem)` (min-width:120rem에서 별도 ceiling 있음, 동일값으로 통일) | |
 | `--scene-block-space` (페이지 위아래 여백) | `clamp(4rem,6.5vw,11.25rem)` | |
 | `.main-nav a.is-active` | 배경 없음. `::after`로 그라디언트 밑줄: `position:absolute; inset-block-end:-8px; inset-inline:16px; block-size:2px; background:linear-gradient(90deg,transparent,#64eaff,#5ef7cd,transparent)` | 필박스 아님 |
+| **모든 대제목/카드제목** (`h1`, `.scene-copy h2`, `.project-statement h2`, `.panel-head h2`) | `font-weight:950`, `line-height:.96`, `letter-spacing:normal` | **크기(font-size)만 맞추고 굵기는 놓쳤던 항목** — 기본 h1/h2는 브라우저 기본값(bold=700)으로 떨어져서 D보다 훨씬 얇아 보였음. letter-spacing도 D는 압축(negative) 안 씀 |
+| `.brand-mark` (헤더 로고) | D는 원본 로고 파일(1440×960) 그대로 `object-fit:contain`, 크롭 안 함. D 자체 크기(52px)는 실측상 글자가 안 보일 정도로 작음 | 이 앱은 가독성을 위해 D보다 큰 3.5rem(56px)+흰 배경으로 의도적으로 확대 — D와 안 맞는 게 아니라 의도된 개선 |
 | `.main-nav a` (비활성) | `color: rgba(225,242,255,.68)` / 활성 `color:#f6fdff`, `font-weight:760` | 배경/그림자 없음, 색상 대비만 |
+| `.main-nav a` 크기 | `font-size:.92rem`(고정, clamp 아님), `min-height:2.375rem`, `padding-inline:.75rem`, `font-weight:760`. 2560px+: `1.18rem`/`3.25rem`/`1.25rem` | 반응형 계산식이 아니라 고정값 — 화면폭 줄어들수록 메뉴가 계속 작아지게 짜여있던 게 버그였음 |
+| `.site-header` 좌우 여백 | `clamp(1.375rem,4vw,4.5rem)` (2560px+: `8rem`) | `.scene` 좌우 여백과 **다른 별개 변수**임. 같은 변수 재사용하면 헤더가 대시보드 여백만큼 과하게 넓어짐 |
+| `--header-size` | `4.875rem`(78px), 2560px+: `7rem`(112px) | |
+| `.scene` 전체 폭 | **상한선 없음** (`max-width:100%`, `width:100%`). 좌우 여백만 `clamp(3rem,5.4vw,8.625rem)`(2560px+: `11.25rem` 고정)으로 조절 | 예전엔 `--scene-content-max`로 전체 폭에 상한(96rem)을 걸어놨었는데, D는 화면 끝까지 채우고 패딩만 키우는 방식 — 초광폭 화면에서 양옆에 큰 빈 공간이 남는 원인이었음 |
+| `html` 스크롤 | `scroll-snap-type:y mandatory` + 각 `.scene`에 `scroll-snap-align:start`, `min-block-size:100svh` | 이 자체가 아예 빠져있었음 — "스크롤 내리면 섹션 단위로 딱 멈추는" D 특유의 느낌이 전혀 없었던 원인 |
+| `.hero-copy h1 span` | `display:block; white-space:nowrap;` | HTML엔 `<span>버리는 순간,</span><span>데이터가 되다</span>` 두 개가 이미 있었지만 이 CSS가 없어서 그냥 이어지는 한 줄처럼 취급돼 화면 폭에 따라 아무데서나 줄바꿈되고 있었음 |
+| `.school-panel`/`.class-panel` 숫자칸 폭 | `7.875rem`(126px) 기본 / `6.5rem`(104px) 1181–1600px / `11.875rem`(190px) 2560px+ | D 파일 자체에 이 셀렉터가 여러 번 다시 선언돼 있어서, **어느 게 실제로 이기는지 라이브로 확인 안 하면 죽은 코드를 베낄 위험이 큼** — 실제로 처음엔 2560px 전용 `.dashboard-scene` 비율 규칙을 그대로 베꼈다가, 그건 D 파일 안에서도 더 뒤에 있는 무조건 규칙에 덮여 죽은 코드라는 걸 나중에 발견함 |
 
 ## 도넛/링 컴포넌트
 

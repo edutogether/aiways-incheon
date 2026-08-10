@@ -70,5 +70,28 @@ D 파일을 다시 뒤지지 말고 이 문서 값을 그대로 쓴다. 여기 �
 
 - D의 로고 파일도 "AI Ways Incheon" 전체 워드마크(1440×960)이지 정사각형 아이콘이 아님. 헤더에 쓸 아이콘은 별도로 다리 그림 부분만 크롭해서 써야 함 (`assets/brand/aiways-mark.png`, 크롭 좌표 `left:660,top:245,width:170,height:100`).
 
+## 페이지별 제목/카드 (2026-08-11 8페이지 전수 확인)
+
+| 대상 | D 확정 값 | 비고 |
+|---|---|---|
+| `.hah-title` (H-A-H 페이지 제목) | `width:min(1780px,100%)`, `font-size:clamp(4.95rem,5.48vw,7.45rem)`, `line-height:1.14`, `word-break:keep-all`. `span` 자식은 `display:block;white-space:nowrap` | HTML에 이미 `<span>` 2개로 나뉘어 있었는데 CSS가 없어서 그냥 이어진 한 줄처럼 취급되어 아무데서나 줄바꿈되던 버그. 대시보드 h1과 똑같은 패턴 |
+| `.flow-scene/.gallery-scene/.sorting-scene/.resources-scene .scene-copy h2` | `font-size:clamp(4.4rem,5.4vw,7.15rem)` | 4페이지 공용, 일반 `.scene-copy h2`의 `clamp(2.35rem,4.4vw,7.15rem)`보다 커야 함 |
+| `.standards-grid article span`(교육과정 성취기준 배지) | `font-weight:950` | `800`이 아님 |
+| `.standards-grid article p` | `font-size:.82rem`, `font-weight:760`, `color:#9eb3c7` | 이 규칙 자체가 없어서 기본 본문 스타일(16px/400/흰색)로 새고 있었음 |
+| `.flow-card h3` | `font-size:clamp(1.08rem,1.05vw,1.38rem)`, `line-height:1.24` | |
+| `.flow-card p` | `font-size:clamp(.82rem,.76vw,.98rem)`, `line-height:1.54` | |
+| `.gallery-grid article>span`(번호 라벨) | `color:rgb(164 191 216 / 78%)`, `font-weight:800` | |
+| `.resource-grid a` | `font-size:.95rem`, `font-weight:880`, `padding:1.08rem` | |
+| `.resource-grid a span`(번호) | `color:#5ef7cd`(mint), `font-weight:900` | 흰색이 아니라 민트색 |
+| `.footer-credit` | `display:grid; grid-template-columns:1fr auto; justify-content:space-between; border-block-start:1px solid rgb(132 220 255 / 20%); padding-block-start:1.5rem`. 마지막 `p`는 `justify-self:end; text-align:end` | 둘 다 왼쪽에 쌓여있던 게 원래는 좌우로 나뉘어야 함 |
+
+## 3초판단(sorting) 페이지 — D와 의도적으로 다름
+
+D의 3초판단 섹션은 정적 목업(빠른선택 버튼, 검색창, Teachable Machine 링크 입력칸)이고, 지금 앱은 실제 카메라/AI 분류가 동작하는 완성된 기능입니다. **이 페이지는 D보다 발전된 상태라 1:1 비교 대상이 아닙니다.**
+
+## 스크롤 스냅 — CSS로 새로 만들지 말 것
+
+`app.js`에 이미 `snapByWheel`/`navigateToSection` 함수로 자체 스크롤 스냅이 구현돼 있습니다 (휠 이벤트를 가로채서 `scrollIntoView`로 다음 섹션으로 이동). 여기에 CSS `scroll-snap-type`을 추가하면 두 메커니즘이 충돌해서 스크롤 자체가 멈춥니다 — 2026-08-11에 실제로 이 사고를 내고 되돌렸습니다. 스크롤 관련 문제는 CSS가 아니라 `app.js`의 이 함수들을 먼저 확인할 것.
+
 ---
 관련 메모리: `aiways-d-matching-method` (방법론), `aiways-current-milestone` (진행 상황)

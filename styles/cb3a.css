@@ -337,4 +337,20 @@
   .qr-invite img { flex:0 0 auto; inline-size:4.6rem; block-size:4.6rem; border-radius:.6rem; }
   .qr-invite p { margin:0; color:#a9c2d6; font-size:.72rem; font-weight:700; line-height:1.4; }
   .sorting-features + .qr-invite { margin-block-start:.9rem; }
+
+  /* Global button texture — D: pill-shaped controls with a lifted glow
+     shadow, not the flat/square buttons the closed-beta shell fell back to. */
+  .primary-btn, .quick-action-row button:first-child, #confirmDecision { border-radius:999px; box-shadow:0 1.125rem 2.875rem rgb(94 247 205 / 18%); background:linear-gradient(135deg,#5ef7cd,#64eaff); color:#06111c; font-weight:850; }
+  .secondary-btn, .quick-action-row button, .decision-grid button, .tm-model-line button, .hold-input-line button { border-radius:999px; border:1px solid rgb(132 220 255 / 26%); background:rgb(255 255 255 / 6%); color:#f6fbff; font-weight:850; }
+  .upload-actions button { border-radius:1.25rem; border:1px dashed rgb(94 247 205 / 36%); background:linear-gradient(145deg,rgb(94 247 205 / 22%),rgb(67 137 255 / 12%)); box-shadow:0 1.125rem 2.875rem rgb(94 247 205 / 18%); color:#f8fdff; font-weight:900; }
+  .app-tabs button { border-radius:.875rem; border:1px solid transparent; color:rgb(225 244 250 / 80%); }
+  .app-tabs button.is-active { border-radius:.875rem; background:linear-gradient(135deg,rgb(126 255 226 / 96%),rgb(86 218 255 / 92%)); box-shadow:0 .625rem 1.5rem rgb(94 247 205 / 15%); color:#06111c; font-weight:850; }
+
+  /* Global form controls — D's glass inputs; #searchButton/.data-refresh-btn
+     had no background rule anywhere and were falling back to the browser's
+     native grey button chrome. */
+  .select-line select, .search-line input, .tm-model-line input, .hold-input-line input { border-radius:.75rem; border-color:rgb(100 234 255 / 22%); background:rgb(255 255 255 / 7%); }
+  #searchButton { border-radius:1rem; border:0; background:rgb(94 247 205 / 9%); color:#f2fdff; }
+  .data-refresh-btn { border-radius:50%; border:1px solid rgb(100 234 255 / 24%); background:rgb(100 234 255 / 8%); color:#e9fbff; }
+  .close-btn { border-radius:999px; border:1px solid rgb(255 255 255 / 16%); background:rgb(255 255 255 / 8%); color:#f2fdff; }
 }

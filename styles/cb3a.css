@@ -177,8 +177,11 @@
   .subject-card { position:relative; display:flex; flex-direction:column; gap:.5rem; min-block-size:0; padding:1.53rem 1.53rem 4rem; border:1px solid rgb(131 224 255 / 18%); border-radius:1.5rem; background:linear-gradient(150deg,rgb(20 58 90 / 55%),rgb(8 27 48 / 52%)); box-shadow:none; }
   .subject-card em { position:absolute; inset-inline-end:1.125rem; inset-block-end:1.125rem; margin-block-start:0; }
   .standards-panel { grid-template-columns:1fr; gap:1.5rem; padding:1.485rem; border:1px solid rgb(105 174 255 / 30%); border-radius:1.5rem; background:rgb(9 34 59 / 64%); box-shadow:none; }
+  .standards-panel>div:first-child { display:flex; justify-content:space-between; align-items:baseline; gap:1rem; }
+  .standards-panel>div:first-child p { color:#9eb3c7; font-size:1rem; }
   .standards-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:.875rem; margin-block-start:0; }
   .standards-grid article { display:grid; gap:.35rem; padding:.75rem 1rem; border:1px solid rgb(105 174 255 / 30%); border-radius:1rem; background:rgb(79 147 255 / 8%); }
+  .standards-grid article span { display:inline-flex; inline-size:fit-content; padding:.25rem .625rem; border-radius:999px; background:linear-gradient(135deg,#5ef7cd,#64eaff); color:#06111c; font-size:.78rem; font-weight:800; }
 
   /* H-A-H → D: centered copy, three bordered glass cards, pill callout. */
   .hah-scene { grid-template-columns:1fr; gap:1.125rem; text-align:center; background:none; }

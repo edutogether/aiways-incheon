@@ -210,6 +210,8 @@
   .resources-scene { grid-template-columns:1fr; gap:3.6rem; text-align:left; background:none; }
   .resource-grid { grid-template-columns:repeat(6,minmax(0,1fr)); gap:.75rem; border:0; }
   .resource-grid a { display:grid; gap:.875rem; min-block-size:0; padding:.9rem; border:1px solid rgb(138 171 195 / 28%); border-radius:1.5rem; background:rgb(11 30 51 / 55%); box-shadow:none; }
+  .resource-pending { cursor:default; background:rgb(255 255 255 / 3.5%); }
+  .resource-pending em { color:rgb(170 188 201 / 62%); font-style:normal; }
   .resource-grid a:first-child { grid-row:auto; min-block-size:0; background:rgb(11 30 51 / 55%); }
 
   /* GALLERY → D: copy left, 4-up card grid; detail opens on click (is-detail). */

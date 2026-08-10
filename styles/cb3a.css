@@ -265,11 +265,11 @@
      pie slice. The old base .donut relies on a small per-child dark circle
      instead, which leaves almost no room for the label -> this D-revival
      override replaces the fill technique entirely for this context. */
-  .school-panel .donut { inline-size:clamp(4.6rem,6vw,5.5rem); block-size:clamp(4.6rem,6vw,5.5rem); grid-template-rows:1fr; align-content:stretch; background:radial-gradient(circle at center,#0b1c2d 56%,transparent 57%),conic-gradient(#4fe4cf calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 .875rem rgb(255 255 255 / 6%),0 0 .875rem rgb(79 228 207 / 12%); }
-  .school-panel .donut.violet { background:radial-gradient(circle at center,#0b1c2d 56%,transparent 57%),conic-gradient(#ad8cff calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 .875rem rgb(255 255 255 / 6%),0 0 .875rem rgb(173 140 255 / 12%); }
+  .school-panel .donut { inline-size:clamp(5rem,6.6vw,6rem); block-size:clamp(5rem,6.6vw,6rem); grid-template-rows:1fr; align-content:stretch; background:radial-gradient(circle at center,#0b1c2d 46%,transparent 47%),conic-gradient(#4fe4cf calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 .875rem rgb(255 255 255 / 6%),0 0 .875rem rgb(79 228 207 / 12%); }
+  .school-panel .donut.violet { background:radial-gradient(circle at center,#0b1c2d 46%,transparent 47%),conic-gradient(#ad8cff calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 .875rem rgb(255 255 255 / 6%),0 0 .875rem rgb(173 140 255 / 12%); }
   .school-panel .donut>* { background:none; }
-  .school-panel .donut span { align-self:center; padding:0; margin-block-start:-.55rem; font-size:.68rem; }
-  .school-panel .donut small { align-self:end; padding:0; margin-block-end:14%; max-inline-size:3.4rem; font-size:.46rem; line-height:1.1; }
+  .school-panel .donut span { align-self:center; padding:0; margin-block-end:-.1rem; font-size:.86rem; }
+  .school-panel .donut small { align-self:center; padding:0; margin-block-start:-.1rem; max-inline-size:3.2rem; font-size:.52rem; line-height:1.05; }
 
   /* 4. Landfill: the four metric boxes were letting "16,400t" run into the
      next box ("-9.4%"); the title/time row needed a hard nowrap so it can

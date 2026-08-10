@@ -358,7 +358,10 @@
      native grey button chrome. */
   .select-line select, .search-line input, .tm-model-line input, .hold-input-line input { border-radius:.75rem; border-color:rgb(100 234 255 / 22%); background:rgb(255 255 255 / 7%); }
   #searchButton { border-radius:1rem; border:0; background:rgb(94 247 205 / 9%); color:#f2fdff; }
-  .edu2g-beta-trigger { border:1px solid rgb(100 234 255 / 24%); background:rgb(100 234 255 / 8%); color:#e9fbff; }
+  /* Exhibition desktop is kiosk-only (3-second-sort demo); the cross-app
+     closed-beta login is a mobile-only concern now, auto-opened instead
+     of needing this button (see edu2gBetaUi.js autoOpenOnMobileIfUnregistered). */
+  .edu2g-beta-trigger { display:none; }
   /* D's nav "effect" is text color contrast only, no filled pill background. */
   .main-nav a { font-weight:760; }
   .main-nav a.is-active, .main-nav a:hover { background:none; box-shadow:none; color:#f6fdff; }

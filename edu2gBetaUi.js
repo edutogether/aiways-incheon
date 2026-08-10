@@ -47,5 +47,14 @@
   function renderDevices(root) { const section = document.createElement("section"); section.className = "edu2g-beta-devices"; const title = document.createElement("h3"); text(title, "신뢰 기기"); section.append(title); state.devices.forEach(device => { const row = document.createElement("article"); row.className = "edu2g-beta-device"; const label = document.createElement("strong"), detail = document.createElement("p"); text(label, device.deviceLabel || "등록된 기기"); text(detail, `${device.platform || "Other"}${device.currentDevice ? " · 현재 기기" : ""} · ${device.status === "active" ? "연결됨" : "해제됨"}`); row.append(label, detail); if (device.status === "active") { const revoke = button(device.currentDevice ? "이 기기 해제" : "기기 해제", () => revokeDevice(device)); revoke.dataset.managementId = device.managementId || ""; row.append(revoke); } section.append(row); }); root.append(section); }
   async function revokeDevice(device) { if (state.mode === "revoking" || !device.managementId || !confirm(`“${device.deviceLabel || "이 기기"}” 연결을 해제할까요?`)) return; setMode("revoking"); render(); const result = await client().revokeTrustedDevice({ targetManagementId: device.managementId }); if (!result.ok) { setMode("access_error"); render(); ui.content.append(showError(result.code)); return; } if (device.currentDevice) { await window.AIWaysBetaAuth?.clearEdu2gDeviceSession?.(); state.session = null; state.devices = []; setMode("unregistered"); setTrigger("unregistered"); announce("현재 기기 연결을 해제했습니다."); render(); return; } setMode("registered"); await loadDevices(); }
   async function restore() { if (!ui) return; setMode("booting"); setTrigger("booting"); const result = await client().getSession(); if (result.ok) { state.session = result.data; setMode("registered"); setTrigger("registered"); return; } if (result.code === "device_revoked") { await window.AIWaysBetaAuth?.clearEdu2gDeviceSession?.(); state.session = null; setMode("access_error"); setTrigger("temporary_error"); return; } if (["device_not_registered", "auth_missing", "auth_invalid"].includes(result.code)) { state.session = null; setMode("unregistered"); setTrigger("unregistered"); return; } setMode("temporary_error"); setTrigger("temporary_error"); }
-  window.addEventListener("DOMContentLoaded", () => { void restore(); }, { once: true });
+  async function autoOpenOnMobileIfUnregistered() {
+    if (!ui) return;
+    const isMobile = window.matchMedia("(max-width: 63.99rem)").matches;
+    if (!isMobile || state.mode !== "unregistered") return;
+    state.opener = ui.trigger;
+    ui.dialog.showModal();
+    render();
+    requestAnimationFrame(() => ui.dialog.querySelector("input, button")?.focus());
+  }
+  window.addEventListener("DOMContentLoaded", async () => { await restore(); await autoOpenOnMobileIfUnregistered(); }, { once: true });
 })();

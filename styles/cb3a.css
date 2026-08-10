@@ -184,7 +184,10 @@
   .standards-grid article span { display:inline-flex; inline-size:fit-content; padding:.25rem .625rem; border-radius:999px; background:linear-gradient(135deg,#5ef7cd,#64eaff); color:#06111c; font-size:.78rem; font-weight:800; }
 
   /* H-A-H → D: centered copy, three bordered glass cards, pill callout. */
-  .hah-scene { grid-template-columns:1fr; gap:1.125rem; text-align:center; background:none; }
+  .hah-scene { grid-template-columns:1fr; gap:1.125rem; text-align:start; background:none; }
+  .hah-scene .scene-copy { justify-items:start; margin-inline:0; max-inline-size:none; }
+  .hah-grid .panel ul { padding-inline-start:2.5rem; list-style:disc; }
+  .hah-grid .panel li { color:#9eb3c7; }
   .hah-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.35rem; align-items:stretch; }
   .hah-grid .panel { display:block; min-block-size:0; padding:1.5rem; border:1px solid rgb(131 224 255 / 18%); border-radius:1.5rem; background:linear-gradient(150deg,rgb(20 58 90 / 60%),rgb(8 27 48 / 55%)); box-shadow:none; transform:none; text-align:left; }
   .hah-grid .panel::before { display:none; }

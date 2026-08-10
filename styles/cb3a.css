@@ -127,7 +127,7 @@
   .dashboard-grid { padding:clamp(.65rem,1vw,1.5rem); border:1px solid rgb(100 220 235 / 28%); border-radius:1.8rem; background:linear-gradient(145deg,rgb(13 56 84 / 74%),rgb(5 23 39 / 78%)); box-shadow:0 28px 68px rgb(0 7 20 / 28%); }
   .dashboard-grid>.panel { border-color:rgb(100 220 235 / 23%); box-shadow:0 20px 70px rgb(14 28 54 / 34%),inset 0 1px rgb(255 255 255 / 6%); }
   .dashboard-grid>.panel:hover { box-shadow:0 28px 80px rgb(6 18 36 / 48%),0 0 34px rgb(94 247 205 / 16%),inset 0 1px rgb(255 255 255 / 8%); background:linear-gradient(145deg,rgb(255 255 255 / 10.6%),rgb(94 247 205 / 6.7%),rgb(100 169 255 / 4.3%)); }
-  .school-panel .panel-head h2 { font-size:clamp(.875rem,1.14vw,1.231rem); }
+  .school-panel .panel-head h2,.class-panel .panel-head h2 { font-size:clamp(.875rem,1.14vw,1.231rem); }
   .project-scene,.curriculum-scene,.hah-scene,.flow-scene,.gallery-scene,.sorting-scene,.resources-scene { isolation:isolate; }
   .project-statement,.standards-panel,.sorting-app { box-shadow:0 24px 56px rgb(0 7 20 / 25%); }
   .flow-card,.resource-grid a { transition:transform .18s ease,border-color .18s ease,background .18s ease; }
@@ -322,7 +322,7 @@
   .school-panel .donut { inline-size:clamp(5rem,6.6vw,6rem); block-size:clamp(5rem,6.6vw,6rem); grid-template-rows:1fr; align-content:stretch; background:radial-gradient(circle at center,#0b1c2d 46%,transparent 47%),conic-gradient(#4fe4cf calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 1.5rem rgb(255 255 255 / 6%),0 0 1.5rem rgb(79 228 207 / 12%); }
   .school-panel .donut.violet { background:radial-gradient(circle at center,#0b1c2d 46%,transparent 47%),conic-gradient(#ad8cff calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 .875rem rgb(255 255 255 / 6%),0 0 .875rem rgb(173 140 255 / 12%); }
   .school-panel .donut>* { background:none; }
-  .school-panel .donut span { align-self:center; padding:0; margin-block-end:-.55rem; font-size:.86rem; font-weight:950; }
+  .school-panel .donut span { align-self:center; padding:0; margin-block-end:-.55rem; font-size:1rem; font-weight:950; }
   .school-panel .donut small { align-self:center; padding:0; margin-block-start:-.55rem; max-inline-size:3.2rem; font-size:.66rem; font-weight:850; line-height:1.05; }
 
   /* 4. Landfill: the four metric boxes were letting "16,400t" run into the
@@ -360,8 +360,8 @@
   .landfill-kpi-ring::before { z-index:-1; inset:18%; background:conic-gradient(#ad8cff 32.7%, rgb(126 116 177 / 22%) 0); box-shadow:0 0 12px rgb(173 140 255 / 10%); }
   .landfill-kpi-ring::after { z-index:-1; inset:34%; background:radial-gradient(circle at 36% 28%, rgb(33 64 102 / 98%), #0a1830 72%); box-shadow:inset 0 0 0 1px rgb(173 214 255 / 8%); }
   .landfill-kpi-ring > span, .landfill-kpi-ring > small { position:relative; z-index:1; grid-area:1 / 1; text-align:center; }
-  .landfill-kpi-ring > span { align-self:center; padding:0; margin-block-start:-.8125rem; color:#f3fffe; font-size:.86rem; font-weight:950; line-height:1; text-shadow:0 0 12px rgb(94 247 205 / 22%); }
-  .landfill-kpi-ring > small { align-self:end; padding:0; max-inline-size:3.6rem; margin-block-end:17%; color:rgb(219 241 249 / 76%); font-size:.42rem; font-weight:850; line-height:1.15; }
+  .landfill-kpi-ring > span { align-self:center; padding:0; margin-block-start:-.8125rem; color:#f3fffe; font-size:1.32rem; font-weight:950; line-height:1; text-shadow:0 0 12px rgb(94 247 205 / 22%); }
+  .landfill-kpi-ring > small { align-self:end; padding:0; max-inline-size:3.6rem; margin-block-end:17%; color:rgb(219 241 249 / 76%); font-size:.57rem; font-weight:850; line-height:1.15; }
   .landfill-kpi-legend { inline-size:min(100%,8.3rem); min-inline-size:0; display:flex; align-items:center; justify-content:space-between; gap:.4rem; padding:.4rem .55rem; border:1px solid rgb(173 140 255 / 26%); border-radius:999px; color:rgb(226 218 255 / 86%); background:linear-gradient(135deg,rgb(173 140 255 / 13%),rgb(100 169 255 / 5.5%)); font-size:.54rem; font-weight:850; white-space:nowrap; }
   .landfill-kpi-legend span { min-inline-size:0; display:inline-flex; align-items:center; gap:.3rem; }
   .landfill-kpi-legend i { inline-size:.4rem; block-size:.4rem; flex:0 0 auto; border-radius:999px; background:#ad8cff; box-shadow:0 0 9px rgb(173 140 255 / 62%); }

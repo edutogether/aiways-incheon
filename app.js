@@ -2567,7 +2567,7 @@
     // duration of our animation and restore whatever was there afterwards -
     // more reliable than passing behavior:"instant" per call.
     let snapScrollFrame = 0;
-    function snapScrollTo(section, duration = 420) {
+    function snapScrollTo(section, duration = 440) {
       if (snapScrollFrame) cancelAnimationFrame(snapScrollFrame);
       const root = document.documentElement;
       const previousBehavior = root.style.scrollBehavior;
@@ -2586,9 +2586,14 @@
         return;
       }
       const startedAt = performance.now();
-      // easeInOutCubic: the pure ease-out curve started at full speed, which
-      // read as a jolt rather than smooth motion on every wheel tick.
-      const ease = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+      // easeInOutBack, dialed well below the standard c1 of 1.70158. 0.95 gave
+      // the magnetic snap but read as flippant; 0.42 keeps a ~1.5% pull-past -
+      // felt as weight settling rather than a bounce.
+      const c1 = 0.42;
+      const c2 = c1 * 1.525;
+      const ease = t => t < 0.5
+        ? (Math.pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2
+        : (Math.pow(2 * t - 2, 2) * ((c2 + 1) * (2 * t - 2) + c2) + 2) / 2;
       function step(now) {
         const progress = Math.min(1, (now - startedAt) / duration);
         window.scrollTo(0, Math.round(startY + distance * ease(progress)));

@@ -114,7 +114,7 @@
 
     function showIcon(emoji) {
       icon.style.opacity = "0";
-      setTimeout(() => { icon.textContent = emoji; icon.style.opacity = "1"; }, 90);
+      setTimeout(() => { icon.textContent = emoji; icon.style.opacity = "1"; }, 60);
     }
 
     function nextRandomEmoji() {
@@ -127,7 +127,7 @@
     function startRotation() {
       stopRotation();
       showIcon(nextRandomEmoji());
-      rotationTimer = setInterval(() => showIcon(nextRandomEmoji()), 650);
+      rotationTimer = setInterval(() => showIcon(nextRandomEmoji()), 350);
     }
     function stopRotation() { clearInterval(rotationTimer); }
 
@@ -318,7 +318,9 @@
   // -----------------------------------------------------------------
   // Judge tab: search box -> local match, or Gemini text lookup fallback
   // -----------------------------------------------------------------
-  const TEXT_SCAN_MIN_MS = 900;
+  // Kept in sync with the loading-bar-fill CSS animation duration (1.4s) so the
+  // bar always visibly finishes filling before the result swaps in.
+  const TEXT_SCAN_MIN_MS = 1400;
 
   function showTextScanState(query) {
     $("judgeTextScanQuery").textContent = query;

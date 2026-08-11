@@ -28,10 +28,9 @@ body {
     filter: blur(1px);
 }
 
-@keyframes loadingBarSlide {
-    0% { left: -45%; width: 45%; }
-    50% { left: 28%; width: 55%; }
-    100% { left: 100%; width: 45%; }
+@keyframes loadingBarFill {
+    0% { width: 4%; }
+    100% { width: 100%; }
 }
 .loading-bar-track {
     position: relative;
@@ -40,10 +39,11 @@ body {
 .loading-bar-fill {
     position: absolute;
     top: 0;
+    left: 0;
     bottom: 0;
     border-radius: 9999px;
     background: linear-gradient(90deg, #EA4335, #4285F4, #34A853, #FBBC05);
-    animation: loadingBarSlide 1.3s ease-in-out infinite;
+    animation: loadingBarFill 1.4s ease-out forwards;
 }
 
 /* Belt-and-suspenders centering for the fixed modals: some mobile browsers

@@ -55,6 +55,9 @@
   function showApp() {
     gate.classList.add("hidden");
     appRoot.classList.remove("hidden");
+    // app.js measures tab heights at DOMContentLoaded, while #appRoot is
+    // still display:none (pre-auth) -- re-measure now that it's real.
+    requestAnimationFrame(() => window.AIWaysMobileApp?.syncTabHeights?.());
   }
 
   function renderLoading(message) {

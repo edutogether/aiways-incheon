@@ -567,4 +567,10 @@
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
+
+  // #appRoot is display:none until the auth gate reveals it, so the
+  // scrollHeight-based measurement above runs against a hidden (0-height)
+  // tree at DOMContentLoaded time. authGate.js calls this after it actually
+  // un-hides #appRoot, when heights are real.
+  window.AIWaysMobileApp = { syncTabHeights: () => syncTabHeights() };
 })();

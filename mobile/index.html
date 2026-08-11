@@ -57,6 +57,28 @@
         <!-- 1. 3초 판단 탭 -->
         <div id="tab-judge" class="tab-content space-y-5">
 
+            <!-- 오늘의 실천 현황 (통계 탭과 동일한 실데이터) -->
+            <div class="bg-teal-50 border border-teal-100 rounded-2xl p-3.5">
+                <div class="flex items-center gap-2 mb-2.5">
+                    <span class="text-lg">🌱</span>
+                    <span class="text-xs font-bold text-teal-800">오늘 나의 3초 판단 현황</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="bg-white/70 rounded-xl py-2 text-center">
+                        <div class="text-[8.5px] font-semibold text-teal-700/70">누적 올바른 배출</div>
+                        <div id="judge-stat-count" class="text-base font-extrabold text-blue-600">0회</div>
+                    </div>
+                    <div class="bg-white/70 rounded-xl py-2 text-center">
+                        <div class="text-[8.5px] font-semibold text-teal-700/70">이산화탄소 저감량</div>
+                        <div id="judge-stat-carbon" class="text-base font-extrabold text-teal-600">0.0g</div>
+                    </div>
+                    <div class="bg-white/70 rounded-xl py-2 text-center">
+                        <div class="text-[8.5px] font-semibold text-teal-700/70">판단 보류 등록</div>
+                        <div id="judge-stat-hold" class="text-base font-extrabold text-amber-500">0개</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- 사진으로 판단하기 (실제 AI 연결) -->
             <div>
                 <div class="flex items-center justify-between gap-2 mb-2.5">

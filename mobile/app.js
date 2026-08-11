@@ -257,11 +257,14 @@
 
   function updateHoldCountStat() {
     $("stat-hold").textContent = `${holdBoxList.length}개`;
+    $("judge-stat-hold").textContent = `${holdBoxList.length}개`;
   }
 
   function updateStatsUI() {
     $("stat-count").textContent = `${practiceStats.totalCount}회`;
     $("stat-carbon").textContent = `${practiceStats.carbonReduction.toFixed(1)}g`;
+    $("judge-stat-count").textContent = `${practiceStats.totalCount}회`;
+    $("judge-stat-carbon").textContent = `${practiceStats.carbonReduction.toFixed(1)}g`;
     updateHoldCountStat();
     const container = $("practice-logs-container");
     const noLogs = $("no-logs-msg");

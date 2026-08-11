@@ -1872,9 +1872,9 @@
     ticks.slice().reverse().forEach(tick => {
       const y = Math.round(yScale(tick));
       appendSvg(grid, "path", { d: `M${chartLeft - 8} ${y} H${chartRight + 12}` });
-      appendSvg(yAxis, "text", { class: "y-label", x: "2", y: String(y + 4) }, tickLabel(tick));
+      appendSvg(yAxis, "text", { class: "y-label", x: "-14", y: String(y + 4) }, tickLabel(tick));
     });
-    appendSvg(yAxis, "text", { class: "y-zero", x: "10", y: String(chartBottom + 22), "text-anchor": "middle" }, "0");
+    appendSvg(yAxis, "text", { class: "y-zero", x: "-6", y: String(chartBottom + 22), "text-anchor": "middle" }, "0");
 
     const linePath = smoothPathFor(points);
     const first = points[0];

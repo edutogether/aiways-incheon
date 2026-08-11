@@ -416,7 +416,7 @@
     $("quiz-score").textContent = `현재 점수: ${userQuizScore}점`;
     $("quiz-progress-bar").style.width = `${((currentQuizIndex + 1) / currentQuizSet.length) * 100}%`;
     $("quiz-emoji").textContent = data.emoji;
-    $("quiz-question").textContent = data.question;
+    $("quiz-question").innerHTML = data.question;
     $("quiz-buttons").classList.remove("hidden");
     $("quiz-explanation-panel").classList.add("hidden");
   }

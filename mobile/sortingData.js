@@ -93,9 +93,32 @@
 
   const QUICK_SELECT_ORDER = ["milk-carton", "tape-box", "plastic-cup", "ramen-container", "snack-wrapper", "can", "pet-bottle", "glass-bottle"];
 
-  // Quiz bank ported verbatim from ../app.js's buildExpandedSortingQuizData /
+  // Unbiased Fisher-Yates -- Array.sort(() => Math.random() - 0.5) is a
+  // well-known non-uniform shuffle that leaves elements biased toward their
+  // original position, which read as "the same quiz questions keep showing up".
+  function shuffle(items) {
+    const arr = [...items];
+    for (let i = arr.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function hasBatchim(text) {
+    const lastChar = text.trim().slice(-1);
+    const code = lastChar.charCodeAt(0);
+    if (code < 0xac00 || code > 0xd7a3) return false;
+    return (code - 0xac00) % 28 !== 0;
+  }
+  const topic = name => (hasBatchim(name) ? "은" : "는");
+  const object = name => (hasBatchim(name) ? "을" : "를");
+
+  // Quiz bank ported from ../app.js's buildExpandedSortingQuizData /
   // sortingQuizData / pickQuizSet / quizRank, so the mobile quiz uses the same
-  // large question pool and rank titles as the PC app.
+  // large question pool and rank titles as the PC app -- templates rewritten
+  // to pick 은/는 and 을/를 correctly per item name, and to break each
+  // question at a natural clause boundary instead of an arbitrary wrap point.
   function buildExpandedSortingQuizData(seedQuestions) {
     const quizItems = [
       ["🥛", "우유갑", "종이팩류", "내용물을 비우고 헹군 뒤 펼쳐 말린"],
@@ -140,24 +163,24 @@
       ["❓", "이름 모를 물건", "판단 보류", "아무 데나 버리지 않고 기록한"]
     ];
     const trueTemplates = [
-      item => `${item.name}은 ${item.action} 뒤 ${item.category} 기준으로 검토하는 것이 좋다.`,
-      item => `${item.name}은 배출 전 오염 상태와 학교 수거 기준을 함께 확인해야 한다.`,
-      item => `${item.name}처럼 헷갈리는 물건은 AI 제안 후 학생이 다시 확인하는 과정이 필요하다.`,
-      item => `${item.name}은 분리 가능한 부품을 떼어내면 자원순환 품질을 높일 수 있다.`,
-      item => `${item.name}을 판단 보류함에 남기는 것도 아무 데나 버리지 않는 실천이다.`,
-      item => `${item.name}은 같은 이름이어도 오염 상태에 따라 최종 판단이 달라질 수 있다.`,
-      item => `${item.name} 배출 기준은 우리 학교 수거함 안내와 지역 기준을 같이 살펴야 한다.`,
-      item => `${item.name}을 기록하면 우리 반 자원순환 데이터가 더 정확해진다.`
+      item => `${item.name}${topic(item.name)} ${item.action} 뒤<br>${item.category} 기준으로 검토하는 것이 좋다.`,
+      item => `${item.name}${topic(item.name)} 배출 전<br>오염 상태와 학교 수거 기준을 함께 확인해야 한다.`,
+      item => `${item.name}처럼 헷갈리는 물건은<br>AI 제안 후 학생이 다시 확인하는 과정이 필요하다.`,
+      item => `${item.name}${topic(item.name)} 분리 가능한 부품을 떼어내면<br>자원순환 품질을 높일 수 있다.`,
+      item => `${item.name}${object(item.name)} 판단 보류함에 남기는 것도<br>아무 데나 버리지 않는 실천이다.`,
+      item => `${item.name}${topic(item.name)} 같은 이름이어도<br>오염 상태에 따라 최종 판단이 달라질 수 있다.`,
+      item => `${item.name} 배출 기준은<br>우리 학교 수거함 안내와 지역 기준을 같이 살펴야 한다.`,
+      item => `${item.name}${object(item.name)} 기록하면<br>우리 반 자원순환 데이터가 더 정확해진다.`
     ];
     const falseTemplates = [
-      item => `${item.name}은 오염 상태와 상관없이 무조건 ${item.category}로 버리면 된다.`,
-      item => `${item.name}은 AI가 한 번 제안하면 학생 확인 없이 바로 최종 판단해도 된다.`,
-      item => `${item.name}은 학교 기준을 보지 않아도 전국 어디서나 항상 같은 수거함에 넣는다.`,
-      item => `${item.name}은 음식물이나 액체가 묻어도 재활용 품질에 영향을 주지 않는다.`,
-      item => `${item.name}은 작거나 가벼우면 아무 일반 수거함에 섞어도 괜찮다.`,
-      item => `${item.name}은 분리 가능한 부품이 있어도 그대로 버리는 것이 항상 더 좋다.`,
-      item => `${item.name}을 헷갈릴 때 보류함에 기록하는 것은 자원순환 실천이 아니다.`,
-      item => `${item.name}은 친구 의견이나 학교 안내보다 색깔만 보고 분류하면 충분하다.`
+      item => `${item.name}${topic(item.name)} 오염 상태와 상관없이<br>무조건 ${item.category}로 버리면 된다.`,
+      item => `${item.name}${topic(item.name)} AI가 한 번 제안하면<br>학생 확인 없이 바로 최종 판단해도 된다.`,
+      item => `${item.name}${topic(item.name)} 학교 기준을 보지 않아도<br>전국 어디서나 항상 같은 수거함에 넣는다.`,
+      item => `${item.name}${topic(item.name)} 음식물이나 액체가 묻어도<br>재활용 품질에 영향을 주지 않는다.`,
+      item => `${item.name}${topic(item.name)} 작거나 가벼우면<br>아무 일반 수거함에 섞어도 괜찮다.`,
+      item => `${item.name}${topic(item.name)} 분리 가능한 부품이 있어도<br>그대로 버리는 것이 항상 더 좋다.`,
+      item => `${item.name}${object(item.name)} 헷갈릴 때<br>보류함에 기록하는 것은 자원순환 실천이 아니다.`,
+      item => `${item.name}${topic(item.name)} 친구 의견이나 학교 안내보다<br>색깔만 보고 분류하면 충분하다.`
     ];
     const trueQuestions = seedQuestions.filter(item => item.answer);
     const falseQuestions = seedQuestions.filter(item => !item.answer);
@@ -172,72 +195,72 @@
       });
     });
 
-    const balanced = [];
-    for (let index = 0; index < 250; index += 1) {
-      balanced.push(trueQuestions[index % trueQuestions.length]);
-      balanced.push(falseQuestions[index % falseQuestions.length]);
-    }
-    return balanced;
+    // Previously this interleaved only the first 250 of each pool via
+    // index % length, which -- since both pools are already longer than 250
+    // -- silently dropped every quizItem past roughly the 31st, and always
+    // in the same order. Shuffle the full combined pool and cap at 500 so
+    // every item can appear and the cap is an actual random sample, not a
+    // truncation.
+    return shuffle([...trueQuestions, ...falseQuestions]).slice(0, 500);
   }
 
   const quizPool = buildExpandedSortingQuizData([
-    ["🧾", "영수증은 깨끗해 보여도 감열지라 일반쓰레기로 배출하는 것이 맞다.", true],
-    ["🥛", "우유갑은 일반 종이와 같은 수거함에 섞어도 항상 괜찮다.", false],
-    ["📦", "택배상자는 테이프와 송장을 최대한 제거하고 종이류로 배출한다.", true],
-    ["🥤", "플라스틱컵은 남은 음료를 비우고 헹군 뒤 배출해야 한다.", true],
-    ["🍜", "국물 자국이 심한 컵라면 용기는 재활용보다 일반쓰레기 검토가 필요하다.", true],
-    ["🍿", "과자봉지는 부스러기와 기름기가 많아도 무조건 비닐류다.", false],
-    ["🥫", "캔 안에 이물질이 들어 있으면 먼저 비우는 것이 좋다.", true],
-    ["🔋", "폐건전지는 일반쓰레기 봉투에 넣어도 안전하다.", false],
-    ["🪥", "칫솔처럼 여러 재질이 결합된 생활용품은 일반쓰레기 검토가 필요하다.", true],
-    ["🖊️", "볼펜은 플라스틱처럼 보여도 재질 분리가 어려워 일반쓰레기로 보는 경우가 많다.", true],
-    ["🧼", "지우개 조각은 종이류와 함께 버리면 좋다.", false],
-    ["🍌", "바나나 껍질은 지역 기준에 따라 음식물쓰레기로 배출할 수 있다.", true],
-    ["🥚", "달걀 껍데기는 음식물쓰레기로 항상 배출한다.", false],
-    ["🧃", "빨대가 붙은 음료팩은 빨대를 분리하고 팩을 헹구는 것이 좋다.", true],
-    ["☕", "종이컵 안쪽 코팅과 오염 상태가 애매하면 학교 기준을 다시 확인한다.", true],
-    ["🧴", "페트병은 내용물을 비우고 라벨을 제거한 뒤 찌그러뜨려 배출하면 좋다.", true],
-    ["🧴", "페트병 뚜껑은 닫아도 되는지 학교 기준에 따라 확인할 필요가 있다.", true],
-    ["🍱", "음식물이 묻은 배달 용기는 씻기 어렵다면 재활용함을 오염시킬 수 있다.", true],
-    ["🧻", "물티슈는 종이류로 재활용하는 것이 원칙이다.", false],
-    ["📄", "코팅된 전단지는 일반 종이와 다르게 판단이 필요할 수 있다.", true],
-    ["🧲", "자석이 붙은 홍보물은 종이류로만 보면 안 된다.", true],
-    ["🧃", "종이팩은 펼쳐 말린 뒤 배출하면 재활용 품질이 좋아진다.", true],
-    ["🥢", "나무젓가락은 깨끗하면 종이류로 배출한다.", false],
-    ["🍕", "기름이 밴 피자박스는 오염된 부분을 일반쓰레기로 검토한다.", true],
-    ["🧊", "스티로폼은 이물질과 테이프를 제거하고 깨끗할 때 분리배출한다.", true],
-    ["🧷", "클립과 종이는 가능하면 분리해서 배출한다.", true],
-    ["🧽", "수세미는 플라스틱류로 재활용하는 것이 일반적이다.", false],
-    ["🧴", "샴푸통은 내용물을 비우고 헹군 뒤 배출한다.", true],
-    ["🛍️", "비닐봉투는 음식물 오염이 심하면 비닐류 배출이 어려울 수 있다.", true],
-    ["🧃", "빨대는 작고 재질이 달라 별도 판단이 필요할 수 있다.", true],
-    ["🪙", "알루미늄 캔과 철 캔은 같은 캔류 흐름에서 관리될 수 있다.", true],
-    ["📚", "스프링 노트는 종이와 스프링을 분리하면 더 좋다.", true],
-    ["🧴", "펌프형 용기는 금속 스프링이 있어 재질 분리가 필요하다.", true],
-    ["🧂", "양념이 묻은 비닐은 깨끗한 비닐과 섞지 않는 것이 좋다.", true],
-    ["🥤", "플라스틱 빨대는 작아서 선별이 어려울 수 있다.", true],
-    ["📦", "택배 완충재는 재질에 따라 비닐류 또는 일반쓰레기로 나뉠 수 있다.", true],
-    ["🧻", "휴지는 사용 후 오염되므로 종이류로 재활용하지 않는다.", true],
-    ["🥫", "통조림 캔은 내용물을 비우고 헹구면 재활용에 도움이 된다.", true],
-    ["🧴", "화장품 용기는 내용물을 비우고 재질 표시를 확인한다.", true],
-    ["🧃", "멸균팩과 일반 종이팩은 수거 체계가 다를 수 있어 학교 기준을 확인한다.", true],
-    ["🧸", "고장난 장난감은 플라스틱류로 무조건 배출한다.", false],
-    ["📎", "복합 재질 물건은 판단 보류함에 기록해 기준을 정할 수 있다.", true],
-    ["🍗", "닭뼈는 음식물쓰레기가 아니라 일반쓰레기로 보는 지역이 많다.", true],
-    ["🐚", "조개껍데기는 음식물쓰레기로 배출하면 사료화에 좋다.", false],
-    ["🥤", "테이크아웃 컵의 뚜껑과 컵은 재질이 다를 수 있어 분리 확인이 필요하다.", true],
-    ["🧪", "깨진 유리는 안전하게 감싸 별도 배출 기준을 확인한다.", true],
-    ["🧼", "세제 리필 파우치는 내용물을 비우고 재질 표시를 확인한다.", true],
-    ["🥡", "검은색 플라스틱 용기는 선별이 어려울 수 있어 지역 기준을 확인한다.", true],
-    ["❓", "모르는 물건을 아무 데나 버리지 않고 보류하는 것도 좋은 선택이다.", true],
-    ["🌱", "AI가 제안한 분류는 학생이 오염 상태와 학교 기준으로 다시 확인해야 한다.", true]
+    ["🧾", "영수증은 깨끗해 보여도<br>감열지라 일반쓰레기로 배출하는 것이 맞다.", true],
+    ["🥛", "우유갑은 일반 종이와 같은 수거함에 섞어도<br>항상 괜찮다.", false],
+    ["📦", "택배상자는 테이프와 송장을 최대한 제거하고<br>종이류로 배출한다.", true],
+    ["🥤", "플라스틱컵은 남은 음료를 비우고 헹군 뒤<br>배출해야 한다.", true],
+    ["🍜", "국물 자국이 심한 컵라면 용기는<br>재활용보다 일반쓰레기 검토가 필요하다.", true],
+    ["🍿", "과자봉지는 부스러기와 기름기가 많아도<br>무조건 비닐류다.", false],
+    ["🥫", "캔 안에 이물질이 들어 있으면<br>먼저 비우는 것이 좋다.", true],
+    ["🔋", "폐건전지는 일반쓰레기 봉투에 넣어도<br>안전하다.", false],
+    ["🪥", "칫솔처럼 여러 재질이 결합된 생활용품은<br>일반쓰레기 검토가 필요하다.", true],
+    ["🖊️", "볼펜은 플라스틱처럼 보여도<br>재질 분리가 어려워 일반쓰레기로 보는 경우가 많다.", true],
+    ["🧼", "지우개 조각은 종이류와<br>함께 버리면 좋다.", false],
+    ["🍌", "바나나 껍질은 지역 기준에 따라<br>음식물쓰레기로 배출할 수 있다.", true],
+    ["🥚", "달걀 껍데기는<br>음식물쓰레기로 항상 배출한다.", false],
+    ["🧃", "빨대가 붙은 음료팩은 빨대를 분리하고<br>팩을 헹구는 것이 좋다.", true],
+    ["☕", "종이컵 안쪽 코팅과 오염 상태가 애매하면<br>학교 기준을 다시 확인한다.", true],
+    ["🧴", "페트병은 내용물을 비우고 라벨을 제거한 뒤<br>찌그러뜨려 배출하면 좋다.", true],
+    ["🧴", "페트병 뚜껑은 닫아도 되는지<br>학교 기준에 따라 확인할 필요가 있다.", true],
+    ["🍱", "음식물이 묻은 배달 용기는 씻기 어렵다면<br>재활용함을 오염시킬 수 있다.", true],
+    ["🧻", "물티슈는<br>종이류로 재활용하는 것이 원칙이다.", false],
+    ["📄", "코팅된 전단지는<br>일반 종이와 다르게 판단이 필요할 수 있다.", true],
+    ["🧲", "자석이 붙은 홍보물은<br>종이류로만 보면 안 된다.", true],
+    ["🧃", "종이팩은 펼쳐 말린 뒤 배출하면<br>재활용 품질이 좋아진다.", true],
+    ["🥢", "나무젓가락은 깨끗하면<br>종이류로 배출한다.", false],
+    ["🍕", "기름이 밴 피자박스는<br>오염된 부분을 일반쓰레기로 검토한다.", true],
+    ["🧊", "스티로폼은 이물질과 테이프를 제거하고<br>깨끗할 때 분리배출한다.", true],
+    ["🧷", "클립과 종이는<br>가능하면 분리해서 배출한다.", true],
+    ["🧽", "수세미는<br>플라스틱류로 재활용하는 것이 일반적이다.", false],
+    ["🧴", "샴푸통은 내용물을 비우고<br>헹군 뒤 배출한다.", true],
+    ["🛍️", "비닐봉투는 음식물 오염이 심하면<br>비닐류 배출이 어려울 수 있다.", true],
+    ["🧃", "빨대는 작고 재질이 달라<br>별도 판단이 필요할 수 있다.", true],
+    ["🪙", "알루미늄 캔과 철 캔은<br>같은 캔류 흐름에서 관리될 수 있다.", true],
+    ["📚", "스프링 노트는 종이와 스프링을 분리하면<br>더 좋다.", true],
+    ["🧴", "펌프형 용기는 금속 스프링이 있어<br>재질 분리가 필요하다.", true],
+    ["🧂", "양념이 묻은 비닐은<br>깨끗한 비닐과 섞지 않는 것이 좋다.", true],
+    ["🥤", "플라스틱 빨대는<br>작아서 선별이 어려울 수 있다.", true],
+    ["📦", "택배 완충재는 재질에 따라<br>비닐류 또는 일반쓰레기로 나뉠 수 있다.", true],
+    ["🧻", "휴지는 사용 후 오염되므로<br>종이류로 재활용하지 않는다.", true],
+    ["🥫", "통조림 캔은 내용물을 비우고 헹구면<br>재활용에 도움이 된다.", true],
+    ["🧴", "화장품 용기는 내용물을 비우고<br>재질 표시를 확인한다.", true],
+    ["🧃", "멸균팩과 일반 종이팩은 수거 체계가 다를 수 있어<br>학교 기준을 확인한다.", true],
+    ["🧸", "고장난 장난감은<br>플라스틱류로 무조건 배출한다.", false],
+    ["📎", "복합 재질 물건은<br>판단 보류함에 기록해 기준을 정할 수 있다.", true],
+    ["🍗", "닭뼈는 음식물쓰레기가 아니라<br>일반쓰레기로 보는 지역이 많다.", true],
+    ["🐚", "조개껍데기는<br>음식물쓰레기로 배출하면 사료화에 좋다.", false],
+    ["🥤", "테이크아웃 컵의 뚜껑과 컵은<br>재질이 다를 수 있어 분리 확인이 필요하다.", true],
+    ["🧪", "깨진 유리는 안전하게 감싸<br>별도 배출 기준을 확인한다.", true],
+    ["🧼", "세제 리필 파우치는 내용물을 비우고<br>재질 표시를 확인한다.", true],
+    ["🥡", "검은색 플라스틱 용기는<br>선별이 어려울 수 있어 지역 기준을 확인한다.", true],
+    ["❓", "모르는 물건을 아무 데나 버리지 않고<br>보류하는 것도 좋은 선택이다.", true],
+    ["🌱", "AI가 제안한 분류는<br>학생이 오염 상태와 학교 기준으로 다시 확인해야 한다.", true]
   ].map(([emoji, question, answer]) => ({
     emoji, question, answer,
     explanation: answer ? "맞는 기준입니다. 실제 배출 전 오염 상태와 학교 기준을 한 번 더 확인해요." : "헷갈리기 쉬운 기준입니다. 재질과 오염 상태를 다시 살펴봐요."
   })));
 
   function pickQuizSet() {
-    const shuffle = items => [...items].sort(() => Math.random() - 0.5);
     const truePool = shuffle(quizPool.filter(item => item.answer === true));
     const falsePool = shuffle(quizPool.filter(item => item.answer === false));
     return shuffle([...truePool.slice(0, 5), ...falsePool.slice(0, 5)]);

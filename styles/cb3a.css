@@ -362,7 +362,7 @@
   .landfill-kpi-ring > span, .landfill-kpi-ring > small { position:relative; z-index:1; grid-area:1 / 1; text-align:center; }
   .landfill-kpi-ring > span { align-self:center; padding:0; margin-block-start:-.8125rem; color:#f3fffe; font-size:1.32rem; font-weight:950; line-height:1; text-shadow:0 0 12px rgb(94 247 205 / 22%); }
   .landfill-kpi-ring > small { align-self:end; padding:0; max-inline-size:3.6rem; margin-block-end:17%; color:rgb(219 241 249 / 76%); font-size:.57rem; font-weight:850; line-height:1.15; }
-  .landfill-kpi-legend { inline-size:min(100%,8.3rem); min-inline-size:0; display:flex; align-items:center; justify-content:space-between; gap:.4rem; padding:.4rem .55rem; border:1px solid rgb(173 140 255 / 26%); border-radius:999px; color:rgb(226 218 255 / 86%); background:linear-gradient(135deg,rgb(173 140 255 / 13%),rgb(100 169 255 / 5.5%)); font-size:.54rem; font-weight:850; white-space:nowrap; }
+  .landfill-kpi-legend { inline-size:min(100%,8.3rem); min-inline-size:0; display:flex; align-items:center; justify-content:space-between; gap:.4rem; padding:.4rem .55rem; border:1px solid rgb(173 140 255 / 26%); border-radius:999px; color:rgb(226 218 255 / 86%); background:linear-gradient(135deg,rgb(173 140 255 / 13%),rgb(100 169 255 / 5.5%)); font-size:.6rem; font-weight:850; white-space:nowrap; }
   .landfill-kpi-legend span { min-inline-size:0; display:inline-flex; align-items:center; gap:.3rem; }
   .landfill-kpi-legend i { inline-size:.4rem; block-size:.4rem; flex:0 0 auto; border-radius:999px; background:#ad8cff; box-shadow:0 0 9px rgb(173 140 255 / 62%); }
   .landfill-kpi-legend b { color:#f2edff; font-size:.68rem; font-variant-numeric:tabular-nums; }

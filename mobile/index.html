@@ -16,7 +16,7 @@
     <script defer src="./authGate.js"></script>
     <script defer src="./app.js"></script>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-between p-3 sm:p-6 text-slate-800">
+<body class="min-h-screen flex flex-col items-center p-3 sm:p-6 text-slate-800">
 
     <!-- 클로즈드 베타 접속 게이트: 인증 전에는 이 화면만 보임 -->
     <div id="authGate" class="fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -35,12 +35,12 @@
     <header class="text-center max-w-lg w-full my-4">
         <div class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 px-3.5 py-1 rounded-full text-[11px] font-bold mb-3 shadow-sm border border-blue-100">
             <span class="inline-block w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
-            AI Ways 인천 - 학교 자원순환 캠페인
+            AI Ways Incheon - 버리는 순간을 바꾸다.
         </div>
         <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 flex justify-center items-center gap-2">
             ♻️ <span class="text-blue-600">3초 판단</span> 도우미
         </h1>
-        <p class="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium">버리는 순간을 바꾸는 자원순환 UX 개선 가이드</p>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium">AI와 데이터로 실천하는 학교 자원순환 UX 개선 프로젝트</p>
     </header>
 
     <!-- 메인 앱 컨테이너 -->
@@ -51,7 +51,7 @@
             <button data-tab-btn="tab-judge" class="text-center py-2.5 rounded-xl transition-all duration-300 bg-white text-slate-900 shadow-sm">🔍 판단</button>
             <button data-tab-btn="tab-quiz" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">🎮 퀴즈</button>
             <button data-tab-btn="tab-stats" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">🌱 통계</button>
-            <button data-tab-btn="tab-hold" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">🟨 보류함</button>
+            <button data-tab-btn="tab-hold" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">❓ 보류함</button>
         </nav>
 
         <!-- 1. 3초 판단 탭 -->
@@ -60,9 +60,12 @@
             <!-- 사진으로 판단하기 (실제 AI 연결) -->
             <div>
                 <div class="flex items-center justify-between gap-2 mb-2.5">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">사진으로 3초 판단</span>
-                    <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-400 shrink-0">
-                        <svg viewBox="0 0 24 24" class="w-3 h-3 text-indigo-400" fill="currentColor"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
+                    <span class="flex items-center gap-1.5 text-sm font-extrabold text-slate-800">
+                        <span class="text-base">📷</span>
+                        사진으로 3초 판단
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-indigo-500 shrink-0">
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 text-indigo-500" fill="currentColor"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
                         Powered by Google Gemini
                     </span>
                 </div>
@@ -71,7 +74,6 @@
                     <span class="text-xl">📷</span>
                     <span>사진 찍고 AI에게 물어보기</span>
                 </button>
-                <p id="photoStatus" class="text-[11px] text-slate-400 mt-2 text-center hidden"></p>
             </div>
 
             <!-- 검색 + 자주 찾는 학교 쓰레기 -->
@@ -88,7 +90,7 @@
 
                 <div id="quickSelectGrid" class="grid grid-cols-4 gap-2 mt-3.5"></div>
                 <button id="holdQuickBtn" type="button" class="w-full mt-2.5 flex items-center justify-center gap-2 p-3 bg-amber-50 hover:bg-amber-100/50 border border-amber-100 hover:border-amber-300 rounded-2xl transition-all duration-200 text-amber-800 active:scale-95">
-                    <span class="text-lg">🟨</span>
+                    <span class="text-lg">❓</span>
                     <span class="text-xs font-bold">잘 모르겠어요 (판단 보류함 기록)</span>
                 </button>
             </div>
@@ -96,9 +98,10 @@
 
         <!-- 2. 3초 퀴즈 탭 -->
         <div id="tab-quiz" class="tab-content hidden space-y-5">
-            <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 text-center">
-                <span class="text-xs font-bold text-blue-600">3초 블리츠! 분리배출 O/X 챌린지</span>
-                <p class="text-[11px] text-slate-500 mt-1">학교에서 흔히 발생하는 알쏭달쏭 퀴즈를 맞히고 우수 대원이 되어보세요.</p>
+            <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 text-center space-y-1">
+                <span class="text-xs font-bold text-blue-600">3초 퀴즈! 분리배출 O/X 챌린지</span>
+                <p class="text-[11px] text-slate-500">500문제 중 10문제가 랜덤으로 출제돼요.</p>
+                <p class="text-[11px] text-slate-500">9개 맞히면 🌍 자원순환 환경운동가, 10개 다 맞히면 🏆 AI Ways 자원순환 마스터!</p>
             </div>
 
             <div id="quiz-box" class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4 relative min-h-[220px] flex flex-col justify-between">
@@ -152,15 +155,27 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-center space-y-1">
-                    <span class="text-[10px] font-semibold text-slate-400">누적 올바른 배출</span>
-                    <h5 id="stat-count" class="text-2xl sm:text-3xl font-extrabold text-blue-600">0회</h5>
+            <div class="grid grid-cols-3 gap-2.5">
+                <div class="bg-slate-50 border border-slate-100 p-3 rounded-2xl text-center space-y-1">
+                    <span class="text-[9px] font-semibold text-slate-400 leading-tight block">누적 올바른 배출</span>
+                    <h5 id="stat-count" class="text-xl sm:text-2xl font-extrabold text-blue-600">0회</h5>
                 </div>
-                <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-center space-y-1">
-                    <span class="text-[10px] font-semibold text-slate-400">이산화탄소 저감량</span>
-                    <h5 id="stat-carbon" class="text-2xl sm:text-3xl font-extrabold text-teal-600">0.0g</h5>
+                <div class="bg-slate-50 border border-slate-100 p-3 rounded-2xl text-center space-y-1">
+                    <span class="text-[9px] font-semibold text-slate-400 leading-tight block">이산화탄소 저감량</span>
+                    <h5 id="stat-carbon" class="text-xl sm:text-2xl font-extrabold text-teal-600">0.0g</h5>
                 </div>
+                <div class="bg-slate-50 border border-slate-100 p-3 rounded-2xl text-center space-y-1">
+                    <span class="text-[9px] font-semibold text-slate-400 leading-tight block">판단 보류 등록</span>
+                    <h5 id="stat-hold" class="text-xl sm:text-2xl font-extrabold text-amber-500">0개</h5>
+                </div>
+            </div>
+
+            <div class="text-center space-y-1 py-1">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-indigo-500">
+                    <svg viewBox="0 0 24 24" class="w-4 h-4 text-indigo-500" fill="currentColor"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
+                    Powered by Google Gemini
+                </span>
+                <p class="text-[10px] text-slate-400">본 플랫폼은 인천광역시교육청 자원순환 지침 및 환경부 공식 분리수거 지침을 바탕으로 제작되었습니다.</p>
             </div>
 
             <div class="space-y-2">
@@ -179,7 +194,7 @@
         <!-- 4. 판단 보류함 탭 -->
         <div id="tab-hold" class="tab-content hidden space-y-5">
             <div class="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex items-center gap-3">
-                <span class="text-3xl">🟨</span>
+                <span class="text-3xl">❓</span>
                 <div>
                     <h4 class="text-xs sm:text-sm font-bold text-amber-800">학교 판단 보류함 대기 목록</h4>
                     <p class="text-[11px] text-amber-600 mt-0.5">애매한 물건을 무단 투기하지 않고 정기 자원순환 회의를 통해 올바른 해결법을 결정하는 보류함입니다.</p>
@@ -209,54 +224,63 @@
         </div>
 
         <!-- 하단 실시간 작동 모드 배너 -->
-        <div class="flex items-center justify-center gap-1.5 text-[10px] sm:text-[11px] font-bold bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-slate-500">
-            <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-indigo-400" fill="currentColor"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
-            Powered by Google Gemini
+        <div class="text-center text-[10px] sm:text-[11px] font-semibold bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-slate-500 leading-relaxed">
+            본 플랫폼은 인천광역시교육청 자원순환 지침 및 환경부 공식 분리수거 지침을 바탕으로 제작되었습니다.
         </div>
     </main>
-
-    <footer class="max-w-lg w-full text-center mt-6 text-[10px] sm:text-[11px] text-slate-400 leading-relaxed space-y-1">
-        <p>본 플랫폼은 인천광역시 교육청 자원순환 지침 및 환경부 공식 분리수거 지침을 바탕으로 제작되었습니다.</p>
-    </footer>
 
     <!-- 3초 판단 결과 모달 -->
     <div id="judgeModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl max-w-sm w-full max-h-[85vh] overflow-y-auto p-5 space-y-4 shadow-2xl border border-slate-100 relative" id="judgeModalBox">
             <button id="judgeModalClose" type="button" aria-label="닫기" class="absolute right-4 top-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 text-lg font-bold transition-colors">×</button>
 
-            <div class="pr-9">
-                <span id="resCategory" class="inline-block bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase mb-1">카테고리</span>
-                <h3 id="resTitle" class="text-lg sm:text-xl font-bold text-slate-900">물건 이름</h3>
-            </div>
-            <span id="resActionTag" class="inline-block text-[10px] font-bold px-2.5 py-1 rounded-full">판단 대기</span>
-
-            <p id="resBody" class="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">안내 가이드라인 문장</p>
-
-            <div id="resCandidates" class="hidden flex flex-wrap gap-1.5"></div>
-
-            <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100 flex items-start gap-2">
-                <span class="text-base shrink-0">💡</span>
-                <div>
-                    <p class="text-xs font-bold text-slate-700 mb-0.5">핵심 팁</p>
-                    <p id="resTip" class="text-[11px] text-slate-500 leading-relaxed">추가 꿀팁이나 세부 사항이 표시됩니다.</p>
+            <!-- 사진 AI 분석 중 스캔 연출 -->
+            <div id="judgeScanState" class="hidden space-y-3 pr-4">
+                <div class="relative rounded-2xl overflow-hidden bg-slate-900 aspect-square">
+                    <img id="judgeScanImage" class="w-full h-full object-cover opacity-80" alt="" />
+                    <span class="scan-line"></span>
+                </div>
+                <div class="flex items-center justify-center gap-1.5 text-xs font-extrabold text-indigo-500">
+                    <svg viewBox="0 0 24 24" class="w-4 h-4 animate-pulse" fill="currentColor"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
+                    Gemini가 사진을 분석하고 있어요 · Powered by Google Gemini
                 </div>
             </div>
 
-            <div id="hold-registration-form" class="hidden p-3.5 bg-amber-50 border border-amber-200 rounded-2xl space-y-2.5">
-                <div class="flex items-center gap-1.5 text-xs font-bold text-amber-900">
-                    <span>🟨</span><span>학교 판단 보류함에 실물 기록하기</span>
+            <div id="judgeResultState" class="space-y-4">
+                <div class="pr-9">
+                    <span id="resCategory" class="inline-block bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase mb-1">카테고리</span>
+                    <h3 id="resTitle" class="text-lg sm:text-xl font-bold text-slate-900">물건 이름</h3>
                 </div>
-                <p class="text-[10px] text-slate-500 leading-snug">애매한 복합 쓰레기를 무단 투기하지 않고 보류함에 모아 자원순환 회의에 안건으로 제출해 보세요.</p>
-                <div class="flex gap-2">
-                    <input type="text" id="holdItemName" placeholder="예: 스프링 공책, 부러진 자" class="flex-1 bg-white border border-amber-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500" />
-                    <button id="registerHoldBtn" type="button" class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shrink-0">보류함 기록</button>
-                </div>
-            </div>
+                <span id="resActionTag" class="inline-block text-[10px] font-bold px-2.5 py-1 rounded-full">판단 대기</span>
 
-            <div class="pt-1 flex justify-end" id="practiceActionRow">
-                <button id="btnLogPractice" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm hover:shadow transition-all flex items-center gap-1.5 active:scale-95">
-                    ✅ 가이드 확인 및 실천 기록하기
-                </button>
+                <p id="resBody" class="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">안내 가이드라인 문장</p>
+
+                <div id="resCandidates" class="hidden flex flex-wrap gap-1.5"></div>
+
+                <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100 flex items-start gap-2">
+                    <span class="text-base shrink-0">💡</span>
+                    <div>
+                        <p class="text-xs font-bold text-slate-700 mb-0.5">핵심 팁</p>
+                        <p id="resTip" class="text-[11px] text-slate-500 leading-relaxed">추가 꿀팁이나 세부 사항이 표시됩니다.</p>
+                    </div>
+                </div>
+
+                <div id="hold-registration-form" class="hidden p-3.5 bg-amber-50 border border-amber-200 rounded-2xl space-y-2.5">
+                    <div class="flex items-center gap-1.5 text-xs font-bold text-amber-900">
+                        <span>❓</span><span>학교 판단 보류함에 실물 기록하기</span>
+                    </div>
+                    <p class="text-[10px] text-slate-500 leading-snug">애매한 복합 쓰레기를 무단 투기하지 않고 보류함에 모아 자원순환 회의에 안건으로 제출해 보세요.</p>
+                    <div class="flex gap-2">
+                        <input type="text" id="holdItemName" placeholder="예: 스프링 공책, 부러진 자" class="flex-1 bg-white border border-amber-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500" />
+                        <button id="registerHoldBtn" type="button" class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shrink-0">보류함 기록</button>
+                    </div>
+                </div>
+
+                <div class="pt-1 flex justify-end" id="practiceActionRow">
+                    <button id="btnLogPractice" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm hover:shadow transition-all flex items-center gap-1.5 active:scale-95">
+                        ✅ 가이드 확인 및 실천 기록하기
+                    </button>
+                </div>
             </div>
         </div>
     </div>

@@ -61,6 +61,8 @@
   }
 
   function openJudgeModal() {
+    $("judgeScanState").classList.add("hidden");
+    $("judgeResultState").classList.remove("hidden");
     $("judgeModal").classList.remove("hidden");
   }
   function closeJudgeModal() {
@@ -164,17 +166,29 @@
   // -----------------------------------------------------------------
   // Judge tab: photo -> real AI judgment
   // -----------------------------------------------------------------
-  function runPhotoAnalysis(imageEl) {
+  // Scan animation stays up at least this long so it never flashes by
+  // even when the real Gemini response comes back fast.
+  const SCAN_MIN_MS = 2500;
+
+  function showScanState(imageUrl) {
+    $("judgeScanImage").src = imageUrl;
+    $("judgeScanState").classList.remove("hidden");
+    $("judgeResultState").classList.add("hidden");
+    $("judgeModal").classList.remove("hidden");
+  }
+
+  function runPhotoAnalysis(imageEl, imageUrl) {
     const btn = $("photoTriggerBtn");
-    const status = $("photoStatus");
     btn.disabled = true;
-    status.textContent = "AI가 사진을 분석하고 있어요...";
-    status.classList.remove("hidden");
+    showScanState(imageUrl);
+    const startedAt = Date.now();
     return window.AIWaysMobileVision.analyzePhoto(imageEl, { searchQuery: $("searchInput").value })
-      .then(result => {
+      .then(async result => {
+        const remaining = SCAN_MIN_MS - (Date.now() - startedAt);
+        if (remaining > 0) await new Promise(resolve => setTimeout(resolve, remaining));
         btn.disabled = false;
-        status.classList.add("hidden");
         if (!result.ok) {
+          closeJudgeModal();
           showVisualAlert(window.AIWaysEdu2gClient?.errorMessageFor?.(result.code) || "사진 분석에 실패했습니다. 다시 시도해 주세요.", "amber");
           return;
         }
@@ -198,7 +212,7 @@
       if (!file) return;
       const url = URL.createObjectURL(file);
       const img = new Image();
-      img.onload = () => { URL.revokeObjectURL(url); runPhotoAnalysis(img); };
+      img.onload = () => { runPhotoAnalysis(img, url).finally(() => URL.revokeObjectURL(url)); };
       img.onerror = () => { URL.revokeObjectURL(url); showVisualAlert("사진을 불러오지 못했습니다. 다시 시도해 주세요.", "amber"); };
       img.src = url;
     });
@@ -222,9 +236,14 @@
     showVisualAlert(`🌳 올바른 실천! CO2 ${item.carbonSaved || 0}g이 절감되었습니다.`, "emerald");
   }
 
+  function updateHoldCountStat() {
+    $("stat-hold").textContent = `${holdBoxList.length}개`;
+  }
+
   function updateStatsUI() {
     $("stat-count").textContent = `${practiceStats.totalCount}회`;
     $("stat-carbon").textContent = `${practiceStats.carbonReduction.toFixed(1)}g`;
+    updateHoldCountStat();
     const container = $("practice-logs-container");
     const noLogs = $("no-logs-msg");
     container.querySelectorAll(".practice-item").forEach(el => el.remove());
@@ -254,13 +273,14 @@
     holdBoxList.unshift({ id: crypto.randomUUID(), name, date: `${today.getMonth() + 1}월 ${today.getDate()}일` });
     try { localStorage.setItem(HOLD_KEY, JSON.stringify(holdBoxList)); } catch {}
     updateHoldUI();
-    showVisualAlert(`🟨 "${name}"이(가) 회의 안건 목록에 등록되었습니다.`, "amber");
+    showVisualAlert(`❓ "${name}"이(가) 회의 안건 목록에 등록되었습니다.`, "amber");
   }
 
   function updateHoldUI() {
     const container = $("hold-list-container");
     const noHold = $("no-hold-items-msg");
     $("hold-count-badge").textContent = holdBoxList.length;
+    updateHoldCountStat();
     container.querySelectorAll(".hold-item-card").forEach(el => el.remove());
     if (holdBoxList.length === 0) { noHold.classList.remove("hidden"); return; }
     noHold.classList.add("hidden");

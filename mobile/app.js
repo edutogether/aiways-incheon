@@ -30,6 +30,8 @@
       tab.style.minHeight = "";
       if (wasHidden) {
         tab.style.position = "absolute";
+        tab.style.left = "0";
+        tab.style.right = "0";
         tab.style.visibility = "hidden";
         tab.classList.remove("hidden");
       }
@@ -37,6 +39,8 @@
       if (wasHidden) {
         tab.classList.add("hidden");
         tab.style.position = "";
+        tab.style.left = "";
+        tab.style.right = "";
         tab.style.visibility = "";
       }
       tab.style.minHeight = prevMinHeight;

@@ -382,7 +382,7 @@
      stay after both the school-panel and class-panel base rules above -
      same specificity means source order decides, and an earlier placement
      gets silently shadowed. */
-  @media (min-width:1181px) and (max-width:1600px) { .school-panel,.class-panel { grid-template-columns:6.5rem minmax(0,1fr); column-gap:.75rem; } }
+  @media (min-width:1181px) and (max-width:1600px) { .school-panel,.class-panel { grid-template-columns:6.5rem minmax(0,1fr); column-gap:.75rem; }.school-panel .kpi-row,.class-panel .class-kpis,.landfill-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }
   @media (min-width:160rem) { :root { --scene-inline-space:11.25rem; --header-inline-space:8rem; --header-size:7rem; }.main-nav a { min-block-size:3.25rem; padding-inline:1.25rem; font-size:1.18rem; }.school-panel,.class-panel { grid-template-columns:11.875rem minmax(0,1fr); column-gap:1.75rem; } }
   .class-panel .panel-head { grid-area:head; }
   .class-panel .class-kpis { grid-area:kpi; grid-template-columns:1fr; gap:.5rem; }

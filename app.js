@@ -931,8 +931,6 @@
       cancelAnimationFrame(dashboardIntroStartFrame);
       dashboardIntroStartFrame = 0;
     }
-    document.body.classList.add("is-dashboard-preparing");
-    document.body.classList.remove("is-dashboard-intro");
     [
       "[data-school-classes]",
       "[data-school-observed]",
@@ -990,7 +988,6 @@
     dashboardIntroPlayed = false;
     dashboardIntroRenderConsumed = false;
     dashboardIntroPendingOnSettle = false;
-    document.body.classList.remove("is-dashboard-intro");
     $$(".school-panel, .class-panel, .landfill-panel").forEach(item => item.classList.remove("is-dashboard-repaint"));
     prepareDashboardIntroState({ force: true });
   }
@@ -1023,7 +1020,6 @@
     }[scope];
     const panel = panelSelector ? $(panelSelector) : null;
     $$(".school-panel, .class-panel, .landfill-panel").forEach(item => item.classList.remove("is-dashboard-repaint"));
-    document.body.classList.toggle("is-dashboard-intro", scope === "all");
     panel?.classList.add("is-dashboard-repaint");
     dashboardRepaintTimer = window.setTimeout(() => {
       if (dashboardAnimationScope === scope) {
@@ -1031,7 +1027,6 @@
         countUpNextDashboard = false;
         dashboardIntroActive = false;
       }
-      document.body.classList.remove("is-dashboard-intro");
       panel?.classList.remove("is-dashboard-repaint");
     }, duration);
   }
@@ -1045,7 +1040,6 @@
     if (dashboardIntroPlayed || dashboardIntroActive) return;
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
       dashboardIntroPlayed = true;
-      document.body.classList.remove("is-dashboard-preparing", "is-dashboard-intro");
       return;
     }
     dashboardIntroPlayed = true;
@@ -1069,23 +1063,13 @@
     dashboardIntroPendingOnSettle = false;
     if (dashboardIntroStartFrame) cancelAnimationFrame(dashboardIntroStartFrame);
     dashboardIntroStartFrame = requestAnimationFrame(() => {
-      dashboardIntroStartFrame = requestAnimationFrame(() => {
-        if (!dashboardSection?.classList.contains("is-active") && !options.initial) {
-          dashboardIntroStartFrame = 0;
-          dashboardIntroPendingOnSettle = true;
-          return;
-        }
-        document.body.classList.remove("is-dashboard-preparing");
-        dashboardIntroStartFrame = requestAnimationFrame(() => {
-          dashboardIntroStartFrame = 0;
-          if (!dashboardSection?.classList.contains("is-active") && !options.initial) {
-            dashboardIntroPendingOnSettle = true;
-            return;
-          }
-          beginDashboardIntro();
-          applyDashboard(allStoredRecords());
-        });
-      });
+      dashboardIntroStartFrame = 0;
+      if (!dashboardSection?.classList.contains("is-active") && !options.initial) {
+        dashboardIntroPendingOnSettle = true;
+        return;
+      }
+      beginDashboardIntro();
+      applyDashboard(allStoredRecords());
     });
   }
 
@@ -2429,7 +2413,12 @@
     ];
     const labels = new Set(navPairs.map(pair => pair[0]));
     const links = $$(".main-nav a").filter(link => labels.has(cleanText(link.textContent)));
-    const sections = navPairs.map(([, id]) => document.getElementById(id)).filter(Boolean);
+    // A scene hidden by the stylesheet (PC hides #sorting) must drop out of the
+    // scroll/keyboard sequence too, so gallery steps straight to resources.
+    const sections = navPairs
+      .map(([, id]) => document.getElementById(id))
+      .filter(Boolean)
+      .filter(section => getComputedStyle(section).display !== "none");
     let currentId = "";
     let snapLocked = false;
     let scrollTicking = false;
@@ -2454,6 +2443,7 @@
       if (!force && id === currentId && (!sectionLight || section.classList.contains("is-active"))) return;
       const previousId = currentId;
       const previousSection = previousId ? document.getElementById(previousId) : null;
+      if (id !== "dashboard") document.body.classList.remove("is-rewound");
       if (previousId && previousId !== id) resetTransientUiState(previousSection);
       if (previousId !== id) resetSectionEntryState(section);
       if (previousId === "dashboard" && id !== "dashboard") scheduleDashboardIntroResetForNextEntry();
@@ -2482,7 +2472,7 @@
       }
     }
 
-    function waitForScrollSettle(section, callback, maxWait = 860) {
+    function waitForScrollSettle(section, callback, maxWait = 300) {
       if (!section) { callback(); return; }
       const startedAt = performance.now();
       const tolerance = Math.max(8, Math.round(window.innerHeight * 0.014));
@@ -2498,12 +2488,12 @@
       requestAnimationFrame(check);
     }
 
-    function activateAfterSettle(section, delay = 105) {
+    function activateAfterSettle(section, delay = 40) {
       if (!section) return;
       cancelPendingLight();
       const startedAt = performance.now();
-      const maxWait = 860;
-      const tolerance = Math.max(8, Math.round(window.innerHeight * 0.014));
+      const maxWait = 300;
+      const tolerance = Math.max(24, Math.round(window.innerHeight * 0.05));
 
       function waitForSettle(now) {
         const rect = section.getBoundingClientRect();
@@ -2608,6 +2598,10 @@
       activateAfterSettle(first, 75);
       waitForScrollSettle(first, () => {
         activate(first, true);
+        // Reaching the top by rewinding means the visitor has seen the whole
+        // deck, so this is the moment to offer the phone hand-off QR. A first
+        // visit to the dashboard does not get it.
+        document.body.classList.add("is-rewound");
         rewindActive = false;
         snapLocked = false;
         clickLockUntil = 0;

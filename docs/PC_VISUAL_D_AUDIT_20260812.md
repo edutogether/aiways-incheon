@@ -148,7 +148,104 @@ D의 팔레트가 현재 빌드에서 전반적으로 탁해져 있었다. 배�
 `prepareDashboardIntroState`)이 남았다. 로컬 실측에서 `is-dashboard-preparing`은 25초 뒤에도 body에 남아 있었으나
 매칭되는 스타일이 없어 시각적 영향은 없다. 정리 대상.
 
-## 7. 재현 도구
+## 7. 2차 작업 — 스크롤 복구·3초판단 제거·스크롤 큐·QR 조건부 노출
+
+복구 지점: 태그 **`pc-front-palette-d-20260812`** (커밋 `439e2c2`). 아래 변경이 잘못되면
+`git reset --hard pc-front-palette-d-20260812`로 색 복원까지만 남은 상태로 즉시 돌아온다.
+
+### 7.1 스크롤 스냅 복구 + 대기 예산 축소
+
+6절에서 규명한 원인에 대한 조치다. `styles/cb3a.css`의 `@media (min-width:64rem)` 블록에만 넣었다 —
+`style.css`는 아키텍처 테스트가 `scroll-snap` 문자열을 금지한다.
+
+```css
+html { scroll-snap-type:y proximity; }
+.scene { scroll-snap-align:start; scroll-snap-stop:normal; }
+```
+
+`mandatory`가 아니라 **`proximity`를 쓴 이유**: 갤러리 씬은 1440x900에서 높이가 922px로 뷰포트를 넘는다.
+`mandatory`면 그 안에서 스크롤이 갇힌다.
+
+`app.js` 대기 예산:
+
+| 항목 | 이전 | 변경 |
+|---|---|---|
+| `waitForScrollSettle` 기본 `maxWait` | 860ms | 300ms |
+| `activateAfterSettle`의 `maxWait` | 860ms | 300ms |
+| `activateAfterSettle`의 `delay` | 105ms | 40ms |
+| settle tolerance | `max(8, vh*0.014)` ≈ 12px | `max(24, vh*0.05)` ≈ 45px |
+| `.scene` transition | 0.43s / 0.42s | 0.3s |
+
+최악 예산이 약 1.4초 → 약 0.64초로 줄고, 스냅이 `rect.top`을 0 근처로 붙여주므로 실제로는 훨씬 앞당겨진다.
+
+### 7.2 PC에서 3초판단 제거
+
+**마크업은 지우지 않았다.** `frontendDomContract.test.js`가 `id="sorting"`을 비롯해 `searchInput`,
+`tmModelInput`, `sortingTimeline`, `holdList`, `aiModal` 등을 `index.html`에 요구하고, 64rem 미만
+모바일 레이아웃은 이 씬을 계속 쓴다. 그래서 PC에서만 숨겼다.
+
+```css
+.sorting-scene { display:none; }
+.main-nav a[href="#sorting"] { display:none; }
+```
+
+`app.js`의 씬 목록도 맞췄다. 숨겨진 씬이 스크롤·키보드 순서에 남으면 갤러리에서 빈 칸을 거치게 된다.
+
+```js
+const sections = navPairs
+  .map(([, id]) => document.getElementById(id))
+  .filter(Boolean)
+  .filter(section => getComputedStyle(section).display !== "none");
+```
+
+### 7.3 다음 씬 스크롤 큐
+
+`.scene::before`에 CSS만으로 아래꺾쇠(테두리 두 변 + 45도 회전)를 그리고 위아래로 떠다니게 했다.
+활성 씬에서만 보이고, 마지막 씬(`.resources-scene`)에서는 `content:none`으로 끈다.
+`::after`는 기존 하단 헤어라인이 쓰고 있어 `::before`를 썼다.
+
+### 7.4 QR 조건부 노출
+
+QR(`assets/qr/kiosk-5-1.png`)은 원래 대시보드에서 **항상 보이는 상태**였다(실측 `display:flex`).
+"다 보고 마지막에서 한 장 더 내려 맨 위로 되감겼을 때만" 뜨도록 바꿨다.
+
+- `app.js` `rewindFromLastSection()`의 settle 콜백에서 `document.body.classList.add("is-rewound")`
+- `activate()`에서 대시보드를 벗어나면 `is-rewound` 제거
+- PC 블록에서 `.dashboard-scene .qr-invite { display:none }`, `body.is-rewound` 일 때 `display:flex` + 등장 애니메이션
+
+3초판단 씬 안의 QR 사본은 그대로 뒀다 — PC에서 그 씬 자체가 `display:none`이다.
+
+### 7.5 죽은 인트로 코드 정리
+
+CSS 정의가 전혀 없던 `is-dashboard-preparing` / `is-dashboard-intro` 토글을 `app.js` 7곳과
+`index.html`의 `<body class>`에서 제거했다. `playDashboardIntroForCurrentData()`의 3단 중첩
+`requestAnimationFrame`은 그 클래스 제거를 순서 맞추려고 있던 것이라 1단으로 접었다(약 2프레임 단축).
+
+`beginDashboardRepaint()`의 플래그 로직(`dashboardAnimationScope`, `countUpNextDashboard`,
+`dashboardIntroActive`)은 숫자 카운트업 연출을 실제로 구동하므로 **남겼다**.
+`is-dashboard-repaint` 클래스 역시 CSS 정의가 없어 죽은 상태지만, 이번엔 건드리지 않았다 — 후속 정리 대상.
+
+### 7.6 검증 결과와 검증하지 못한 것
+
+실측으로 확인한 것 (1440px / 2560px):
+
+- `#sorting` `display:none`, 주 메뉴 노출 7개(3초판단 사라짐), 문서 높이 6411px(1440)
+- `.scene`의 `scroll-snap-align:start`, 루트 `scroll-snap-type:y`(proximity)
+- 꺾쇠: 활성 씬에서 `scene-scroll-cue` 애니메이션 동작, 자료실에서 `content:none`
+- QR: 되감기 전 `display:none` → `is-rewound` 부여 시 `display:flex`(높이 89px, 등장 애니메이션) → 제거 시 다시 `none`
+- **모바일(<64rem) 무영향**: 3초판단 표시, 주 메뉴에 3초판단 있음, QR 표시, 스냅 없음, 씬 불투명도 1.0
+- 테스트 4건 전부 통과
+
+**검증하지 못한 것 — 반드시 실제 브라우저에서 확인할 것.** 이 세션의 브라우저 패널이 화면에 표시되지
+않아 페이지가 프레임을 합성하지 않았고, 그 결과 `window.scrollTo()`를 호출해도 `scrollY`가 0에서
+움직이지 않았다. 손대지 않은 D 참조본에서도 동일하게 재현되므로 코드 문제가 아니라 측정 환경 제약이다.
+따라서 다음은 **정적 확인만 된 상태**다.
+
+- 스냅이 실제로 붙는 감각과 갤러리 씬(뷰포트 초과)에서 갇히지 않는지
+- 불 켜지는 체감 지연이 실제로 줄었는지
+- 마지막 씬에서 한 번 더 내렸을 때 되감기가 발동하고 QR이 뜨는지
+
+## 8. 재현 도구
 
 측정 하네스는 세션 스크래치패드에 있고 저장소에는 커밋하지 않았다. 재구성 방법:
 

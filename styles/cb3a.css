@@ -124,8 +124,39 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
 @media (min-width:64rem) {
   .site-header { box-shadow:none; }
   .main-nav a { border-radius:.7rem; }
-  .scene { position:relative; opacity:.56; filter:saturate(.68) brightness(.66); transition:opacity .43s cubic-bezier(.18,.92,.24,1),filter .43s cubic-bezier(.18,.92,.24,1),transform .42s cubic-bezier(.18,.92,.24,1); }.scene.is-active { opacity:1; filter:saturate(1.08) brightness(1.08); }
+  .scene { position:relative; opacity:.56; filter:saturate(.68) brightness(.66); transition:opacity .3s cubic-bezier(.18,.92,.24,1),filter .3s cubic-bezier(.18,.92,.24,1),transform .3s cubic-bezier(.18,.92,.24,1); }.scene.is-active { opacity:1; filter:saturate(1.08) brightness(1.08); }
   .scene::after { content:""; position:absolute; inset:auto 0 0; block-size:1px; background:linear-gradient(90deg,transparent,rgb(111 212 232 / 18%),transparent); pointer-events:none; }
+
+  /* D drove the scroll root with scroll-snap (y mandatory); Stage 7.5-0 dropped
+     it. Without snapping, app.js's settle check almost never sees rect.top near
+     zero, so every scene burned its full settle timeout before lighting up -
+     the "page brightens far too late" report. Restored as `proximity`, not
+     `mandatory`: the gallery scene already exceeds the viewport at 1440x900 and
+     mandatory snapping would trap the scroll inside it. This cannot live in
+     style.css - frontendCssArchitecture.test.js bans the `scroll-snap` string
+     there. */
+  html { scroll-snap-type:y proximity; }
+  .scene { scroll-snap-align:start; scroll-snap-stop:normal; }
+
+  /* PC drops the 3-second-judgement app: the nav goes gallery -> resources. The
+     markup stays put because frontendDomContract.test.js requires #sorting and
+     its child ids, and the mobile layout below 64rem still renders the scene.
+     app.js filters display:none scenes out of the scroll sequence to match. */
+  .sorting-scene { display:none; }
+  .main-nav a[href="#sorting"] { display:none; }
+
+  /* The phone hand-off QR is a reward for finishing the deck, not a greeting:
+     hidden on a first look at the dashboard, revealed once app.js rewinds the
+     visitor to the top from the last scene (body.is-rewound). Leaving the
+     dashboard again clears it. The sorting scene's own copy is unaffected -
+     that scene is display:none on PC anyway. */
+  .dashboard-scene .qr-invite { display:none; }
+  body.is-rewound .dashboard-scene .qr-invite { display:flex; animation:qr-invite-reveal .62s cubic-bezier(.2,.7,.2,1) both; }
+
+  /* Cue that another scene sits below. Suppressed on the last one. */
+  .scene::before { content:""; position:absolute; inset-block-end:1.05rem; inset-inline-start:50%; inline-size:.95rem; block-size:.95rem; border-inline-end:2px solid rgb(131 224 255 / 72%); border-block-end:2px solid rgb(131 224 255 / 72%); transform:translate(-50%,0) rotate(45deg); opacity:0; pointer-events:none; transition:opacity .3s ease; }
+  .scene.is-active::before { opacity:1; animation:scene-scroll-cue 1.8s cubic-bezier(.4,0,.3,1) infinite; }
+  .resources-scene::before { content:none; }
   /* The base layer's h1,h2,h3,h4{letter-spacing:-0.035em} (style.css) applies
      site-wide and compresses every card/section heading - D never uses
      negative tracking on any heading level. Cancel it once, everywhere,
@@ -468,4 +499,14 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .brand-mark img { object-fit:contain; }
   .data-refresh-btn { border-radius:50%; border:1px solid rgb(100 234 255 / 28%); background:rgb(100 234 255 / 8%); color:rgb(100 234 255); padding:.0625rem .375rem; }
   .close-btn { border-radius:999px; border:1px solid rgb(255 255 255 / 16%); background:rgb(255 255 255 / 8%); color:#f2fdff; }
+}
+
+@keyframes scene-scroll-cue {
+  0%, 100% { transform:translate(-50%,0) rotate(45deg); opacity:.34; }
+  50% { transform:translate(-50%,.42rem) rotate(45deg); opacity:.95; }
+}
+
+@keyframes qr-invite-reveal {
+  from { opacity:0; transform:translateY(.55rem) scale(.96); }
+  to { opacity:1; transform:none; }
 }

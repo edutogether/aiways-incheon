@@ -347,7 +347,7 @@
   function submitQuizAnswer(userAns) {
     const data = currentQuizSet[currentQuizIndex];
     const isCorrect = userAns === data.answer;
-    if (isCorrect) userQuizScore += 20;
+    if (isCorrect) userQuizScore += 10;
     $("quiz-score").textContent = `현재 점수: ${userQuizScore}점`;
     const expTitle = $("explanation-title"), expDesc = $("explanation-desc"), expEmoji = $("explanation-emoji"), expBox = $("explanation-box-color");
     if (isCorrect) {

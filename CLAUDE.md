@@ -22,6 +22,20 @@
 
 → 전부 `git worktree remove`로 안전하게 정리함. 앞으로 새 후보 비교용 worktree를 만들 땐 다 쓴 뒤 바로 정리하는 습관을 들일 것 (`git worktree remove <path>`).
 
+## 모바일 앱 프리즈 (2026-08-12)
+
+모바일 앱(`mobile/`) 전방위 검토를 마치고 **`mobile-freeze-20260812`** 태그로 복구 지점을 고정했다. 상세 검토 결과는 태그 메시지에 전부 기록되어 있음 (`git show mobile-freeze-20260812`).
+
+**태그 보호**: `.githooks/pre-push`가 freeze/baseline/reference 태그의 삭제·이동을 차단한다. 새 클론이나 새 worktree에서는 아래를 한 번 실행해야 활성화된다 (이 저장소는 루트에 package.json이 없어 자동 활성화가 안 됨):
+```
+git config core.hooksPath .githooks
+```
+보호 대상 패턴: `*-freeze-*`, `pc-visual-master-*`, `*-baseline*`, `v*-stable-*`. 새 태그 생성은 허용되고, 기존 태그의 삭제·강제이동만 막는다.
+
+**프리즈 시점에 알고 있는, 수용된 항목**:
+- 탭 버튼 73×37px, 검색 트리거 20×20px — 모바일 터치 타깃 권장치(44px) 미만. 기능엔 문제 없고 시연에도 지장 없어 이번 라운드에서는 그대로 둠.
+- App Check가 localhost를 막아서 로컬에서는 인증 게이트를 통과할 수 없음. UI 검증이 필요하면 게이트를 화면상으로만 열고(`authGate`에 `hidden` 추가 + `appRoot`에서 제거) 테스트할 것 — 실제 보안은 전부 Functions 쪽에서 강제되므로 이 방식이 보안을 우회하지는 않는다.
+
 ## 배포
 
 GitHub Pages. `main` 브랜치가 배포 대상 (최상위 CLAUDE.md의 공통 Git 원칙 상속 — merge/배포는 사용자 명시적 허가 후에만).

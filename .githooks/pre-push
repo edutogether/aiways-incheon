@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+# Shared, version-controlled pre-push hook: guards freeze / reference tags from
+# deletion or force-move on any machine.
+#
+# Activate once per clone or worktree with:
+#     git config core.hooksPath .githooks
+#
+# Rules, applied to the protected tag patterns below:
+#   - creating a NEW tag is allowed (the remote has no such ref yet)
+#   - deleting an existing protected tag is blocked
+#   - moving an existing protected tag to another commit is blocked
+#
+# Matching by name rather than a hard-coded SHA means a newly cut freeze tag is
+# protected the moment it exists, with no hook edit required.
+
+ZERO="0000000000000000000000000000000000000000"
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+	case "$remote_ref" in
+	refs/tags/*-freeze-* | refs/tags/pc-visual-master-* | refs/tags/*-baseline* | refs/tags/v*-stable-*)
+		if [ "$local_sha" = "$ZERO" ]; then
+			echo "pre-push: BLOCKED — refusing to DELETE a protected tag ($remote_ref)." >&2
+			echo "          Freeze / baseline tags are official recovery points." >&2
+			exit 1
+		fi
+		if [ "$remote_sha" != "$ZERO" ] && [ "$local_sha" != "$remote_sha" ]; then
+			echo "pre-push: BLOCKED — refusing to MOVE a protected tag ($remote_ref)." >&2
+			echo "          Remote has $remote_sha but this push would set it to $local_sha." >&2
+			echo "          Cut a new dated tag instead of moving an existing one." >&2
+			exit 1
+		fi
+		;;
+	esac
+done
+
+exit 0

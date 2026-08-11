@@ -516,6 +516,12 @@
     startQuiz();
     syncTabHeights();
     document.fonts?.ready?.then(syncTabHeights).catch(() => {});
+    // Belt-and-suspenders: the Pretendard webfont can swap in and reflow text
+    // (changing which line a sentence wraps to) slightly after fonts.ready
+    // resolves in some browsers, which can leave one tab a few px off. Cheap
+    // to re-run, so just catch it a couple more times shortly after load.
+    setTimeout(syncTabHeights, 400);
+    setTimeout(syncTabHeights, 1200);
     let resizeTimer = 0;
     window.addEventListener("resize", () => {
       clearTimeout(resizeTimer);

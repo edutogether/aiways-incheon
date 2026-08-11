@@ -318,8 +318,8 @@
   /* D's real formula (read directly from its source, not guessed from one
      viewport): confirmed across 1440/1728/1920/2560px. */
   .kpi-row strong, .class-kpis strong, .landfill-metrics strong { font-size:clamp(1.32rem,1.55vw,2.02rem); }
-  .school-panel .school-visuals { grid-template-columns:minmax(6rem,1fr) auto; gap:.6rem; overflow:hidden; }
-  .school-panel .bar-list > div { grid-template-columns:2.3rem minmax(2.4rem,1fr) 1.5rem; font-size:.7rem; }
+  .school-panel .school-visuals { grid-template-columns:1fr; gap:.75rem; overflow:visible; align-self:stretch; }
+  .school-panel .bar-list > div { grid-template-columns:5.75rem minmax(2.4rem,1fr) 2.625rem; font-size:.9rem; font-weight:760; color:#9eb3c7; }
   .school-panel .donut-pair { flex-wrap:nowrap; gap:.4rem; }
   /* D's donut is a RING with a hollow center (radial-gradient masks out the
      middle so the conic-gradient only shows as an outer band), not a solid

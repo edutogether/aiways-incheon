@@ -4,7 +4,7 @@ const { createHash } = require("node:crypto");
 
 const RATE_LIMIT_SCHEMA = "global-rate-limit-v1";
 const RATE_LIMITS = Object.freeze({
-  analyzeSortingImage: { perMinute: 8, perDay: 200 },
+  analyzeSortingImage: { perMinute: 20, perDay: 1000 },
   saveSortingRecord: { perMinute: 60 },
   listSortingRecords: { perMinute: 120 },
   resolveSortingRecord: { perMinute: 60 }

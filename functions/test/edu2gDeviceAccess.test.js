@@ -11,11 +11,47 @@ test("rejects missing, invalid and non-anonymous authentication", async () => {
   const invalid = createEdu2gDeviceAccess({ auth: { verifyIdToken: async () => { throw Error(); } }, db: fakeDb({}) }); assert.equal((await invalid.resolve(request())).code, "auth_invalid");
   const social = createEdu2gDeviceAccess({ auth: auth({ uid: "u1", firebase: { sign_in_provider: "google.com" } }), db: fakeDb({}) }); assert.equal((await social.resolve(request())).code, "anonymous_auth_required");
 });
-test("fails closed for unregistered, revoked and mismatched state", async () => {
+test("fails closed for revoked and mismatched state", async () => {
   const decoded = { uid: "u1", firebase: { sign_in_provider: "anonymous" } };
-  for (const [values, code] of [[{}, "device_not_registered"], [{ "edu2gDeviceBindings/u1": { status: "revoked" } }, "device_revoked"], [{ "edu2gDeviceBindings/u1": { status: "active", actorId: "actor1" }, "actors/actor1": { status: "active", plan: "closed_beta" }, "actors/actor1/trustedDevices/u1": { status: "active", uid: "other" } }, "access_state_invalid"], [{ "edu2gDeviceBindings/u1": { status: "active", actorId: "actor1" }, "actors/actor1": { status: "active", plan: "closed_beta" }, "actors/actor1/trustedDevices/u1": { status: "active", uid: "u1" } }, "access_state_invalid"]]) { const access = createEdu2gDeviceAccess({ auth: auth(decoded), db: fakeDb(values) }); assert.equal((await access.resolve(request())).code, code); }
+  for (const [values, code] of [[{ "edu2gDeviceBindings/u1": { status: "revoked" } }, "device_revoked"], [{ "edu2gDeviceBindings/u1": { status: "active", actorId: "actor1" }, "actors/actor1": { status: "active", plan: "closed_beta" }, "actors/actor1/trustedDevices/u1": { status: "active", uid: "other" } }, "access_state_invalid"], [{ "edu2gDeviceBindings/u1": { status: "active", actorId: "actor1" }, "actors/actor1": { status: "active", plan: "closed_beta" }, "actors/actor1/trustedDevices/u1": { status: "active", uid: "u1" } }, "access_state_invalid"]]) { const access = createEdu2gDeviceAccess({ auth: auth(decoded), db: fakeDb(values) }); assert.equal((await access.resolve(request())).code, code); }
 });
 test("resolves only an active anonymous binding", async () => {
   const values = { "edu2gDeviceBindings/u1": { status: "active", actorId: "actor1" }, "actors/actor1": { status: "active", plan: "closed_beta", displayName: "테스트" }, "actors/actor1/trustedDevices/u1": { status: "active", uid: "u1", managementId: "00000000-0000-4000-8000-000000000001", deviceLabel: "테스트 기기" } };
   const access = createEdu2gDeviceAccess({ auth: auth({ uid: "u1", firebase: { sign_in_provider: "anonymous" } }), db: fakeDb(values) }); const result = await access.resolve(request()); assert.equal(result.ok, true); assert.equal(result.actorId, "actor1"); assert.equal(JSON.stringify(result).includes("token"), false);
+});
+function fakeDbWithTransaction(initial) {
+  const store = { ...initial };
+  function makeRef(key) {
+    return {
+      key,
+      get: async () => doc(store[key]),
+      update: (patch) => { store[key] = { ...(store[key] || {}), ...patch }; },
+      collection(child) { return { doc(next) { return makeRef(`${key}/${child}/${next}`); } }; }
+    };
+  }
+  return {
+    collection(name) { return { doc(id) { return makeRef(`${name}/${id}`); } }; },
+    async runTransaction(fn) {
+      return fn({
+        get: async ref => ref.get(),
+        create: (ref, data) => { if (store[ref.key] !== undefined) throw new Error("already exists"); store[ref.key] = data; }
+      });
+    },
+    _store: store
+  };
+}
+test("auto-provisions an open-access actor for a brand-new anonymous uid (no code needed)", async () => {
+  const db = fakeDbWithTransaction({});
+  const access = createEdu2gDeviceAccess({ auth: auth({ uid: "u1", firebase: { sign_in_provider: "anonymous" } }), db, serverTimestamp: () => "now" });
+  const first = await access.resolve(request());
+  assert.equal(first.ok, true);
+  assert.equal(first.actorId, "u1");
+  assert.equal(first.actor.plan, "open_access");
+  assert.equal(first.actor.maxDevices, 1);
+  assert.equal(first.device.status, "active");
+  assert.equal(db._store["edu2gDeviceBindings/u1"].status, "active");
+  // A returning visitor (binding now exists) resolves through the normal path, not re-provisioning.
+  const second = await access.resolve(request());
+  assert.equal(second.ok, true);
+  assert.equal(second.actorId, "u1");
 });

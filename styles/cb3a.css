@@ -261,7 +261,11 @@
   .gallery-description { font-size:.821rem; line-height:1.7; }
   .project-statement { margin-block-start:2.592rem; }
   .project-cards { gap:2.268rem; }
-  .resource-grid { box-shadow:none; }
+  .resource-grid { box-shadow:none; gap:.886rem; }
+  .resources-scene .scene-copy { gap:1rem; }
+  .resources-description { font-weight:400; font-size:1.101rem; line-height:1.72; color:rgba(218 239 247 / 76%); }
+  .resource-grid a.resource-pending { background-color:rgb(255 255 255 / 3.5%); background-image:linear-gradient(145deg,rgb(15 36 64 / 52%),rgb(6 15 31 / 48%)); border-color:rgb(148 198 220 / 18%); gap:.5rem; line-height:1.28; }
+  .footer-credit { margin-block-start:1.08rem; }
   .resource-pending em { color:rgb(170 188 201 / 62%); font-style:normal; }
   .resource-grid a:first-child { grid-row:auto; min-block-size:0; background:rgb(11 30 51 / 55%); }
 

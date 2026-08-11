@@ -409,15 +409,21 @@
     practiceStats.logs.forEach(log => {
       const div = document.createElement("div");
       div.className = "practice-item flex justify-between items-center bg-white p-3 border border-slate-100 rounded-xl shadow-sm text-xs transition-all duration-300";
+      // Item names/categories can originate outside this file (search results,
+      // and the AI text-lookup fallback), so they are assigned as text rather
+      // than interpolated into markup. carbon is a number computed here.
       div.innerHTML = `
         <div class="flex items-center gap-2">
-          <span class="bg-blue-50 text-blue-600 font-extrabold px-1.5 py-0.5 rounded text-[9px] shrink-0">${log.category}</span>
-          <span class="font-bold text-slate-700 truncate max-w-[150px] sm:max-w-xs">${log.name}</span>
+          <span class="log-category bg-blue-50 text-blue-600 font-extrabold px-1.5 py-0.5 rounded text-[9px] shrink-0"></span>
+          <span class="log-name font-bold text-slate-700 truncate max-w-[150px] sm:max-w-xs"></span>
         </div>
         <div class="text-right shrink-0">
           <span class="font-extrabold text-emerald-600 block">-${log.carbon}g CO₂</span>
-          <span class="text-[9px] text-slate-400 block">${log.time}</span>
+          <span class="log-time text-[9px] text-slate-400 block"></span>
         </div>`;
+      div.querySelector(".log-category").textContent = log.category;
+      div.querySelector(".log-name").textContent = log.name;
+      div.querySelector(".log-time").textContent = log.time;
       container.append(div);
     });
   }
@@ -444,15 +450,21 @@
     holdBoxList.forEach(item => {
       const div = document.createElement("div");
       div.className = "hold-item-card flex justify-between items-center bg-white p-3.5 border border-slate-100 rounded-2xl shadow-sm text-xs hover:border-amber-200 transition-all";
+      // item.name is free text the user typed into the hold form, so it is
+      // assigned as text -- interpolating it into markup would let a name like
+      // "<img src=x onerror=...>" run as script on every later page load,
+      // since the hold list is replayed from localStorage.
       div.innerHTML = `
         <div class="flex items-center gap-2.5 min-w-0 mr-2">
           <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
-          <span class="font-extrabold text-slate-800 truncate">${item.name}</span>
+          <span class="hold-item-name font-extrabold text-slate-800 truncate"></span>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-          <span class="text-[9px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded-md">${item.date}</span>
+          <span class="hold-item-date text-[9px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded-md"></span>
           <button type="button" class="resolve-hold-btn bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-xl font-bold text-[10px] transition-colors">해결 완료</button>
         </div>`;
+      div.querySelector(".hold-item-name").textContent = item.name;
+      div.querySelector(".hold-item-date").textContent = item.date;
       div.querySelector(".resolve-hold-btn").addEventListener("click", () => resolveHoldItem(item.id, item.name));
       container.append(div);
     });

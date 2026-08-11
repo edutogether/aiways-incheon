@@ -27,8 +27,12 @@
       background: #5ef7cd; border: 2px solid #06111c; border-radius: 50%;
       display: none; box-sizing: border-box;
     }
+    .vt-handle.vt-corner { border-radius: 50%; }
+    .vt-handle.vt-edge { border-radius: 3px; background: #64eaff; }
     .vt-handle.vt-nw, .vt-handle.vt-se { cursor: nwse-resize; }
     .vt-handle.vt-ne, .vt-handle.vt-sw { cursor: nesw-resize; }
+    .vt-handle.vt-n, .vt-handle.vt-s { cursor: ns-resize; }
+    .vt-handle.vt-e, .vt-handle.vt-w { cursor: ew-resize; }
 
     #vt-mini-toolbar {
       position: fixed; z-index: 99999; display: none; align-items: center; gap: 6px;
@@ -148,13 +152,20 @@
   const exportBadge = el("button", { id: "vt-export-badge", textContent: "📋 변경 0건 보기" });
   const hoverOutline = el("div", { id: "vt-hover-outline" });
   const selectBox = el("div", { id: "vt-select-box" });
-  const handles = ["nw", "ne", "sw", "se"].map(pos => el("div", { className: "vt-handle vt-" + pos, dataset: { pos } }));
+  const CORNER_POS = ["nw", "ne", "sw", "se"];
+  const EDGE_POS = ["n", "s", "e", "w"];
+  const handles = [
+    ...CORNER_POS.map(pos => el("div", { className: "vt-handle vt-corner vt-" + pos, dataset: { pos, kind: "corner" } })),
+    ...EDGE_POS.map(pos => el("div", { className: "vt-handle vt-edge vt-" + pos, dataset: { pos, kind: "edge" } }))
+  ];
   const miniToolbar = el("div", { id: "vt-mini-toolbar" });
   const sizeReadout = el("span", { className: "vt-size-readout" });
+  const fontMinusBtn = el("button", { textContent: "A−", title: "글자 작게" });
+  const fontPlusBtn = el("button", { textContent: "A+", title: "글자 크게" });
   const editBtn = el("button", { textContent: "✏️", title: "텍스트 편집 (더블클릭해도 됩니다)" });
   const deleteBtn = el("button", { textContent: "🗑", title: "삭제" });
   const resetBtn = el("button", { textContent: "↺", title: "이 요소만 초기화" });
-  miniToolbar.append(sizeReadout, editBtn, deleteBtn, resetBtn);
+  miniToolbar.append(sizeReadout, fontMinusBtn, fontPlusBtn, editBtn, deleteBtn, resetBtn);
 
   document.body.append(toggleBtn, exportBadge, hoverOutline, selectBox, ...handles, miniToolbar);
 
@@ -206,7 +217,11 @@
     nw: r => [r.left, r.top],
     ne: r => [r.right, r.top],
     sw: r => [r.left, r.bottom],
-    se: r => [r.right, r.bottom]
+    se: r => [r.right, r.bottom],
+    n: r => [r.left + r.width / 2, r.top],
+    s: r => [r.left + r.width / 2, r.bottom],
+    e: r => [r.right, r.top + r.height / 2],
+    w: r => [r.left, r.top + r.height / 2]
   };
 
   function refreshSelectionGeometry() {
@@ -240,7 +255,8 @@
     refreshSelectionGeometry();
   }
 
-  // ---- resize via corner handles (scales font-size) ----
+  // ---- resize via handles: corners scale width+height together (keeps ratio),
+  // edges stretch a single axis (breaks ratio) ----
   let resizeState = null;
   let suppressNextClick = false;
   handles.forEach(h => {
@@ -249,32 +265,62 @@
       event.preventDefault();
       event.stopPropagation();
       ensureOriginal(state.selected);
-      const cs = getComputedStyle(state.selected);
+      // some elements (e.g. img/svg) have a site-wide max-width:100% reset that
+      // would silently cap a bigger explicit width - clear any size constraints
+      // so the handle drag isn't fighting a hidden ceiling.
+      state.selected.style.maxWidth = "none";
+      state.selected.style.maxHeight = "none";
+      state.selected.style.minWidth = "0";
+      state.selected.style.minHeight = "0";
+      const rect = rectOf(state.selected);
       resizeState = {
-        pos: h.dataset.pos,
+        pos: h.dataset.pos, kind: h.dataset.kind,
         startX: event.clientX, startY: event.clientY,
-        startFontSize: parseFloat(cs.fontSize) || 16
+        startWidth: rect.width, startHeight: rect.height
       };
     });
   });
   document.addEventListener("mousemove", event => {
     if (!resizeState || !state.selected) return;
+    const { pos, kind, startWidth, startHeight } = resizeState;
     const dx = event.clientX - resizeState.startX;
     const dy = event.clientY - resizeState.startY;
-    const sign = (resizeState.pos === "se" || resizeState.pos === "ne") ? 1 : -1;
-    const drag = resizeState.pos[0] === "n" ? -dy : dy;
-    const delta = (drag + sign * dx) / 2;
-    const next = Math.max(6, Math.round(resizeState.startFontSize + delta * 0.15));
-    state.selected.style.fontSize = next + "px";
+    if (kind === "edge") {
+      if (pos === "e") state.selected.style.width = Math.max(12, Math.round(startWidth + dx)) + "px";
+      else if (pos === "w") state.selected.style.width = Math.max(12, Math.round(startWidth - dx)) + "px";
+      else if (pos === "s") state.selected.style.height = Math.max(12, Math.round(startHeight + dy)) + "px";
+      else if (pos === "n") state.selected.style.height = Math.max(12, Math.round(startHeight - dy)) + "px";
+    } else {
+      const signX = (pos === "ne" || pos === "se") ? 1 : -1;
+      const signY = (pos === "sw" || pos === "se") ? 1 : -1;
+      const scaleX = (startWidth + signX * dx) / startWidth;
+      const scaleY = (startHeight + signY * dy) / startHeight;
+      const scale = Math.max(0.1, (scaleX + scaleY) / 2);
+      state.selected.style.width = Math.max(12, Math.round(startWidth * scale)) + "px";
+      state.selected.style.height = Math.max(12, Math.round(startHeight * scale)) + "px";
+    }
     refreshSelectionGeometry();
   }, true);
   document.addEventListener("mouseup", () => {
     if (resizeState && state.selected) {
-      recordChange(state.selected, `font-size: ${getComputedStyle(state.selected).fontSize}`);
+      const cs = getComputedStyle(state.selected);
+      recordChange(state.selected, `크기: ${cs.width} × ${cs.height}`);
       suppressNextClick = true;
     }
     resizeState = null;
   }, true);
+
+  function stepFontSize(delta) {
+    if (!state.selected) return;
+    ensureOriginal(state.selected);
+    const cs = getComputedStyle(state.selected);
+    const next = Math.max(6, Math.round((parseFloat(cs.fontSize) || 16) + delta));
+    state.selected.style.fontSize = next + "px";
+    recordChange(state.selected, `font-size: ${next}px`);
+    refreshSelectionGeometry();
+  }
+  fontMinusBtn.addEventListener("click", () => stepFontSize(-2));
+  fontPlusBtn.addEventListener("click", () => stepFontSize(2));
 
   // ---- move via dragging the selection body ----
   let dragState = null;

@@ -25,7 +25,11 @@
   }
   function normalResponse(status, body) {
     if (!body || typeof body !== "object" || Array.isArray(body)) return { ok: false, status, code: "invalid_response", data: null };
-    return { ok: body.ok === true, status, code: typeof body.code === "string" ? body.code : body.ok === true ? "ok" : "invalid_response", data: body };
+    // Most endpoints return an explicit {ok:true|false,...}. analyzeSortingImage /
+    // analyzeSortingSafetyObserver return their success payload bare (no "ok" field),
+    // so a 2xx status with no explicit ok:false also counts as success.
+    const ok = body.ok === true || (body.ok !== false && status >= 200 && status < 300);
+    return { ok, status, code: typeof body.code === "string" ? body.code : ok ? "ok" : "invalid_response", data: body };
   }
   async function request(name, payload = {}, retried = false) {
     if (visualReviewRequested()) return { ok: false, status: 0, code: "auth_invalid", data: null };

@@ -250,7 +250,9 @@
   .resource-grid a { display:grid; gap:.875rem; min-block-size:0; padding:1.08rem; border:1px solid rgb(138 171 195 / 28%); border-radius:1.5rem; background:rgb(11 30 51 / 55%); box-shadow:0 24px 64px rgb(0 0 0 / 28%),inset 0 1px rgb(255 255 255 / 6%); font-size:.95rem; font-weight:880; }
   .resource-grid a span { color:#5ef7cd; font-weight:900; font-size:.95rem; }
   .footer-credit { display:grid; grid-template-columns:1fr auto; justify-content:space-between; gap:1.5rem; border-block-start:1px solid rgb(132 220 255 / 20%); padding-block-start:1.5rem; margin-block-start:.75rem; color:#9eb3c7; font-weight:760; }.footer-credit p:last-child { justify-self:end; text-align:end; }
-  .resource-pending { cursor:default; background:rgb(255 255 255 / 3.5%); }
+  .resource-pending { cursor:default; color:rgb(180 197 210 / 70%); background:rgb(255 255 255 / 3.5%); }
+  .project-subtitle,.curriculum-description,.hah-description,.gallery-description,.resources-description,.flow-scene .scene-copy>p:not(.eyebrow) { color:#9eb3c7; font-weight:760; }
+  .resource-grid { box-shadow:none; }
   .resource-pending em { color:rgb(170 188 201 / 62%); font-style:normal; }
   .resource-grid a:first-child { grid-row:auto; min-block-size:0; background:rgb(11 30 51 / 55%); }
 

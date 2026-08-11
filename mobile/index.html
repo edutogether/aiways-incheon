@@ -93,17 +93,10 @@
 
             <!-- 사진으로 판단하기 (실제 AI 연결) -->
             <div>
-                <div class="flex items-center justify-between gap-2 mb-2.5">
-                    <span class="flex items-center gap-1.5 text-sm font-extrabold text-slate-800 whitespace-nowrap">
+                <div class="mb-2.5">
+                    <span class="flex items-center gap-1.5 text-sm font-extrabold text-slate-800">
                         <span class="text-base">📷</span>
                         사진으로 3초 판단
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 shrink-0">
-                        <svg viewBox="0 0 24 24" class="w-9 h-9 shrink-0"><defs><linearGradient id="gemGradPhoto" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#EA4335"/><stop offset=".35" stop-color="#4285F4"/><stop offset=".65" stop-color="#34A853"/><stop offset="1" stop-color="#FBBC05"/></linearGradient></defs><path fill="url(#gemGradPhoto)" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
-                        <span class="flex flex-col leading-none whitespace-nowrap">
-                            <span class="text-[10px] font-medium text-slate-400">Powered by</span>
-                            <span class="text-base font-extrabold text-slate-800 -mt-0.5">Google Gemini</span>
-                        </span>
                     </span>
                 </div>
                 <input type="file" id="photoInput" accept="image/*" capture="environment" class="hidden" />
@@ -220,9 +213,9 @@
             </div>
 
             <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 space-y-2">
-                <span class="text-base font-bold text-blue-600">💡 왜 실천을 기록하나요?</span>
-                <p class="text-sm text-slate-600 leading-relaxed">한 번의 올바른 분리배출은 작아 보이지만, 우리 반 전체가 매일 실천하면 학교 단위의 자원순환 데이터가 쌓입니다. 이 기록은 우리 학교가 실제로 자원을 얼마나 아끼고 있는지 보여주는 증거가 됩니다.</p>
-                <p class="text-sm text-slate-600 leading-relaxed">🌍 깜짝 상식: 투명 페트병 1개를 제대로 분리배출하면 약 22g의 이산화탄소를 줄일 수 있어요. 하루에 우리 반 25명이 하나씩만 실천해도 약 550g을 절감하는 셈이에요.</p>
+                <span class="text-sm font-bold text-blue-600">💡 왜 실천을 기록하나요?</span>
+                <p class="text-xs text-slate-600 leading-relaxed">한 번의 올바른 분리배출은 작아 보이지만, 우리 반 전체가 매일 실천하면 학교 단위의 자원순환 데이터가 쌓입니다. 이 기록은 우리 학교가 실제로 자원을 얼마나 아끼고 있는지 보여주는 증거가 됩니다.</p>
+                <p class="text-xs text-slate-600 leading-relaxed"><strong class="font-bold text-slate-700">🌍 깜짝 상식:</strong> 투명 페트병 1개를 제대로 분리배출하면 약 22g의 이산화탄소를 줄일 수 있어요. 하루에 우리 반 25명이 하나씩만 실천해도 약 550g을 절감하는 셈이에요.</p>
             </div>
         </div>
 
@@ -260,17 +253,17 @@
             <div class="bg-amber-50/60 border border-amber-100 rounded-2xl p-4 space-y-2">
                 <span class="text-sm font-bold text-amber-700">💡 판단 보류는 왜 필요한가요?</span>
                 <p class="text-xs text-slate-600 leading-relaxed">복합 재질이거나 오염 상태가 애매한 물건을 억지로 분류하면 오히려 재활용 라인 전체를 오염시킬 수 있어요. 아무 데나 버리지 않고 여기에 기록해두면, 정기 자원순환 회의에서 우리 학교만의 기준을 함께 정할 수 있습니다.</p>
-                <p class="text-xs text-slate-600 leading-relaxed">🌍 깜짝 상식: 재활용품 중 약 25%는 오염이나 잘못된 분류 때문에 선별장에서 다시 일반쓰레기로 폐기된다고 해요. "일단 보류함에" 기록하는 습관이 이런 손실을 줄여줍니다.</p>
+                <p class="text-xs text-slate-600 leading-relaxed"><strong class="font-bold text-slate-700">🌍 깜짝 상식:</strong> 재활용품 중 약 25%는 오염이나 잘못된 분류 때문에 선별장에서 다시 일반쓰레기로 폐기된다고 해요. "일단 보류함에" 기록하는 습관이 이런 손실을 줄여줍니다.</p>
             </div>
         </div>
 
         <!-- 하단 실시간 작동 모드 배너 (모든 탭 공통) -->
         <div class="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2.5 space-y-1.5">
             <div class="flex items-center justify-center gap-1.5">
-                <svg viewBox="0 0 24 24" class="w-7 h-7 shrink-0"><defs><linearGradient id="gemGradBanner" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#EA4335"/><stop offset=".35" stop-color="#4285F4"/><stop offset=".65" stop-color="#34A853"/><stop offset="1" stop-color="#FBBC05"/></linearGradient></defs><path fill="url(#gemGradBanner)" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
-                <span class="text-xs font-bold text-slate-900">Powered by Google Gemini</span>
+                <svg viewBox="0 0 24 24" class="w-8 h-8 shrink-0"><defs><linearGradient id="gemGradBanner" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#EA4335"/><stop offset=".35" stop-color="#4285F4"/><stop offset=".65" stop-color="#34A853"/><stop offset="1" stop-color="#FBBC05"/></linearGradient></defs><path fill="url(#gemGradBanner)" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
+                <span class="text-xs font-bold"><span class="text-slate-400 font-medium">Powered by</span> <span class="text-slate-900">Google Gemini</span></span>
             </div>
-            <p class="text-center text-[7.5px] whitespace-nowrap text-slate-500">본 플랫폼은 인천광역시교육청 자원순환 및 환경부 분리배출 공식 지침을 바탕으로 제작되었습니다.</p>
+            <p class="text-center text-[10.5px] leading-snug text-slate-500">본 플랫폼은 환경부 분리배출 및 인천광역시교육청 자원순환 공식 지침을 바탕으로 제작되었습니다.</p>
         </div>
     </main>
 

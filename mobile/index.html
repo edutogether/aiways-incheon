@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Ways 인천 - 3초 판단 도우미</title>
+    <meta name="description" content="AI Ways 인천 학교 자원순환 캠페인 - 클로즈드 베타 3초 판단 도우미" />
+    <link rel="icon" type="image/png" href="../assets/brand/aiways-logo.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./mobile.css" />
+    <script defer src="../firebaseAppCheck.js"></script>
+    <script defer src="../firebaseBetaAuth.js"></script>
+    <script defer src="../edu2gBetaClient.js"></script>
+    <script defer src="./sortingData.js"></script>
+    <script defer src="./sortingVision.js"></script>
+    <script defer src="./authGate.js"></script>
+    <script defer src="./app.js"></script>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-3 sm:p-6 text-slate-800">
+
+    <!-- 클로즈드 베타 접속 게이트: 인증 전에는 이 화면만 보임 -->
+    <div id="authGate" class="fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100" id="authGateContent">
+            <div class="text-center py-10 space-y-3">
+                <p class="text-3xl">🔒</p>
+                <p class="text-sm font-semibold text-slate-500">연결 정보를 확인하고 있습니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 인증 후에만 노출되는 3초 판단 앱 -->
+    <div id="appRoot" class="hidden w-full flex flex-col items-center">
+
+    <!-- 상단 헤더 -->
+    <header class="text-center max-w-lg w-full my-4">
+        <div class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 px-3.5 py-1 rounded-full text-[11px] font-bold mb-3 shadow-sm border border-blue-100">
+            <span class="inline-block w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
+            AI Ways 인천 - 학교 자원순환 캠페인
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 flex justify-center items-center gap-2">
+            ♻️ <span class="text-blue-600">3초 판단</span> 도우미
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1.5 font-medium">행동 경험을 바꾸는 학교 전용 자원순환 가이드</p>
+    </header>
+
+    <!-- 메인 앱 컨테이너 -->
+    <main class="max-w-lg w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-4 sm:p-6 space-y-6">
+
+        <!-- 탭 메뉴 -->
+        <nav class="grid grid-cols-4 gap-1 bg-slate-100 p-1.5 rounded-2xl text-[11px] sm:text-xs font-bold">
+            <button data-tab-btn="tab-judge" class="text-center py-2.5 rounded-xl transition-all duration-300 bg-white text-slate-900 shadow-sm">🔍 판단</button>
+            <button data-tab-btn="tab-quiz" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">🎮 퀴즈</button>
+            <button data-tab-btn="tab-stats" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">🌱 통계</button>
+            <button data-tab-btn="tab-hold" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">🟨 보류함</button>
+        </nav>
+
+        <!-- 1. 3초 판단 탭 -->
+        <div id="tab-judge" class="tab-content space-y-5">
+
+            <!-- 사진으로 판단하기 (실제 AI 연결) -->
+            <div>
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">사진으로 3초 판단 (AI 분석)</span>
+                <input type="file" id="photoInput" accept="image/*" capture="environment" class="hidden" />
+                <button id="photoTriggerBtn" type="button" class="w-full flex items-center justify-center gap-2.5 p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl transition-all duration-200 active:scale-[0.98] font-bold text-sm shadow-sm">
+                    <span class="text-xl">📷</span>
+                    <span>사진 찍고 AI에게 물어보기</span>
+                </button>
+                <p id="photoStatus" class="text-[11px] text-slate-400 mt-2 text-center hidden"></p>
+            </div>
+
+            <!-- 검색 영역 -->
+            <div class="relative">
+                <label for="searchInput" class="block text-xs sm:text-sm font-bold text-slate-700 mb-2 flex items-center gap-1">🎯 무엇을 버리시나요?</label>
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="예: 영수증, 컵라면, 캔, 생수병..."
+                           class="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 pl-4 pr-12 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-300" />
+                    <button id="searchTriggerBtn" type="button" class="absolute right-3.5 top-3.5 text-slate-400 hover:text-blue-600 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </button>
+                </div>
+                <div id="search-suggestions" class="hidden absolute left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-2xl shadow-xl z-20 max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs custom-scrollbar"></div>
+            </div>
+
+            <!-- 신속 도우미 버튼 그리드 -->
+            <div>
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">자주 찾는 학교 쓰레기 (3초 클릭)</span>
+                <div id="quickSelectGrid" class="grid grid-cols-2 gap-2.5"></div>
+            </div>
+
+            <!-- 결과 표시창 -->
+            <div class="border-2 border-dashed border-slate-200 rounded-3xl p-5 bg-slate-50/30 flex flex-col justify-center min-h-[160px] relative transition-all duration-300" id="displayScreen">
+                <div id="placeholder" class="text-center py-6">
+                    <p class="text-3xl mb-2">🔍</p>
+                    <p class="text-xs sm:text-sm font-semibold text-slate-600">사진을 찍거나 물건을 선택·검색해 보세요!</p>
+                    <p class="text-[11px] text-slate-400 mt-1">인천광역시 분리배출 가이드라인 기준 판단 결과를 제공합니다.</p>
+                </div>
+
+                <div id="resultContent" class="hidden space-y-4">
+                    <div class="flex justify-between items-start gap-2">
+                        <div>
+                            <span id="resCategory" class="inline-block bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase mb-1">카테고리</span>
+                            <h3 id="resTitle" class="text-lg sm:text-xl font-bold text-slate-900">물건 이름</h3>
+                        </div>
+                        <span id="resActionTag" class="text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0">판단 대기</span>
+                    </div>
+
+                    <p id="resBody" class="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">안내 가이드라인 문장</p>
+
+                    <div id="resCandidates" class="hidden flex flex-wrap gap-1.5"></div>
+
+                    <div class="bg-white rounded-2xl p-3 border border-slate-100 flex items-start gap-2 shadow-sm">
+                        <span class="text-base shrink-0">💡</span>
+                        <div>
+                            <p class="text-xs font-bold text-slate-700 mb-0.5">핵심 팁</p>
+                            <p id="resTip" class="text-[11px] text-slate-500 leading-relaxed">추가 꿀팁이나 세부 사항이 표시됩니다.</p>
+                        </div>
+                    </div>
+
+                    <div id="hold-registration-form" class="hidden mt-2 p-3.5 bg-amber-50 border border-amber-200 rounded-2xl space-y-2.5">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-amber-900">
+                            <span>🟨</span><span>학교 판단 보류함에 실물 기록하기</span>
+                        </div>
+                        <p class="text-[10px] text-slate-500 leading-snug">애매한 복합 쓰레기를 무단 투기하지 않고 보류함에 모아 자원순환 회의에 안건으로 제출해 보세요.</p>
+                        <div class="flex gap-2">
+                            <input type="text" id="holdItemName" placeholder="예: 스프링 공책, 부러진 자" class="flex-1 bg-white border border-amber-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500" />
+                            <button id="registerHoldBtn" type="button" class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shrink-0">보류함 기록</button>
+                        </div>
+                    </div>
+
+                    <div class="pt-1 flex justify-end" id="practiceActionRow">
+                        <button id="btnLogPractice" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm hover:shadow transition-all flex items-center gap-1.5 active:scale-95">
+                            ✅ 가이드 확인 및 실천 기록하기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 3초 퀴즈 탭 -->
+        <div id="tab-quiz" class="tab-content hidden space-y-5">
+            <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 text-center">
+                <span class="text-xs font-bold text-blue-600">3초 블리츠! 분리배출 O/X 챌린지</span>
+                <p class="text-[11px] text-slate-500 mt-1">학교에서 흔히 발생하는 알쏭달쏭 퀴즈를 맞히고 우수 대원이 되어보세요.</p>
+            </div>
+
+            <div id="quiz-box" class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4 relative min-h-[220px] flex flex-col justify-between">
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-[10px] sm:text-xs font-bold text-slate-400">
+                        <span id="quiz-progress">질문 1 / 5</span>
+                        <span id="quiz-score" class="text-blue-600">현재 점수: 0점</span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                        <div id="quiz-progress-bar" class="bg-blue-500 h-full transition-all duration-300" style="width: 20%"></div>
+                    </div>
+                </div>
+
+                <div class="text-center py-4 space-y-2">
+                    <span id="quiz-emoji" class="text-4xl block">📦</span>
+                    <h4 id="quiz-question" class="text-sm sm:text-base font-extrabold text-slate-800 leading-snug">질문 텍스트가 여기에 나옵니다.</h4>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4" id="quiz-buttons">
+                    <button data-quiz-answer="true" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 rounded-2xl shadow-md transition-all active:scale-[0.97] text-xl">O</button>
+                    <button data-quiz-answer="false" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3.5 rounded-2xl shadow-md transition-all active:scale-[0.97] text-xl">X</button>
+                </div>
+
+                <div id="quiz-explanation-panel" class="hidden space-y-3 pt-2">
+                    <div class="p-3.5 rounded-xl border flex items-start gap-2.5" id="explanation-box-color">
+                        <span id="explanation-emoji" class="text-lg">🎉</span>
+                        <div>
+                            <p id="explanation-title" class="text-xs font-extrabold"></p>
+                            <p id="explanation-desc" class="text-[11px] leading-relaxed mt-0.5 text-slate-600"></p>
+                        </div>
+                    </div>
+                    <button id="nextQuizBtn" type="button" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-3 rounded-xl transition-all">다음 문제 풀기 ➔</button>
+                </div>
+            </div>
+
+            <div id="quiz-result-summary" class="hidden text-center p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
+                <span class="text-4xl">🏆</span>
+                <h3 class="text-lg font-extrabold text-slate-800">퀴즈 완료!</h3>
+                <p id="quiz-result-score-text" class="text-sm font-semibold text-slate-600">5문제 중 4문제를 맞췄습니다.</p>
+                <button id="restartQuizBtn" type="button" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-3 rounded-xl transition-all">다시 도전하기 🔄</button>
+            </div>
+        </div>
+
+        <!-- 3. 실천 통계 탭 -->
+        <div id="tab-stats" class="tab-content hidden space-y-5">
+            <div class="bg-teal-50 border border-teal-100 rounded-2xl p-4 flex items-center gap-3">
+                <span class="text-3xl">🌳</span>
+                <div>
+                    <h4 class="text-xs sm:text-sm font-bold text-teal-800">나의 분리배출 작은 실천 효과</h4>
+                    <p class="text-[11px] text-teal-600 mt-0.5">올바른 3초 분리배출 실천이 모여 깨끗한 지구를 만듭니다.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-center space-y-1">
+                    <span class="text-[10px] font-semibold text-slate-400">누적 올바른 배출</span>
+                    <h5 id="stat-count" class="text-2xl sm:text-3xl font-extrabold text-blue-600">0회</h5>
+                </div>
+                <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-center space-y-1">
+                    <span class="text-[10px] font-semibold text-slate-400">이산화탄소 저감량</span>
+                    <h5 id="stat-carbon" class="text-2xl sm:text-3xl font-extrabold text-teal-600">0.0g</h5>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-400">오늘의 실천 타임라인</span>
+                    <button id="resetStatsBtn" type="button" class="text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors">기록 초기화 🗑️</button>
+                </div>
+                <div id="practice-logs-container" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+                    <div id="no-logs-msg" class="text-center py-8 border border-dashed border-slate-200 rounded-2xl">
+                        <p class="text-[11px] text-slate-400">아직 기록된 실천이 없습니다.<br>'3초 판단'에서 가이드라인을 확인하고 실천해보세요!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 판단 보류함 탭 -->
+        <div id="tab-hold" class="tab-content hidden space-y-5">
+            <div class="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex items-center gap-3">
+                <span class="text-3xl">🟨</span>
+                <div>
+                    <h4 class="text-xs sm:text-sm font-bold text-amber-800">학교 판단 보류함 대기 목록</h4>
+                    <p class="text-[11px] text-amber-600 mt-0.5">애매한 물건을 무단 투기하지 않고 정기 자원순환 회의를 통해 올바른 해결법을 결정하는 보류함입니다.</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
+                <label for="directHoldInput" class="block text-[11px] font-extrabold text-slate-600">✍️ 회의 안건 수동 등록</label>
+                <div class="flex gap-2">
+                    <input type="text" id="directHoldInput" placeholder="예: 코팅 박막 책 표지, 실리콘 케이스"
+                           class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all" />
+                    <button id="addHoldDirectBtn" type="button" class="bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs px-4 py-2 rounded-xl transition-all shadow-sm shrink-0">등록</button>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-400">보류 및 유예 처리 물건 (<span id="hold-count-badge">0</span>개)</span>
+                    <button id="resetHoldBtn" type="button" class="text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors">목록 비우기 🗑️</button>
+                </div>
+                <div id="hold-list-container" class="space-y-2 max-h-52 overflow-y-auto custom-scrollbar">
+                    <div id="no-hold-items-msg" class="text-center py-8 border border-dashed border-slate-200 rounded-2xl">
+                        <p class="text-[11px] text-slate-400">기록된 판단 보류 물건이 없습니다.<br>'3초 판단'에서 애매한 쓰레기를 등록하거나, 직접 기재해 보세요!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 실시간 작동 모드 배너 -->
+        <div class="flex justify-between items-center text-[10px] sm:text-[11px] font-bold bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-slate-500">
+            <span class="flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                인천 공식 환경 기준 가이드 적용 · 사진 판단은 AI 분석 연동
+            </span>
+        </div>
+    </main>
+
+    <footer class="max-w-lg w-full text-center mt-6 text-[10px] sm:text-[11px] text-slate-400 leading-relaxed space-y-1">
+        <p>본 플랫폼은 인천광역시 교육청 자원순환 지침 및 환경부 공식 분리수거 지침을 바탕으로 제작되었습니다.</p>
+        <p>퀴즈·통계·보류함 기록은 이 기기의 브라우저 내부(Local Storage)에만 보존됩니다.</p>
+    </footer>
+
+    <!-- 자체 디자인 커스텀 확인용 모달 -->
+    <div id="customModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl border border-slate-100 transform scale-95 opacity-0 transition-all duration-300" id="modalBox">
+            <div class="text-center space-y-2">
+                <span id="modalIcon" class="text-3xl block">⚠️</span>
+                <h4 id="modalTitle" class="text-base font-extrabold text-slate-800">모달 제목</h4>
+                <p id="modalDesc" class="text-xs text-slate-500 leading-relaxed">상세 내용 설명이 표시되는 구간입니다.</p>
+            </div>
+            <div class="flex gap-2.5">
+                <button id="modalCancelBtn" type="button" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs py-2.5 rounded-xl transition-all">취소</button>
+                <button id="modalConfirmBtn" type="button" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs py-2.5 rounded-xl transition-all">확인</button>
+            </div>
+        </div>
+    </div>
+
+    </div><!-- /#appRoot -->
+</body>
+</html>

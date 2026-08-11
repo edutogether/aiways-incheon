@@ -514,7 +514,8 @@
     restoreLocal();
     renderQuizRankLadder();
     startQuiz();
-    requestAnimationFrame(syncTabHeights);
+    syncTabHeights();
+    document.fonts?.ready?.then(syncTabHeights).catch(() => {});
     let resizeTimer = 0;
     window.addEventListener("resize", () => {
       clearTimeout(resizeTimer);

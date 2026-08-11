@@ -23,7 +23,7 @@
     <script defer src="./aiRuntimeLoader.js"></script>
     <script defer src="./app.js"></script>
   </head>
-  <body class="is-dashboard-preparing">
+  <body>
     <header class="site-header">
       <a class="brand" href="#dashboard" aria-label="AI Ways Incheon dashboard">
         <span class="brand-mark"><img src="./assets/brand/aiways-logo.png" alt="AI Ways Incheon" /></span>
@@ -142,7 +142,7 @@
                 <h3 class="chart-title">최근 일주일 반입량 추이</h3>
                 <time class="landfill-time-now" datetime="2026-07-05T00:00:00" data-landfill-clock aria-live="polite">26.07.05(일) 00:00:00</time>
               </div>
-              <svg class="combo-chart" viewBox="0 0 440 252" role="img" aria-label="최근 일주일 반입량 막대와 선 그래프">
+              <svg class="combo-chart" viewBox="-16 0 456 252" preserveAspectRatio="xMinYMid meet" role="img" aria-label="최근 일주일 반입량 막대와 선 그래프">
                 <defs>
                   <linearGradient id="cleanLineFill" x1="0" x2="0" y1="0" y2="1">
                     <stop offset="0%" stop-color="#4bffe1" stop-opacity=".12" />
@@ -164,12 +164,12 @@
                   <path d="M48 188 H400" />
                 </g>
                 <g class="chart-axis" fill="rgba(220,245,255,.6)" font-size="10" font-weight="760">
-                  <text x="9" y="28">25K</text>
-                  <text x="9" y="61">20K</text>
-                  <text x="9" y="94">15K</text>
-                  <text x="9" y="126">10K</text>
-                  <text x="9" y="159">5K</text>
-                  <text x="9" y="192">0</text>
+                  <text x="1" y="28">25K</text>
+                  <text x="1" y="61">20K</text>
+                  <text x="1" y="94">15K</text>
+                  <text x="1" y="126">10K</text>
+                  <text x="1" y="159">5K</text>
+                  <text x="1" y="192">0</text>
                   <text class="x-label" x="64" y="216" text-anchor="middle"><tspan class="date-label" x="64">06.29</tspan><tspan class="weekday-label" x="64" dy="15">월</tspan></text><text class="x-label" x="114" y="216" text-anchor="middle"><tspan class="date-label" x="114">06.30</tspan><tspan class="weekday-label" x="114" dy="15">화</tspan></text><text class="x-label" x="164" y="216" text-anchor="middle"><tspan class="date-label" x="164">07.01</tspan><tspan class="weekday-label" x="164" dy="15">수</tspan></text><text class="x-label" x="214" y="216" text-anchor="middle"><tspan class="date-label" x="214">07.02</tspan><tspan class="weekday-label" x="214" dy="15">목</tspan></text><text class="x-label" x="264" y="216" text-anchor="middle"><tspan class="date-label" x="264">07.03</tspan><tspan class="weekday-label" x="264" dy="15">금</tspan></text><text class="x-label" x="314" y="216" text-anchor="middle"><tspan class="date-label" x="314">07.04</tspan><tspan class="weekday-label" x="314" dy="15">토</tspan></text><text class="x-label" x="364" y="216" text-anchor="middle"><tspan class="date-label" x="364">07.05</tspan><tspan class="weekday-label" x="364" dy="15">일</tspan></text>
                 </g>
                 <path class="chart-area" d="M64 188 L114 188 L164 188 L214 188 L264 188 L314 188 L364 188 L364 188 L64 188 Z" fill="url(#cleanLineFill)" opacity="0" />
@@ -193,9 +193,9 @@
                   <span>0%</span>
                   <small>총량 대비<br />반입량</small>
                 </div>
-                <div class="landfill-kpi-legend">
-                  <span><i aria-hidden="true"></i>잔여 관리 여력</span>
-                  <b data-landfill-secondary-value>0%</b>
+                <div class="donut landfill-kpi-ring landfill-kpi-ring--secondary" style="--pct:0">
+                  <span data-landfill-secondary-value>0%</span>
+                  <small>잔여 관리<br />여력</small>
                 </div>
               </aside>
             </div>
@@ -257,9 +257,16 @@
               <li>사진은 저장하지 않고 판단 기록만 남습니다.</li>
             </ul>
             <span class="gemini-credit"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c.6 4.6 5.4 9.4 10 10-4.6.6-9.4 5.4-10 10-.6-4.6-5.4-9.4-10-10 4.6-.6 9.4-5.4 10-10Z" /></svg>Powered by Gemini</span>
-            <div class="qr-invite">
-              <img src="./assets/qr/kiosk-5-1.png" alt="내 폰으로 3초판단 바로 열기 QR코드" loading="lazy" />
-              <p>내 폰으로 QR을 찍으면<br />3초판단을 바로 체험할 수 있어요.</p>
+            <div class="experience-portal">
+              <span class="portal-powered"><svg class="portal-gemini-star" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="geminiStarA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f9ab00" /><stop offset=".55" stop-color="#4285f4" /><stop offset="1" stop-color="#4285f4" /></linearGradient><linearGradient id="geminiStarB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ea4335" stop-opacity=".95" /><stop offset=".45" stop-color="#ea4335" stop-opacity="0" /><stop offset=".62" stop-color="#34a853" stop-opacity="0" /><stop offset="1" stop-color="#34a853" stop-opacity=".95" /></linearGradient></defs><path fill="url(#geminiStarA)" d="M12 2c.6 4.6 5.4 9.4 10 10-4.6.6-9.4 5.4-10 10-.6-4.6-5.4-9.4-10-10 4.6-.6 9.4-5.4 10-10Z" /><path fill="url(#geminiStarB)" d="M12 2c.6 4.6 5.4 9.4 10 10-4.6.6-9.4 5.4-10 10-.6-4.6-5.4-9.4-10-10 4.6-.6 9.4-5.4 10-10Z" /></svg>Powered by Google Gemini</span>
+              <div class="portal-frame">
+                <p class="portal-teaser">모든 화면을 끝까지 둘러본 뒤 이곳으로 다시 돌아오면<br /><strong>새로운 자원 순환 UX 체험 포탈</strong>이 열립니다.</p>
+                <span class="portal-arrow" aria-hidden="true"></span>
+                <div class="qr-invite">
+                  <img src="./assets/qr/kiosk-5-1.png" alt="내 폰으로 3초판단 바로 열기 QR코드" loading="lazy" />
+                  <p>QR코드를 스캔하면<br />버리는 순간의 UX를 바꾸는<br /><strong>3초 판단 도우미 앱</strong>을<br />체험할 수 있어요.</p>
+                </div>
+              </div>
             </div>
             <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden />
             <input id="uploadInput" type="file" accept="image/*" hidden />
@@ -277,7 +284,7 @@
                 <span>찍은 사진<br />올리기</span>
               </button>
             </div>
-            <small>※ 본 플랫폼은 인천광역시교육청 자원순환 및 환경부 공식 분리수거 지침을 바탕으로 제작되었습니다.</small>
+            <small>※ 본 플랫폼은 환경부 분리배출 및 인천광역시교육청 자원순환 공식 지침을 바탕으로 제작되었습니다.</small>
           </article>
         </div>
       </section>
@@ -553,6 +560,12 @@
           <h2>자료실</h2>
           <p class="resources-description">수업 설계안, 활동지, 학부모 안내 자료, 학생 산출물 양식을 한곳에 모았습니다.<br />교사는 바로 활용하고, 학생은 자신의 실천 기록을 다시 확인할 수 있도록 구성했습니다.<br />자료는 수업 운영 흐름에 따라 계속 업데이트됩니다.</p>
         </div>
+        <aside class="scroll-finale-hint">
+          <span class="hint-kicker">ONE MORE SCROLL</span>
+          <p class="hint-title">아래로 스크롤해보세요 !</p>
+          <p class="hint-sub"><strong>3초판단 앱</strong>을 직접 체험할 수 있는<br />QR코드가 나타납니다 !</p>
+          <span class="hint-arrow" aria-hidden="true"></span>
+        </aside>
         <div class="resource-grid">
           <a href="https://drive.google.com/file/d/1XNCMOSDJTFnsaVcYYR_eTKW8lIrEj5gx/view?usp=sharing" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span>01</span>수업 설계 기획안</a>
           <a href="https://forms.gle/FvAwezV3drFjegCU9" target="_blank" rel="noopener noreferrer"><span>02</span>학부모 GoogleForm</a>
@@ -564,8 +577,6 @@
           <a class="resource-pending" aria-disabled="true" tabindex="-1"><span>08</span><em>업로드 예정</em></a>
           <a class="resource-pending" aria-disabled="true" tabindex="-1"><span>09</span><em>업로드 예정</em></a>
           <a class="resource-pending" aria-disabled="true" tabindex="-1"><span>10</span><em>업로드 예정</em></a>
-          <a class="resource-pending" aria-disabled="true" tabindex="-1"><span>11</span><em>업로드 예정</em></a>
-          <a class="resource-pending" aria-disabled="true" tabindex="-1"><span>12</span><em>업로드 예정</em></a>
         </div>
         <div class="footer-credit">
           <p>AI Ways Incheon · Human → AI → Human Learning Project</p>
@@ -573,6 +584,7 @@
         </div>
       </section>
     </main>
+    <span class="scroll-cue" aria-hidden="true"></span>
 
     <dialog class="ai-modal" id="aiModal">
       <form method="dialog">

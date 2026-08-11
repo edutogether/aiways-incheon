@@ -931,8 +931,6 @@
       cancelAnimationFrame(dashboardIntroStartFrame);
       dashboardIntroStartFrame = 0;
     }
-    document.body.classList.add("is-dashboard-preparing");
-    document.body.classList.remove("is-dashboard-intro");
     [
       "[data-school-classes]",
       "[data-school-observed]",
@@ -990,7 +988,6 @@
     dashboardIntroPlayed = false;
     dashboardIntroRenderConsumed = false;
     dashboardIntroPendingOnSettle = false;
-    document.body.classList.remove("is-dashboard-intro");
     $$(".school-panel, .class-panel, .landfill-panel").forEach(item => item.classList.remove("is-dashboard-repaint"));
     prepareDashboardIntroState({ force: true });
   }
@@ -1023,7 +1020,6 @@
     }[scope];
     const panel = panelSelector ? $(panelSelector) : null;
     $$(".school-panel, .class-panel, .landfill-panel").forEach(item => item.classList.remove("is-dashboard-repaint"));
-    document.body.classList.toggle("is-dashboard-intro", scope === "all");
     panel?.classList.add("is-dashboard-repaint");
     dashboardRepaintTimer = window.setTimeout(() => {
       if (dashboardAnimationScope === scope) {
@@ -1031,7 +1027,6 @@
         countUpNextDashboard = false;
         dashboardIntroActive = false;
       }
-      document.body.classList.remove("is-dashboard-intro");
       panel?.classList.remove("is-dashboard-repaint");
     }, duration);
   }
@@ -1045,7 +1040,6 @@
     if (dashboardIntroPlayed || dashboardIntroActive) return;
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
       dashboardIntroPlayed = true;
-      document.body.classList.remove("is-dashboard-preparing", "is-dashboard-intro");
       return;
     }
     dashboardIntroPlayed = true;
@@ -1069,23 +1063,13 @@
     dashboardIntroPendingOnSettle = false;
     if (dashboardIntroStartFrame) cancelAnimationFrame(dashboardIntroStartFrame);
     dashboardIntroStartFrame = requestAnimationFrame(() => {
-      dashboardIntroStartFrame = requestAnimationFrame(() => {
-        if (!dashboardSection?.classList.contains("is-active") && !options.initial) {
-          dashboardIntroStartFrame = 0;
-          dashboardIntroPendingOnSettle = true;
-          return;
-        }
-        document.body.classList.remove("is-dashboard-preparing");
-        dashboardIntroStartFrame = requestAnimationFrame(() => {
-          dashboardIntroStartFrame = 0;
-          if (!dashboardSection?.classList.contains("is-active") && !options.initial) {
-            dashboardIntroPendingOnSettle = true;
-            return;
-          }
-          beginDashboardIntro();
-          applyDashboard(allStoredRecords());
-        });
-      });
+      dashboardIntroStartFrame = 0;
+      if (!dashboardSection?.classList.contains("is-active") && !options.initial) {
+        dashboardIntroPendingOnSettle = true;
+        return;
+      }
+      beginDashboardIntro();
+      applyDashboard(allStoredRecords());
     });
   }
 
@@ -1888,9 +1872,9 @@
     ticks.slice().reverse().forEach(tick => {
       const y = Math.round(yScale(tick));
       appendSvg(grid, "path", { d: `M${chartLeft - 8} ${y} H${chartRight + 12}` });
-      appendSvg(yAxis, "text", { class: "y-label", x: "2", y: String(y + 4) }, tickLabel(tick));
+      appendSvg(yAxis, "text", { class: "y-label", x: "-14", y: String(y + 4) }, tickLabel(tick));
     });
-    appendSvg(yAxis, "text", { class: "y-zero", x: "10", y: String(chartBottom + 22), "text-anchor": "middle" }, "0");
+    appendSvg(yAxis, "text", { class: "y-zero", x: "-6", y: String(chartBottom + 22), "text-anchor": "middle" }, "0");
 
     const linePath = smoothPathFor(points);
     const first = points[0];
@@ -1949,7 +1933,7 @@
       "stroke-dasharray": "7 6",
       "stroke-linecap": "round"
     });
-    appendSvg(averageGroup, "text", { x: String(chartRight + 8), y: String(averageY - 10), "text-anchor": "end", "font-size": "12.5", "font-weight": "800" }, "주간 평균");
+    appendSvg(averageGroup, "text", { x: String(chartRight + 8), y: String(averageY - 10), "text-anchor": "end", "font-size": "12.5", "font-weight": "800", fill: "rgba(255,232,128,.96)" }, "주간 평균");
 
     const xAxis = appendSvg(svg, "g", { class: "chart-axis chart-x-axis", fill: "rgba(220,245,255,.75)", "font-size": "12.5", "font-weight": "800" });
     points.forEach(point => {
@@ -2429,23 +2413,20 @@
     ];
     const labels = new Set(navPairs.map(pair => pair[0]));
     const links = $$(".main-nav a").filter(link => labels.has(cleanText(link.textContent)));
-    const sections = navPairs.map(([, id]) => document.getElementById(id)).filter(Boolean);
+    // A scene hidden by the stylesheet (PC hides #sorting) must drop out of the
+    // scroll/keyboard sequence too, so gallery steps straight to resources.
+    const sections = navPairs
+      .map(([, id]) => document.getElementById(id))
+      .filter(Boolean)
+      .filter(section => getComputedStyle(section).display !== "none");
     let currentId = "";
     let snapLocked = false;
     let scrollTicking = false;
     let scrollDebounce = 0;
     let clickLockUntil = 0;
-    let dashboardLockUntil = Date.now() + 520;
-    let pendingLightTimer = 0;
-    let pendingLightFrame = 0;
+    let dashboardLockUntil = Date.now() + 260;
     let rewindActive = false;
     let rewindCooldownUntil = 0;
-
-    function cancelPendingLight() {
-      window.clearTimeout(pendingLightTimer);
-      if (pendingLightFrame) cancelAnimationFrame(pendingLightFrame);
-      pendingLightFrame = 0;
-    }
 
     function activate(section, force = false, options = {}) {
       if (!section) return;
@@ -2454,6 +2435,7 @@
       if (!force && id === currentId && (!sectionLight || section.classList.contains("is-active"))) return;
       const previousId = currentId;
       const previousSection = previousId ? document.getElementById(previousId) : null;
+      if (id !== "dashboard") document.body.classList.remove("is-rewound");
       if (previousId && previousId !== id) resetTransientUiState(previousSection);
       if (previousId !== id) resetSectionEntryState(section);
       if (previousId === "dashboard" && id !== "dashboard") scheduleDashboardIntroResetForNextEntry();
@@ -2482,7 +2464,7 @@
       }
     }
 
-    function waitForScrollSettle(section, callback, maxWait = 860) {
+    function waitForScrollSettle(section, callback, maxWait = 300) {
       if (!section) { callback(); return; }
       const startedAt = performance.now();
       const tolerance = Math.max(8, Math.round(window.innerHeight * 0.014));
@@ -2496,26 +2478,6 @@
         callback();
       }
       requestAnimationFrame(check);
-    }
-
-    function activateAfterSettle(section, delay = 105) {
-      if (!section) return;
-      cancelPendingLight();
-      const startedAt = performance.now();
-      const maxWait = 860;
-      const tolerance = Math.max(8, Math.round(window.innerHeight * 0.014));
-
-      function waitForSettle(now) {
-        const rect = section.getBoundingClientRect();
-        const settled = Math.abs(rect.top) <= tolerance || now - startedAt > maxWait;
-        if (!settled) {
-          pendingLightFrame = requestAnimationFrame(waitForSettle);
-          return;
-        }
-        pendingLightTimer = window.setTimeout(() => activate(section, true), delay);
-      }
-
-      pendingLightFrame = requestAnimationFrame(waitForSettle);
     }
 
     function nearestSection() {
@@ -2595,24 +2557,77 @@
       return false;
     }
 
+    // Chrome ramps native smooth-scroll duration with distance, which reads as
+    // drifting over to the next scene rather than snapping onto it, so drive
+    // the scroll ourselves on a short, sharply decelerating curve.
+    //
+    // style.css sets html{scroll-behavior:smooth}. Left on, the browser starts
+    // its own animation for every frame we set, and sixty of those per second
+    // fight each other into visible chaos. Pin the property to auto for the
+    // duration of our animation and restore whatever was there afterwards -
+    // more reliable than passing behavior:"instant" per call.
+    let snapScrollFrame = 0;
+    function snapScrollTo(section, duration = 640, onLanded) {
+      if (snapScrollFrame) cancelAnimationFrame(snapScrollFrame);
+      const root = document.documentElement;
+      root.style.scrollBehavior = "auto";
+      const finish = (landed) => {
+        snapScrollFrame = 0;
+        // Always restore to empty, never to a captured value: a snap that
+        // interrupts another snap would capture "auto" and leave it inline
+        // forever, and stale inline state is one way the feel degrades.
+        root.style.scrollBehavior = "";
+        if (landed && onLanded) onLanded();
+      };
+      const startY = window.scrollY;
+      const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
+      // The first scene starts below the in-flow sticky header, so snapping it
+      // to the viewport top would slide it back under the header; land the
+      // whole page at 0 instead so header and scene are both fully visible.
+      const endY = section === sections[0]
+        ? 0
+        : Math.min(maxY, Math.max(0, startY + section.getBoundingClientRect().top));
+      const distance = endY - startY;
+      if (Math.abs(distance) < 2) {
+        window.scrollTo(0, endY);
+        finish(true);
+        return;
+      }
+      const startedAt = performance.now();
+      // Apple-style: a longer ride on easeInOutQuart - soft start, fast middle,
+      // long heavily-damped landing, zero overshoot. The back-curve variants
+      // (tried at c1 0.95 and 0.42) both read as jitter, not weight.
+      const ease = t => (t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2);
+      function step(now) {
+        const progress = Math.min(1, (now - startedAt) / duration);
+        window.scrollTo(0, Math.round(startY + distance * ease(progress)));
+        if (progress < 1) snapScrollFrame = requestAnimationFrame(step);
+        else finish(true);
+      }
+      snapScrollFrame = requestAnimationFrame(step);
+    }
+
     function rewindFromLastSection() {
       if (rewindActive || Date.now() < rewindCooldownUntil) return;
       rewindActive = true;
       snapLocked = true;
-      clickLockUntil = Date.now() + 1800;
+      clickLockUntil = Date.now() + 820;
 
       const first = sections[0];
       history.replaceState(null, "", "#" + first.id);
-      first.scrollIntoView({ behavior: "smooth", block: "start" });
       activate(first, true, { sectionLight: false });
-      activateAfterSettle(first, 75);
+      snapScrollTo(first, 480, () => activate(first, true));
       waitForScrollSettle(first, () => {
         activate(first, true);
+        // Reaching the top by rewinding means the visitor has seen the whole
+        // deck, so this is the moment to offer the phone hand-off QR. A first
+        // visit to the dashboard does not get it.
+        document.body.classList.add("is-rewound");
         rewindActive = false;
         snapLocked = false;
         clickLockUntil = 0;
         rewindCooldownUntil = Date.now() + 900;
-      }, 1600);
+      }, 700);
     }
 
   function snapByWheel(event) {
@@ -2630,36 +2645,34 @@
         }
         event.preventDefault();
         snapLocked = true;
-        clickLockUntil = Date.now() + 420;
+        clickLockUntil = Date.now() + 300;
         const edgeTarget = sections[currentIndex] || active;
-        edgeTarget.scrollIntoView({ behavior: "smooth", block: "start" });
-        activate(edgeTarget, true, { sectionLight: false });
-        activateAfterSettle(edgeTarget, 80);
+        snapScrollTo(edgeTarget, 300);
+        activate(edgeTarget, true);
         window.setTimeout(() => {
           snapLocked = false;
           clickLockUntil = 0;
-        }, 500);
+        }, 320);
         return;
       }
 
       event.preventDefault();
       snapLocked = true;
-      clickLockUntil = Date.now() + 820;
+      clickLockUntil = Date.now() + 420;
       const target = sections[nextIndex];
       history.replaceState(null, "", "#" + target.id);
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      // Travel dark, light on landing: the nav highlight moves immediately but
+      // the destination scene stays dimmed for the whole ride and snaps on the
+      // instant the scroll locks in - the eye reads "off, arrived, ON".
       activate(target, true, { sectionLight: false });
-      activateAfterSettle(target, 105);
+      snapScrollTo(target, 440, () => activate(target, true));
       waitForScrollSettle(target, () => {
         snapLocked = false;
         clickLockUntil = 0;
         const rect = target.getBoundingClientRect();
-        const tolerance = Math.max(8, Math.round(window.innerHeight * 0.014));
-        if (Math.abs(rect.top) > tolerance) {
-          target.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-        activateAfterSettle(target, 65);
-      }, 820);
+        const tolerance = Math.max(24, Math.round(window.innerHeight * 0.05));
+        if (Math.abs(rect.top) > tolerance) snapScrollTo(target, 220);
+      }, 420);
     }
 
     if (!sections.length) return;
@@ -2667,15 +2680,13 @@
     function navigateToSection(id) {
       const section = document.getElementById(id);
       if (!section) return false;
-      clickLockUntil = Date.now() + 760;
+      clickLockUntil = Date.now() + 420;
       history.replaceState(null, "", "#" + id);
-      section.scrollIntoView({ behavior: "smooth", block: "start" });
       activate(section, true, { sectionLight: false });
-      activateAfterSettle(section, 105);
+      snapScrollTo(section, 420, () => activate(section, true));
       window.setTimeout(() => {
         clickLockUntil = 0;
-        activateAfterSettle(section, 65);
-      }, 700);
+      }, 440);
       return true;
     }
 
@@ -2701,6 +2712,19 @@
 
     window.addEventListener("scroll", () => scheduleActiveUpdate(110), { passive: true });
     window.addEventListener("wheel", snapByWheel, { passive: false });
+
+    // PC dropped the sorting scene - the deck funnels visitors to the mobile
+    // app through the QR portal. So on PC the hero's "지금 분류하기" opens the
+    // portal in place (the QR reveal in the upload panel, already on screen)
+    // instead of scrolling to a display:none scene. Below 64rem the anchor
+    // keeps its native behavior and reaches the real scene.
+    $$(".hero-actions a[href='#sorting']").forEach(anchor => {
+      anchor.addEventListener("click", event => {
+        if (window.innerWidth < 1024) return;
+        event.preventDefault();
+        document.body.classList.add("is-rewound");
+      });
+    });
 
     // Expo kiosk mode: a QR code can carry ?kiosk=5-1 so any visitor's own
     // phone lands straight on 3초판단 with the demo class pre-selected,

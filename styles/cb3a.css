@@ -1,15 +1,15 @@
 /* CB-3A: final product composition. This module owns visual overrides for the beta shell. */
 @layer cb3a {
-  :root { --scene-content-max: 112rem; --scene-inline-space: clamp(1rem,3.4vw,4rem); --scene-block-space: clamp(4.5rem,8vw,9rem); --header-size:4.875rem; --header-inline-space:clamp(1.375rem,4vw,4.5rem); --scene-gap:clamp(1rem,1.65vw,1.5rem); --panel-pad:clamp(1.035rem,calc(1.5571vw - .366rem),2.125rem); --copy-max:49.375rem; }
+  :root { --scene-content-max: 112rem; --scene-inline-space: clamp(1rem,3.4vw,4rem); --scene-block-space: clamp(4.5rem,8vw,9rem); --header-size:4.875rem; --header-inline-space:clamp(1.375rem,4vw,4.5rem); --nav-link-pad:.75rem; --scene-gap:clamp(1rem,1.65vw,1.5rem); --panel-pad:clamp(1.035rem,calc(1.5571vw - .366rem),2.125rem); --copy-max:49.375rem; }
   /* D's .scene never caps total width (confirmed live: max-width:100%,
      width:100%) - it controls margins purely through side padding, which
      scales as clamp(48px,5.4vw,138px) and locks to a flat 180px at
      2560px+. No --scene-content-max cap belongs at desktop widths. */
   body { color:#f6fbff; line-height:normal; background:radial-gradient(circle at 72% 16%,rgb(86 141 255 / 22%),transparent 34vw),radial-gradient(circle at 14% 78%,rgb(80 255 207 / 14%),transparent 30vw),linear-gradient(135deg,#020611 0%,#071223 44%,#030712 100%); }
   body::before { background:none; }
-  .site-header { min-block-size:var(--header-size); padding:.875rem var(--header-inline-space); gap:.7rem 1.15rem; background:rgb(5 17 30 / 86%); border-block-end-color:rgb(122 213 237 / 16%); backdrop-filter:blur(18px); }
+  .site-header { min-block-size:var(--header-size); padding:.875rem var(--header-inline-space); gap:.7rem 1.15rem; background:rgb(2 6 17 / 88%); border-block-end-color:rgb(122 213 237 / 16%); backdrop-filter:blur(18px); }
   .brand { gap:.65rem; font-size:1.08rem; white-space:nowrap; }.brand-mark { inline-size:2.45rem; block-size:2.45rem; padding:.25rem; border:1px solid rgb(96 239 224 / 56%); background:linear-gradient(145deg,#65e9de,#24759d); box-shadow:0 0 24px rgb(75 222 208 / 17%); }
-  .main-nav { flex:1 1 auto; justify-content:flex-end; gap:.1rem; overflow:visible; }.main-nav a { min-block-size:2.375rem; display:grid; place-items:center; padding-inline:.75rem; color:#b9cddb; font-size:.92rem; font-weight:760; }.edu2g-beta-trigger { flex:0 0 auto; min-block-size:2.375rem; }
+  .main-nav { flex:1 1 auto; justify-content:flex-end; gap:.1rem; overflow:visible; }.main-nav a { min-block-size:2.375rem; display:grid; place-items:center; padding-inline:var(--nav-link-pad); color:#b9cddb; font-size:.92rem; font-weight:760; }.edu2g-beta-trigger { flex:0 0 auto; min-block-size:2.375rem; }
   .responsive-nav-trigger { display:none; min-block-size:2.65rem; padding-inline:.82rem; color:#dffaff; background:transparent; border-color:rgb(111 212 232 / 34%); }
   main { gap:0; padding-block-end:0; }.scene { inline-size:100%; padding-inline:var(--scene-inline-space); min-block-size:100svh; padding-block:var(--scene-block-space); scroll-margin-block-start:calc(var(--header-size) + 1rem); box-sizing:border-box; }.scene-copy,.project-intro,.hero-copy { gap:0; }.scene-copy h2,.project-statement h2 { max-inline-size:16ch; font-size:clamp(2.35rem,4.4vw,7.15rem); font-weight:950; line-height:.96; letter-spacing:normal; }.eyebrow { display:inline-flex; align-items:center; gap:.65rem; color:#65ead6; font-size:.77rem; font-weight:850; letter-spacing:.11em; }.eyebrow::before { content:""; inline-size:2.15rem; block-size:1px; background:currentColor; }
   .panel { border-radius:1.375rem; border-color:rgb(131 224 255 / 18%); background:linear-gradient(145deg,rgb(13 31 61 / 86%),rgb(5 13 29 / 66%)); box-shadow:0 18px 48px rgb(0 7 20 / 20%); }.dashboard-grid>.panel:hover { border-color:rgb(99 232 215 / 56%); box-shadow:0 20px 48px rgb(0 7 20 / 29%); }
@@ -56,7 +56,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .resources-scene { text-align:left; background:linear-gradient(100deg,rgb(88 132 166 / 10%),transparent 47%); }.resources-scene .scene-copy { justify-items:start; margin-inline:0; }.resource-grid { grid-template-columns:minmax(16rem,1.15fr) repeat(3,minmax(0,1fr)); gap:0; border-block:1px solid rgb(138 171 195 / 28%); }.resource-grid a { min-block-size:0; padding:1.05rem; border:0; border-radius:0; border-inline-end:1px solid rgb(138 171 195 / 22%); background:transparent; box-shadow:none; }.resource-grid a:first-child { grid-row:span 2; min-block-size:15rem; background:linear-gradient(135deg,rgb(93 147 183 / 22%),rgb(13 35 54 / 36%)); }.resource-grid a:nth-child(5n + 2) { background:transparent; }
   .sorting-scene { background:radial-gradient(circle at 75% 40%,rgb(93 237 213 / 10%),transparent 34rem); }.sorting-layout { min-inline-size:0; }.sorting-app { border-radius:1.35rem; background:#081d2d; box-shadow:0 30px 70px rgb(0 6 17 / 38%); }.app-tabs { border-radius:.5rem; background:transparent; border-block-end:1px solid rgb(110 219 220 / 22%); }.app-tabs button { border:0; border-radius:0; background:transparent; }.quick-result { border-radius:.8rem; background:#0c2a3c; }.judgement-checklist { border-inline:3px solid #efbf6b; background:rgb(239 191 107 / 8%); }
 
-  @media (min-width:64rem) { .dashboard-scene { grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr); align-items:stretch; gap:clamp(2.125rem,3.4vw,5.5rem); }.dashboard-grid { align-self:stretch; block-size:calc(100svh - var(--header-size) - 2.2rem); min-block-size:0; grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-rows:repeat(2,minmax(0,1fr)); align-content:stretch; }.dashboard-grid>.panel,.dashboard-grid>.school-panel,.dashboard-grid>.landfill-panel,.dashboard-grid>.class-panel,.dashboard-grid>.upload-panel { min-block-size:0; }.upload-actions button { min-block-size:5.3rem; }.combo-chart { max-block-size:6.25rem; }.school-panel,.landfill-panel,.class-panel,.upload-panel { grid-column:auto; }.kpi-row,.class-kpis { grid-template-columns:repeat(3,minmax(0,1fr)); }.school-visuals { grid-template-columns:minmax(0,1fr) auto; align-items:center; }.project-cards,.hah-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+  @media (min-width:64rem) { .dashboard-scene { grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr); align-items:stretch; gap:clamp(2.125rem,3.4vw,5.5rem); }.dashboard-grid { align-self:start; margin-block-start:.4rem; block-size:calc(100svh - var(--header-size) - 7.4rem); min-block-size:0; gap:1.05rem; grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-rows:1.05fr .95fr; align-content:stretch; }.dashboard-grid>.panel,.dashboard-grid>.school-panel,.dashboard-grid>.landfill-panel,.dashboard-grid>.class-panel,.dashboard-grid>.upload-panel { min-block-size:0; }.upload-actions button { min-block-size:5.3rem; }.combo-chart { max-block-size:6.25rem; }.school-panel,.landfill-panel,.class-panel,.upload-panel { grid-column:auto; }.kpi-row,.class-kpis { grid-template-columns:repeat(3,minmax(0,1fr)); }.school-visuals { grid-template-columns:minmax(0,1fr) auto; align-items:center; }.project-cards,.hah-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
   /* Preserve the pre-refactor lecture-board rhythm above tablet width without
      touching the closed-beta controls or their state selectors. */
   @media (min-width:64rem) { :root { --scene-inline-space:clamp(3rem,5.4vw,8.625rem); --scene-block-space:clamp(4rem,6.5vw,11.25rem); }.scene-copy h2,.project-statement h2 { max-inline-size:14ch; }.panel,.sorting-app { box-shadow:0 20px 52px rgb(0 7 20 / 26%); }.project-scene,.curriculum-scene,.hah-scene,.flow-scene,.gallery-scene,.sorting-scene,.resources-scene { border-block-start:1px solid rgb(111 212 232 / 9%); }.gallery-stage,.resource-grid,.flow-grid { box-shadow:0 18px 42px rgb(0 7 20 / 18%); }.main-nav a { position:relative; }.main-nav a.is-active::after,.main-nav a[aria-current]::after { content:""; position:absolute; inset-block-end:-.5rem; inset-inline:1rem; block-size:2px; background:linear-gradient(90deg,rgb(0 0 0 / 0%),#64eaff,#5ef7cd,rgb(0 0 0 / 0%)); } }
@@ -64,7 +64,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      (a typical 13-15" laptop width) - the wide-desktop clamp above only
      matches D at >=1601px. Read directly from D's source, not guessed. */
   @media (min-width:1181px) and (max-width:1600px) { .dashboard-scene h1 { font-size:clamp(3.7rem,5.6vw,6.6rem); }.dashboard-scene { grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr); gap:clamp(1.375rem,2.6vw,2.75rem); } }
-  @media (min-width:64rem) and (max-width:73.74rem) { .dashboard-grid { block-size:calc(100svh - var(--header-size) - 2.5rem); } }
+  @media (min-width:64rem) and (max-width:73.74rem) { .dashboard-grid { block-size:calc(100svh - var(--header-size)*2 - 2.2rem); } }
   /* --scene-content-max and the h2 ceiling already match the base values
      above at this width, so only the genuinely ultra-wide-specific rule
      (wider dashboard columns) is kept here. */
@@ -122,10 +122,115 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
 /* Exhibition desktop finish: keeps the approved D/E presentation language
    together without altering the closed-beta mobile application below 64rem. */
 @media (min-width:64rem) {
-  .site-header { box-shadow:none; }
+  /* The last nav item's *text* should line up with the right edge of the scene
+     content below it, so the header stops short of the scene inset by exactly
+     the link's own inline padding. Verified at both widths: 180-20=160 at
+     2560px, 77.76-12=65.6 at 1440px. */
+  .site-header { box-shadow:none; padding-inline-end:calc(var(--scene-inline-space) - var(--nav-link-pad)); }
   .main-nav a { border-radius:.7rem; }
-  .scene { position:relative; opacity:.56; filter:saturate(.68) brightness(.66); transition:opacity .43s cubic-bezier(.18,.92,.24,1),filter .43s cubic-bezier(.18,.92,.24,1),transform .42s cubic-bezier(.18,.92,.24,1); }.scene.is-active { opacity:1; filter:saturate(1.08) brightness(1.08); }
+  /* Lights flip in .17s - fast enough to read as a switch ("탁"), not a fade.
+     app.js keeps the destination dark for the whole ride and calls the light
+     the instant the snap lands. */
+  .scene { position:relative; opacity:.56; filter:saturate(.68) brightness(.66); transition:opacity .17s cubic-bezier(.2,0,.25,1),filter .17s cubic-bezier(.2,0,.25,1),transform .3s cubic-bezier(.18,.92,.24,1); }.scene.is-active { opacity:1; filter:saturate(1.08) brightness(1.08); }
   .scene::after { content:""; position:absolute; inset:auto 0 0; block-size:1px; background:linear-gradient(90deg,transparent,rgb(111 212 232 / 18%),transparent); pointer-events:none; }
+
+  /* No CSS scroll-snap here on purpose. D used it, but D's app.js did not
+     hijack the wheel; this build's snapByWheel calls preventDefault and drives
+     the scroll itself, so native snapping never gets to participate on a wheel
+     gesture - it only wakes up to re-snap *after* each frame our animation
+     writes, dragging against the curve. The snap feel comes from the JS curve
+     in app.js (snapScrollTo) instead. */
+
+  /* PC drops the 3-second-judgement app: the nav goes gallery -> resources. The
+     markup stays put because frontendDomContract.test.js requires #sorting and
+     its child ids, and the mobile layout below 64rem still renders the scene.
+     app.js filters display:none scenes out of the scroll sequence to match. */
+  .sorting-scene { display:none; }
+  .main-nav a[href="#sorting"] { display:none; }
+
+  /* Experience portal (upload panel, PC only): the panel's mobile capture UI
+     gives way to a centered "Powered by Google Gemini" over one big dashed
+     frame. The frame teases that finishing the deck and returning opens a new
+     experience; the rewind (body.is-rewound) swaps the teaser for the hand-off
+     QR and the dashed border "locks in" solid mint - the portal opening. */
+  .upload-panel > p, .upload-panel .upload-highlights, .upload-panel .upload-card-actions, .upload-panel .gemini-credit { display:none; }
+  .experience-portal { display:grid; grid-template-rows:auto 1fr; gap:.4rem; block-size:100%; min-block-size:0; }
+  .portal-powered { justify-self:center; display:inline-flex; align-items:center; gap:.5rem; font-size:clamp(.98rem,.8vw,1.22rem); font-weight:850; letter-spacing:.02em; background:linear-gradient(90deg,#64eaff,#5ef7cd); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .portal-gemini-star { inline-size:1.25em; block-size:1.25em; flex:0 0 auto; filter:drop-shadow(0 0 6px rgb(66 133 244 / 35%)); }
+  .upload-panel .experience-portal { margin-block-end:.55rem; }
+  .upload-panel > small { display:block; margin-block-start:.3rem; line-height:1.5; font-size:clamp(.85rem,.72vw,1.05rem); color:#bcd3e0; }
+  .portal-frame { display:grid; place-items:center; min-block-size:7.2rem; align-content:center; row-gap:.3rem; padding:.7rem 1.1rem 1.15rem; border:2px dashed rgb(131 224 255 / 36%); border-radius:1.15rem; background:rgb(100 234 255 / 4%); transition:border-color .45s ease, box-shadow .45s ease, background .45s ease; animation:finale-hint-float 3.4s ease-in-out infinite; }
+  .portal-teaser { margin:0; text-align:center; color:#f6fbff; font-size:clamp(.98rem,.85vw,1.28rem); font-weight:850; line-height:1.55; letter-spacing:-.01em; }
+  .portal-teaser strong { color:#5ef7cd; }
+  .portal-arrow { inline-size:1.7rem; block-size:1.55rem; margin-block-start:.05rem; background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 44'><defs><linearGradient id='p' x1='0' x2='0' y1='0' y2='1'><stop offset='0' stop-color='%2364eaff'/><stop offset='1' stop-color='%235ef7cd'/></linearGradient></defs><path d='M7 5l17 13L41 5' fill='none' stroke='url(%23p)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round' opacity='.38'/><path d='M7 21l17 13L41 21' fill='none' stroke='url(%23p)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/contain no-repeat; filter:drop-shadow(0 0 9px rgb(94 247 205 / 5)); animation:finale-arrow-bob 1.7s cubic-bezier(.45,0,.25,1) infinite; }
+  .dashboard-scene .qr-invite { display:none; }
+  body.is-rewound .portal-teaser, body.is-rewound .portal-arrow { display:none; }
+  body.is-rewound .portal-frame { border-style:solid; border-color:rgb(94 247 205 / 55%); background:rgb(94 247 205 / 6%); box-shadow:0 0 34px rgb(94 247 205 / 16%), inset 0 0 24px rgb(94 247 205 / 7%); }
+  /* Rewound state: the checklist gives way entirely - the panel opens with
+     "Powered by Google Gemini" and spends the freed room on a booth-scannable
+     QR, drawn with margin to spare instead of clipping the frame. */
+  body.is-rewound .upload-panel .upload-highlights { display:none; }
+  /* With the checklist gone the panel has spare height: pull Powered-by up,
+     grow the frame vertically so the QR sits inside with clear margins. */
+  body.is-rewound .portal-powered { margin-block-start:-.35rem; }
+  body.is-rewound .portal-frame { padding:1.5rem 1.4rem; min-block-size:clamp(7rem,23svh,15.5rem); }
+  body.is-rewound .dashboard-scene .qr-invite { display:flex; align-items:center; gap:1.1rem; margin:0; padding:.3rem 0; border:0; background:transparent; box-shadow:none; animation:qr-invite-reveal .62s cubic-bezier(.2,.7,.2,1) both; }
+  body.is-rewound .dashboard-scene .qr-invite img { inline-size:clamp(9rem,10.2vw,12.5rem); block-size:auto; border-radius:.9rem; }
+  body.is-rewound .dashboard-scene .qr-invite p { color:#dff2fb; font-size:clamp(.95rem,.8vw,1.18rem); font-weight:750; line-height:1.7; word-break:keep-all; }
+  body.is-rewound .dashboard-scene .qr-invite p strong { color:#5ef7cd; font-weight:850; }
+
+  /* ==== D revival: scene rhythm (every scene except the dashboard) ====
+     All numbers below are two-point measurements of the live D reference
+     (tag pc-visual-master-d) at 1440px and 2560px, refit as linear vw
+     formulas - both viewports verify to <0.5px. D's language: content
+     vertically centered in the frame, a long lead-in above (146->180px),
+     a short exit below, per-scene side insets, and wider copy-to-content
+     gaps than the rebuild kept. The dashboard is deliberately excluded:
+     its right column is viewport-height-locked, so centering does nothing
+     and its own layout is still under discussion. */
+  .project-scene, .curriculum-scene, .hah-scene, .flow-scene, .gallery-scene, .resources-scene {
+    align-items:center;
+    padding-block-start:calc(6.39rem + 3.04vw);   /* D 146 -> 180 */
+  }
+  .project-scene, .curriculum-scene { padding-block-end:3.625rem; }          /* D 58 flat */
+  .hah-scene, .flow-scene, .gallery-scene { padding-block-end:calc(.96rem + 2.05vw); } /* D 45 -> 68 */
+  .project-scene { padding-inline:calc(2.05rem + 4.73vw); }                  /* D 101 -> 154 */
+  .curriculum-scene { padding-inline:calc(.96rem + 6.43vw); }                /* D 108 -> 180 */
+  /* D ran the gallery full-bleed, but the card grid's rounded corners then sit
+     clipped against the viewport edge (user: cards overflow). Keep the left
+     bleed for the copy, inset the right so the grid breathes. */
+  .gallery-scene { padding-inline:0 var(--scene-inline-space); }
+  .resources-scene { padding-block-start:calc(3.23rem + 5.71vw); padding-block-end:3.625rem; padding-inline:calc(2.38rem + 4.38vw); } /* D 134->198 / 58 / 101->150 */
+  /* Per-scene copy-to-content gaps live with each scene's own layout rules
+     further down (search "D gap"); only the shared rhythm lives here. */
+
+  /* Cue that another scene sits below: a double chevron drawn as an inline SVG
+     (gradient stroke, ghosted leading stroke) with a mint glow, bobbing on the
+     active scene. Suppressed on the last scene - its finale hint takes over. */
+  .scene::before { content:""; position:absolute; inset-block-end:1.1rem; inset-inline-start:50%; translate:-50% 0; inline-size:3.2rem; block-size:2.9rem; background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 44'><defs><linearGradient id='g' x1='0' x2='0' y1='0' y2='1'><stop offset='0' stop-color='%2364eaff'/><stop offset='1' stop-color='%235ef7cd'/></linearGradient></defs><path d='M7 5l17 13L41 5' fill='none' stroke='url(%23g)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round' opacity='.38'/><path d='M7 21l17 13L41 21' fill='none' stroke='url(%23g)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/contain no-repeat; filter:drop-shadow(0 0 14px rgb(94 247 205 / 52%)) drop-shadow(0 4px 12px rgb(0 6 16 / 55%)); opacity:0; pointer-events:none; transition:opacity .3s ease; }
+  .scene.is-active::before { opacity:1; animation:scene-scroll-cue 1.7s cubic-bezier(.45,0,.25,1) infinite; }
+  .resources-scene::before { content:none; }
+  /* The dashboard's ::before is taken by its grid overlay, so the first scene
+     carries the same chevron as a real element instead. */
+  .dashboard-scene::before, .dashboard-scene.is-active::before { background:linear-gradient(90deg,rgb(100 234 255 / 5%) 1px,transparent 1px),linear-gradient(rgb(100 234 255 / 4.3%) 1px,transparent 1px); background-size:2.6rem 2.6rem; opacity:1; filter:none; translate:none; inline-size:auto; block-size:auto; animation:none; transition:none; }
+  /* The cue lives OUTSIDE the scenes (a direct child of body): at scroll 0 the
+     sticky header pushes the dashboard 89px down so a scene-anchored cue sits
+     below the fold, and position:fixed can't save it from inside - the scene's
+     filter makes the scene itself the containing block for fixed descendants.
+     From the body it is genuinely viewport-fixed, shown only while the
+     dashboard (the one scene whose ::before is taken by its grid overlay) is
+     the active scene. */
+  .scroll-cue { position:fixed; z-index:5; inset-block-end:1.1rem; inset-inline-start:50%; translate:-50% 0; inline-size:3.2rem; block-size:2.9rem; background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 44'><defs><linearGradient id='g' x1='0' x2='0' y1='0' y2='1'><stop offset='0' stop-color='%2364eaff'/><stop offset='1' stop-color='%235ef7cd'/></linearGradient></defs><path d='M7 5l17 13L41 5' fill='none' stroke='url(%23g)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round' opacity='.38'/><path d='M7 21l17 13L41 21' fill='none' stroke='url(%23g)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/contain no-repeat; filter:drop-shadow(0 0 14px rgb(94 247 205 / 52%)) drop-shadow(0 4px 12px rgb(0 6 16 / 55%)); opacity:0; pointer-events:none; transition:opacity .3s ease; }
+  body:has(.dashboard-scene.is-active) .scroll-cue { opacity:1; animation:scene-scroll-cue 1.7s cubic-bezier(.45,0,.25,1) infinite; }
+
+  /* Finale hint: floats in the resources scene's empty top-right, telling the
+     visitor one more scroll rewinds the deck and reveals the hand-off QR. */
+  .scroll-finale-hint { position:absolute; z-index:2; inset-block-start:calc(9rem + 8vw); inset-inline-end:clamp(24rem,34vw,58rem); display:grid; justify-items:center; gap:.7rem; max-inline-size:31rem; padding:2rem 2.6rem 1.7rem; text-align:center; border-radius:1.6rem; border:1px solid rgb(94 247 205 / 30%); background:linear-gradient(155deg,rgb(13 48 66 / 74%),rgb(7 22 42 / 84%)); box-shadow:0 24px 60px rgb(0 6 16 / 45%), inset 0 1px rgb(255 255 255 / 8%), 0 0 44px rgb(94 247 205 / 10%); backdrop-filter:blur(10px); animation:finale-hint-float 3.4s ease-in-out infinite; }
+  .scroll-finale-hint .hint-kicker { display:inline-flex; padding:.34rem .85rem; border-radius:999px; border:1px solid rgb(94 247 205 / 32%); background:rgb(94 247 205 / 10%); color:#5ef7cd; font-size:.74rem; font-weight:850; letter-spacing:.11em; }
+  .scroll-finale-hint .hint-title { margin:0; color:#f6fbff; font-size:clamp(1.45rem,1.22vw,1.85rem); font-weight:900; letter-spacing:-.02em; }
+  .scroll-finale-hint .hint-sub { margin:0; color:#9eb3c7; font-size:clamp(1rem,.84vw,1.22rem); font-weight:700; line-height:1.6; }
+  .scroll-finale-hint .hint-sub strong { color:#64eaff; font-weight:850; }
+  .scroll-finale-hint .hint-arrow { inline-size:2.8rem; block-size:2.55rem; margin-block-start:.15rem; background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 44'><defs><linearGradient id='h' x1='0' x2='0' y1='0' y2='1'><stop offset='0' stop-color='%2364eaff'/><stop offset='1' stop-color='%235ef7cd'/></linearGradient></defs><path d='M7 5l17 13L41 5' fill='none' stroke='url(%23h)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round' opacity='.38'/><path d='M7 21l17 13L41 21' fill='none' stroke='url(%23h)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/contain no-repeat; filter:drop-shadow(0 0 12px rgb(94 247 205 / 55%)); animation:finale-arrow-bob 1.7s cubic-bezier(.45,0,.25,1) infinite; }
   /* The base layer's h1,h2,h3,h4{letter-spacing:-0.035em} (style.css) applies
      site-wide and compresses every card/section heading - D never uses
      negative tracking on any heading level. Cancel it once, everywhere,
@@ -138,7 +243,8 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .dashboard-grid { padding:clamp(.875rem,calc(1.202vw - .423rem),1.5rem); border:1px solid rgb(116 189 255 / 20%); border-radius:clamp(1.875rem,calc(1.442vw + .318rem),2.625rem); background:linear-gradient(145deg,rgb(24 52 88 / 72%),rgb(5 13 29 / 38%)); box-shadow:0 26px 90px rgb(0 0 0 / 34%),inset 0 1px rgb(255 255 255 / 5%); }
   .dashboard-grid>.panel { border-color:rgb(131 224 255 / 18%); box-shadow:0 20px 70px rgb(14 28 54 / 34%),inset 0 1px rgb(255 255 255 / 6%); }
   .dashboard-grid>.panel:hover { box-shadow:0 28px 80px rgb(6 18 36 / 48%),0 0 34px rgb(94 247 205 / 16%),inset 0 1px rgb(255 255 255 / 8%); background:linear-gradient(145deg,rgb(255 255 255 / 10.6%),rgb(94 247 205 / 6.7%),rgb(100 169 255 / 4.3%)); }
-  .school-panel .panel-head h2,.class-panel .panel-head h2 { font-size:clamp(.875rem,1.14vw,1.231rem); }
+  .dashboard-grid>.panel .panel-head h2 { font-size:clamp(1.05rem,1.4vw,2.05rem); line-height:1.22; }
+  .dashboard-grid>.panel .panel-head p { font-size:clamp(.72rem,.62vw,.95rem); }
   .project-scene,.curriculum-scene,.hah-scene,.flow-scene,.gallery-scene,.sorting-scene,.resources-scene { isolation:isolate; }
   .project-statement,.standards-panel,.sorting-app { box-shadow:0 24px 56px rgb(0 7 20 / 25%); }
   .flow-card,.resource-grid a { transition:transform .18s ease,border-color .18s ease,background .18s ease; }
@@ -194,7 +300,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
    PROJECT page → D full-width editorial layout.
    ============================================================ */
 @media (min-width:64rem) {
-  .project-scene { grid-template-columns:1fr; align-items:start; gap:3.375rem; background:none; }
+  .project-scene { grid-template-columns:1fr; gap:calc(.8rem + 1.61vw); background:none; } /* D gap 36->54; align comes from the D-revival rhythm block */
   .project-intro { max-inline-size:none; }
   .project-statement { padding:0; border:0; border-radius:0; background:none; box-shadow:none; }
   .project-statement h2 { max-inline-size:none; font-size:clamp(3rem,4.85vw,7.1rem); line-height:.96; font-weight:950; letter-spacing:normal; }
@@ -210,24 +316,28 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .eyebrow::before { display:none; }
 
   /* CURRICULUM → D: copy left, subject cards + standards panel right. */
-  .curriculum-scene { grid-template-columns:minmax(0,.71fr) minmax(0,1fr); gap:3.6rem; align-items:start; background:none; }
+  .curriculum-scene { grid-template-columns:minmax(0,.71fr) minmax(0,1fr); gap:calc(.84rem + 3.07vw); background:none; } /* D gap 57.6->92 */
   .curriculum-layout { grid-template-columns:1fr; gap:1.125rem; }
   .curriculum-title { display:grid; gap:.1em; font-size:clamp(3.825rem,calc(5.1643vw - .823rem),7.44rem); line-height:1.11; }
   .curriculum-title span { display:block; }
   .subject-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(1.035rem,calc(.598rem + .4857vw),1.375rem); border:0; }
-  .subject-card { position:relative; display:flex; flex-direction:column; gap:.5rem; min-block-size:0; padding:clamp(1.53rem,calc(.122rem + 1.5643vw),2.625rem) clamp(1.53rem,calc(.122rem + 1.5643vw),2.625rem) 4rem; border:1px solid rgb(131 224 255 / 18%); border-radius:clamp(1.5rem,calc(.857rem + .7143vw),2rem); background:linear-gradient(145deg,rgb(13 31 61 / 86%),rgb(5 13 29 / 66%)); box-shadow:0 24px 64px rgb(0 0 0 / 28%),inset 0 1px rgb(255 255 255 / 6%); }
+  .subject-card { position:relative; display:flex; flex-direction:column; gap:.6rem; min-block-size:0; padding:clamp(1.9rem,calc(.5rem + 1.6vw),3.1rem) clamp(1.53rem,calc(.122rem + 1.5643vw),2.625rem) 4.6rem; border:1px solid rgb(131 224 255 / 18%); border-radius:clamp(1.5rem,calc(.857rem + .7143vw),2rem); background:linear-gradient(145deg,rgb(13 31 61 / 86%),rgb(5 13 29 / 66%)); box-shadow:0 24px 64px rgb(0 0 0 / 28%),inset 0 1px rgb(255 255 255 / 6%); }
   .subject-card em { position:absolute; inset-inline-end:1.125rem; inset-block-end:1.125rem; margin-block-start:0; opacity:0; transform:translateY(.5rem); transition:opacity .18s,transform .18s; }
   .subject-card:hover em, .subject-card:focus-within em { opacity:1; transform:none; }
+  /* Right-column readability pass (user feedback): the cards ran short and the
+     copy small next to the enlarged left column. */
+  .subject-card h3 { font-size:clamp(1.32rem,1.12vw,1.68rem); }
+  .subject-card p { font-size:clamp(.97rem,.83vw,1.2rem); line-height:1.66; }
   .standards-panel { grid-template-columns:1fr; gap:1.5rem; padding:clamp(1.485rem,calc(.662rem + .9143vw),2.125rem); margin-block-start:1.25rem; border:1px solid rgb(131 224 255 / 18%); border-radius:clamp(1.5rem,calc(.857rem + .7143vw),2rem); background:linear-gradient(145deg,rgb(9 22 44 / 78%),rgb(5 13 29 / 62%)); box-shadow:none; }
   .standards-panel>div:first-child { display:flex; justify-content:space-between; align-items:baseline; gap:1rem; }
   .standards-panel>div:first-child p { color:#9eb3c7; font-size:1rem; }
-  .standards-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:.875rem; margin-block-start:0; }
-  .standards-grid article { display:grid; gap:.35rem; padding:.75rem 1rem; border:1px solid rgb(105 174 255 / 30%); border-radius:1rem; background:rgb(79 147 255 / 8%); }
-  .standards-grid article span { display:inline-flex; inline-size:fit-content; padding:.25rem .625rem; border-radius:999px; background:linear-gradient(135deg,#5ef7cd,#64eaff); color:#06111c; font-size:.78rem; font-weight:950; }
-  .standards-grid article p { font-size:.82rem; font-weight:760; color:#9eb3c7; }
+  .standards-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.05rem; margin-block-start:0; }
+  .standards-grid article { display:grid; gap:.5rem; padding:1.05rem 1.2rem; border:1px solid rgb(105 174 255 / 30%); border-radius:1rem; background:rgb(79 147 255 / 8%); }
+  .standards-grid article span { display:inline-flex; inline-size:fit-content; padding:.3rem .7rem; border-radius:999px; background:linear-gradient(135deg,#5ef7cd,#64eaff); color:#06111c; font-size:.85rem; font-weight:950; }
+  .standards-grid article p { font-size:clamp(.92rem,.76vw,1.08rem); font-weight:760; color:#9eb3c7; line-height:1.55; }
 
   /* H-A-H → D: centered copy, three bordered glass cards, pill callout. */
-  .hah-scene { grid-template-columns:1fr; gap:1.125rem; text-align:start; background:none; }
+  .hah-scene { grid-template-columns:1fr; gap:calc(.24rem + .98vw); text-align:start; background:none; } /* D gap 18->29 */
   .hah-scene .scene-copy { justify-items:start; margin-inline:0; max-inline-size:none; }
   .hah-grid .panel ul { padding-inline-start:2.5rem; list-style:disc; }
   .hah-grid .panel li { color:#9eb3c7; }
@@ -242,7 +352,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .callout { max-inline-size:66rem; margin-inline:auto; margin-block-start:-1.875rem; padding:.75rem 1.5rem; border:1px solid rgb(94 247 205 / 24%); border-radius:1.25rem; background:rgb(94 247 205 / 8%); color:rgb(237 255 250 / 92%); font-weight:850; font-size:clamp(1.08rem,calc(.771rem + .3429vw),1.32rem); line-height:1.4; }
 
   /* FLOW → D: copy left, four bordered cards with gaps (no strip / stagger). */
-  .flow-scene { grid-template-columns:minmax(0,.52fr) minmax(0,1fr); gap:1.35rem; background:none; }
+  .flow-scene { grid-template-columns:minmax(0,.52fr) minmax(0,1fr); gap:calc(.51rem + .93vw); background:none; } /* D gap 21.6->32 */
   .flow-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(.84375rem,calc(.482rem + .4018vw),1.125rem) 1rem; border:0; box-shadow:none; }
   .flow-card { display:flex; flex-direction:column; gap:.625rem; min-block-size:0; margin:0; padding:clamp(1.08rem,calc(.701rem + .4214vw),1.375rem); border:1px solid rgb(131 224 255 / 18%); border-radius:1.375rem; background:rgb(255 255 255 / 6%); box-shadow:none; }
   .flow-card.ai-badge { border-color:rgb(100 234 255 / 30%); }
@@ -254,10 +364,11 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .flow-card:hover em, .flow-card:focus-within em { opacity:1; transform:none; }
 
   /* RESOURCES → D: full-width, even six-up bordered tiles. */
-  .resources-scene { grid-template-columns:1fr; gap:3.6rem; text-align:left; background:none; }
-  .resource-grid { grid-template-columns:repeat(6,minmax(0,1fr)); gap:.75rem; border:0; }
-  .resource-grid a { display:grid; gap:.875rem; min-block-size:0; padding:1.08rem; border:1px solid rgb(138 171 195 / 28%); border-radius:1.5rem; background:rgb(11 30 51 / 55%); box-shadow:0 24px 64px rgb(0 0 0 / 28%),inset 0 1px rgb(255 255 255 / 6%); font-size:.95rem; font-weight:880; }
-  .resource-grid a span { color:#5ef7cd; font-weight:900; font-size:.95rem; }
+  .resources-scene { grid-template-columns:1fr; gap:calc(1.8rem + 2vw); text-align:left; background:none; } /* D gap 57.6->80 */
+  /* 5x2 (11/12 removed from the markup), taller cards, bigger type. */
+  .resource-grid { grid-template-columns:repeat(5,minmax(0,1fr)); gap:1rem; border:0; }
+  .resource-grid a { display:grid; gap:1rem; align-content:center; min-block-size:clamp(6.5rem,7vw,9rem); padding:1.4rem 1.5rem; border:1px solid rgb(138 171 195 / 28%); border-radius:1.5rem; background:rgb(11 30 51 / 55%); box-shadow:0 24px 64px rgb(0 0 0 / 28%),inset 0 1px rgb(255 255 255 / 6%); font-size:clamp(1.1rem,.95vw,1.4rem); font-weight:880; }
+  .resource-grid a span { color:#5ef7cd; font-weight:900; font-size:clamp(1.05rem,.9vw,1.35rem); }
   .footer-credit { display:grid; grid-template-columns:1fr auto; justify-content:space-between; gap:1.5rem; border-block-start:1px solid rgb(132 220 255 / 20%); padding-block-start:1.5rem; margin-block-start:.75rem; color:#9eb3c7; font-weight:760; }.footer-credit p:last-child { justify-self:end; text-align:end; }
   .resource-pending { cursor:default; color:rgb(180 197 210 / 70%); background:rgb(255 255 255 / 3.5%); }
   .project-subtitle,.curriculum-description,.hah-description,.gallery-description,.resources-description,.flow-scene .scene-copy>p:not(.eyebrow) { color:#9eb3c7; font-weight:760; margin-block:1em; }
@@ -276,13 +387,13 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .resource-grid a:first-child { grid-row:auto; min-block-size:0; background:rgb(11 30 51 / 55%); }
 
   /* GALLERY → D: copy left, 4-up card grid; detail opens on click (is-detail). */
-  .gallery-scene { grid-template-columns:minmax(0,.56fr) minmax(0,1fr); gap:2.7rem 2.88rem; background:none; }
+  .gallery-scene { grid-template-columns:minmax(0,.56fr) minmax(0,1fr); gap:calc(.39rem + 2.57vw) calc(2.41rem + .53vw); background:none; } /* D row 43.2->72, col 46.08->52 */
   .gallery-scene .scene-copy { padding-inline-start:clamp(4.5rem,calc(2.25rem + 2.5vw),6.25rem); }
   .gallery-stage { display:block; border:0; background:none; box-shadow:none; }
   .gallery-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(.84375rem,calc(.482rem + .4018vw),1.125rem) 1rem; background:transparent; }
   .gallery-detail-head { gap:.375rem clamp(1.35rem,calc(.675rem + .75vw),1.875rem); }
   .gallery-detail-grid { gap:clamp(1.98rem,calc(1.311rem + .7429vw),2.5rem); }
-  .gallery-grid article { position:relative; overflow:hidden; display:grid; align-content:center; justify-items:center; gap:.75rem; min-block-size:22.5rem; padding:1.25rem; border:1px solid rgb(126 166 184 / 26%); border-radius:1.5rem; background:linear-gradient(145deg,rgb(16 62 84 / 55%),rgb(8 27 48 / 52%)); box-shadow:0 24px 64px rgb(0 0 0 / 28%),inset 0 1px rgb(255 255 255 / 6%); text-align:center; }
+  .gallery-grid article { position:relative; overflow:hidden; display:grid; align-content:center; justify-items:center; gap:.75rem; min-block-size:clamp(11rem,11vw,14.5rem); padding:1.25rem; border:1px solid rgb(126 166 184 / 26%); border-radius:1.5rem; background:linear-gradient(145deg,rgb(16 62 84 / 55%),rgb(8 27 48 / 52%)); box-shadow:0 24px 64px rgb(0 0 0 / 28%),inset 0 1px rgb(255 255 255 / 6%); text-align:center; }
   /* D pins the "바로가기" button to the card's bottom-right corner as a pill. */
   .gallery-grid article button { position:absolute; inset-inline-end:1.125rem; inset-block-end:1.125rem; min-block-size:2.375rem; padding:0 1rem; border-radius:999px; border:1px solid rgb(94 247 205 / 28%); color:#06111c; background:linear-gradient(135deg,#5ef7cd,#64eaff); opacity:0; transform:translateY(.5rem); transition:opacity .18s,transform .18s; }
   .gallery-grid article:hover button, .gallery-grid article:focus-within button { opacity:1; transform:none; }
@@ -313,7 +424,24 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   /* D itself only shows the full logo at 52px (illegible at that size,
      verified live) - enlarging beyond D here is a deliberate legibility
      improvement, not a mismatch. Full original logo file, not a crop. */
-  .brand-mark { inline-size:3.75rem; block-size:3.75rem; overflow:hidden; background:#fff; border-color:rgb(0 0 0 / 10%); box-shadow:0 2px 10px rgb(0 0 0 / 22%); padding:.32rem; }.brand-mark img { inline-size:100%; block-size:100%; object-fit:contain; }
+  /* Fill the white tile: the logo was 48px inside a 60px tile because of a
+     .32rem inset. At 1440px the tile already uses 60 of the header's 61px of
+     free height, so the only room left is that inset; at 2560px there are 84px
+     of free height, so the tile itself can grow too. The clamp keeps 1440px
+     exactly where it was and only spends the headroom wider screens have. */
+  /* Tile trimmed ~14% per feedback; the logo inside stays maximized via the
+     hairline inset, and the flat white gets a soft top-lit wash. */
+  .brand-mark { inline-size:clamp(3.2rem,2.66vw,4.3rem); block-size:clamp(3.2rem,2.66vw,4.3rem); overflow:hidden; background:linear-gradient(155deg,#ffffff 12%,#eef8ff 56%,#d9edf7 100%); border-color:rgb(0 0 0 / 10%); box-shadow:0 2px 10px rgb(0 0 0 / 22%), inset 0 1px rgb(255 255 255 / 90%); padding:.06rem; }
+  .brand { font-size:clamp(1.18rem,.88vw,1.4rem); }
+  /* The PNG carries ~33% transparent margin around its ink (measured via
+     canvas alpha bbox: 969x686 ink in a 1440x960 file). Scaling the img 1.38x
+     brings the ink to ~93% of the tile; the tile's overflow:hidden guarantees
+     nothing escapes. */
+  .brand-mark img { scale:1.22; }
+  .hero-actions .primary-btn, .hero-actions .secondary-btn { min-block-size:clamp(3.15rem,2.5vw,3.9rem); padding-inline:clamp(1.7rem,1.5vw,2.4rem); font-size:clamp(1.02rem,.82vw,1.3rem); }
+  /* The markup already carries the intended line breaks as spans - let them break. */
+  .project-statement h2 span { display:block; }
+  .curriculum-description span { display:block; }.brand-mark img { inline-size:100%; block-size:100%; object-fit:contain; }
   .ai-modal { inline-size:min(65rem,calc(100vw - 2.25rem)); border-radius:1.75rem; background:#071326; border-color:rgb(100 234 255 / 25%); }
 
   /* 2 & 7. Grade/class selects: the base rule `.select-line { grid-column:2;
@@ -325,35 +453,68 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      Taking the select out of grid flow entirely fixes both the overlap and
      the phantom column at once. */
   .school-panel, .class-panel { position:relative; }
-  .school-panel .select-line, .class-panel .select-line { position:absolute; inset-block-start:2.05rem; inset-inline-end:1.1rem; grid-column:auto; grid-row:auto; z-index:2; }
+  /* The select drops to the title's line and its right edge matches the grade
+     numbers' column (both sit at the panel's content inset). */
+  .school-panel .select-line, .class-panel .select-line { position:absolute; inset-block-start:2.95rem; inset-inline-end:var(--panel-pad); grid-column:auto; grid-row:auto; z-index:2; }
   .school-panel .panel-head, .class-panel .panel-head { padding-inline-end:7rem; }
   .landfill-panel .panel-head, .upload-panel .panel-head { padding-inline-end:0; margin-block-end:.875rem; }
-  .school-panel .select-line select, .class-panel .select-line select { min-block-size:1.6rem; padding:.2rem .45rem; font-size:.64rem; font-weight:850; border-radius:.75rem; }
+  .school-panel .select-line select, .class-panel .select-line select { min-block-size:2.15rem; padding:.32rem .65rem; font-size:clamp(.82rem,.7vw,1.05rem); font-weight:850; border-radius:.8rem; }
 
   /* D's real fixed kpi-column width (read from source, not guessed):
      126px base / 104px at 1181-1600px / 190px at 2560px+. These breakpoint
      overrides must stay AFTER this base rule in source order - an earlier
      placement gets silently shadowed since specificity is identical. */
-  .school-panel { grid-template-columns:7.875rem minmax(0,1fr); column-gap:1rem; row-gap:.625rem; grid-template-rows:auto minmax(0,1fr); grid-template-areas:"head head" "kpi visual"; }
+  .school-panel { grid-template-columns:7.5rem minmax(0,1fr); column-gap:1rem; row-gap:.625rem; grid-template-rows:auto minmax(0,1fr); grid-template-areas:"head head" "kpi visual"; }
+  /* Grade bars stretched, the selected grade lit (app.js stamps .is-selected),
+     donut captions given air. */
+  .school-panel .bar-list { row-gap:clamp(1rem,1.05vw,1.45rem); align-content:center; }
+  /* Bars over donuts, stacked: side by side the two enlarged rings squeezed
+     the bar list to nothing and spilled out of the panel's right edge. */
+  .school-panel .school-visuals { min-inline-size:0; grid-template-columns:minmax(0,1fr); justify-items:stretch; row-gap:.15rem; }
+  /* Three KPI tiles at one uniform size with comfortable padding - fit-content
+     made each box hug its own number and cut the dark plate too tight. */
+  .school-panel .kpi-row>div { inline-size:auto; min-inline-size:0; padding:.7rem .95rem; }
+  /* Donut captions move fully below the ring - inside it they overlapped the
+     arc and clipped ("분리 성공률"). The pair gets bottom room to hold them. */
+  .school-panel .donut { overflow:visible; position:relative; }
+  .school-panel .donut-pair { padding-block-end:1.9rem; }
+  .school-panel .bar-list { min-inline-size:0; }
+  .school-panel .bar-list>div { grid-template-columns:2.9rem minmax(0,1fr) 2.4rem; align-items:center; column-gap:.4rem; }
+  .school-panel .bar-list b { min-inline-size:0; text-align:right; }
+  .school-panel .bar-list i { block-size:.68rem; }
+  .school-panel .bar-list>div.is-selected span, .school-panel .bar-list>div.is-selected b { color:#5ef7cd; }
+  .school-panel .bar-list>div.is-selected i { box-shadow:0 0 12px rgb(94 247 205 / 45%); }
+  .school-panel .donut-pair { align-items:center; justify-content:center; gap:clamp(1.6rem,1.8vw,2.6rem); padding-block-end:0; align-self:center; }
   .class-panel { column-gap:1rem; row-gap:.625rem; }
-  .school-panel .kpi-row { grid-template-columns:1fr; gap:.5625rem; }
+  .school-panel .kpi-row { grid-template-columns:1fr; gap:clamp(1rem,1.1vw,1.5rem); }
   .school-panel .kpi-row > div { padding:.5rem .55rem; }
   /* D's real formula (read directly from its source, not guessed from one
      viewport): confirmed across 1440/1728/1920/2560px. */
-  .kpi-row strong, .class-kpis strong, .landfill-metrics strong { font-size:clamp(1.32rem,1.55vw,2.02rem); }
+  .kpi-row strong, .class-kpis strong, .landfill-metrics strong { font-size:clamp(1.45rem,2.05vw,3.15rem); }
+  /* Left-panel readability pass: stat labels, grade bars, donut captions, TOP5
+     rows and the ranking pill all ran a size class too small next to the
+     enlarged panel titles, and rows sat misaligned. */
+  .kpi-row span, .class-kpis span, .landfill-metrics span { font-size:clamp(.85rem,.72vw,1.1rem); }
+  .school-panel .bar-list span, .school-panel .bar-list b { font-size:clamp(1rem,.85vw,1.3rem); }
+  .school-panel .bar-list>div { align-items:center; column-gap:.7rem; }
+  .school-panel .donut span { font-size:clamp(1.1rem,.95vw,1.45rem); }
+  .class-panel .confusion h3, .class-panel .confusion span, .class-panel .confusion li { font-size:clamp(.92rem,.78vw,1.18rem); }
+  .class-panel .rank-note { font-size:clamp(.8rem,.68vw,1rem); }
   .school-panel .school-visuals { grid-template-columns:1fr; gap:.75rem; overflow:visible; align-self:stretch; }
   .school-panel .bar-list > div { grid-template-columns:5.75rem minmax(2.4rem,1fr) 2.625rem; font-size:.9rem; font-weight:760; color:#9eb3c7; }
-  .school-panel .donut-pair { flex-wrap:nowrap; gap:.625rem; }
+  .school-panel .donut-pair { flex-wrap:nowrap; gap:clamp(1.6rem,1.8vw,2.6rem); min-inline-size:0; }
   /* D's donut is a RING with a hollow center (radial-gradient masks out the
      middle so the conic-gradient only shows as an outer band), not a solid
      pie slice. The old base .donut relies on a small per-child dark circle
      instead, which leaves almost no room for the label -> this D-revival
      override replaces the fill technique entirely for this context. */
-  .school-panel .donut { inline-size:clamp(5rem,6.6vw,6rem); block-size:clamp(5rem,6.6vw,6rem); grid-template-rows:1fr; align-content:stretch; background:radial-gradient(circle at center,#0b1c2d 46%,transparent 47%),conic-gradient(#4fe4cf calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 1.5rem rgb(255 255 255 / 6%),0 0 1.5rem rgb(79 228 207 / 12%); }
-  .school-panel .donut.violet { background:radial-gradient(circle at center,#0b1c2d 46%,transparent 47%),conic-gradient(#ad8cff calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 .875rem rgb(255 255 255 / 6%),0 0 .875rem rgb(173 140 255 / 12%); }
+  .school-panel .donut { inline-size:clamp(6rem,7.8vw,8rem); block-size:clamp(6rem,7.8vw,8rem); grid-template-rows:1fr; align-content:stretch; background:radial-gradient(circle at center,#081326 46%,transparent 47%),conic-gradient(#5ef7cd calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 1.5rem rgb(255 255 255 / 6%),0 0 1.5rem rgb(94 247 205 / 12%); }
+  .school-panel .donut.violet { background:radial-gradient(circle at center,#081326 46%,transparent 47%),conic-gradient(#ad8cff calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 .875rem rgb(255 255 255 / 6%),0 0 .875rem rgb(173 140 255 / 12%); }
   .school-panel .donut>* { background:none; }
   .school-panel .donut span { align-self:center; padding:0; margin-block-end:-.55rem; font-size:1rem; font-weight:950; }
-  .school-panel .donut small { align-self:center; padding:0; margin-block-start:-.55rem; max-inline-size:3.2rem; font-size:.66rem; font-weight:850; line-height:1.05; }
+  /* One rule only (a duplicate above used to win the cascade and drag the
+     caption back onto the ring): the label floats fully below the donut. */
+  .school-panel .donut small { position:absolute; inset-block-start:100%; inset-inline-start:50%; translate:-50% 0; align-self:auto; padding:0; margin:0; margin-block-start:.5rem; max-inline-size:none; white-space:nowrap; font-size:clamp(.76rem,.64vw,.95rem); font-weight:850; line-height:1.15; }
 
   /* 4. Landfill: the four metric boxes were letting "16,400t" run into the
      next box ("-9.4%"); the title/time row needed a hard nowrap so it can
@@ -370,7 +531,27 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      chartLeft/axis font-size/label-x to match; overflow:visible lets the
      bigger axis numbers spill slightly into the panel's own padding
      without ever crossing the card's outer edge. */
-  .combo-chart { max-block-size:9.4rem; overflow:visible; }
+  /* The panel is height-locked, so the chart must absorb the shortfall: the
+     svg lives in a minmax(0,1fr) row and scales down instead of spilling out
+     of the panel bottom (it was 68px over at 1440x900). */
+  .landfill-panel { display:flex; flex-direction:column; min-block-size:0; }
+  .landfill-panel .chart-wrap { flex:1 1 auto; min-block-size:0; display:grid; gap:.5rem .7rem; grid-template-columns:minmax(0,1fr) auto; grid-template-rows:auto minmax(0,1fr); grid-template-areas:"title title" "chart rings"; align-items:center; }
+  /* Metric tiles: small caption, big percentage - but capped where four tiles
+     share the row, or the numerals collide across tile borders. */
+  /* Column ratios negotiated so "총량 대비 반입량" keeps its last character and
+     "오늘 반입 총량" stops hoarding the spare width. */
+  .landfill-panel .landfill-metrics { gap:.55rem; grid-template-columns:minmax(0,1.1fr) minmax(0,.82fr) minmax(0,1.18fr) minmax(0,.95fr); }
+  .landfill-panel .landfill-metrics > div { min-inline-size:0; padding-inline:.55rem; }
+  .landfill-panel .landfill-metrics strong { font-size:clamp(1.02rem,1.14vw,1.7rem); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .landfill-panel .landfill-metrics span { font-size:clamp(.72rem,.6vw,.9rem); }
+  .landfill-panel .chart-title-row { grid-area:title; }
+  .landfill-panel .combo-chart { grid-area:chart; }
+  /* aspect-ratio breaks the width/height circularity, so the svg's box hugs
+     the drawing exactly - no dead background trailing to the panel's right.
+     The freed width goes to the two rings. */
+  .combo-chart { grid-area:chart; inline-size:auto; block-size:100%; aspect-ratio:456/252; min-block-size:0; max-block-size:10.4rem; max-inline-size:100%; justify-self:start; align-self:center; overflow:visible; padding-inline:.45rem; box-sizing:content-box; }
+  .upload-panel { display:flex; flex-direction:column; min-block-size:0; }
+  .upload-panel .experience-portal { flex:1 1 auto; block-size:auto; min-block-size:0; }
   .chart-axis text { font-variant-numeric:tabular-nums; }
 
   /* 6. Split the single incoming/remaining gauge into two distinct reads:
@@ -381,18 +562,28 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   /* Landfill status → D's dual-ring donut (was a status-card + two gauge bars,
      which is why app.js's already-built updateLandfillDonuts()/.landfill-kpi-ring
      donut code was silently dead — the HTML no longer had a matching element). */
-  .landfill-kpi-module { grid-area:status; min-inline-size:0; display:grid; justify-items:center; align-content:center; gap:.625rem; padding:.5rem 0; }
+  /* Two separate rings side by side (user call: the combined ring with the
+     violet inner band read as two charts stacked on each other). The old
+     .landfill-kpi-legend row is gone from the markup; progress-stack's two bar
+     rows are dropped on PC - the rings carry both metrics alone. */
+  .landfill-panel .progress-stack { display:none; }
+  .landfill-kpi-module { grid-area:rings; min-inline-size:0; min-block-size:0; display:flex; flex-direction:column; justify-content:center; align-items:flex-end; gap:.7rem; padding:0; }
   /* inline-size/block-size, the span margin-block-start and the small margin-block-end
      below are tuned together for THIS 5.5rem ring. Resizing the ring without
      re-checking those two margins (via real getBoundingClientRect measurement,
      not eyeballing) will silently reintroduce text overlap. */
-  .landfill-kpi-ring { position:relative; isolation:isolate; inline-size:clamp(6.75rem,8.4vw,8.5rem); block-size:clamp(6.75rem,8.4vw,8.5rem); flex:0 0 auto; aspect-ratio:1; grid-template-rows:1fr; align-content:stretch; background:conic-gradient(rgb(94 247 205 / 78%) calc(var(--pct) * 1%), rgb(87 117 154 / 22%) 0); box-shadow:0 0 14px rgb(94 247 205 / 8%), inset 0 0 18px rgb(255 255 255 / 3.5%); }
+  .landfill-kpi-ring { position:relative; isolation:isolate; inline-size:clamp(5.1rem,5.7vw,6.2rem); block-size:clamp(5.1rem,5.7vw,6.2rem); flex:0 0 auto; aspect-ratio:1; grid-template-rows:1fr; align-content:stretch; background:conic-gradient(rgb(94 247 205 / 78%) calc(var(--pct) * 1%), rgb(87 117 154 / 22%) 0); box-shadow:0 0 14px rgb(94 247 205 / 8%), inset 0 0 18px rgb(255 255 255 / 3.5%); }
   .landfill-kpi-ring::before, .landfill-kpi-ring::after { content:""; position:absolute; border-radius:inherit; pointer-events:none; }
-  .landfill-kpi-ring::before { z-index:-1; inset:18%; background:conic-gradient(#ad8cff 32.7%, rgb(126 116 177 / 22%) 0); box-shadow:0 0 12px rgb(173 140 255 / 10%); }
-  .landfill-kpi-ring::after { z-index:-1; inset:34%; background:radial-gradient(circle at 36% 28%, rgb(33 64 102 / 98%), #0a1830 72%); box-shadow:inset 0 0 0 1px rgb(173 214 255 / 8%); }
+  .landfill-kpi-ring::before { content:none; }
+  .landfill-kpi-ring::after { z-index:-1; inset:22%; background:radial-gradient(circle at 36% 28%, rgb(33 64 102 / 98%), #0a1830 72%); box-shadow:inset 0 0 0 1px rgb(173 214 255 / 8%); }
+  .landfill-kpi-ring--secondary { background:conic-gradient(#ad8cff calc(var(--pct) * 1%), rgb(126 116 177 / 20%) 0); box-shadow:0 0 14px rgb(173 140 255 / 14%); }
+  .landfill-kpi-ring--secondary > span { text-shadow:0 0 12px rgb(173 140 255 / 30%); }
   .landfill-kpi-ring > span, .landfill-kpi-ring > small { position:relative; z-index:1; grid-area:1 / 1; text-align:center; }
-  .landfill-kpi-ring > span { align-self:center; padding:0; margin-block-start:-.8125rem; color:#f3fffe; font-size:1.32rem; font-weight:950; line-height:1; text-shadow:0 0 12px rgb(94 247 205 / 22%); }
-  .landfill-kpi-ring > small { align-self:end; padding:0; max-inline-size:3.6rem; margin-block-end:17%; color:rgb(219 241 249 / 76%); font-size:.57rem; font-weight:850; line-height:1.15; }
+  .landfill-kpi-ring > span { align-self:center; padding:0; margin-block-start:0; color:#f3fffe; font-size:clamp(.5rem,.42vw,.62rem); font-weight:950; line-height:1; text-shadow:0 0 12px rgb(94 247 205 / 22%);}
+  /* The two-line metric name moves out of the ring into a small plate at its
+     side, so the ring keeps only its percentage and can grow uncropped. */
+  .landfill-kpi-ring > small { position:absolute; inset-inline-end:calc(100% + .55rem); inset-block-start:50%; translate:0 -50%; align-self:auto; margin:0; padding:.35rem .6rem; max-inline-size:none; inline-size:max-content; border:1px solid rgb(131 224 255 / 22%); border-radius:.65rem; background:rgb(10 26 46 / 78%); color:#c9dbe6; font-size:clamp(.68rem,.58vw,.85rem); font-weight:850; line-height:1.3; text-align:center; }
+  .landfill-kpi-ring--secondary > small { border-color:rgb(173 140 255 / 30%); }
   .landfill-kpi-legend { inline-size:min(100%,8.3rem); min-inline-size:0; display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:.4375rem .5625rem; margin-block-end:.3125rem; border:1px solid rgb(173 140 255 / 26%); border-radius:999px; color:rgb(226 218 255 / 86%); background:linear-gradient(135deg,rgb(173 140 255 / 9%),rgb(100 169 255 / 3.5%)); font-size:.6rem; font-weight:850; white-space:nowrap; }
   .landfill-kpi-legend span { min-inline-size:0; display:inline-flex; align-items:center; gap:.3rem; }
   .landfill-kpi-legend i { inline-size:.4rem; block-size:.4rem; flex:0 0 auto; border-radius:999px; background:#ad8cff; box-shadow:0 0 9px rgb(173 140 255 / 62%); }
@@ -400,19 +591,39 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
 
   /* 8. Class panel: same accidental-column bug as #3 — rebalance so the
      kpi numbers get a narrow column and 헷갈린 물건 TOP 5 gets the wide one. */
-  .class-panel { grid-template-columns:7.875rem minmax(0,1fr); grid-template-rows:auto minmax(0,1fr) auto; grid-template-areas:"head head" "kpi visual" "note note"; }
+  /* KPI column narrowed so 헷갈린 물건 grows leftward - labels stop wrapping,
+     which is what was eating the vertical room. */
+  .class-panel { grid-template-columns:4.9rem minmax(0,1fr); grid-template-rows:auto minmax(0,1fr) auto; grid-template-areas:"head head" "kpi visual" "note note"; }
   /* D's real fixed kpi-column width per breakpoint (confirmed live, not
      guessed): 126px base / 104px at 1181-1600px / 190px at 2560px+. Must
      stay after both the school-panel and class-panel base rules above -
      same specificity means source order decides, and an earlier placement
      gets silently shadowed. */
   @media (min-width:1181px) and (max-width:1600px) { .school-panel,.class-panel { grid-template-columns:6.5rem minmax(0,1fr); column-gap:.75rem; }.school-panel .kpi-row,.class-panel .class-kpis,.landfill-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-  @media (min-width:160rem) { :root { --scene-inline-space:11.25rem; --header-inline-space:8rem; --header-size:7rem; }.main-nav a { min-block-size:3.25rem; padding-inline:1.25rem; font-size:1.18rem; }.school-panel,.class-panel { grid-template-columns:11.875rem minmax(0,1fr); column-gap:1.75rem; } }
+  @media (min-width:160rem) { :root { --scene-inline-space:11.25rem; --header-inline-space:8rem; --header-size:7rem; --nav-link-pad:1.25rem; }.main-nav a { min-block-size:3.25rem; padding-inline:var(--nav-link-pad); font-size:1.18rem; }.school-panel { grid-template-columns:8.75rem minmax(0,1fr); column-gap:1.5rem; }.class-panel { grid-template-columns:7rem minmax(0,1fr); column-gap:1.5rem; } }
   .class-panel .panel-head { grid-area:head; }
-  .class-panel .class-kpis { grid-area:kpi; grid-template-columns:1fr; gap:.5625rem; }
-  .class-panel .class-kpis > div { padding:.5rem .55rem; }
+  /* Both columns stretch the shared row and distribute, so the TOP5 box's
+     bottom lands exactly on the 전환 사례 plate's bottom. */
+  .class-panel .class-kpis { grid-area:kpi; grid-template-columns:1fr; gap:.55rem; align-self:stretch; align-content:space-between; min-block-size:0; }
+  .class-panel .class-kpis > div { padding:.55rem .55rem; }
+  .class-panel .class-kpis span { margin-block-start:.05rem; }
+  .class-panel .class-kpis strong { font-size:clamp(1.25rem,1.5vw,2.2rem); }
   .class-panel .confusion { grid-area:visual; }
-  .class-panel .confusion > div { grid-template-columns:5.875rem minmax(0,1fr) 1.875rem; }
+  .class-panel .confusion > div { grid-template-columns:10.6rem minmax(0,1fr) 2.4rem; align-items:center; column-gap:.6rem; }
+  /* The TOP5 box runs the full height of the KPI column (down to 전환 사례's
+     plate) and spreads its rows into the room; every bar starts at one x
+     because the label column is fixed, not content-sized. */
+  .class-panel .confusion { row-gap:.75rem; min-block-size:0; align-content:space-between; align-self:stretch; margin-block-start:0; padding:1.05rem 1.15rem; }
+  .class-panel .confusion > div { min-block-size:0; }
+  .class-panel .rank-note { margin-block-start:1.6rem; padding-block:.45rem; }
+  .class-panel .confusion span { word-break:keep-all; }
+  /* The renderer wraps each emoji in <em>, whose browser default is italic -
+     that's why the emoji leaned. inline-block also makes the gap immune to
+     inline whitespace collapsing. */
+  .class-panel .confusion span em { display:inline-block; margin-inline-end:.6rem; font-style:normal; }
+  /* Native dropdown popups are white; the inherited pale text was invisible
+     on them ("안 보이는 것"). */
+  .select-line select option { color:#10283b; background:#ffffff; }
   .class-panel .rank-note { grid-area:note; }
 
   /* 9. Ranking pill: a touch smaller so it never crowds its own edge. */
@@ -424,15 +635,15 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      decides) instead of empty air, and credit Gemini with a text-only
      badge — no Google brand asset is bundled here without your say-so. */
   .upload-panel { align-content:start; gap:.85rem; }
-  .upload-panel .upload-highlights { display:grid; gap:.4rem; margin:0; padding:.75rem .85rem; border:1px solid rgb(100 220 235 / 18%); border-radius:1rem; background:rgb(4 24 42 / 55%); }
-  .upload-panel .upload-highlights li { display:flex; gap:.5rem; align-items:flex-start; color:#c9dbe6; font-size:.76rem; line-height:1.45; }
+  .upload-panel .upload-highlights { display:grid; gap:.28rem; margin:0; padding:.55rem .8rem; border:1px solid rgb(100 220 235 / 18%); border-radius:1rem; background:rgb(4 24 42 / 55%); }
+  .upload-panel .upload-highlights li { display:flex; gap:.5rem; align-items:flex-start; color:#c9dbe6; font-size:.76rem; line-height:1.35; }
   .upload-panel .upload-highlights li::before { content:"✓"; flex:0 0 auto; color:#65ead6; font-weight:900; }
   .upload-actions.upload-card-actions { margin-block-start:0; }
   .gemini-credit { display:inline-flex; align-items:center; gap:.4rem; margin-block-start:.1rem; padding:.32rem .75rem; border:1px solid rgb(138 180 255 / 24%); border-radius:999px; background:rgb(66 133 244 / 8%); color:#a9c2ff; font-size:.68rem; font-weight:700; }
   .upload-icon,.sorting-upload-icon { inline-size:2.625rem; block-size:2.625rem; }.upload-icon svg,.sorting-upload-icon svg { stroke-width:2.2; }
   .upload-icon { font-size:clamp(1.08rem,calc(.643rem + .4857vw),1.42rem); line-height:1.3; font-weight:900; margin-block-end:.5rem; color:rgb(248 253 255); }
   .gemini-credit svg { inline-size:.8rem; block-size:.8rem; }
-  .upload-panel small { font-size:.64rem; line-height:1.5; font-weight:800; letter-spacing:-.0032em; }
+  .upload-panel small { font-size:clamp(.6rem,.52vw,.78rem); line-height:1.5; font-weight:800; letter-spacing:-.02em; color:#bcd3e0; white-space:nowrap; }
 
   /* QR invite: dashboard upload panel + sorting page, same asset/behavior. */
   .qr-invite { display:flex; align-items:center; gap:.7rem; padding:.55rem .75rem; border:1px solid rgb(100 220 235 / 20%); border-radius:1rem; background:rgb(4 24 42 / 45%); }
@@ -468,4 +679,50 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .brand-mark img { object-fit:contain; }
   .data-refresh-btn { border-radius:50%; border:1px solid rgb(100 234 255 / 28%); background:rgb(100 234 255 / 8%); color:rgb(100 234 255); padding:.0625rem .375rem; }
   .close-btn { border-radius:999px; border:1px solid rgb(255 255 255 / 16%); background:rgb(255 255 255 / 8%); color:#f2fdff; }
+}
+
+/* Mid-width PCs (64-100rem): the viewport-scaled donuts and rings outgrow
+   their stacked columns and the fixed TOP5 label column runs too wide. This
+   block sits at the end of the file on purpose - it must outrank every
+   component rule above it. */
+@media (min-width:64rem) and (max-width:100rem) {
+  .school-panel .donut { inline-size:5rem; block-size:5rem; }
+  .school-panel .donut-pair { gap:1rem; margin-block-end:1.3rem; }
+  .school-panel .donut small { margin-block-start:.28rem; }
+  .landfill-kpi-ring { inline-size:4.6rem; block-size:4.6rem; }
+  .class-panel .confusion > div { grid-template-columns:6.9rem minmax(0,1fr) 2.2rem; }
+  .portal-frame { padding-block:.5rem .75rem; min-block-size:0; }
+  .portal-teaser { line-height:1.45; }
+  body.is-rewound .portal-frame { min-block-size:clamp(6rem,19svh,15.5rem); padding-block:.9rem; }
+  body.is-rewound .dashboard-scene .qr-invite img { inline-size:clamp(6.8rem,8.6vw,12.5rem); }
+}
+
+@keyframes scene-scroll-cue {
+  0%, 100% { translate:-50% 0; opacity:.5; }
+  50% { translate:-50% .6rem; opacity:1; }
+}
+
+@keyframes finale-arrow-bob {
+  0%, 100% { translate:0 0; opacity:.55; }
+  50% { translate:0 .45rem; opacity:1; }
+}
+
+@keyframes finale-hint-float {
+  0%, 100% { transform:translateY(0); }
+  50% { transform:translateY(.45rem); }
+}
+
+/* The finale hint is a PC-only device; the sub-64rem closed-beta app keeps
+   its own flow and must never see it. */
+@media (max-width:63.99rem) {
+  .scroll-finale-hint, .scroll-cue { display:none; }
+  /* Below 64rem the portal wrappers dissolve so the QR flows exactly where it
+     always sat in the mobile panel; the PC-only teaser copy disappears. */
+  .experience-portal, .portal-frame { display:contents; }
+  .portal-powered, .portal-teaser { display:none; }
+}
+
+@keyframes qr-invite-reveal {
+  from { opacity:0; transform:translateY(.55rem) scale(.96); }
+  to { opacity:1; transform:none; }
 }

@@ -12,21 +12,21 @@
 
 @layer tokens {
   :root {
-    --canvas-bg: #071522; --elevated-bg: #0b1c2d; --surface-1: #10283b; --surface-2: #14344a; --surface-3: #193e56;
-    --text-primary: #edf8ff; --text-secondary: #b8cbd8; --text-tertiary: #88a3b5;
-    --line-subtle: #1d4158; --line-default: #2a5970; --line-strong: #4a8296;
-    --accent-primary: #4fe4cf; --accent-secondary: #5a9dff; --success: #58d7a0; --caution: #f2bc62; --error: #ef7180; --info: #77c9ff; --focus: #ffcf70;
-    --shadow-low: 0 6px 18px rgb(0 8 18 / 18%); --shadow-medium: 0 16px 38px rgb(0 7 17 / 28%); --shadow-high: 0 24px 60px rgb(0 5 14 / 42%); --glow-subtle: 0 0 28px rgb(79 228 207 / 12%);
+    --canvas-bg: #020611; --elevated-bg: #081326; --surface-1: #10283b; --surface-2: #14344a; --surface-3: #193e56;
+    --text-primary: #f6fbff; --text-secondary: #b8cbd8; --text-tertiary: #9eb3c7;
+    --line-subtle: rgb(131 224 255 / 11%); --line-default: rgb(131 224 255 / 18%); --line-strong: rgb(131 224 255 / 32%);
+    --accent-primary: #5ef7cd; --accent-secondary: #6aa9ff; --success: #58d7a0; --caution: #f2bc62; --error: #ef7180; --info: #64eaff; --focus: #ffcf70;
+    --shadow-low: 0 6px 18px rgb(0 8 18 / 18%); --shadow-medium: 0 16px 38px rgb(0 7 17 / 28%); --shadow-high: 0 24px 60px rgb(0 5 14 / 42%); --glow-subtle: 0 0 28px rgb(94 247 205 / 12%);
     --radius-small: .65rem; --radius-medium: 1rem; --radius-large: 1.35rem; --radius-pill: 999px;
     --space-1: .45rem; --space-2: .75rem; --space-3: 1rem; --space-4: 1.5rem; --space-5: 2rem;
     --type-display: clamp(2.25rem, 5.2vw, 4.6rem); --type-section: clamp(1.75rem, 4vw, 3.1rem); --type-card: clamp(1.2rem, 1.9vw, 2.05rem); --type-body: 1rem; --type-small: .84rem;
     --control-height: 2.75rem; --content: 76rem; --gutter: clamp(1rem, 4vw, 3rem); --space: clamp(1rem, 2.5vw, 2rem); --duration: 180ms; --ease: cubic-bezier(.2,.7,.2,1);
-    --ink: var(--text-primary); --muted: var(--text-tertiary); --paper: var(--canvas-bg); --card: var(--surface-1); --line: var(--line-default); --brand: var(--accent-primary); --brand-dark: var(--accent-primary); --mint: #123f4b; --blue: var(--accent-secondary); --violet: #b598ff; --amber: var(--caution); --danger: var(--error); --radius: var(--radius-medium); --shadow: var(--shadow-medium);
+    --ink: var(--text-primary); --muted: var(--text-tertiary); --paper: var(--canvas-bg); --card: var(--surface-1); --line: var(--line-default); --brand: var(--accent-primary); --brand-dark: var(--accent-primary); --mint: #123f4b; --blue: var(--accent-secondary); --violet: #ad8cff; --amber: var(--caution); --danger: var(--error); --radius: var(--radius-medium); --shadow: var(--shadow-medium);
   }
 }
 
 @layer base {
-  body { color: var(--ink); background: radial-gradient(circle at 76% 0, rgb(90 157 255 / 10%), transparent 30rem), radial-gradient(circle at 12% 22rem, rgb(79 228 207 / 7%), transparent 27rem), var(--paper); font-family: Pretendard, "Noto Sans KR", system-ui, sans-serif; font-size: var(--type-body); line-height: 1.65; }
+  body { color: var(--ink); background: radial-gradient(circle at 76% 0, rgb(90 157 255 / 10%), transparent 30rem), radial-gradient(circle at 12% 22rem, rgb(94 247 205 / 7%), transparent 27rem), var(--paper); font-family: Pretendard, "Noto Sans KR", system-ui, sans-serif; font-size: var(--type-body); line-height: 1.65; }
   a { color: inherit; text-decoration: none; }
   h1, h2, h3, h4 { line-height: 1.24; letter-spacing: -0.035em; }
   h1 { font-size: var(--type-display); }
@@ -39,7 +39,7 @@
 }
 
 @layer layout {
-  .site-header { position: sticky; inset-block-start: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .8rem var(--gutter); background: rgb(7 21 34 / 92%); border-block-end: 1px solid var(--line-subtle); backdrop-filter: blur(14px); }
+  .site-header { position: sticky; inset-block-start: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .8rem var(--gutter); background: rgb(2 6 17 / 92%); border-block-end: 1px solid var(--line-subtle); backdrop-filter: blur(14px); }
   .brand { display: inline-flex; align-items: center; gap: .6rem; font-weight: 850; letter-spacing: -.04em; }
   .brand-mark { inline-size: 2rem; block-size: 2rem; border-radius: .6rem; background: var(--mint); padding: .22rem; }
   .brand-mark img { inline-size: 100%; block-size: 100%; object-fit: contain; }

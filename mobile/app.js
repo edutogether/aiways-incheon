@@ -7,6 +7,7 @@
   let practiceStats = { totalCount: 0, carbonReduction: 0, logs: [] };
   let holdBoxList = [];
   let activeResultItem = null;
+  let currentQuizSet = [];
   let currentQuizIndex = 0;
   let userQuizScore = 0;
 
@@ -38,13 +39,8 @@
       if (!item) return;
       const btn = document.createElement("button");
       btn.type = "button";
-      if (item.isHold) {
-        btn.className = "col-span-2 flex items-center justify-center gap-2.5 p-3 bg-amber-50 hover:bg-amber-100/50 border border-amber-100 hover:border-amber-300 rounded-2xl transition-all duration-200 text-amber-800 active:scale-95";
-        btn.innerHTML = `<span class="text-xl">${item.emoji}</span><span class="text-xs font-bold">잘 모르겠어요 (판단 보류함 기록)</span>`;
-      } else {
-        btn.className = "flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95";
-        btn.innerHTML = `<span class="text-2xl">${item.emoji}</span><span class="text-xs font-bold text-slate-700">${item.label.split(" / ")[0]}</span>`;
-      }
+      btn.className = "flex flex-col items-center gap-1 p-2.5 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95";
+      btn.innerHTML = `<span class="text-xl">${item.emoji}</span><span class="text-[10px] font-bold text-slate-700 text-center leading-tight">${item.label.split(" / ")[0]}</span>`;
       btn.addEventListener("click", () => renderResult(id));
       grid.append(btn);
     });
@@ -64,13 +60,18 @@
     return null;
   }
 
+  function openJudgeModal() {
+    $("judgeModal").classList.remove("hidden");
+  }
+  function closeJudgeModal() {
+    $("judgeModal").classList.add("hidden");
+  }
+
   function renderResult(itemId, opts = {}) {
     const db = DATA.sortingDbV2;
     const item = db[itemId] || db.hold;
     activeResultItem = item;
 
-    $("placeholder").classList.add("hidden");
-    $("resultContent").classList.remove("hidden");
     $("resCategory").textContent = item.category;
     $("resTitle").textContent = `${item.emoji} ${item.label}`;
     $("resBody").textContent = item.guide;
@@ -102,22 +103,20 @@
     const holdInput = $("holdItemName");
     const practiceRow = $("practiceActionRow");
     const tag = $("resActionTag");
-    const displayScreen = $("displayScreen");
 
     if (item.isHold) {
       holdInput.value = opts.rawQuery || "";
       holdForm.classList.remove("hidden");
       practiceRow.classList.add("hidden");
       tag.textContent = "🛑 보류함 보관 권장";
-      tag.className = "text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200 shrink-0";
-      displayScreen.className = "border-2 border-dashed border-amber-300 rounded-3xl p-5 bg-amber-50/20 flex flex-col justify-center min-h-[160px] relative transition-all duration-300";
+      tag.className = "inline-block text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200";
     } else {
       holdForm.classList.add("hidden");
       practiceRow.classList.remove("hidden");
       tag.textContent = opts.isAiResult ? "🤖 AI 사진 판단" : "🔍 배출 가이드 확인";
-      tag.className = "text-[10px] font-bold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 border border-blue-200 shrink-0";
-      displayScreen.className = "border-2 border-dashed border-blue-200 rounded-3xl p-5 bg-blue-50/20 flex flex-col justify-center min-h-[160px] relative transition-all duration-300";
+      tag.className = "inline-block text-[10px] font-bold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 border border-blue-200";
     }
+    openJudgeModal();
   }
 
   // -----------------------------------------------------------------
@@ -326,6 +325,7 @@
   // Quiz
   // -----------------------------------------------------------------
   function startQuiz() {
+    currentQuizSet = DATA.pickQuizSet();
     currentQuizIndex = 0;
     userQuizScore = 0;
     $("quiz-box").classList.remove("hidden");
@@ -334,10 +334,10 @@
   }
 
   function showCurrentQuizQuestion() {
-    const data = DATA.quizData[currentQuizIndex];
-    $("quiz-progress").textContent = `질문 ${currentQuizIndex + 1} / ${DATA.quizData.length}`;
+    const data = currentQuizSet[currentQuizIndex];
+    $("quiz-progress").textContent = `질문 ${currentQuizIndex + 1} / ${currentQuizSet.length}`;
     $("quiz-score").textContent = `현재 점수: ${userQuizScore}점`;
-    $("quiz-progress-bar").style.width = `${((currentQuizIndex + 1) / DATA.quizData.length) * 100}%`;
+    $("quiz-progress-bar").style.width = `${((currentQuizIndex + 1) / currentQuizSet.length) * 100}%`;
     $("quiz-emoji").textContent = data.emoji;
     $("quiz-question").textContent = data.question;
     $("quiz-buttons").classList.remove("hidden");
@@ -345,7 +345,7 @@
   }
 
   function submitQuizAnswer(userAns) {
-    const data = DATA.quizData[currentQuizIndex];
+    const data = currentQuizSet[currentQuizIndex];
     const isCorrect = userAns === data.answer;
     if (isCorrect) userQuizScore += 20;
     $("quiz-score").textContent = `현재 점수: ${userQuizScore}점`;
@@ -368,10 +368,14 @@
 
   function nextQuiz() {
     currentQuizIndex += 1;
-    if (currentQuizIndex < DATA.quizData.length) { showCurrentQuizQuestion(); return; }
+    if (currentQuizIndex < currentQuizSet.length) { showCurrentQuizQuestion(); return; }
     $("quiz-box").classList.add("hidden");
     $("quiz-result-summary").classList.remove("hidden");
-    $("quiz-result-score-text").textContent = `${DATA.quizData.length}문제 중 최종 점수: ${userQuizScore}점 달성!`;
+    const correctCount = Math.round(userQuizScore / 10);
+    const rank = DATA.quizRank(correctCount);
+    $("quiz-result-score-text").textContent = `${currentQuizSet.length}문제 중 ${correctCount}개 정답 · ${userQuizScore}점`;
+    $("quiz-result-title").textContent = `${rank.emoji} ${rank.title}`;
+    $("quiz-result-message").textContent = rank.message;
   }
 
   // -----------------------------------------------------------------
@@ -401,6 +405,9 @@
 
     $("searchInput").addEventListener("keyup", handleSearch);
     $("searchTriggerBtn").addEventListener("click", triggerSearch);
+    $("holdQuickBtn").addEventListener("click", () => renderResult("hold"));
+    $("judgeModalClose").addEventListener("click", closeJudgeModal);
+    $("judgeModal").addEventListener("click", event => { if (event.target === $("judgeModal")) closeJudgeModal(); });
     $("btnLogPractice").addEventListener("click", () => logPractice(activeResultItem));
     $("registerHoldBtn").addEventListener("click", () => {
       const value = $("holdItemName").value.trim();

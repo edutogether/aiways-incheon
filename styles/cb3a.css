@@ -175,10 +175,33 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   /* Per-scene copy-to-content gaps live with each scene's own layout rules
      further down (search "D gap"); only the shared rhythm lives here. */
 
-  /* Cue that another scene sits below. Suppressed on the last one. */
-  .scene::before { content:""; position:absolute; inset-block-end:1.05rem; inset-inline-start:50%; inline-size:.95rem; block-size:.95rem; border-inline-end:2px solid rgb(131 224 255 / 72%); border-block-end:2px solid rgb(131 224 255 / 72%); transform:translate(-50%,0) rotate(45deg); opacity:0; pointer-events:none; transition:opacity .3s ease; }
-  .scene.is-active::before { opacity:1; animation:scene-scroll-cue 1.8s cubic-bezier(.4,0,.3,1) infinite; }
+  /* Cue that another scene sits below: a double chevron drawn as an inline SVG
+     (gradient stroke, ghosted leading stroke) with a mint glow, bobbing on the
+     active scene. Suppressed on the last scene - its finale hint takes over. */
+  .scene::before { content:""; position:absolute; inset-block-end:1.1rem; inset-inline-start:50%; translate:-50% 0; inline-size:3.2rem; block-size:2.9rem; background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 44'><defs><linearGradient id='g' x1='0' x2='0' y1='0' y2='1'><stop offset='0' stop-color='%2364eaff'/><stop offset='1' stop-color='%235ef7cd'/></linearGradient></defs><path d='M7 5l17 13L41 5' fill='none' stroke='url(%23g)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round' opacity='.38'/><path d='M7 21l17 13L41 21' fill='none' stroke='url(%23g)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/contain no-repeat; filter:drop-shadow(0 0 14px rgb(94 247 205 / 52%)) drop-shadow(0 4px 12px rgb(0 6 16 / 55%)); opacity:0; pointer-events:none; transition:opacity .3s ease; }
+  .scene.is-active::before { opacity:1; animation:scene-scroll-cue 1.7s cubic-bezier(.45,0,.25,1) infinite; }
   .resources-scene::before { content:none; }
+  /* The dashboard's ::before is taken by its grid overlay, so the first scene
+     carries the same chevron as a real element instead. */
+  .dashboard-scene::before, .dashboard-scene.is-active::before { background:linear-gradient(90deg,rgb(100 234 255 / 5%) 1px,transparent 1px),linear-gradient(rgb(100 234 255 / 4.3%) 1px,transparent 1px); background-size:2.6rem 2.6rem; opacity:1; filter:none; translate:none; inline-size:auto; block-size:auto; animation:none; transition:none; }
+  /* The cue lives OUTSIDE the scenes (a direct child of body): at scroll 0 the
+     sticky header pushes the dashboard 89px down so a scene-anchored cue sits
+     below the fold, and position:fixed can't save it from inside - the scene's
+     filter makes the scene itself the containing block for fixed descendants.
+     From the body it is genuinely viewport-fixed, shown only while the
+     dashboard (the one scene whose ::before is taken by its grid overlay) is
+     the active scene. */
+  .scroll-cue { position:fixed; z-index:5; inset-block-end:1.1rem; inset-inline-start:50%; translate:-50% 0; inline-size:3.2rem; block-size:2.9rem; background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 44'><defs><linearGradient id='g' x1='0' x2='0' y1='0' y2='1'><stop offset='0' stop-color='%2364eaff'/><stop offset='1' stop-color='%235ef7cd'/></linearGradient></defs><path d='M7 5l17 13L41 5' fill='none' stroke='url(%23g)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round' opacity='.38'/><path d='M7 21l17 13L41 21' fill='none' stroke='url(%23g)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/contain no-repeat; filter:drop-shadow(0 0 14px rgb(94 247 205 / 52%)) drop-shadow(0 4px 12px rgb(0 6 16 / 55%)); opacity:0; pointer-events:none; transition:opacity .3s ease; }
+  body:has(.dashboard-scene.is-active) .scroll-cue { opacity:1; animation:scene-scroll-cue 1.7s cubic-bezier(.45,0,.25,1) infinite; }
+
+  /* Finale hint: floats in the resources scene's empty top-right, telling the
+     visitor one more scroll rewinds the deck and reveals the hand-off QR. */
+  .scroll-finale-hint { position:absolute; z-index:2; inset-block-start:calc(3.23rem + 5.71vw); inset-inline-end:calc(2.38rem + 4.38vw); display:grid; justify-items:center; gap:.6rem; max-inline-size:27rem; padding:1.7rem 2.2rem 1.45rem; text-align:center; border-radius:1.6rem; border:1px solid rgb(94 247 205 / 30%); background:linear-gradient(155deg,rgb(13 48 66 / 74%),rgb(7 22 42 / 84%)); box-shadow:0 24px 60px rgb(0 6 16 / 45%), inset 0 1px rgb(255 255 255 / 8%), 0 0 44px rgb(94 247 205 / 10%); backdrop-filter:blur(10px); animation:finale-hint-float 3.4s ease-in-out infinite; }
+  .scroll-finale-hint .hint-kicker { display:inline-flex; padding:.34rem .85rem; border-radius:999px; border:1px solid rgb(94 247 205 / 32%); background:rgb(94 247 205 / 10%); color:#5ef7cd; font-size:.74rem; font-weight:850; letter-spacing:.11em; }
+  .scroll-finale-hint .hint-title { margin:0; color:#f6fbff; font-size:clamp(1.25rem,1.05vw,1.55rem); font-weight:900; letter-spacing:-.02em; }
+  .scroll-finale-hint .hint-sub { margin:0; color:#9eb3c7; font-size:clamp(.9rem,.72vw,1.05rem); font-weight:700; line-height:1.55; }
+  .scroll-finale-hint .hint-sub strong { color:#64eaff; font-weight:850; }
+  .scroll-finale-hint .hint-arrow { inline-size:2.3rem; block-size:2.1rem; margin-block-start:.15rem; background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 44'><defs><linearGradient id='h' x1='0' x2='0' y1='0' y2='1'><stop offset='0' stop-color='%2364eaff'/><stop offset='1' stop-color='%235ef7cd'/></linearGradient></defs><path d='M7 5l17 13L41 5' fill='none' stroke='url(%23h)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round' opacity='.38'/><path d='M7 21l17 13L41 21' fill='none' stroke='url(%23h)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/contain no-repeat; filter:drop-shadow(0 0 12px rgb(94 247 205 / 55%)); animation:finale-arrow-bob 1.7s cubic-bezier(.45,0,.25,1) infinite; }
   /* The base layer's h1,h2,h3,h4{letter-spacing:-0.035em} (style.css) applies
      site-wide and compresses every card/section heading - D never uses
      negative tracking on any heading level. Cancel it once, everywhere,
@@ -335,7 +358,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .gallery-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(.84375rem,calc(.482rem + .4018vw),1.125rem) 1rem; background:transparent; }
   .gallery-detail-head { gap:.375rem clamp(1.35rem,calc(.675rem + .75vw),1.875rem); }
   .gallery-detail-grid { gap:clamp(1.98rem,calc(1.311rem + .7429vw),2.5rem); }
-  .gallery-grid article { position:relative; overflow:hidden; display:grid; align-content:center; justify-items:center; gap:.75rem; min-block-size:22.5rem; padding:1.25rem; border:1px solid rgb(126 166 184 / 26%); border-radius:1.5rem; background:linear-gradient(145deg,rgb(16 62 84 / 55%),rgb(8 27 48 / 52%)); box-shadow:0 24px 64px rgb(0 0 0 / 28%),inset 0 1px rgb(255 255 255 / 6%); text-align:center; }
+  .gallery-grid article { position:relative; overflow:hidden; display:grid; align-content:center; justify-items:center; gap:.75rem; min-block-size:clamp(11rem,11vw,14.5rem); padding:1.25rem; border:1px solid rgb(126 166 184 / 26%); border-radius:1.5rem; background:linear-gradient(145deg,rgb(16 62 84 / 55%),rgb(8 27 48 / 52%)); box-shadow:0 24px 64px rgb(0 0 0 / 28%),inset 0 1px rgb(255 255 255 / 6%); text-align:center; }
   /* D pins the "바로가기" button to the card's bottom-right corner as a pill. */
   .gallery-grid article button { position:absolute; inset-inline-end:1.125rem; inset-block-end:1.125rem; min-block-size:2.375rem; padding:0 1rem; border-radius:999px; border:1px solid rgb(94 247 205 / 28%); color:#06111c; background:linear-gradient(135deg,#5ef7cd,#64eaff); opacity:0; transform:translateY(.5rem); transition:opacity .18s,transform .18s; }
   .gallery-grid article:hover button, .gallery-grid article:focus-within button { opacity:1; transform:none; }
@@ -371,7 +394,14 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      free height, so the only room left is that inset; at 2560px there are 84px
      of free height, so the tile itself can grow too. The clamp keeps 1440px
      exactly where it was and only spends the headroom wider screens have. */
-  .brand-mark { inline-size:clamp(3.75rem,3.1vw,5rem); block-size:clamp(3.75rem,3.1vw,5rem); overflow:hidden; background:#fff; border-color:rgb(0 0 0 / 10%); box-shadow:0 2px 10px rgb(0 0 0 / 22%); padding:.12rem; }.brand-mark img { inline-size:100%; block-size:100%; object-fit:contain; }
+  /* Tile size stays put (user call, 2026-08-12); the logo grows by shrinking
+     the inset to a hairline, and the flat white gets a soft top-lit wash. */
+  .brand-mark { inline-size:clamp(3.75rem,3.1vw,5rem); block-size:clamp(3.75rem,3.1vw,5rem); overflow:hidden; background:linear-gradient(155deg,#ffffff 12%,#eef8ff 56%,#d9edf7 100%); border-color:rgb(0 0 0 / 10%); box-shadow:0 2px 10px rgb(0 0 0 / 22%), inset 0 1px rgb(255 255 255 / 90%); padding:.06rem; }
+  .brand { font-size:clamp(1.18rem,.88vw,1.4rem); }
+  .hero-actions .primary-btn, .hero-actions .secondary-btn { min-block-size:clamp(3.15rem,2.5vw,3.9rem); padding-inline:clamp(1.7rem,1.5vw,2.4rem); font-size:clamp(1.02rem,.82vw,1.3rem); }
+  /* The markup already carries the intended line breaks as spans - let them break. */
+  .project-statement h2 span { display:block; }
+  .curriculum-description span { display:block; }.brand-mark img { inline-size:100%; block-size:100%; object-fit:contain; }
   .ai-modal { inline-size:min(65rem,calc(100vw - 2.25rem)); border-radius:1.75rem; background:#071326; border-color:rgb(100 234 255 / 25%); }
 
   /* 2 & 7. Grade/class selects: the base rule `.select-line { grid-column:2;
@@ -529,8 +559,24 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
 }
 
 @keyframes scene-scroll-cue {
-  0%, 100% { transform:translate(-50%,0) rotate(45deg); opacity:.34; }
-  50% { transform:translate(-50%,.42rem) rotate(45deg); opacity:.95; }
+  0%, 100% { translate:-50% 0; opacity:.5; }
+  50% { translate:-50% .6rem; opacity:1; }
+}
+
+@keyframes finale-arrow-bob {
+  0%, 100% { translate:0 0; opacity:.55; }
+  50% { translate:0 .45rem; opacity:1; }
+}
+
+@keyframes finale-hint-float {
+  0%, 100% { transform:translateY(0); }
+  50% { transform:translateY(.45rem); }
+}
+
+/* The finale hint is a PC-only device; the sub-64rem closed-beta app keeps
+   its own flow and must never see it. */
+@media (max-width:63.99rem) {
+  .scroll-finale-hint, .scroll-cue { display:none; }
 }
 
 @keyframes qr-invite-reveal {

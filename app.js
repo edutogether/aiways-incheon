@@ -2567,7 +2567,7 @@
     // duration of our animation and restore whatever was there afterwards -
     // more reliable than passing behavior:"instant" per call.
     let snapScrollFrame = 0;
-    function snapScrollTo(section, duration = 360) {
+    function snapScrollTo(section, duration = 420) {
       if (snapScrollFrame) cancelAnimationFrame(snapScrollFrame);
       const root = document.documentElement;
       const previousBehavior = root.style.scrollBehavior;
@@ -2586,7 +2586,9 @@
         return;
       }
       const startedAt = performance.now();
-      const ease = t => 1 - Math.pow(1 - t, 5);
+      // easeInOutCubic: the pure ease-out curve started at full speed, which
+      // read as a jolt rather than smooth motion on every wheel tick.
+      const ease = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
       function step(now) {
         const progress = Math.min(1, (now - startedAt) / duration);
         window.scrollTo(0, Math.round(startY + distance * ease(progress)));

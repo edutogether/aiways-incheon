@@ -33,6 +33,8 @@
   time.landfill-time-now { display:inline-block; padding-block:.375rem; border:1px solid rgb(94 247 205 / 18%); border-radius:999px; background:rgb(4 16 34 / 42%); box-shadow:inset 0 1px rgb(255 255 255 / 4.3%),0 0 .75rem rgb(94 247 205 / 5.5%); }
   a.source-link { padding-inline:.75rem; border:1px solid rgb(94 247 205 / 26%); border-radius:999px; background:rgb(255 255 255 / 5.5%); color:rgb(238 253 255 / 86%); font-size:.82rem; font-weight:900; }
 .landfill-actions { gap:.5rem; }
+a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 205 / 12%); color:#fff; box-shadow:0 0 18px rgb(94 247 205 / 12%); }
+.data-refresh-btn:hover { border-color:rgb(94 247 205 / 52%); box-shadow:0 0 20px rgb(94 247 205 / 20%); transform:rotate(24deg); }
   .project-origin { color:rgb(231 244 255 / 86%); font-size:1.512rem; letter-spacing:normal; font-weight:860; }
   .project-subtitle,.curriculum-description,.hah-description,.gallery-description,.flow-scene .scene-copy>p:not(.eyebrow) { color:#9eb3c7; font-weight:760; }.upload-panel { align-content:space-between; }.upload-panel>p { color:#b6cedc; font-size:.78rem; }.upload-actions.upload-card-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.55rem; }.upload-actions button { min-block-size:6.6rem; padding:.7rem; border-color:rgb(95 230 214 / 37%); background:linear-gradient(145deg,rgb(17 84 96 / 62%),rgb(9 43 69 / 90%)); }.upload-panel small { font-size:.55rem; line-height:1.35; }
   .school-panel { grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(5.3rem,.75fr); grid-template-rows:auto minmax(0,1fr); grid-template-areas:"head head select" "kpi visual visual"; }.school-panel .panel-head { display:block; grid-area:head; }.school-panel .select-line { grid-area:select; align-self:start; }.school-panel .kpi-row { grid-area:kpi; grid-template-columns:1fr; align-content:start; }.school-panel .school-visuals { grid-area:visual; min-inline-size:0; }.school-panel .kpi-row>div { padding:.45rem .5rem; }.class-panel .class-kpis>div { padding:.48rem .42rem; }.class-panel .confusion>div { grid-template-columns:5.875rem minmax(0,1fr) 1.875rem; font-size:.94rem; }
@@ -415,6 +417,7 @@
 
   /* 9. Ranking pill: a touch smaller so it never crowds its own edge. */
   .rank-note { font-size:.886rem; font-weight:900; letter-spacing:normal; line-height:1.72; color:rgb(158 179 199); }
+  .primary-btn:hover, .quick-action-row button:first-child:hover, #confirmDecision:hover { background:linear-gradient(135deg,#5ef7cd,#64eaff); transform:none; }
 
   /* 10. Upload panel: fill the dead space between the description and the
      buttons with the product's own locked copy (AI suggests, student

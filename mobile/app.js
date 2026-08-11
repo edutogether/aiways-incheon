@@ -84,6 +84,66 @@
     return null;
   }
 
+  // -----------------------------------------------------------------
+  // Search box live emoji icon: idle rotation through a broad pool of item
+  // emojis, snaps to whatever best matches once the user pauses typing.
+  // Real sortingDbV2 items (with actual disposal guidance) win over the
+  // purely decorative lookup; "?" only shows when nothing matches either.
+  // -----------------------------------------------------------------
+  function matchDecorativeEmoji(query) {
+    const q = normalize(query);
+    if (!q) return null;
+    for (const [emoji, keywords] of DATA.DECORATIVE_EMOJI_LOOKUP) {
+      if (keywords.some(k => { const nk = normalize(k); return q.includes(nk) || nk.includes(q); })) return emoji;
+    }
+    return null;
+  }
+
+  function initSearchEmojiIcon() {
+    const icon = $("searchEmojiIcon");
+    const input = $("searchInput");
+    if (!icon || !input) return;
+
+    const rotationPool = [
+      ...Object.values(DATA.sortingDbV2).filter(item => !item.isHold).map(item => item.emoji),
+      ...DATA.DECORATIVE_EMOJI_LOOKUP.map(([emoji]) => emoji)
+    ];
+    let rotationIndex = 0;
+    let rotationTimer = 0;
+    let debounceTimer = 0;
+
+    function showIcon(emoji) {
+      icon.style.opacity = "0";
+      setTimeout(() => { icon.textContent = emoji; icon.style.opacity = "1"; }, 120);
+    }
+
+    function startRotation() {
+      stopRotation();
+      showIcon(rotationPool[rotationIndex % rotationPool.length]);
+      rotationTimer = setInterval(() => {
+        rotationIndex += 1;
+        showIcon(rotationPool[rotationIndex % rotationPool.length]);
+      }, 1800);
+    }
+    function stopRotation() { clearInterval(rotationTimer); }
+
+    function matchNow() {
+      const value = input.value.trim();
+      if (!value) { startRotation(); return; }
+      stopRotation();
+      const realId = findItemId(value);
+      const emoji = realId ? DATA.sortingDbV2[realId].emoji : matchDecorativeEmoji(value);
+      showIcon(emoji || "❓");
+    }
+
+    input.addEventListener("input", () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(matchNow, 350);
+    });
+
+    startRotation();
+  }
+
   function openJudgeModal() {
     $("judgeScanState").classList.add("hidden");
     $("judgeResultState").classList.remove("hidden");
@@ -501,6 +561,7 @@
 
     renderQuickSelectGrid();
     initSearchAutocomplete();
+    initSearchEmojiIcon();
     initPhotoCapture();
     restoreLocal();
     renderQuizRankLadder();

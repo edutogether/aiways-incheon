@@ -99,6 +99,91 @@
 
   const QUICK_SELECT_ORDER = ["milk-carton", "tape-box", "plastic-cup", "ramen-container", "snack-wrapper", "can", "pet-bottle", "glass-bottle", "paper-cup", "vinyl-bag", "receipt", "battery"];
 
+  // Decorative-only emoji matches for the search box's live icon (idle rotation +
+  // type-to-match). These are NOT tied to disposal guidance -- only the 12
+  // sortingDbV2 items above have real guides -- this is purely so typing an
+  // everyday object's name (책, 우산, 핸드폰, ...) shows a sensible icon instead
+  // of always falling back to a plain question mark.
+  const DECORATIVE_EMOJI_LOOKUP = [
+    ["📖", ["책", "교과서", "동화책", "잡지"]],
+    ["📓", ["공책", "노트", "수첩"]],
+    ["✏️", ["연필", "샤프"]],
+    ["🖊️", ["볼펜", "펜", "만년필"]],
+    ["🖍️", ["크레파스", "색연필"]],
+    ["🎨", ["물감", "팔레트", "미술도구"]],
+    ["✂️", ["가위"]],
+    ["📏", ["자", "줄자"]],
+    ["🧷", ["안전핀", "옷핀"]],
+    ["📎", ["클립"]],
+    ["📌", ["압정"]],
+    ["🧻", ["휴지", "화장지", "냅킨"]],
+    ["🩹", ["반창고", "밴드"]],
+    ["💊", ["약", "알약"]],
+    ["🌡️", ["체온계", "온도계"]],
+    ["😷", ["마스크"]],
+    ["👓", ["안경"]],
+    ["⌚", ["손목시계", "시계"]],
+    ["📱", ["핸드폰", "휴대폰", "스마트폰"]],
+    ["🎧", ["이어폰", "헤드폰"]],
+    ["🔌", ["충전기", "콘센트", "플러그"]],
+    ["💻", ["노트북", "랩탑"]],
+    ["🖥️", ["컴퓨터", "모니터", "데스크탑"]],
+    ["🖱️", ["마우스"]],
+    ["⌨️", ["키보드"]],
+    ["🖨️", ["프린터"]],
+    ["💾", ["usb", "저장장치"]],
+    ["💿", ["시디", "디스크"]],
+    ["🧮", ["계산기"]],
+    ["🧲", ["자석"]],
+    ["🔨", ["망치"]],
+    ["🔩", ["나사", "볼트"]],
+    ["🪛", ["드라이버"]],
+    ["🧹", ["빗자루", "청소도구"]],
+    ["🧽", ["수세미", "스펀지", "걸레"]],
+    ["🪣", ["양동이", "대야"]],
+    ["🔑", ["열쇠"]],
+    ["🔒", ["자물쇠"]],
+    ["💳", ["카드", "교통카드"]],
+    ["🪙", ["동전"]],
+    ["💵", ["지폐", "돈"]],
+    ["👛", ["지갑"]],
+    ["🎒", ["가방", "책가방", "배낭"]],
+    ["👟", ["운동화", "신발"]],
+    ["🥿", ["실내화"]],
+    ["🩴", ["슬리퍼"]],
+    ["🧦", ["양말"]],
+    ["🧤", ["장갑"]],
+    ["🧣", ["목도리", "스카프"]],
+    ["🧢", ["모자", "캡모자"]],
+    ["👕", ["옷", "티셔츠", "의류"]],
+    ["☂️", ["우산"]],
+    ["🌂", ["우비", "비옷"]],
+    ["🎈", ["풍선"]],
+    ["🧸", ["인형", "곰인형", "장난감"]],
+    ["🪀", ["요요"]],
+    ["⚽", ["축구공"]],
+    ["🏀", ["농구공"]],
+    ["🏸", ["배드민턴", "라켓"]],
+    ["🪢", ["줄넘기", "밧줄"]],
+    ["🚲", ["자전거"]],
+    ["🪖", ["헬멧"]],
+    ["🪴", ["화분", "식물"]],
+    ["💐", ["꽃"]],
+    ["🍂", ["낙엽", "나뭇잎"]],
+    ["💡", ["전구", "램프"]],
+    ["🕯️", ["초", "양초"]],
+    ["🔥", ["라이터", "성냥"]],
+    ["📅", ["달력"]],
+    ["✉️", ["편지", "편지봉투"]],
+    ["📮", ["우표"]],
+    ["📰", ["신문"]],
+    ["🏷️", ["스티커", "라벨"]],
+    ["🍽️", ["접시", "그릇"]],
+    ["🥢", ["젓가락"]],
+    ["🍴", ["수저", "포크", "숟가락"]],
+    ["🧴", ["물병", "텀블러", "보온병", "로션"]]
+  ];
+
   // Unbiased Fisher-Yates -- Array.sort(() => Math.random() - 0.5) is a
   // well-known non-uniform shuffle that leaves elements biased toward their
   // original position, which read as "the same quiz questions keep showing up".
@@ -281,5 +366,5 @@
     return { title: "분리배출 새싹", message: "처음은 누구나 헷갈릴 수 있어요. 다시 도전해봐요 🌱", emoji: "🌱" };
   }
 
-  window.AIWaysMobileData = { sortingDbV2, QUICK_SELECT_ORDER, quizPool, pickQuizSet, quizRank };
+  window.AIWaysMobileData = { sortingDbV2, QUICK_SELECT_ORDER, DECORATIVE_EMOJI_LOOKUP, quizPool, pickQuizSet, quizRank };
 })();

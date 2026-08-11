@@ -19,44 +19,31 @@
   // -----------------------------------------------------------------
   // All 4 tabs get a min-height matching whichever is naturally tallest, so
   // the card doesn't visibly shrink/grow when switching. Nothing is
-  // hardcoded -- every tab is briefly measured (invisibly, out of layout
-  // flow) so this adapts to real content and viewport width instead of
-  // breaking at other resolutions or when copy changes.
-  function measureTallestTabHeight() {
-    let tallest = 0;
-    document.querySelectorAll(".tab-content").forEach(tab => {
-      const wasHidden = tab.classList.contains("hidden");
-      const prevMinHeight = tab.style.minHeight;
-      tab.style.minHeight = "";
-      if (wasHidden) {
-        tab.style.position = "absolute";
-        tab.style.left = "0";
-        tab.style.right = "0";
-        tab.style.visibility = "hidden";
-        tab.classList.remove("hidden");
-      }
-      tallest = Math.max(tallest, tab.scrollHeight);
-      if (wasHidden) {
-        tab.classList.add("hidden");
-        tab.style.position = "";
-        tab.style.left = "";
-        tab.style.right = "";
-        tab.style.visibility = "";
-      }
-      tab.style.minHeight = prevMinHeight;
-    });
-    return tallest;
+  // hardcoded: a tab's real height is only ever measured while it's actually
+  // visible in normal flow (never guessed via a hidden/position:absolute
+  // trick, which can measure the wrong width and under-report height), so
+  // this stays accurate regardless of viewport width or copy changes.
+  // The only cost is that a tab not yet visited this session doesn't
+  // contribute to the shared height until the user actually opens it, which
+  // resolves itself within the first couple of tab switches.
+  let sharedTabMinHeight = 0;
+  function growSharedTabHeight(fromTab) {
+    fromTab.style.minHeight = "";
+    const natural = fromTab.scrollHeight;
+    if (natural <= sharedTabMinHeight) { fromTab.style.minHeight = `${sharedTabMinHeight}px`; return; }
+    sharedTabMinHeight = natural;
+    document.querySelectorAll(".tab-content").forEach(tab => { tab.style.minHeight = `${sharedTabMinHeight}px`; });
   }
-
   function syncTabHeights() {
-    const tallest = measureTallestTabHeight();
-    if (!tallest) return;
-    document.querySelectorAll(".tab-content").forEach(tab => { tab.style.minHeight = `${tallest}px`; });
+    const active = document.querySelector(".tab-content:not(.hidden)");
+    if (active) growSharedTabHeight(active);
   }
 
   function switchTab(tabId) {
     document.querySelectorAll(".tab-content").forEach(tab => tab.classList.add("hidden"));
-    $(tabId).classList.remove("hidden");
+    const target = $(tabId);
+    target.classList.remove("hidden");
+    growSharedTabHeight(target);
     document.querySelectorAll("[data-tab-btn]").forEach(btn => {
       const active = btn.dataset.tabBtn === tabId;
       btn.className = active

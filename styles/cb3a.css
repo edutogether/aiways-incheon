@@ -173,7 +173,8 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   body.is-rewound .portal-frame { padding:1rem 1.2rem; }
   body.is-rewound .dashboard-scene .qr-invite { display:flex; align-items:center; gap:1.1rem; margin:0; padding:.3rem 0; border:0; background:transparent; box-shadow:none; animation:qr-invite-reveal .62s cubic-bezier(.2,.7,.2,1) both; }
   body.is-rewound .dashboard-scene .qr-invite img { inline-size:clamp(9rem,10.2vw,12.5rem); block-size:auto; border-radius:.9rem; }
-  body.is-rewound .dashboard-scene .qr-invite p { color:#dff2fb; font-size:clamp(.95rem,.8vw,1.18rem); font-weight:750; line-height:1.6; }
+  body.is-rewound .dashboard-scene .qr-invite p { color:#dff2fb; font-size:clamp(.95rem,.8vw,1.18rem); font-weight:750; line-height:1.7; word-break:keep-all; }
+  body.is-rewound .dashboard-scene .qr-invite p strong { color:#5ef7cd; font-weight:850; }
 
   /* ==== D revival: scene rhythm (every scene except the dashboard) ====
      All numbers below are two-point measurements of the live D reference
@@ -496,7 +497,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .school-panel .bar-list>div { align-items:center; column-gap:.7rem; }
   .school-panel .donut span { font-size:clamp(1.1rem,.95vw,1.45rem); }
   .class-panel .confusion h3, .class-panel .confusion span, .class-panel .confusion li { font-size:clamp(.92rem,.78vw,1.18rem); }
-  .class-panel .rank-note { font-size:clamp(1.1rem,.95vw,1.45rem); }
+  .class-panel .rank-note { font-size:clamp(.95rem,.82vw,1.22rem); }
   .school-panel .school-visuals { grid-template-columns:1fr; gap:.75rem; overflow:visible; align-self:stretch; }
   .school-panel .bar-list > div { grid-template-columns:5.75rem minmax(2.4rem,1fr) 2.625rem; font-size:.9rem; font-weight:760; color:#9eb3c7; }
   .school-panel .donut-pair { flex-wrap:nowrap; gap:.625rem; }
@@ -541,7 +542,10 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .landfill-panel .landfill-metrics span { font-size:clamp(.72rem,.6vw,.9rem); }
   .landfill-panel .chart-title-row { grid-area:title; }
   .landfill-panel .combo-chart { grid-area:chart; }
-  .combo-chart { grid-area:chart; inline-size:100%; block-size:100%; min-block-size:0; max-block-size:11rem; justify-self:stretch; align-self:center; overflow:visible; }
+  /* aspect-ratio breaks the width/height circularity, so the svg's box hugs
+     the drawing exactly - no dead background trailing to the panel's right.
+     The freed width goes to the two rings. */
+  .combo-chart { grid-area:chart; inline-size:auto; block-size:100%; aspect-ratio:440/252; min-block-size:0; max-block-size:11rem; max-inline-size:100%; justify-self:start; align-self:center; overflow:visible; }
   .upload-panel { display:flex; flex-direction:column; min-block-size:0; }
   .upload-panel .experience-portal { flex:1 1 auto; block-size:auto; min-block-size:0; }
   .chart-axis text { font-variant-numeric:tabular-nums; }
@@ -564,7 +568,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      below are tuned together for THIS 5.5rem ring. Resizing the ring without
      re-checking those two margins (via real getBoundingClientRect measurement,
      not eyeballing) will silently reintroduce text overlap. */
-  .landfill-kpi-ring { position:relative; isolation:isolate; inline-size:clamp(4.4rem,4.8vw,5.2rem); block-size:clamp(4.4rem,4.8vw,5.2rem); flex:0 0 auto; aspect-ratio:1; grid-template-rows:1fr; align-content:stretch; background:conic-gradient(rgb(94 247 205 / 78%) calc(var(--pct) * 1%), rgb(87 117 154 / 22%) 0); box-shadow:0 0 14px rgb(94 247 205 / 8%), inset 0 0 18px rgb(255 255 255 / 3.5%); }
+  .landfill-kpi-ring { position:relative; isolation:isolate; inline-size:clamp(4.8rem,5.4vw,5.9rem); block-size:clamp(4.8rem,5.4vw,5.9rem); flex:0 0 auto; aspect-ratio:1; grid-template-rows:1fr; align-content:stretch; background:conic-gradient(rgb(94 247 205 / 78%) calc(var(--pct) * 1%), rgb(87 117 154 / 22%) 0); box-shadow:0 0 14px rgb(94 247 205 / 8%), inset 0 0 18px rgb(255 255 255 / 3.5%); }
   .landfill-kpi-ring::before, .landfill-kpi-ring::after { content:""; position:absolute; border-radius:inherit; pointer-events:none; }
   .landfill-kpi-ring::before { content:none; }
   .landfill-kpi-ring::after { z-index:-1; inset:22%; background:radial-gradient(circle at 36% 28%, rgb(33 64 102 / 98%), #0a1830 72%); box-shadow:inset 0 0 0 1px rgb(173 214 255 / 8%); }
@@ -589,7 +593,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      same specificity means source order decides, and an earlier placement
      gets silently shadowed. */
   @media (min-width:1181px) and (max-width:1600px) { .school-panel,.class-panel { grid-template-columns:6.5rem minmax(0,1fr); column-gap:.75rem; }.school-panel .kpi-row,.class-panel .class-kpis,.landfill-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-  @media (min-width:160rem) { :root { --scene-inline-space:11.25rem; --header-inline-space:8rem; --header-size:7rem; --nav-link-pad:1.25rem; }.main-nav a { min-block-size:3.25rem; padding-inline:var(--nav-link-pad); font-size:1.18rem; }.school-panel,.class-panel { grid-template-columns:11.875rem minmax(0,1fr); column-gap:1.75rem; } }
+  @media (min-width:160rem) { :root { --scene-inline-space:11.25rem; --header-inline-space:8rem; --header-size:7rem; --nav-link-pad:1.25rem; }.main-nav a { min-block-size:3.25rem; padding-inline:var(--nav-link-pad); font-size:1.18rem; }.school-panel { grid-template-columns:8.75rem minmax(0,1fr); column-gap:1.5rem; }.class-panel { grid-template-columns:7rem minmax(0,1fr); column-gap:1.5rem; } }
   .class-panel .panel-head { grid-area:head; }
   .class-panel .class-kpis { grid-area:kpi; grid-template-columns:1fr; gap:.55rem; align-self:start; min-block-size:0; }
   .class-panel .class-kpis > div { padding:.55rem .55rem; }

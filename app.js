@@ -2567,19 +2567,26 @@
     // duration of our animation and restore whatever was there afterwards -
     // more reliable than passing behavior:"instant" per call.
     let snapScrollFrame = 0;
-    function snapScrollTo(section, duration = 440, onLanded) {
+    function snapScrollTo(section, duration = 640, onLanded) {
       if (snapScrollFrame) cancelAnimationFrame(snapScrollFrame);
       const root = document.documentElement;
-      const previousBehavior = root.style.scrollBehavior;
       root.style.scrollBehavior = "auto";
       const finish = (landed) => {
         snapScrollFrame = 0;
-        root.style.scrollBehavior = previousBehavior;
+        // Always restore to empty, never to a captured value: a snap that
+        // interrupts another snap would capture "auto" and leave it inline
+        // forever, and stale inline state is one way the feel degrades.
+        root.style.scrollBehavior = "";
         if (landed && onLanded) onLanded();
       };
       const startY = window.scrollY;
       const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
-      const endY = Math.min(maxY, Math.max(0, startY + section.getBoundingClientRect().top));
+      // The first scene starts below the in-flow sticky header, so snapping it
+      // to the viewport top would slide it back under the header; land the
+      // whole page at 0 instead so header and scene are both fully visible.
+      const endY = section === sections[0]
+        ? 0
+        : Math.min(maxY, Math.max(0, startY + section.getBoundingClientRect().top));
       const distance = endY - startY;
       if (Math.abs(distance) < 2) {
         window.scrollTo(0, endY);
@@ -2587,14 +2594,10 @@
         return;
       }
       const startedAt = performance.now();
-      // easeInOutBack, dialed well below the standard c1 of 1.70158. 0.95 gave
-      // the magnetic snap but read as flippant; 0.42 keeps a ~1.5% pull-past -
-      // felt as weight settling rather than a bounce.
-      const c1 = 0.42;
-      const c2 = c1 * 1.525;
-      const ease = t => t < 0.5
-        ? (Math.pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2
-        : (Math.pow(2 * t - 2, 2) * ((c2 + 1) * (2 * t - 2) + c2) + 2) / 2;
+      // Apple-style: a longer ride on easeInOutQuart - soft start, fast middle,
+      // long heavily-damped landing, zero overshoot. The back-curve variants
+      // (tried at c1 0.95 and 0.42) both read as jitter, not weight.
+      const ease = t => (t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2);
       function step(now) {
         const progress = Math.min(1, (now - startedAt) / duration);
         window.scrollTo(0, Math.round(startY + distance * ease(progress)));

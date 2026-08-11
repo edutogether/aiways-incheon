@@ -16,6 +16,7 @@
       const auth = getAuth(base.app);
       if (emulatorRequested()) connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
       await setPersistence(auth, browserLocalPersistence);
+      await auth.authStateReady();
       if (!auth.currentUser) await signInAnonymously(auth);
       return { auth, signOut };
     })();

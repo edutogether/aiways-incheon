@@ -83,8 +83,9 @@
     nameInput.autocomplete = "off";
     nameInput.value = defaultDeviceName();
     nameInput.className = "w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all";
+    nameInput.addEventListener("focus", () => nameInput.select());
 
-    const help = el("p", "text-[11px] text-slate-400", `기기 이름은 한글 ${DEVICE_NAME_MAX}자 이내로 직접 바꿀 수 있어요 · 기기당 최대 5대까지 등록돼요`);
+    const help = el("p", "text-[11px] text-slate-400", `누구 기기인지 알아보게 예: "민수 아이폰"처럼 직접 바꿔 주세요 (한글 ${DEVICE_NAME_MAX}자 이내) · 기기당 최대 5대까지 등록돼요`);
 
     const feedback = el("div", "space-y-2");
 

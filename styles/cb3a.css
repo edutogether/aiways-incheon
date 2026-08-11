@@ -1,6 +1,6 @@
 /* CB-3A: final product composition. This module owns visual overrides for the beta shell. */
 @layer cb3a {
-  :root { --scene-content-max: 112rem; --scene-inline-space: clamp(1rem,3.4vw,4rem); --scene-block-space: clamp(4.5rem,8vw,9rem); --header-size:4.875rem; --header-inline-space:clamp(1.375rem,4vw,4.5rem); --scene-gap:clamp(1rem,1.65vw,1.5rem); --panel-pad:clamp(1.035rem,calc(1.5571vw - .366rem),2.125rem); --copy-max:49.375rem; }
+  :root { --scene-content-max: 112rem; --scene-inline-space: clamp(1rem,3.4vw,4rem); --scene-block-space: clamp(4.5rem,8vw,9rem); --header-size:4.875rem; --header-inline-space:clamp(1.375rem,4vw,4.5rem); --nav-link-pad:.75rem; --scene-gap:clamp(1rem,1.65vw,1.5rem); --panel-pad:clamp(1.035rem,calc(1.5571vw - .366rem),2.125rem); --copy-max:49.375rem; }
   /* D's .scene never caps total width (confirmed live: max-width:100%,
      width:100%) - it controls margins purely through side padding, which
      scales as clamp(48px,5.4vw,138px) and locks to a flat 180px at
@@ -9,7 +9,7 @@
   body::before { background:none; }
   .site-header { min-block-size:var(--header-size); padding:.875rem var(--header-inline-space); gap:.7rem 1.15rem; background:rgb(2 6 17 / 88%); border-block-end-color:rgb(122 213 237 / 16%); backdrop-filter:blur(18px); }
   .brand { gap:.65rem; font-size:1.08rem; white-space:nowrap; }.brand-mark { inline-size:2.45rem; block-size:2.45rem; padding:.25rem; border:1px solid rgb(96 239 224 / 56%); background:linear-gradient(145deg,#65e9de,#24759d); box-shadow:0 0 24px rgb(75 222 208 / 17%); }
-  .main-nav { flex:1 1 auto; justify-content:flex-end; gap:.1rem; overflow:visible; }.main-nav a { min-block-size:2.375rem; display:grid; place-items:center; padding-inline:.75rem; color:#b9cddb; font-size:.92rem; font-weight:760; }.edu2g-beta-trigger { flex:0 0 auto; min-block-size:2.375rem; }
+  .main-nav { flex:1 1 auto; justify-content:flex-end; gap:.1rem; overflow:visible; }.main-nav a { min-block-size:2.375rem; display:grid; place-items:center; padding-inline:var(--nav-link-pad); color:#b9cddb; font-size:.92rem; font-weight:760; }.edu2g-beta-trigger { flex:0 0 auto; min-block-size:2.375rem; }
   .responsive-nav-trigger { display:none; min-block-size:2.65rem; padding-inline:.82rem; color:#dffaff; background:transparent; border-color:rgb(111 212 232 / 34%); }
   main { gap:0; padding-block-end:0; }.scene { inline-size:100%; padding-inline:var(--scene-inline-space); min-block-size:100svh; padding-block:var(--scene-block-space); scroll-margin-block-start:calc(var(--header-size) + 1rem); box-sizing:border-box; }.scene-copy,.project-intro,.hero-copy { gap:0; }.scene-copy h2,.project-statement h2 { max-inline-size:16ch; font-size:clamp(2.35rem,4.4vw,7.15rem); font-weight:950; line-height:.96; letter-spacing:normal; }.eyebrow { display:inline-flex; align-items:center; gap:.65rem; color:#65ead6; font-size:.77rem; font-weight:850; letter-spacing:.11em; }.eyebrow::before { content:""; inline-size:2.15rem; block-size:1px; background:currentColor; }
   .panel { border-radius:1.375rem; border-color:rgb(131 224 255 / 18%); background:linear-gradient(145deg,rgb(13 31 61 / 86%),rgb(5 13 29 / 66%)); box-shadow:0 18px 48px rgb(0 7 20 / 20%); }.dashboard-grid>.panel:hover { border-color:rgb(99 232 215 / 56%); box-shadow:0 20px 48px rgb(0 7 20 / 29%); }
@@ -122,21 +122,21 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
 /* Exhibition desktop finish: keeps the approved D/E presentation language
    together without altering the closed-beta mobile application below 64rem. */
 @media (min-width:64rem) {
-  .site-header { box-shadow:none; }
+  /* The last nav item's *text* should line up with the right edge of the scene
+     content below it, so the header stops short of the scene inset by exactly
+     the link's own inline padding. Verified at both widths: 180-20=160 at
+     2560px, 77.76-12=65.6 at 1440px. */
+  .site-header { box-shadow:none; padding-inline-end:calc(var(--scene-inline-space) - var(--nav-link-pad)); }
   .main-nav a { border-radius:.7rem; }
   .scene { position:relative; opacity:.56; filter:saturate(.68) brightness(.66); transition:opacity .3s cubic-bezier(.18,.92,.24,1),filter .3s cubic-bezier(.18,.92,.24,1),transform .3s cubic-bezier(.18,.92,.24,1); }.scene.is-active { opacity:1; filter:saturate(1.08) brightness(1.08); }
   .scene::after { content:""; position:absolute; inset:auto 0 0; block-size:1px; background:linear-gradient(90deg,transparent,rgb(111 212 232 / 18%),transparent); pointer-events:none; }
 
-  /* D drove the scroll root with scroll-snap (y mandatory); Stage 7.5-0 dropped
-     it. Without snapping, app.js's settle check almost never sees rect.top near
-     zero, so every scene burned its full settle timeout before lighting up -
-     the "page brightens far too late" report. Restored as `proximity`, not
-     `mandatory`: the gallery scene already exceeds the viewport at 1440x900 and
-     mandatory snapping would trap the scroll inside it. This cannot live in
-     style.css - frontendCssArchitecture.test.js bans the `scroll-snap` string
-     there. */
-  html { scroll-snap-type:y proximity; }
-  .scene { scroll-snap-align:start; scroll-snap-stop:normal; }
+  /* No CSS scroll-snap here on purpose. D used it, but D's app.js did not
+     hijack the wheel; this build's snapByWheel calls preventDefault and drives
+     the scroll itself, so native snapping never gets to participate on a wheel
+     gesture - it only wakes up to re-snap *after* each frame our animation
+     writes, dragging against the curve. The snap feel comes from the JS curve
+     in app.js (snapScrollTo) instead. */
 
   /* PC drops the 3-second-judgement app: the nav goes gallery -> resources. The
      markup stays put because frontendDomContract.test.js requires #sorting and
@@ -344,7 +344,12 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   /* D itself only shows the full logo at 52px (illegible at that size,
      verified live) - enlarging beyond D here is a deliberate legibility
      improvement, not a mismatch. Full original logo file, not a crop. */
-  .brand-mark { inline-size:3.75rem; block-size:3.75rem; overflow:hidden; background:#fff; border-color:rgb(0 0 0 / 10%); box-shadow:0 2px 10px rgb(0 0 0 / 22%); padding:.32rem; }.brand-mark img { inline-size:100%; block-size:100%; object-fit:contain; }
+  /* Fill the white tile: the logo was 48px inside a 60px tile because of a
+     .32rem inset. At 1440px the tile already uses 60 of the header's 61px of
+     free height, so the only room left is that inset; at 2560px there are 84px
+     of free height, so the tile itself can grow too. The clamp keeps 1440px
+     exactly where it was and only spends the headroom wider screens have. */
+  .brand-mark { inline-size:clamp(3.75rem,3.1vw,5rem); block-size:clamp(3.75rem,3.1vw,5rem); overflow:hidden; background:#fff; border-color:rgb(0 0 0 / 10%); box-shadow:0 2px 10px rgb(0 0 0 / 22%); padding:.12rem; }.brand-mark img { inline-size:100%; block-size:100%; object-fit:contain; }
   .ai-modal { inline-size:min(65rem,calc(100vw - 2.25rem)); border-radius:1.75rem; background:#071326; border-color:rgb(100 234 255 / 25%); }
 
   /* 2 & 7. Grade/class selects: the base rule `.select-line { grid-column:2;
@@ -438,7 +443,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      same specificity means source order decides, and an earlier placement
      gets silently shadowed. */
   @media (min-width:1181px) and (max-width:1600px) { .school-panel,.class-panel { grid-template-columns:6.5rem minmax(0,1fr); column-gap:.75rem; }.school-panel .kpi-row,.class-panel .class-kpis,.landfill-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-  @media (min-width:160rem) { :root { --scene-inline-space:11.25rem; --header-inline-space:8rem; --header-size:7rem; }.main-nav a { min-block-size:3.25rem; padding-inline:1.25rem; font-size:1.18rem; }.school-panel,.class-panel { grid-template-columns:11.875rem minmax(0,1fr); column-gap:1.75rem; } }
+  @media (min-width:160rem) { :root { --scene-inline-space:11.25rem; --header-inline-space:8rem; --header-size:7rem; --nav-link-pad:1.25rem; }.main-nav a { min-block-size:3.25rem; padding-inline:var(--nav-link-pad); font-size:1.18rem; }.school-panel,.class-panel { grid-template-columns:11.875rem minmax(0,1fr); column-gap:1.75rem; } }
   .class-panel .panel-head { grid-area:head; }
   .class-panel .class-kpis { grid-area:kpi; grid-template-columns:1fr; gap:.5625rem; }
   .class-panel .class-kpis > div { padding:.5rem .55rem; }

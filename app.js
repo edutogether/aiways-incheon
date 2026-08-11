@@ -2558,28 +2558,40 @@
     }
 
     // Chrome ramps native smooth-scroll duration with distance, which reads as
-    // drifting over to the next scene rather than snapping onto it. Drive the
-    // scroll ourselves on a short, sharply decelerating curve instead. Every
-    // scrollTo below must pass behavior:"instant" because style.css sets
-    // html{scroll-behavior:smooth}, which would otherwise animate each of our
-    // own frames and fight the curve.
+    // drifting over to the next scene rather than snapping onto it, so drive
+    // the scroll ourselves on a short, sharply decelerating curve.
+    //
+    // style.css sets html{scroll-behavior:smooth}. Left on, the browser starts
+    // its own animation for every frame we set, and sixty of those per second
+    // fight each other into visible chaos. Pin the property to auto for the
+    // duration of our animation and restore whatever was there afterwards -
+    // more reliable than passing behavior:"instant" per call.
     let snapScrollFrame = 0;
     function snapScrollTo(section, duration = 360) {
       if (snapScrollFrame) cancelAnimationFrame(snapScrollFrame);
+      const root = document.documentElement;
+      const previousBehavior = root.style.scrollBehavior;
+      root.style.scrollBehavior = "auto";
+      const finish = () => {
+        snapScrollFrame = 0;
+        root.style.scrollBehavior = previousBehavior;
+      };
       const startY = window.scrollY;
-      const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
       const endY = Math.min(maxY, Math.max(0, startY + section.getBoundingClientRect().top));
       const distance = endY - startY;
       if (Math.abs(distance) < 2) {
-        window.scrollTo({ top: endY, behavior: "instant" });
+        window.scrollTo(0, endY);
+        finish();
         return;
       }
       const startedAt = performance.now();
       const ease = t => 1 - Math.pow(1 - t, 5);
       function step(now) {
         const progress = Math.min(1, (now - startedAt) / duration);
-        window.scrollTo({ top: startY + distance * ease(progress), behavior: "instant" });
-        snapScrollFrame = progress < 1 ? requestAnimationFrame(step) : 0;
+        window.scrollTo(0, Math.round(startY + distance * ease(progress)));
+        if (progress < 1) snapScrollFrame = requestAnimationFrame(step);
+        else finish();
       }
       snapScrollFrame = requestAnimationFrame(step);
     }

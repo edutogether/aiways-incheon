@@ -17,8 +17,9 @@
   function truncateDeviceName(value) { return Array.from(value).slice(0, DEVICE_NAME_MAX).join(""); }
   function detectDeviceKind() {
     const ua = navigator.userAgent || "";
-    if (/ipad/i.test(ua) || (/android/i.test(ua) && !/mobile/i.test(ua))) return "tablet";
-    if (/android|iphone|ipod|mobile/i.test(ua) || navigator.userAgentData?.mobile === true) return "mobile";
+    const touch = (navigator.maxTouchPoints || 0) > 0;
+    if (touch && (/ipad/i.test(ua) || (/android/i.test(ua) && !/mobile/i.test(ua)))) return "tablet";
+    if (touch && (/android|iphone|ipod|mobile/i.test(ua) || navigator.userAgentData?.mobile === true)) return "mobile";
     return "desktop";
   }
   function defaultDeviceName() {
@@ -71,8 +72,7 @@
     const codeInput = document.createElement("input");
     codeInput.type = "text";
     codeInput.autocomplete = "one-time-code";
-    codeInput.inputMode = "numeric";
-    codeInput.placeholder = "6자리 코드 입력";
+    codeInput.placeholder = "여러분만의 시크릿 코드를 입력하세요";
     codeInput.maxLength = 80;
     codeInput.className = "w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-sm tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all";
 

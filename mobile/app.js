@@ -17,26 +17,42 @@
   // -----------------------------------------------------------------
   // Tabs
   // -----------------------------------------------------------------
-  // Judge tab is the reference height: every other tab gets a matching
-  // min-height so the card doesn't visibly shrink/grow when switching, but
-  // nothing is hardcoded -- it's measured live, so it adapts per viewport
-  // instead of breaking at other resolutions.
-  let judgeTabHeight = 0;
-  function measureJudgeTabHeight() {
-    const judge = $("tab-judge");
-    if (!judge.classList.contains("hidden")) judgeTabHeight = judge.scrollHeight;
+  // All 4 tabs get a min-height matching whichever is naturally tallest, so
+  // the card doesn't visibly shrink/grow when switching. Nothing is
+  // hardcoded -- every tab is briefly measured (invisibly, out of layout
+  // flow) so this adapts to real content and viewport width instead of
+  // breaking at other resolutions or when copy changes.
+  function measureTallestTabHeight() {
+    let tallest = 0;
+    document.querySelectorAll(".tab-content").forEach(tab => {
+      const wasHidden = tab.classList.contains("hidden");
+      const prevMinHeight = tab.style.minHeight;
+      tab.style.minHeight = "";
+      if (wasHidden) {
+        tab.style.position = "absolute";
+        tab.style.visibility = "hidden";
+        tab.classList.remove("hidden");
+      }
+      tallest = Math.max(tallest, tab.scrollHeight);
+      if (wasHidden) {
+        tab.classList.add("hidden");
+        tab.style.position = "";
+        tab.style.visibility = "";
+      }
+      tab.style.minHeight = prevMinHeight;
+    });
+    return tallest;
+  }
+
+  function syncTabHeights() {
+    const tallest = measureTallestTabHeight();
+    if (!tallest) return;
+    document.querySelectorAll(".tab-content").forEach(tab => { tab.style.minHeight = `${tallest}px`; });
   }
 
   function switchTab(tabId) {
     document.querySelectorAll(".tab-content").forEach(tab => tab.classList.add("hidden"));
-    const target = $(tabId);
-    target.classList.remove("hidden");
-    if (tabId === "tab-judge") {
-      target.style.minHeight = "";
-      requestAnimationFrame(measureJudgeTabHeight);
-    } else if (judgeTabHeight) {
-      target.style.minHeight = `${judgeTabHeight}px`;
-    }
+    $(tabId).classList.remove("hidden");
     document.querySelectorAll("[data-tab-btn]").forEach(btn => {
       const active = btn.dataset.tabBtn === tabId;
       btn.className = active
@@ -498,15 +514,11 @@
     restoreLocal();
     renderQuizRankLadder();
     startQuiz();
-    requestAnimationFrame(measureJudgeTabHeight);
+    requestAnimationFrame(syncTabHeights);
     let resizeTimer = 0;
     window.addEventListener("resize", () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        measureJudgeTabHeight();
-        const active = document.querySelector(".tab-content:not(.hidden)");
-        if (active && active.id !== "tab-judge" && judgeTabHeight) active.style.minHeight = `${judgeTabHeight}px`;
-      }, 200);
+      resizeTimer = setTimeout(syncTabHeights, 200);
     });
 
     $("searchInput").addEventListener("keyup", handleSearch);

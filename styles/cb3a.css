@@ -212,7 +212,7 @@
   .subject-card { position:relative; display:flex; flex-direction:column; gap:.5rem; min-block-size:0; padding:1.53rem 1.53rem 4rem; border:1px solid rgb(131 224 255 / 18%); border-radius:1.5rem; background:linear-gradient(150deg,rgb(20 58 90 / 55%),rgb(8 27 48 / 52%)); box-shadow:0 24px 64px rgb(0 0 0 / 28%),inset 0 1px rgb(255 255 255 / 6%); }
   .subject-card em { position:absolute; inset-inline-end:1.125rem; inset-block-end:1.125rem; margin-block-start:0; opacity:0; transform:translateY(.5rem); transition:opacity .18s,transform .18s; }
   .subject-card:hover em, .subject-card:focus-within em { opacity:1; transform:none; }
-  .standards-panel { grid-template-columns:1fr; gap:1.5rem; padding:1.485rem; border:1px solid rgb(105 174 255 / 30%); border-radius:1.5rem; background:rgb(9 34 59 / 64%); box-shadow:none; }
+  .standards-panel { grid-template-columns:1fr; gap:1.5rem; padding:1.782rem; margin-block-start:1.25rem; border:1px solid rgb(131 224 255 / 18%); border-radius:1.5rem; background:linear-gradient(145deg,rgb(9 22 44 / 78%),rgb(5 13 29 / 62%)); box-shadow:none; }
   .standards-panel>div:first-child { display:flex; justify-content:space-between; align-items:baseline; gap:1rem; }
   .standards-panel>div:first-child p { color:#9eb3c7; font-size:1rem; }
   .standards-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:.875rem; margin-block-start:0; }
@@ -232,7 +232,7 @@
   .hah-grid .panel::before { display:none; }
   /* D's number badge is a 50px rounded square (18px radius), not a circle. */
   .hah-grid .panel>span { inline-size:3.125rem; block-size:3.125rem; margin-block-end:.875rem; border-radius:1.125rem; background:linear-gradient(135deg,#5ef7cd,#5a9dff); color:#07111b; }
-  .callout { max-inline-size:66rem; margin-inline:auto; padding:.75rem 1.26rem; border:1px solid rgb(102 234 214 / 36%); border-radius:1.25rem; background:rgb(60 211 192 / 8%); }
+  .callout { max-inline-size:66rem; margin-inline:auto; margin-block-start:-1.875rem; padding:.75rem 1.5rem; border:1px solid rgb(94 247 205 / 24%); border-radius:1.25rem; background:rgb(94 247 205 / 8%); color:rgb(237 255 250 / 92%); font-weight:850; }
 
   /* FLOW → D: copy left, four bordered cards with gaps (no strip / stagger). */
   .flow-scene { grid-template-columns:minmax(0,.52fr) minmax(0,1fr); gap:1.35rem; background:none; }
@@ -263,7 +263,7 @@
   .gallery-grid article button { position:absolute; inset-inline-end:1.125rem; inset-block-end:1.125rem; min-block-size:2.375rem; padding:0 1rem; border-radius:999px; border:1px solid rgb(94 247 205 / 28%); color:#06111c; background:linear-gradient(135deg,#5ef7cd,#64eaff); opacity:0; transform:translateY(.5rem); transition:opacity .18s,transform .18s; }
   .gallery-grid article:hover button, .gallery-grid article:focus-within button { opacity:1; transform:none; }
   .gallery-grid article>span { color:rgb(164 191 216 / 78%); font-weight:800; font-size:.78rem; }
-  .gallery-detail { display:none; min-block-size:0; border:1px solid rgb(126 166 184 / 26%); border-radius:1.5rem; background:linear-gradient(145deg,rgb(16 72 91 / 70%),rgb(7 27 49 / 70%)); }
+  .gallery-detail { display:none; min-block-size:0; padding:1.25rem; margin-block-start:1.125rem; border:1px solid rgb(94 247 205 / 22%); border-radius:1.375rem; background:rgb(94 247 205 / 7%); }
   .gallery-stage.is-detail .gallery-grid { display:none; }
   .gallery-stage.is-detail .gallery-detail { display:grid; }
 

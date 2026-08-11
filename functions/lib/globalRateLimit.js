@@ -71,7 +71,8 @@ function hashRateLimitScope(value) { return createHash("sha256").update(String(v
 function createActorRateLimiter({ db, now = () => new Date(), serverTimestamp = () => new Date(), limits = ACTOR_RATE_LIMITS }) {
   return { async check(functionName, scope) {
     const limit = limits[functionName];
-    if (!limit || typeof scope !== "string" || !scope || !db?.runTransaction) return { allowed: false, outcome: "unavailable" };
+    if (!limit) return { allowed: true, outcome: "not_configured" };
+    if (typeof scope !== "string" || !scope || !db?.runTransaction) return { allowed: false, outcome: "unavailable" };
     const current = new Date(now()), { utcDate, minuteKey } = getUtcBuckets(current);
     const ref = db.collection("system_actor_rate_limits").doc(`${functionName}-${hashRateLimitScope(scope)}-${utcDate}`);
     try { return await db.runTransaction(async transaction => {

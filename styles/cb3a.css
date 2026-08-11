@@ -166,10 +166,13 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .dashboard-scene .qr-invite { display:none; }
   body.is-rewound .portal-teaser, body.is-rewound .portal-arrow { display:none; }
   body.is-rewound .portal-frame { border-style:solid; border-color:rgb(94 247 205 / 55%); background:rgb(94 247 205 / 6%); box-shadow:0 0 34px rgb(94 247 205 / 16%), inset 0 0 24px rgb(94 247 205 / 7%); }
-  /* Flatten the QR card inside the portal - its own border made a box within
-     the mint frame - and print the code big enough to scan from a booth. */
+  /* Rewound state: the checklist gives way entirely - the panel opens with
+     "Powered by Google Gemini" and spends the freed room on a booth-scannable
+     QR, drawn with margin to spare instead of clipping the frame. */
+  body.is-rewound .upload-panel .upload-highlights { display:none; }
+  body.is-rewound .portal-frame { padding:1rem 1.2rem; }
   body.is-rewound .dashboard-scene .qr-invite { display:flex; align-items:center; gap:1.1rem; margin:0; padding:.3rem 0; border:0; background:transparent; box-shadow:none; animation:qr-invite-reveal .62s cubic-bezier(.2,.7,.2,1) both; }
-  body.is-rewound .dashboard-scene .qr-invite img { inline-size:clamp(7.5rem,8.5vw,10.5rem); block-size:auto; border-radius:.9rem; }
+  body.is-rewound .dashboard-scene .qr-invite img { inline-size:clamp(9rem,10.2vw,12.5rem); block-size:auto; border-radius:.9rem; }
   body.is-rewound .dashboard-scene .qr-invite p { color:#dff2fb; font-size:clamp(.95rem,.8vw,1.18rem); font-weight:750; line-height:1.6; }
 
   /* ==== D revival: scene rhythm (every scene except the dashboard) ====
@@ -446,7 +449,9 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      Taking the select out of grid flow entirely fixes both the overlap and
      the phantom column at once. */
   .school-panel, .class-panel { position:relative; }
-  .school-panel .select-line, .class-panel .select-line { position:absolute; inset-block-start:1.55rem; inset-inline-end:1.25rem; grid-column:auto; grid-row:auto; z-index:2; }
+  /* The select drops to the title's line and its right edge matches the grade
+     numbers' column (both sit at the panel's content inset). */
+  .school-panel .select-line, .class-panel .select-line { position:absolute; inset-block-start:2.95rem; inset-inline-end:var(--panel-pad); grid-column:auto; grid-row:auto; z-index:2; }
   .school-panel .panel-head, .class-panel .panel-head { padding-inline-end:7rem; }
   .landfill-panel .panel-head, .upload-panel .panel-head { padding-inline-end:0; margin-block-end:.875rem; }
   .school-panel .select-line select, .class-panel .select-line select { min-block-size:2.15rem; padding:.32rem .65rem; font-size:clamp(.82rem,.7vw,1.05rem); font-weight:850; border-radius:.8rem; }
@@ -455,23 +460,23 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      126px base / 104px at 1181-1600px / 190px at 2560px+. These breakpoint
      overrides must stay AFTER this base rule in source order - an earlier
      placement gets silently shadowed since specificity is identical. */
-  .school-panel { grid-template-columns:6.75rem minmax(0,1fr); column-gap:1rem; row-gap:.625rem; grid-template-rows:auto minmax(0,1fr); grid-template-areas:"head head" "kpi visual"; }
+  .school-panel { grid-template-columns:7.5rem minmax(0,1fr); column-gap:1rem; row-gap:.625rem; grid-template-rows:auto minmax(0,1fr); grid-template-areas:"head head" "kpi visual"; }
   /* Grade bars stretched, the selected grade lit (app.js stamps .is-selected),
      donut captions given air. */
   .school-panel .bar-list { row-gap:.8rem; align-content:center; }
   /* Bars over donuts, stacked: side by side the two enlarged rings squeezed
      the bar list to nothing and spilled out of the panel's right edge. */
   .school-panel .school-visuals { min-inline-size:0; grid-template-columns:minmax(0,1fr); justify-items:stretch; row-gap:.15rem; }
-  /* KPI tiles hug their numbers instead of dragging a wide dark box; the freed
-     width flows to the grade bars automatically (their track is the 1fr col). */
-  .school-panel .kpi-row>div { inline-size:fit-content; min-inline-size:5.9rem; padding-inline:.7rem .9rem; }
+  /* Three KPI tiles at one uniform size with comfortable padding - fit-content
+     made each box hug its own number and cut the dark plate too tight. */
+  .school-panel .kpi-row>div { inline-size:auto; min-inline-size:0; padding:.7rem .95rem; }
   /* Donut captions move fully below the ring - inside it they overlapped the
      arc and clipped ("분리 성공률"). The pair gets bottom room to hold them. */
   .school-panel .donut { overflow:visible; position:relative; }
-  .school-panel .donut small { position:absolute; inset-block-start:100%; inset-inline-start:50%; translate:-50% 0; margin:0; margin-block-start:.4rem; max-inline-size:none; white-space:nowrap; align-self:auto; }
-  .school-panel .donut-pair { padding-block-end:1.6rem; }
+  .school-panel .donut small { position:absolute; inset-block-start:100%; inset-inline-start:50%; translate:-50% 0; margin:0; margin-block-start:.55rem; max-inline-size:none; white-space:nowrap; align-self:auto; }
+  .school-panel .donut-pair { padding-block-end:1.9rem; }
   .school-panel .bar-list { min-inline-size:0; }
-  .school-panel .bar-list>div { grid-template-columns:3.2rem minmax(0,1fr) 2.4rem; align-items:center; column-gap:.45rem; }
+  .school-panel .bar-list>div { grid-template-columns:2.9rem minmax(0,1fr) 2.4rem; align-items:center; column-gap:.4rem; }
   .school-panel .bar-list b { min-inline-size:0; text-align:right; }
   .school-panel .bar-list i { block-size:.68rem; }
   .school-panel .bar-list>div.is-selected span, .school-panel .bar-list>div.is-selected b { color:#5ef7cd; }
@@ -500,7 +505,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      pie slice. The old base .donut relies on a small per-child dark circle
      instead, which leaves almost no room for the label -> this D-revival
      override replaces the fill technique entirely for this context. */
-  .school-panel .donut { inline-size:clamp(5.2rem,7vw,7.2rem); block-size:clamp(5.2rem,7vw,7.2rem); grid-template-rows:1fr; align-content:stretch; background:radial-gradient(circle at center,#081326 46%,transparent 47%),conic-gradient(#5ef7cd calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 1.5rem rgb(255 255 255 / 6%),0 0 1.5rem rgb(94 247 205 / 12%); }
+  .school-panel .donut { inline-size:clamp(6rem,7.8vw,8rem); block-size:clamp(6rem,7.8vw,8rem); grid-template-rows:1fr; align-content:stretch; background:radial-gradient(circle at center,#081326 46%,transparent 47%),conic-gradient(#5ef7cd calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 1.5rem rgb(255 255 255 / 6%),0 0 1.5rem rgb(94 247 205 / 12%); }
   .school-panel .donut.violet { background:radial-gradient(circle at center,#081326 46%,transparent 47%),conic-gradient(#ad8cff calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 .875rem rgb(255 255 255 / 6%),0 0 .875rem rgb(173 140 255 / 12%); }
   .school-panel .donut>* { background:none; }
   .school-panel .donut span { align-self:center; padding:0; margin-block-end:-.55rem; font-size:1rem; font-weight:950; }
@@ -528,7 +533,9 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .landfill-panel .chart-wrap { flex:1 1 auto; min-block-size:0; display:grid; gap:.5rem .7rem; grid-template-columns:minmax(0,1fr) auto; grid-template-rows:auto minmax(0,1fr); grid-template-areas:"title title" "chart rings"; align-items:center; }
   /* Metric tiles: small caption, big percentage - but capped where four tiles
      share the row, or the numerals collide across tile borders. */
-  .landfill-panel .landfill-metrics { gap:.55rem; grid-template-columns:minmax(0,1.3fr) repeat(3,minmax(0,1fr)); }
+  /* Column ratios negotiated so "총량 대비 반입량" keeps its last character and
+     "오늘 반입 총량" stops hoarding the spare width. */
+  .landfill-panel .landfill-metrics { gap:.55rem; grid-template-columns:minmax(0,1.1fr) minmax(0,.82fr) minmax(0,1.18fr) minmax(0,.95fr); }
   .landfill-panel .landfill-metrics > div { min-inline-size:0; padding-inline:.55rem; }
   .landfill-panel .landfill-metrics strong { font-size:clamp(1.02rem,1.14vw,1.7rem); font-variant-numeric:tabular-nums; white-space:nowrap; }
   .landfill-panel .landfill-metrics span { font-size:clamp(.72rem,.6vw,.9rem); }
@@ -557,7 +564,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      below are tuned together for THIS 5.5rem ring. Resizing the ring without
      re-checking those two margins (via real getBoundingClientRect measurement,
      not eyeballing) will silently reintroduce text overlap. */
-  .landfill-kpi-ring { position:relative; isolation:isolate; inline-size:clamp(3.9rem,4vw,4.6rem); block-size:clamp(3.9rem,4vw,4.6rem); flex:0 0 auto; aspect-ratio:1; grid-template-rows:1fr; align-content:stretch; background:conic-gradient(rgb(94 247 205 / 78%) calc(var(--pct) * 1%), rgb(87 117 154 / 22%) 0); box-shadow:0 0 14px rgb(94 247 205 / 8%), inset 0 0 18px rgb(255 255 255 / 3.5%); }
+  .landfill-kpi-ring { position:relative; isolation:isolate; inline-size:clamp(4.4rem,4.8vw,5.2rem); block-size:clamp(4.4rem,4.8vw,5.2rem); flex:0 0 auto; aspect-ratio:1; grid-template-rows:1fr; align-content:stretch; background:conic-gradient(rgb(94 247 205 / 78%) calc(var(--pct) * 1%), rgb(87 117 154 / 22%) 0); box-shadow:0 0 14px rgb(94 247 205 / 8%), inset 0 0 18px rgb(255 255 255 / 3.5%); }
   .landfill-kpi-ring::before, .landfill-kpi-ring::after { content:""; position:absolute; border-radius:inherit; pointer-events:none; }
   .landfill-kpi-ring::before { content:none; }
   .landfill-kpi-ring::after { z-index:-1; inset:22%; background:radial-gradient(circle at 36% 28%, rgb(33 64 102 / 98%), #0a1830 72%); box-shadow:inset 0 0 0 1px rgb(173 214 255 / 8%); }
@@ -575,7 +582,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      kpi numbers get a narrow column and 헷갈린 물건 TOP 5 gets the wide one. */
   /* KPI column narrowed so 헷갈린 물건 grows leftward - labels stop wrapping,
      which is what was eating the vertical room. */
-  .class-panel { grid-template-columns:6.75rem minmax(0,1fr); grid-template-rows:auto minmax(0,1fr) auto; grid-template-areas:"head head" "kpi visual" "note note"; }
+  .class-panel { grid-template-columns:5.6rem minmax(0,1fr); grid-template-rows:auto minmax(0,1fr) auto; grid-template-areas:"head head" "kpi visual" "note note"; }
   /* D's real fixed kpi-column width per breakpoint (confirmed live, not
      guessed): 126px base / 104px at 1181-1600px / 190px at 2560px+. Must
      stay after both the school-panel and class-panel base rules above -
@@ -584,12 +591,13 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   @media (min-width:1181px) and (max-width:1600px) { .school-panel,.class-panel { grid-template-columns:6.5rem minmax(0,1fr); column-gap:.75rem; }.school-panel .kpi-row,.class-panel .class-kpis,.landfill-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }
   @media (min-width:160rem) { :root { --scene-inline-space:11.25rem; --header-inline-space:8rem; --header-size:7rem; --nav-link-pad:1.25rem; }.main-nav a { min-block-size:3.25rem; padding-inline:var(--nav-link-pad); font-size:1.18rem; }.school-panel,.class-panel { grid-template-columns:11.875rem minmax(0,1fr); column-gap:1.75rem; } }
   .class-panel .panel-head { grid-area:head; }
-  .class-panel .class-kpis { grid-area:kpi; grid-template-columns:1fr; gap:.6rem; }
-  .class-panel .class-kpis > div { padding:.55rem .6rem; }
-  .class-panel .class-kpis strong { font-size:clamp(1.3rem,1.6vw,2.35rem); }
+  .class-panel .class-kpis { grid-area:kpi; grid-template-columns:1fr; gap:.55rem; align-self:start; min-block-size:0; }
+  .class-panel .class-kpis > div { padding:.55rem .55rem; }
+  .class-panel .class-kpis span { margin-block-start:.05rem; }
+  .class-panel .class-kpis strong { font-size:clamp(1.25rem,1.5vw,2.2rem); }
   .class-panel .confusion { grid-area:visual; }
   .class-panel .confusion > div { grid-template-columns:minmax(7.5rem,auto) minmax(0,1fr) 2.4rem; align-items:center; column-gap:.6rem; }
-  .class-panel .confusion { row-gap:.45rem; min-block-size:0; align-content:start; }
+  .class-panel .confusion { row-gap:.45rem; min-block-size:0; align-content:start; align-self:start; margin-block-start:0; }
   .class-panel .confusion > div { min-block-size:0; }
   .class-panel .rank-note { margin-block-start:.45rem; }
   .class-panel .confusion span { word-break:keep-all; }

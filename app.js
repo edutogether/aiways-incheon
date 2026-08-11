@@ -2567,14 +2567,15 @@
     // duration of our animation and restore whatever was there afterwards -
     // more reliable than passing behavior:"instant" per call.
     let snapScrollFrame = 0;
-    function snapScrollTo(section, duration = 440) {
+    function snapScrollTo(section, duration = 440, onLanded) {
       if (snapScrollFrame) cancelAnimationFrame(snapScrollFrame);
       const root = document.documentElement;
       const previousBehavior = root.style.scrollBehavior;
       root.style.scrollBehavior = "auto";
-      const finish = () => {
+      const finish = (landed) => {
         snapScrollFrame = 0;
         root.style.scrollBehavior = previousBehavior;
+        if (landed && onLanded) onLanded();
       };
       const startY = window.scrollY;
       const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
@@ -2582,7 +2583,7 @@
       const distance = endY - startY;
       if (Math.abs(distance) < 2) {
         window.scrollTo(0, endY);
-        finish();
+        finish(true);
         return;
       }
       const startedAt = performance.now();
@@ -2598,7 +2599,7 @@
         const progress = Math.min(1, (now - startedAt) / duration);
         window.scrollTo(0, Math.round(startY + distance * ease(progress)));
         if (progress < 1) snapScrollFrame = requestAnimationFrame(step);
-        else finish();
+        else finish(true);
       }
       snapScrollFrame = requestAnimationFrame(step);
     }
@@ -2611,10 +2612,8 @@
 
       const first = sections[0];
       history.replaceState(null, "", "#" + first.id);
-      snapScrollTo(first, 480);
-      // Light the destination as the move starts, not after it lands: the
-      // 0.3s opacity/filter fade then runs under the scroll instead of after it.
-      activate(first, true);
+      activate(first, true, { sectionLight: false });
+      snapScrollTo(first, 480, () => activate(first, true));
       waitForScrollSettle(first, () => {
         activate(first, true);
         // Reaching the top by rewinding means the visitor has seen the whole
@@ -2659,8 +2658,11 @@
       clickLockUntil = Date.now() + 420;
       const target = sections[nextIndex];
       history.replaceState(null, "", "#" + target.id);
-      snapScrollTo(target);
-      activate(target, true);
+      // Travel dark, light on landing: the nav highlight moves immediately but
+      // the destination scene stays dimmed for the whole ride and snaps on the
+      // instant the scroll locks in - the eye reads "off, arrived, ON".
+      activate(target, true, { sectionLight: false });
+      snapScrollTo(target, 440, () => activate(target, true));
       waitForScrollSettle(target, () => {
         snapLocked = false;
         clickLockUntil = 0;
@@ -2677,11 +2679,11 @@
       if (!section) return false;
       clickLockUntil = Date.now() + 420;
       history.replaceState(null, "", "#" + id);
-      snapScrollTo(section);
-      activate(section, true);
+      activate(section, true, { sectionLight: false });
+      snapScrollTo(section, 420, () => activate(section, true));
       window.setTimeout(() => {
         clickLockUntil = 0;
-      }, 420);
+      }, 440);
       return true;
     }
 

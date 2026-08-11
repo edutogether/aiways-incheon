@@ -56,7 +56,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .resources-scene { text-align:left; background:linear-gradient(100deg,rgb(88 132 166 / 10%),transparent 47%); }.resources-scene .scene-copy { justify-items:start; margin-inline:0; }.resource-grid { grid-template-columns:minmax(16rem,1.15fr) repeat(3,minmax(0,1fr)); gap:0; border-block:1px solid rgb(138 171 195 / 28%); }.resource-grid a { min-block-size:0; padding:1.05rem; border:0; border-radius:0; border-inline-end:1px solid rgb(138 171 195 / 22%); background:transparent; box-shadow:none; }.resource-grid a:first-child { grid-row:span 2; min-block-size:15rem; background:linear-gradient(135deg,rgb(93 147 183 / 22%),rgb(13 35 54 / 36%)); }.resource-grid a:nth-child(5n + 2) { background:transparent; }
   .sorting-scene { background:radial-gradient(circle at 75% 40%,rgb(93 237 213 / 10%),transparent 34rem); }.sorting-layout { min-inline-size:0; }.sorting-app { border-radius:1.35rem; background:#081d2d; box-shadow:0 30px 70px rgb(0 6 17 / 38%); }.app-tabs { border-radius:.5rem; background:transparent; border-block-end:1px solid rgb(110 219 220 / 22%); }.app-tabs button { border:0; border-radius:0; background:transparent; }.quick-result { border-radius:.8rem; background:#0c2a3c; }.judgement-checklist { border-inline:3px solid #efbf6b; background:rgb(239 191 107 / 8%); }
 
-  @media (min-width:64rem) { .dashboard-scene { grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr); align-items:stretch; gap:clamp(2.125rem,3.4vw,5.5rem); }.dashboard-grid { align-self:start; margin-block-start:calc(var(--header-size) - .6rem); block-size:calc(100svh - var(--header-size)*2 - 2.6rem); min-block-size:0; gap:1.05rem; grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-rows:repeat(2,minmax(0,1fr)); align-content:stretch; }.dashboard-grid>.panel,.dashboard-grid>.school-panel,.dashboard-grid>.landfill-panel,.dashboard-grid>.class-panel,.dashboard-grid>.upload-panel { min-block-size:0; }.upload-actions button { min-block-size:5.3rem; }.combo-chart { max-block-size:6.25rem; }.school-panel,.landfill-panel,.class-panel,.upload-panel { grid-column:auto; }.kpi-row,.class-kpis { grid-template-columns:repeat(3,minmax(0,1fr)); }.school-visuals { grid-template-columns:minmax(0,1fr) auto; align-items:center; }.project-cards,.hah-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+  @media (min-width:64rem) { .dashboard-scene { grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr); align-items:stretch; gap:clamp(2.125rem,3.4vw,5.5rem); }.dashboard-grid { align-self:start; margin-block-start:calc(var(--header-size) - .6rem); block-size:calc(100svh - var(--header-size)*2 - 6.6rem); min-block-size:0; gap:1.05rem; grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-rows:repeat(2,minmax(0,1fr)); align-content:stretch; }.dashboard-grid>.panel,.dashboard-grid>.school-panel,.dashboard-grid>.landfill-panel,.dashboard-grid>.class-panel,.dashboard-grid>.upload-panel { min-block-size:0; }.upload-actions button { min-block-size:5.3rem; }.combo-chart { max-block-size:6.25rem; }.school-panel,.landfill-panel,.class-panel,.upload-panel { grid-column:auto; }.kpi-row,.class-kpis { grid-template-columns:repeat(3,minmax(0,1fr)); }.school-visuals { grid-template-columns:minmax(0,1fr) auto; align-items:center; }.project-cards,.hah-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
   /* Preserve the pre-refactor lecture-board rhythm above tablet width without
      touching the closed-beta controls or their state selectors. */
   @media (min-width:64rem) { :root { --scene-inline-space:clamp(3rem,5.4vw,8.625rem); --scene-block-space:clamp(4rem,6.5vw,11.25rem); }.scene-copy h2,.project-statement h2 { max-inline-size:14ch; }.panel,.sorting-app { box-shadow:0 20px 52px rgb(0 7 20 / 26%); }.project-scene,.curriculum-scene,.hah-scene,.flow-scene,.gallery-scene,.sorting-scene,.resources-scene { border-block-start:1px solid rgb(111 212 232 / 9%); }.gallery-stage,.resource-grid,.flow-grid { box-shadow:0 18px 42px rgb(0 7 20 / 18%); }.main-nav a { position:relative; }.main-nav a.is-active::after,.main-nav a[aria-current]::after { content:""; position:absolute; inset-block-end:-.5rem; inset-inline:1rem; block-size:2px; background:linear-gradient(90deg,rgb(0 0 0 / 0%),#64eaff,#5ef7cd,rgb(0 0 0 / 0%)); } }
@@ -128,7 +128,10 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      2560px, 77.76-12=65.6 at 1440px. */
   .site-header { box-shadow:none; padding-inline-end:calc(var(--scene-inline-space) - var(--nav-link-pad)); }
   .main-nav a { border-radius:.7rem; }
-  .scene { position:relative; opacity:.56; filter:saturate(.68) brightness(.66); transition:opacity .3s cubic-bezier(.18,.92,.24,1),filter .3s cubic-bezier(.18,.92,.24,1),transform .3s cubic-bezier(.18,.92,.24,1); }.scene.is-active { opacity:1; filter:saturate(1.08) brightness(1.08); }
+  /* Lights flip in .17s - fast enough to read as a switch ("탁"), not a fade.
+     app.js keeps the destination dark for the whole ride and calls the light
+     the instant the snap lands. */
+  .scene { position:relative; opacity:.56; filter:saturate(.68) brightness(.66); transition:opacity .17s cubic-bezier(.2,0,.25,1),filter .17s cubic-bezier(.2,0,.25,1),transform .3s cubic-bezier(.18,.92,.24,1); }.scene.is-active { opacity:1; filter:saturate(1.08) brightness(1.08); }
   .scene::after { content:""; position:absolute; inset:auto 0 0; block-size:1px; background:linear-gradient(90deg,transparent,rgb(111 212 232 / 18%),transparent); pointer-events:none; }
 
   /* No CSS scroll-snap here on purpose. D used it, but D's app.js did not
@@ -207,7 +210,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
 
   /* Finale hint: floats in the resources scene's empty top-right, telling the
      visitor one more scroll rewinds the deck and reveals the hand-off QR. */
-  .scroll-finale-hint { position:absolute; z-index:2; inset-block-start:calc(4.1rem + 6.1vw); inset-inline-end:clamp(9rem,17vw,28rem); display:grid; justify-items:center; gap:.7rem; max-inline-size:31rem; padding:2rem 2.6rem 1.7rem; text-align:center; border-radius:1.6rem; border:1px solid rgb(94 247 205 / 30%); background:linear-gradient(155deg,rgb(13 48 66 / 74%),rgb(7 22 42 / 84%)); box-shadow:0 24px 60px rgb(0 6 16 / 45%), inset 0 1px rgb(255 255 255 / 8%), 0 0 44px rgb(94 247 205 / 10%); backdrop-filter:blur(10px); animation:finale-hint-float 3.4s ease-in-out infinite; }
+  .scroll-finale-hint { position:absolute; z-index:2; inset-block-start:calc(4.1rem + 6.1vw); inset-inline-end:clamp(15rem,25vw,42rem); display:grid; justify-items:center; gap:.7rem; max-inline-size:31rem; padding:2rem 2.6rem 1.7rem; text-align:center; border-radius:1.6rem; border:1px solid rgb(94 247 205 / 30%); background:linear-gradient(155deg,rgb(13 48 66 / 74%),rgb(7 22 42 / 84%)); box-shadow:0 24px 60px rgb(0 6 16 / 45%), inset 0 1px rgb(255 255 255 / 8%), 0 0 44px rgb(94 247 205 / 10%); backdrop-filter:blur(10px); animation:finale-hint-float 3.4s ease-in-out infinite; }
   .scroll-finale-hint .hint-kicker { display:inline-flex; padding:.34rem .85rem; border-radius:999px; border:1px solid rgb(94 247 205 / 32%); background:rgb(94 247 205 / 10%); color:#5ef7cd; font-size:.74rem; font-weight:850; letter-spacing:.11em; }
   .scroll-finale-hint .hint-title { margin:0; color:#f6fbff; font-size:clamp(1.45rem,1.22vw,1.85rem); font-weight:900; letter-spacing:-.02em; }
   .scroll-finale-hint .hint-sub { margin:0; color:#9eb3c7; font-size:clamp(1rem,.84vw,1.22rem); font-weight:700; line-height:1.6; }
@@ -225,7 +228,8 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .dashboard-grid { padding:clamp(.875rem,calc(1.202vw - .423rem),1.5rem); border:1px solid rgb(116 189 255 / 20%); border-radius:clamp(1.875rem,calc(1.442vw + .318rem),2.625rem); background:linear-gradient(145deg,rgb(24 52 88 / 72%),rgb(5 13 29 / 38%)); box-shadow:0 26px 90px rgb(0 0 0 / 34%),inset 0 1px rgb(255 255 255 / 5%); }
   .dashboard-grid>.panel { border-color:rgb(131 224 255 / 18%); box-shadow:0 20px 70px rgb(14 28 54 / 34%),inset 0 1px rgb(255 255 255 / 6%); }
   .dashboard-grid>.panel:hover { box-shadow:0 28px 80px rgb(6 18 36 / 48%),0 0 34px rgb(94 247 205 / 16%),inset 0 1px rgb(255 255 255 / 8%); background:linear-gradient(145deg,rgb(255 255 255 / 10.6%),rgb(94 247 205 / 6.7%),rgb(100 169 255 / 4.3%)); }
-  .school-panel .panel-head h2,.class-panel .panel-head h2 { font-size:clamp(.875rem,1.14vw,1.231rem); }
+  .dashboard-grid>.panel .panel-head h2 { font-size:clamp(1.22rem,1.4vw,2.05rem); line-height:1.22; }
+  .dashboard-grid>.panel .panel-head p { font-size:clamp(.72rem,.62vw,.95rem); }
   .project-scene,.curriculum-scene,.hah-scene,.flow-scene,.gallery-scene,.sorting-scene,.resources-scene { isolation:isolate; }
   .project-statement,.standards-panel,.sorting-app { box-shadow:0 24px 56px rgb(0 7 20 / 25%); }
   .flow-card,.resource-grid a { transition:transform .18s ease,border-color .18s ease,background .18s ease; }
@@ -413,6 +417,11 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      hairline inset, and the flat white gets a soft top-lit wash. */
   .brand-mark { inline-size:clamp(3.2rem,2.66vw,4.3rem); block-size:clamp(3.2rem,2.66vw,4.3rem); overflow:hidden; background:linear-gradient(155deg,#ffffff 12%,#eef8ff 56%,#d9edf7 100%); border-color:rgb(0 0 0 / 10%); box-shadow:0 2px 10px rgb(0 0 0 / 22%), inset 0 1px rgb(255 255 255 / 90%); padding:.06rem; }
   .brand { font-size:clamp(1.18rem,.88vw,1.4rem); }
+  /* The PNG carries ~33% transparent margin around its ink (measured via
+     canvas alpha bbox: 969x686 ink in a 1440x960 file). Scaling the img 1.38x
+     brings the ink to ~93% of the tile; the tile's overflow:hidden guarantees
+     nothing escapes. */
+  .brand-mark img { scale:1.38; }
   .hero-actions .primary-btn, .hero-actions .secondary-btn { min-block-size:clamp(3.15rem,2.5vw,3.9rem); padding-inline:clamp(1.7rem,1.5vw,2.4rem); font-size:clamp(1.02rem,.82vw,1.3rem); }
   /* The markup already carries the intended line breaks as spans - let them break. */
   .project-statement h2 span { display:block; }
@@ -431,7 +440,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .school-panel .select-line, .class-panel .select-line { position:absolute; inset-block-start:2.05rem; inset-inline-end:1.1rem; grid-column:auto; grid-row:auto; z-index:2; }
   .school-panel .panel-head, .class-panel .panel-head { padding-inline-end:7rem; }
   .landfill-panel .panel-head, .upload-panel .panel-head { padding-inline-end:0; margin-block-end:.875rem; }
-  .school-panel .select-line select, .class-panel .select-line select { min-block-size:1.6rem; padding:.2rem .45rem; font-size:.64rem; font-weight:850; border-radius:.75rem; }
+  .school-panel .select-line select, .class-panel .select-line select { min-block-size:2.15rem; padding:.32rem .65rem; font-size:clamp(.82rem,.7vw,1.05rem); font-weight:850; border-radius:.8rem; }
 
   /* D's real fixed kpi-column width (read from source, not guessed):
      126px base / 104px at 1181-1600px / 190px at 2560px+. These breakpoint
@@ -443,7 +452,16 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .school-panel .kpi-row > div { padding:.5rem .55rem; }
   /* D's real formula (read directly from its source, not guessed from one
      viewport): confirmed across 1440/1728/1920/2560px. */
-  .kpi-row strong, .class-kpis strong, .landfill-metrics strong { font-size:clamp(1.32rem,1.55vw,2.02rem); }
+  .kpi-row strong, .class-kpis strong, .landfill-metrics strong { font-size:clamp(1.7rem,2.05vw,3.15rem); }
+  /* Left-panel readability pass: stat labels, grade bars, donut captions, TOP5
+     rows and the ranking pill all ran a size class too small next to the
+     enlarged panel titles, and rows sat misaligned. */
+  .kpi-row span, .class-kpis span, .landfill-metrics span { font-size:clamp(.85rem,.72vw,1.1rem); }
+  .school-panel .bar-list span, .school-panel .bar-list b { font-size:clamp(1rem,.85vw,1.3rem); }
+  .school-panel .bar-list>div { align-items:center; column-gap:.7rem; }
+  .school-panel .donut span { font-size:clamp(1.1rem,.95vw,1.45rem); }
+  .class-panel .confusion h3, .class-panel .confusion span, .class-panel .confusion li { font-size:clamp(1.02rem,.88vw,1.32rem); }
+  .class-panel .rank-note { font-size:clamp(1.1rem,.95vw,1.45rem); }
   .school-panel .school-visuals { grid-template-columns:1fr; gap:.75rem; overflow:visible; align-self:stretch; }
   .school-panel .bar-list > div { grid-template-columns:5.75rem minmax(2.4rem,1fr) 2.625rem; font-size:.9rem; font-weight:760; color:#9eb3c7; }
   .school-panel .donut-pair { flex-wrap:nowrap; gap:.625rem; }
@@ -456,7 +474,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .school-panel .donut.violet { background:radial-gradient(circle at center,#081326 46%,transparent 47%),conic-gradient(#ad8cff calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 .875rem rgb(255 255 255 / 6%),0 0 .875rem rgb(173 140 255 / 12%); }
   .school-panel .donut>* { background:none; }
   .school-panel .donut span { align-self:center; padding:0; margin-block-end:-.55rem; font-size:1rem; font-weight:950; }
-  .school-panel .donut small { align-self:center; padding:0; margin-block-start:-.55rem; max-inline-size:3.2rem; font-size:.66rem; font-weight:850; line-height:1.05; }
+  .school-panel .donut small { align-self:center; padding:0; margin-block-start:-.45rem; max-inline-size:4.4rem; font-size:clamp(.76rem,.64vw,.95rem); font-weight:850; line-height:1.15; }
 
   /* 4. Landfill: the four metric boxes were letting "16,400t" run into the
      next box ("-9.4%"); the title/time row needed a hard nowrap so it can

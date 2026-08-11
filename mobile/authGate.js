@@ -22,11 +22,24 @@
     if (touch && (/android|iphone|ipod|mobile/i.test(ua) || navigator.userAgentData?.mobile === true)) return "mobile";
     return "desktop";
   }
-  function defaultDeviceName() {
+  function deviceNoun() {
     const kind = detectDeviceKind();
     const platform = client().getPlatformLabel();
-    const byKind = { mobile: platform === "iOS" ? "iPhone" : `${platform} 휴대폰`, tablet: platform === "iOS" ? "iPad" : `${platform} 태블릿`, desktop: `${platform} PC` };
-    return truncateDeviceName(byKind[kind] || "현재 기기");
+    const byKind = { mobile: platform === "iOS" ? "아이폰" : `${platform} 휴대폰`, tablet: platform === "iOS" ? "아이패드" : `${platform} 태블릿`, desktop: `${platform} PC` };
+    return byKind[kind] || "기기";
+  }
+  function defaultDeviceName() { return truncateDeviceName(deviceNoun()); }
+  function hasBatchim(text) {
+    const lastChar = text.trim().slice(-1);
+    const code = lastChar.charCodeAt(0);
+    if (code < 0xac00 || code > 0xd7a3) return false;
+    return (code - 0xac00) % 28 !== 0;
+  }
+  function personalizedDeviceName(displayName) {
+    const name = (displayName || "").trim();
+    if (!name) return defaultDeviceName();
+    const possessive = hasBatchim(name) ? `${name}이의` : `${name}의`;
+    return truncateDeviceName(`${possessive} ${deviceNoun()}`);
   }
 
   function el(tag, className, text) {
@@ -115,6 +128,7 @@
       if (!result.ok) {
         if (result.code === "device_limit_reached" && Array.isArray(result.data?.devices)) {
           state.devices = result.data.devices;
+          if (state.pending) state.pending.deviceLabel = personalizedDeviceName(result.data?.displayName);
           renderReplace();
           return;
         }
@@ -122,6 +136,7 @@
         return;
       }
       if (result.data?.alreadyRegistered) { await restore(); return; }
+      if (state.pending) state.pending.deviceLabel = personalizedDeviceName(result.data?.displayName);
       renderConfirm();
     });
   }
@@ -134,14 +149,30 @@
       el("h3", "text-base font-extrabold text-slate-900", "이 기기를 등록하시겠습니까?"),
       el("p", "text-xs text-slate-500", "등록하면 이 코드로 최대 5대의 기기를 안전하게 사용할 수 있습니다.")
     );
+    const nameLabel = el("label", "block text-xs font-bold text-slate-700 text-left", "기기 이름");
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.maxLength = DEVICE_NAME_MAX;
+    nameInput.autocomplete = "off";
+    nameInput.value = state.pending?.deviceLabel || defaultDeviceName();
+    nameInput.className = "w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all";
+    nameInput.addEventListener("focus", () => nameInput.select());
+    const nameField = el("div", "text-left space-y-1.5");
+    nameField.append(nameLabel, nameInput);
+
     const feedback = el("div", "space-y-2");
     const actions = el("div", "flex gap-2.5 pt-2");
     const confirmBtn = el("button", "flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm py-3 rounded-2xl transition-all", "등록");
     const backBtn = el("button", "flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm py-3 rounded-2xl transition-all", "돌아가기");
-    confirmBtn.addEventListener("click", () => register(""));
+    confirmBtn.addEventListener("click", () => {
+      const label = nameInput.value.trim();
+      if (!label) { feedback.replaceChildren(renderError("invalid_request")); nameInput.focus(); return; }
+      if (state.pending) state.pending.deviceLabel = label;
+      register("");
+    });
     backBtn.addEventListener("click", renderLogin);
     actions.append(confirmBtn, backBtn);
-    wrap.append(feedback, actions);
+    wrap.append(nameField, feedback, actions);
     gateContent.append(wrap);
   }
 

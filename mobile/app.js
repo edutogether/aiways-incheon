@@ -108,22 +108,26 @@
       ...Object.values(DATA.sortingDbV2).filter(item => !item.isHold).map(item => item.emoji),
       ...DATA.DECORATIVE_EMOJI_LOOKUP.map(([emoji]) => emoji)
     ];
-    let rotationIndex = 0;
+    let lastShown = "";
     let rotationTimer = 0;
     let debounceTimer = 0;
 
     function showIcon(emoji) {
       icon.style.opacity = "0";
-      setTimeout(() => { icon.textContent = emoji; icon.style.opacity = "1"; }, 120);
+      setTimeout(() => { icon.textContent = emoji; icon.style.opacity = "1"; }, 90);
+    }
+
+    function nextRandomEmoji() {
+      let pick = lastShown;
+      while (pick === lastShown) pick = rotationPool[Math.floor(Math.random() * rotationPool.length)];
+      lastShown = pick;
+      return pick;
     }
 
     function startRotation() {
       stopRotation();
-      showIcon(rotationPool[rotationIndex % rotationPool.length]);
-      rotationTimer = setInterval(() => {
-        rotationIndex += 1;
-        showIcon(rotationPool[rotationIndex % rotationPool.length]);
-      }, 1800);
+      showIcon(nextRandomEmoji());
+      rotationTimer = setInterval(() => showIcon(nextRandomEmoji()), 650);
     }
     function stopRotation() { clearInterval(rotationTimer); }
 

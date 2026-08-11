@@ -153,6 +153,28 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .dashboard-scene .qr-invite { display:none; }
   body.is-rewound .dashboard-scene .qr-invite { display:flex; animation:qr-invite-reveal .62s cubic-bezier(.2,.7,.2,1) both; }
 
+  /* ==== D revival: scene rhythm (every scene except the dashboard) ====
+     All numbers below are two-point measurements of the live D reference
+     (tag pc-visual-master-d) at 1440px and 2560px, refit as linear vw
+     formulas - both viewports verify to <0.5px. D's language: content
+     vertically centered in the frame, a long lead-in above (146->180px),
+     a short exit below, per-scene side insets, and wider copy-to-content
+     gaps than the rebuild kept. The dashboard is deliberately excluded:
+     its right column is viewport-height-locked, so centering does nothing
+     and its own layout is still under discussion. */
+  .project-scene, .curriculum-scene, .hah-scene, .flow-scene, .gallery-scene, .resources-scene {
+    align-items:center;
+    padding-block-start:calc(6.39rem + 3.04vw);   /* D 146 -> 180 */
+  }
+  .project-scene, .curriculum-scene { padding-block-end:3.625rem; }          /* D 58 flat */
+  .hah-scene, .flow-scene, .gallery-scene { padding-block-end:calc(.96rem + 2.05vw); } /* D 45 -> 68 */
+  .project-scene { padding-inline:calc(2.05rem + 4.73vw); }                  /* D 101 -> 154 */
+  .curriculum-scene { padding-inline:calc(.96rem + 6.43vw); }                /* D 108 -> 180 */
+  .gallery-scene { padding-inline:0; }                                       /* D full-bleed */
+  .resources-scene { padding-block-start:calc(3.23rem + 5.71vw); padding-block-end:3.625rem; padding-inline:calc(2.38rem + 4.38vw); } /* D 134->198 / 58 / 101->150 */
+  /* Per-scene copy-to-content gaps live with each scene's own layout rules
+     further down (search "D gap"); only the shared rhythm lives here. */
+
   /* Cue that another scene sits below. Suppressed on the last one. */
   .scene::before { content:""; position:absolute; inset-block-end:1.05rem; inset-inline-start:50%; inline-size:.95rem; block-size:.95rem; border-inline-end:2px solid rgb(131 224 255 / 72%); border-block-end:2px solid rgb(131 224 255 / 72%); transform:translate(-50%,0) rotate(45deg); opacity:0; pointer-events:none; transition:opacity .3s ease; }
   .scene.is-active::before { opacity:1; animation:scene-scroll-cue 1.8s cubic-bezier(.4,0,.3,1) infinite; }
@@ -225,7 +247,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
    PROJECT page → D full-width editorial layout.
    ============================================================ */
 @media (min-width:64rem) {
-  .project-scene { grid-template-columns:1fr; align-items:start; gap:3.375rem; background:none; }
+  .project-scene { grid-template-columns:1fr; gap:calc(.8rem + 1.61vw); background:none; } /* D gap 36->54; align comes from the D-revival rhythm block */
   .project-intro { max-inline-size:none; }
   .project-statement { padding:0; border:0; border-radius:0; background:none; box-shadow:none; }
   .project-statement h2 { max-inline-size:none; font-size:clamp(3rem,4.85vw,7.1rem); line-height:.96; font-weight:950; letter-spacing:normal; }
@@ -241,7 +263,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .eyebrow::before { display:none; }
 
   /* CURRICULUM → D: copy left, subject cards + standards panel right. */
-  .curriculum-scene { grid-template-columns:minmax(0,.71fr) minmax(0,1fr); gap:3.6rem; align-items:start; background:none; }
+  .curriculum-scene { grid-template-columns:minmax(0,.71fr) minmax(0,1fr); gap:calc(.84rem + 3.07vw); background:none; } /* D gap 57.6->92 */
   .curriculum-layout { grid-template-columns:1fr; gap:1.125rem; }
   .curriculum-title { display:grid; gap:.1em; font-size:clamp(3.825rem,calc(5.1643vw - .823rem),7.44rem); line-height:1.11; }
   .curriculum-title span { display:block; }
@@ -258,7 +280,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .standards-grid article p { font-size:.82rem; font-weight:760; color:#9eb3c7; }
 
   /* H-A-H → D: centered copy, three bordered glass cards, pill callout. */
-  .hah-scene { grid-template-columns:1fr; gap:1.125rem; text-align:start; background:none; }
+  .hah-scene { grid-template-columns:1fr; gap:calc(.24rem + .98vw); text-align:start; background:none; } /* D gap 18->29 */
   .hah-scene .scene-copy { justify-items:start; margin-inline:0; max-inline-size:none; }
   .hah-grid .panel ul { padding-inline-start:2.5rem; list-style:disc; }
   .hah-grid .panel li { color:#9eb3c7; }
@@ -273,7 +295,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .callout { max-inline-size:66rem; margin-inline:auto; margin-block-start:-1.875rem; padding:.75rem 1.5rem; border:1px solid rgb(94 247 205 / 24%); border-radius:1.25rem; background:rgb(94 247 205 / 8%); color:rgb(237 255 250 / 92%); font-weight:850; font-size:clamp(1.08rem,calc(.771rem + .3429vw),1.32rem); line-height:1.4; }
 
   /* FLOW → D: copy left, four bordered cards with gaps (no strip / stagger). */
-  .flow-scene { grid-template-columns:minmax(0,.52fr) minmax(0,1fr); gap:1.35rem; background:none; }
+  .flow-scene { grid-template-columns:minmax(0,.52fr) minmax(0,1fr); gap:calc(.51rem + .93vw); background:none; } /* D gap 21.6->32 */
   .flow-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(.84375rem,calc(.482rem + .4018vw),1.125rem) 1rem; border:0; box-shadow:none; }
   .flow-card { display:flex; flex-direction:column; gap:.625rem; min-block-size:0; margin:0; padding:clamp(1.08rem,calc(.701rem + .4214vw),1.375rem); border:1px solid rgb(131 224 255 / 18%); border-radius:1.375rem; background:rgb(255 255 255 / 6%); box-shadow:none; }
   .flow-card.ai-badge { border-color:rgb(100 234 255 / 30%); }
@@ -285,7 +307,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .flow-card:hover em, .flow-card:focus-within em { opacity:1; transform:none; }
 
   /* RESOURCES → D: full-width, even six-up bordered tiles. */
-  .resources-scene { grid-template-columns:1fr; gap:3.6rem; text-align:left; background:none; }
+  .resources-scene { grid-template-columns:1fr; gap:calc(1.8rem + 2vw); text-align:left; background:none; } /* D gap 57.6->80 */
   .resource-grid { grid-template-columns:repeat(6,minmax(0,1fr)); gap:.75rem; border:0; }
   .resource-grid a { display:grid; gap:.875rem; min-block-size:0; padding:1.08rem; border:1px solid rgb(138 171 195 / 28%); border-radius:1.5rem; background:rgb(11 30 51 / 55%); box-shadow:0 24px 64px rgb(0 0 0 / 28%),inset 0 1px rgb(255 255 255 / 6%); font-size:.95rem; font-weight:880; }
   .resource-grid a span { color:#5ef7cd; font-weight:900; font-size:.95rem; }
@@ -307,7 +329,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .resource-grid a:first-child { grid-row:auto; min-block-size:0; background:rgb(11 30 51 / 55%); }
 
   /* GALLERY → D: copy left, 4-up card grid; detail opens on click (is-detail). */
-  .gallery-scene { grid-template-columns:minmax(0,.56fr) minmax(0,1fr); gap:2.7rem 2.88rem; background:none; }
+  .gallery-scene { grid-template-columns:minmax(0,.56fr) minmax(0,1fr); gap:calc(.39rem + 2.57vw) calc(2.41rem + .53vw); background:none; } /* D row 43.2->72, col 46.08->52 */
   .gallery-scene .scene-copy { padding-inline-start:clamp(4.5rem,calc(2.25rem + 2.5vw),6.25rem); }
   .gallery-stage { display:block; border:0; background:none; box-shadow:none; }
   .gallery-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(.84375rem,calc(.482rem + .4018vw),1.125rem) 1rem; background:transparent; }

@@ -2438,7 +2438,6 @@
     let dashboardLockUntil = Date.now() + 520;
     let pendingLightTimer = 0;
     let pendingLightFrame = 0;
-    let rewindTimer = 0;
     let rewindActive = false;
     let rewindCooldownUntil = 0;
 
@@ -2481,6 +2480,22 @@
         dashboardIntroPendingOnSettle = false;
         playDashboardIntroForCurrentData();
       }
+    }
+
+    function waitForScrollSettle(section, callback, maxWait = 860) {
+      if (!section) { callback(); return; }
+      const startedAt = performance.now();
+      const tolerance = Math.max(8, Math.round(window.innerHeight * 0.014));
+      function check(now) {
+        const rect = section.getBoundingClientRect();
+        const settled = Math.abs(rect.top) <= tolerance || now - startedAt > maxWait;
+        if (!settled) {
+          requestAnimationFrame(check);
+          return;
+        }
+        callback();
+      }
+      requestAnimationFrame(check);
     }
 
     function activateAfterSettle(section, delay = 105) {
@@ -2585,34 +2600,19 @@
       rewindActive = true;
       snapLocked = true;
       clickLockUntil = Date.now() + 1800;
-      let nextIndex = sections.length - 2;
 
-      function moveToPrevious() {
-        const target = sections[nextIndex];
-        if (!target) {
-          const first = sections[0];
-          history.replaceState(null, "", "#" + first.id);
-          first.scrollIntoView({ behavior: "smooth", block: "start" });
-          activate(first, true, { sectionLight: false });
-          activateAfterSettle(first, 75);
-          window.setTimeout(() => {
-            activate(first, true);
-            rewindActive = false;
-            snapLocked = false;
-            clickLockUntil = 0;
-            rewindCooldownUntil = Date.now() + 900;
-          }, 360);
-          return;
-        }
-
-        history.replaceState(null, "", "#" + target.id);
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-        activate(target, true, { sectionLight: false });
-        nextIndex -= 1;
-        rewindTimer = window.setTimeout(moveToPrevious, 120);
-      }
-
-      rewindTimer = window.setTimeout(moveToPrevious, 100);
+      const first = sections[0];
+      history.replaceState(null, "", "#" + first.id);
+      first.scrollIntoView({ behavior: "smooth", block: "start" });
+      activate(first, true, { sectionLight: false });
+      activateAfterSettle(first, 75);
+      waitForScrollSettle(first, () => {
+        activate(first, true);
+        rewindActive = false;
+        snapLocked = false;
+        clickLockUntil = 0;
+        rewindCooldownUntil = Date.now() + 900;
+      }, 1600);
     }
 
   function snapByWheel(event) {
@@ -2650,11 +2650,13 @@
       target.scrollIntoView({ behavior: "smooth", block: "start" });
       activate(target, true, { sectionLight: false });
       activateAfterSettle(target, 105);
-      window.setTimeout(() => {
+      waitForScrollSettle(target, () => {
         snapLocked = false;
         clickLockUntil = 0;
-        if (Math.abs(window.scrollY - target.offsetTop) > 4) {
-          window.scrollTo({ top: target.offsetTop, left: 0, behavior: "auto" });
+        const rect = target.getBoundingClientRect();
+        const tolerance = Math.max(8, Math.round(window.innerHeight * 0.014));
+        if (Math.abs(rect.top) > tolerance) {
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
         }
         activateAfterSettle(target, 65);
       }, 820);

@@ -5,6 +5,7 @@ const { createHash } = require("node:crypto");
 const RATE_LIMIT_SCHEMA = "global-rate-limit-v1";
 const RATE_LIMITS = Object.freeze({
   analyzeSortingImage: { perMinute: 20, perDay: 1000 },
+  analyzeSortingText: { perMinute: 20, perDay: 1000 },
   saveSortingRecord: { perMinute: 60 },
   listSortingRecords: { perMinute: 120 },
   resolveSortingRecord: { perMinute: 60 }
@@ -63,7 +64,8 @@ function createGlobalRateLimiter({ db, now = () => new Date(), serverTimestamp =
 }
 
 const ACTOR_RATE_LIMITS = Object.freeze({
-  analyzeSortingImage: { perMinute: 4, perDay: 50 }, saveSortingRecord: { perMinute: 12, perDay: 200 },
+  analyzeSortingImage: { perMinute: 4, perDay: 50 }, analyzeSortingText: { perMinute: 6, perDay: 80 },
+  saveSortingRecord: { perMinute: 12, perDay: 200 },
   listSortingRecords: { perMinute: 60, perDay: 500 }, resolveSortingRecord: { perMinute: 20, perDay: 100 },
   redeemEdu2gPass: { perMinute: 5 }
 });

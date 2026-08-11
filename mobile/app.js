@@ -146,6 +146,7 @@
 
   function openJudgeModal() {
     $("judgeScanState").classList.add("hidden");
+    $("judgeTextScanState").classList.add("hidden");
     $("judgeResultState").classList.remove("hidden");
     $("judgeModal").classList.remove("hidden");
     $("judgeModalBox").scrollTop = 0;
@@ -257,9 +258,13 @@
   function triggerSearch() {
     const val = $("searchInput").value.trim();
     if (!val) return;
-    const id = findItemId(val);
-    renderResult(id || "hold", { rawQuery: val });
     $("search-suggestions").classList.add("hidden");
+    const id = findItemId(val);
+    if (id) { renderResult(id, { rawQuery: val }); return; }
+    // Not one of the 12 tracked categories locally -- ask Gemini what the
+    // typed phrase most likely is and whether it fits one of them anyway.
+    if (window.AIWaysMobileTextTip?.analyzeText) { runTextAnalysis(val); return; }
+    renderResult("hold", { rawQuery: val });
   }
 
   // -----------------------------------------------------------------
@@ -298,6 +303,46 @@
         }
         renderResult(top.itemId, {
           isAiResult: true,
+          candidates: result.value.objectCandidates,
+          aiLabel: top.label,
+          materialCandidates: result.value.materialCandidates,
+          cautions: result.value.visibleCautions
+        });
+      });
+  }
+
+  // -----------------------------------------------------------------
+  // Judge tab: search box -> local match, or Gemini text lookup fallback
+  // -----------------------------------------------------------------
+  const TEXT_SCAN_MIN_MS = 900;
+
+  function showTextScanState(query) {
+    $("judgeTextScanQuery").textContent = query;
+    $("judgeTextScanState").classList.remove("hidden");
+    $("judgeResultState").classList.add("hidden");
+    $("judgeModal").classList.remove("hidden");
+  }
+
+  function runTextAnalysis(query) {
+    showTextScanState(query);
+    const startedAt = Date.now();
+    return window.AIWaysMobileTextTip.analyzeText(query)
+      .then(async result => {
+        const remaining = TEXT_SCAN_MIN_MS - (Date.now() - startedAt);
+        if (remaining > 0) await new Promise(resolve => setTimeout(resolve, remaining));
+        if (!result.ok) {
+          closeJudgeModal();
+          showVisualAlert(window.AIWaysEdu2gClient?.errorMessageFor?.(result.code) || "검색어 분석에 실패했습니다. 다시 시도해 주세요.", "amber");
+          return;
+        }
+        const top = result.value.objectCandidates[0];
+        if (!top) {
+          renderResult("hold", { isAiResult: true, rawQuery: query, materialCandidates: result.value.materialCandidates, cautions: result.value.visibleCautions });
+          return;
+        }
+        renderResult(top.itemId, {
+          isAiResult: true,
+          rawQuery: query,
           candidates: result.value.objectCandidates,
           aiLabel: top.label,
           materialCandidates: result.value.materialCandidates,

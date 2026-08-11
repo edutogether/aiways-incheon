@@ -37,20 +37,3 @@ body {
     right: 0;
     bottom: 0;
 }
-
-/* Accurate Gemini sparkle: a real conic sweep through the brand's four
-   colors, masked to the sparkle silhouette -- SVG has no conic gradient, so
-   this uses a CSS conic-gradient background clipped by an SVG mask instead
-   of approximating the 4-point shape with a 2-stop linear gradient. */
-.gemini-sparkle {
-    display: inline-block;
-    background: conic-gradient(from -45deg, #EA4335 0deg, #4285F4 90deg, #34A853 180deg, #FBBC05 270deg, #EA4335 360deg);
-    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>');
-    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>');
-    -webkit-mask-size: contain;
-    mask-size: contain;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    mask-position: center;
-}

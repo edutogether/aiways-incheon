@@ -188,10 +188,10 @@
     quizItems.forEach(([emoji, name, category, action]) => {
       const item = { emoji, name, category, action };
       trueTemplates.forEach(template => {
-        trueQuestions.push({ emoji, question: template(item), answer: true, explanation: "맞는 판단입니다. 오염 상태, 재질, 학교 기준을 함께 확인하는 습관이 중요합니다." });
+        trueQuestions.push({ emoji, question: template(item), answer: true, explanation: "실제로 맞는 기준이에요. 오염 상태, 재질, 학교 기준을 함께 확인하는 습관이 중요합니다." });
       });
       falseTemplates.forEach(template => {
-        falseQuestions.push({ emoji, question: template(item), answer: false, explanation: "아쉬워요. 분리배출은 물건 이름만이 아니라 오염 상태와 학교 기준까지 함께 봐야 합니다." });
+        falseQuestions.push({ emoji, question: template(item), answer: false, explanation: "실제로는 틀린 기준이에요. 분리배출은 물건 이름만이 아니라 오염 상태와 학교 기준까지 함께 봐야 합니다." });
       });
     });
 

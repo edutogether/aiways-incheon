@@ -17,9 +17,26 @@
   // -----------------------------------------------------------------
   // Tabs
   // -----------------------------------------------------------------
+  // Judge tab is the reference height: every other tab gets a matching
+  // min-height so the card doesn't visibly shrink/grow when switching, but
+  // nothing is hardcoded -- it's measured live, so it adapts per viewport
+  // instead of breaking at other resolutions.
+  let judgeTabHeight = 0;
+  function measureJudgeTabHeight() {
+    const judge = $("tab-judge");
+    if (!judge.classList.contains("hidden")) judgeTabHeight = judge.scrollHeight;
+  }
+
   function switchTab(tabId) {
     document.querySelectorAll(".tab-content").forEach(tab => tab.classList.add("hidden"));
-    $(tabId).classList.remove("hidden");
+    const target = $(tabId);
+    target.classList.remove("hidden");
+    if (tabId === "tab-judge") {
+      target.style.minHeight = "";
+      requestAnimationFrame(measureJudgeTabHeight);
+    } else if (judgeTabHeight) {
+      target.style.minHeight = `${judgeTabHeight}px`;
+    }
     document.querySelectorAll("[data-tab-btn]").forEach(btn => {
       const active = btn.dataset.tabBtn === tabId;
       btn.className = active
@@ -377,8 +394,8 @@
     QUIZ_RANK_RANGES.forEach(range => {
       const rank = DATA.quizRank(range.min);
       const chip = document.createElement("div");
-      chip.className = "bg-white border border-blue-100 rounded-xl py-1.5 px-1 text-center";
-      chip.innerHTML = `<div class="text-base">${rank.emoji}</div><div class="text-[9px] font-bold text-slate-600">${range.label}</div><div class="text-[8px] text-slate-400 leading-tight">${rank.title}</div>`;
+      chip.className = "bg-white border border-blue-100 rounded-xl py-2 px-1 text-center";
+      chip.innerHTML = `<div class="text-lg">${rank.emoji}</div><div class="text-[10px] font-bold text-slate-600">${range.label}</div><div class="text-[10px] font-semibold text-slate-500 leading-tight mt-0.5">${rank.title}</div>`;
       container.append(chip);
     });
   }
@@ -481,6 +498,16 @@
     restoreLocal();
     renderQuizRankLadder();
     startQuiz();
+    requestAnimationFrame(measureJudgeTabHeight);
+    let resizeTimer = 0;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        measureJudgeTabHeight();
+        const active = document.querySelector(".tab-content:not(.hidden)");
+        if (active && active.id !== "tab-judge" && judgeTabHeight) active.style.minHeight = `${judgeTabHeight}px`;
+      }, 200);
+    });
 
     $("searchInput").addEventListener("keyup", handleSearch);
     $("searchTriggerBtn").addEventListener("click", triggerSearch);

@@ -96,11 +96,11 @@
                         <span class="text-base">📷</span>
                         사진으로 3초 판단
                     </span>
-                    <span class="inline-flex items-center gap-1.5 shrink-0">
-                        <span class="gemini-sparkle w-6 h-6"></span>
+                    <span class="inline-flex items-center gap-2 shrink-0">
+                        <svg viewBox="0 0 24 24" class="w-8 h-8"><defs><linearGradient id="gemGradPhoto" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#EA4335"/><stop offset=".35" stop-color="#4285F4"/><stop offset=".65" stop-color="#34A853"/><stop offset="1" stop-color="#FBBC05"/></linearGradient></defs><path fill="url(#gemGradPhoto)" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
                         <span class="flex flex-col leading-none">
-                            <span class="text-[9px] font-medium text-slate-400">Powered by</span>
-                            <span class="text-sm font-extrabold text-slate-800 -mt-0.5">Google Gemini</span>
+                            <span class="text-[10px] font-medium text-slate-400">Powered by</span>
+                            <span class="text-base font-extrabold text-slate-800 -mt-0.5">Google Gemini</span>
                         </span>
                     </span>
                 </div>
@@ -208,13 +208,19 @@
             <div class="space-y-2">
                 <div class="flex justify-between items-center">
                     <span class="text-xs font-bold text-slate-400">오늘의 실천 타임라인</span>
-                    <button id="resetStatsBtn" type="button" class="text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors">기록 초기화 🗑️</button>
+                    <button id="resetStatsBtn" type="button" class="text-xs font-bold text-slate-500 hover:text-white bg-slate-100 hover:bg-rose-500 px-3 py-1.5 rounded-lg transition-colors">기록 초기화 🗑️</button>
                 </div>
-                <div id="practice-logs-container" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+                <div id="practice-logs-container" class="space-y-2 h-[280px] overflow-y-auto custom-scrollbar">
                     <div id="no-logs-msg" class="text-center py-8 border border-dashed border-slate-200 rounded-2xl">
                         <p class="text-[11px] text-slate-400">아직 기록된 실천이 없습니다.<br>'3초 판단'에서 가이드라인을 확인하고 실천해보세요!</p>
                     </div>
                 </div>
+            </div>
+
+            <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 space-y-1.5">
+                <span class="text-xs font-bold text-blue-600">💡 왜 실천을 기록하나요?</span>
+                <p class="text-[11px] text-slate-500 leading-relaxed">한 번의 올바른 분리배출은 작아 보이지만, 우리 반 전체가 매일 실천하면 학교 단위의 자원순환 데이터가 쌓입니다. 이 기록은 우리 학교가 실제로 자원을 얼마나 아끼고 있는지 보여주는 증거가 됩니다.</p>
+                <p class="text-[11px] text-slate-500 leading-relaxed">🌍 깜짝 상식: 투명 페트병 1개를 제대로 분리배출하면 약 22g의 이산화탄소를 줄일 수 있어요. 하루에 우리 반 25명이 하나씩만 실천해도 약 550g을 절감하는 셈이에요.</p>
             </div>
         </div>
 
@@ -240,21 +246,27 @@
             <div class="space-y-2">
                 <div class="flex justify-between items-center">
                     <span class="text-xs font-bold text-slate-400">보류 및 유예 처리 물건 (<span id="hold-count-badge">0</span>개)</span>
-                    <button id="resetHoldBtn" type="button" class="text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors">목록 비우기 🗑️</button>
+                    <button id="resetHoldBtn" type="button" class="text-xs font-bold text-slate-500 hover:text-white bg-slate-100 hover:bg-rose-500 px-3 py-1.5 rounded-lg transition-colors">목록 비우기 🗑️</button>
                 </div>
-                <div id="hold-list-container" class="space-y-2 max-h-52 overflow-y-auto custom-scrollbar">
+                <div id="hold-list-container" class="space-y-2 h-[260px] overflow-y-auto custom-scrollbar">
                     <div id="no-hold-items-msg" class="text-center py-8 border border-dashed border-slate-200 rounded-2xl">
                         <p class="text-[11px] text-slate-400">기록된 판단 보류 물건이 없습니다.<br>'3초 판단'에서 애매한 쓰레기를 등록하거나, 직접 기재해 보세요!</p>
                     </div>
                 </div>
+            </div>
+
+            <div class="bg-amber-50/60 border border-amber-100 rounded-2xl p-4 space-y-1.5">
+                <span class="text-xs font-bold text-amber-700">💡 판단 보류는 왜 필요한가요?</span>
+                <p class="text-[11px] text-slate-500 leading-relaxed">복합 재질이거나 오염 상태가 애매한 물건을 억지로 분류하면 오히려 재활용 라인 전체를 오염시킬 수 있어요. 아무 데나 버리지 않고 여기에 기록해두면, 정기 자원순환 회의에서 우리 학교만의 기준을 함께 정할 수 있습니다.</p>
+                <p class="text-[11px] text-slate-500 leading-relaxed">🌍 깜짝 상식: 재활용품 중 약 25%는 오염이나 잘못된 분류 때문에 선별장에서 다시 일반쓰레기로 폐기된다고 해요. "일단 보류함에" 기록하는 습관이 이런 손실을 줄여줍니다.</p>
             </div>
         </div>
 
         <!-- 하단 실시간 작동 모드 배너 (모든 탭 공통) -->
         <div class="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2.5 space-y-1.5">
             <div class="flex items-center justify-center gap-1.5">
-                <span class="gemini-sparkle w-4 h-4 shrink-0"></span>
-                <span class="text-xs font-extrabold text-slate-700">Powered by Google Gemini</span>
+                <svg viewBox="0 0 24 24" class="w-5 h-5 shrink-0"><defs><linearGradient id="gemGradBanner" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#EA4335"/><stop offset=".35" stop-color="#4285F4"/><stop offset=".65" stop-color="#34A853"/><stop offset="1" stop-color="#FBBC05"/></linearGradient></defs><path fill="url(#gemGradBanner)" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
+                <span class="text-sm font-extrabold text-slate-700">Powered by Google Gemini</span>
             </div>
             <p class="text-center text-[9px] leading-tight text-slate-400 px-1">본 플랫폼은 인천광역시교육청 자원순환 지침 및 환경부 공식 분리배출 지침을 바탕으로 제작되었습니다.</p>
         </div>
@@ -271,9 +283,9 @@
                     <img id="judgeScanImage" class="w-full h-full object-cover opacity-80" alt="" />
                     <span class="scan-line"></span>
                 </div>
-                <div class="flex items-center justify-center gap-1.5 text-xs font-extrabold text-indigo-500">
-                    <svg viewBox="0 0 24 24" class="w-4 h-4 animate-pulse" fill="currentColor"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
-                    Gemini가 사진을 분석하고 있어요 · Powered by Google Gemini
+                <div class="flex items-center justify-center gap-1.5 text-sm font-extrabold text-slate-700">
+                    <svg viewBox="0 0 24 24" class="w-5 h-5 animate-pulse shrink-0"><defs><linearGradient id="gemGradScan" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#EA4335"/><stop offset=".35" stop-color="#4285F4"/><stop offset=".65" stop-color="#34A853"/><stop offset="1" stop-color="#FBBC05"/></linearGradient></defs><path fill="url(#gemGradScan)" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
+                    Powered by Google Gemini
                 </div>
             </div>
 

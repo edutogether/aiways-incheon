@@ -410,8 +410,8 @@
     QUIZ_RANK_RANGES.forEach(range => {
       const rank = DATA.quizRank(range.min);
       const chip = document.createElement("div");
-      chip.className = "bg-white border border-blue-100 rounded-xl py-2 px-1 text-center";
-      chip.innerHTML = `<div class="text-lg">${rank.emoji}</div><div class="text-[10px] font-bold text-slate-600">${range.label}</div><div class="text-[10px] font-semibold text-slate-500 leading-tight mt-0.5">${rank.title}</div>`;
+      chip.className = "bg-white border border-blue-100 rounded-xl py-2.5 px-1 text-center";
+      chip.innerHTML = `<div class="text-xl">${rank.emoji}</div><div class="text-xs font-bold text-slate-700">${range.label}</div><div class="text-[11px] font-semibold text-slate-500 leading-tight mt-0.5">${rank.title}</div>`;
       container.append(chip);
     });
   }

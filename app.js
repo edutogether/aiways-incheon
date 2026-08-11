@@ -2713,6 +2713,19 @@
     window.addEventListener("scroll", () => scheduleActiveUpdate(110), { passive: true });
     window.addEventListener("wheel", snapByWheel, { passive: false });
 
+    // PC dropped the sorting scene - the deck funnels visitors to the mobile
+    // app through the QR portal. So on PC the hero's "지금 분류하기" opens the
+    // portal in place (the QR reveal in the upload panel, already on screen)
+    // instead of scrolling to a display:none scene. Below 64rem the anchor
+    // keeps its native behavior and reaches the real scene.
+    $$(".hero-actions a[href='#sorting']").forEach(anchor => {
+      anchor.addEventListener("click", event => {
+        if (window.innerWidth < 1024) return;
+        event.preventDefault();
+        document.body.classList.add("is-rewound");
+      });
+    });
+
     // Expo kiosk mode: a QR code can carry ?kiosk=5-1 so any visitor's own
     // phone lands straight on 3초판단 with the demo class pre-selected,
     // instead of the usual reset-to-dashboard behavior below.

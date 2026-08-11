@@ -170,7 +170,10 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      "Powered by Google Gemini" and spends the freed room on a booth-scannable
      QR, drawn with margin to spare instead of clipping the frame. */
   body.is-rewound .upload-panel .upload-highlights { display:none; }
-  body.is-rewound .portal-frame { padding:1rem 1.2rem; }
+  /* With the checklist gone the panel has spare height: pull Powered-by up,
+     grow the frame vertically so the QR sits inside with clear margins. */
+  body.is-rewound .portal-powered { margin-block-start:-.35rem; }
+  body.is-rewound .portal-frame { padding:1.5rem 1.4rem; min-block-size:clamp(7rem,23svh,15.5rem); }
   body.is-rewound .dashboard-scene .qr-invite { display:flex; align-items:center; gap:1.1rem; margin:0; padding:.3rem 0; border:0; background:transparent; box-shadow:none; animation:qr-invite-reveal .62s cubic-bezier(.2,.7,.2,1) both; }
   body.is-rewound .dashboard-scene .qr-invite img { inline-size:clamp(9rem,10.2vw,12.5rem); block-size:auto; border-radius:.9rem; }
   body.is-rewound .dashboard-scene .qr-invite p { color:#dff2fb; font-size:clamp(.95rem,.8vw,1.18rem); font-weight:750; line-height:1.7; word-break:keep-all; }
@@ -499,7 +502,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .class-panel .rank-note { font-size:clamp(.8rem,.68vw,1rem); }
   .school-panel .school-visuals { grid-template-columns:1fr; gap:.75rem; overflow:visible; align-self:stretch; }
   .school-panel .bar-list > div { grid-template-columns:5.75rem minmax(2.4rem,1fr) 2.625rem; font-size:.9rem; font-weight:760; color:#9eb3c7; }
-  .school-panel .donut-pair { flex-wrap:nowrap; gap:clamp(1.6rem,1.8vw,2.6rem); }
+  .school-panel .donut-pair { flex-wrap:nowrap; gap:clamp(1.6rem,1.8vw,2.6rem); min-inline-size:0; }
   /* D's donut is a RING with a hollow center (radial-gradient masks out the
      middle so the conic-gradient only shows as an outer band), not a solid
      pie slice. The old base .donut relies on a small per-child dark circle
@@ -614,7 +617,10 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .class-panel .confusion > div { min-block-size:0; }
   .class-panel .rank-note { margin-block-start:1.6rem; padding-block:.45rem; }
   .class-panel .confusion span { word-break:keep-all; }
-  .class-panel .confusion span em { margin-inline-end:.55rem; }
+  /* The renderer wraps each emoji in <em>, whose browser default is italic -
+     that's why the emoji leaned. inline-block also makes the gap immune to
+     inline whitespace collapsing. */
+  .class-panel .confusion span em { display:inline-block; margin-inline-end:.6rem; font-style:normal; }
   /* Native dropdown popups are white; the inherited pale text was invisible
      on them ("안 보이는 것"). */
   .select-line select option { color:#10283b; background:#ffffff; }
@@ -673,6 +679,22 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .brand-mark img { object-fit:contain; }
   .data-refresh-btn { border-radius:50%; border:1px solid rgb(100 234 255 / 28%); background:rgb(100 234 255 / 8%); color:rgb(100 234 255); padding:.0625rem .375rem; }
   .close-btn { border-radius:999px; border:1px solid rgb(255 255 255 / 16%); background:rgb(255 255 255 / 8%); color:#f2fdff; }
+}
+
+/* Mid-width PCs (64-100rem): the viewport-scaled donuts and rings outgrow
+   their stacked columns and the fixed TOP5 label column runs too wide. This
+   block sits at the end of the file on purpose - it must outrank every
+   component rule above it. */
+@media (min-width:64rem) and (max-width:100rem) {
+  .school-panel .donut { inline-size:5rem; block-size:5rem; }
+  .school-panel .donut-pair { gap:1rem; margin-block-end:1.3rem; }
+  .school-panel .donut small { margin-block-start:.28rem; }
+  .landfill-kpi-ring { inline-size:4.6rem; block-size:4.6rem; }
+  .class-panel .confusion > div { grid-template-columns:6.9rem minmax(0,1fr) 2.2rem; }
+  .portal-frame { padding-block:.5rem .75rem; min-block-size:0; }
+  .portal-teaser { line-height:1.45; }
+  body.is-rewound .portal-frame { min-block-size:clamp(6rem,19svh,15.5rem); padding-block:.9rem; }
+  body.is-rewound .dashboard-scene .qr-invite img { inline-size:clamp(6.8rem,8.6vw,12.5rem); }
 }
 
 @keyframes scene-scroll-cue {

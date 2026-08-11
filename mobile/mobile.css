@@ -19,10 +19,21 @@ body {
 }
 .scan-line {
     position: absolute;
+    top: 0;
     left: 0;
     right: 0;
     height: 26%;
     background: linear-gradient(to bottom, transparent, rgba(129, 140, 248, .75), rgba(167, 139, 250, .55), transparent);
     animation: scanSweep 1.8s ease-in-out infinite;
     filter: blur(1px);
+}
+
+/* Belt-and-suspenders centering for the fixed modals: some mobile browsers
+   mis-place position:fixed elements relative to the layout viewport instead
+   of the visual one once the page has scrolled. */
+#judgeModal, #customModal, #authGate {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }

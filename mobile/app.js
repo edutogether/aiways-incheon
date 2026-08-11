@@ -64,6 +64,7 @@
     $("judgeScanState").classList.add("hidden");
     $("judgeResultState").classList.remove("hidden");
     $("judgeModal").classList.remove("hidden");
+    $("judgeModalBox").scrollTop = 0;
   }
   function closeJudgeModal() {
     $("judgeModal").classList.add("hidden");
@@ -74,10 +75,24 @@
     const item = db[itemId] || db.hold;
     activeResultItem = item;
 
-    $("resCategory").textContent = item.category;
-    $("resTitle").textContent = `${item.emoji} ${item.label}`;
-    $("resBody").textContent = item.guide;
-    $("resTip").textContent = item.tip;
+    // AI photo results that land on "hold" still carry Gemini's best-effort
+    // read of the object and its likely material -- surface that instead of
+    // just the generic hold boilerplate, so "I don't know" always comes with
+    // a best guess and a reason, not a dead end.
+    const aiGuess = opts.isAiResult && item.isHold && opts.aiLabel;
+    if (aiGuess) {
+      const materials = (opts.materialCandidates || []).map(m => m.label).filter(Boolean);
+      const materialText = materials.length ? `재질은 ${materials.slice(0, 2).join(", ")}(으)로 추정돼요.` : "재질은 사진만으로 확신하기 어려워요.";
+      $("resCategory").textContent = "AI 추정 · 확인 필요";
+      $("resTitle").textContent = `❓ ${opts.aiLabel}`;
+      $("resBody").textContent = `AI가 살펴본 결과 "${opts.aiLabel}"(으)로 보여요. ${materialText} 정확한 분리배출 방법은 확신할 수 없어 학교 판단 보류함에 기록하는 것을 추천해요.`;
+      $("resTip").textContent = (opts.cautions && opts.cautions[0]) || item.tip;
+    } else {
+      $("resCategory").textContent = item.category;
+      $("resTitle").textContent = `${item.emoji} ${item.label}`;
+      $("resBody").textContent = item.guide;
+      $("resTip").textContent = (opts.isAiResult && opts.cautions && opts.cautions[0]) || item.tip;
+    }
 
     const candidatesBox = $("resCandidates");
     if (opts.isAiResult && Array.isArray(opts.candidates) && opts.candidates.length > 1) {
@@ -194,12 +209,16 @@
         }
         const top = result.value.objectCandidates[0];
         if (!top) {
-          renderResult("hold", { isAiResult: true });
-          showVisualAlert("AI가 물건을 확실히 인식하지 못했어요. 판단 보류함에 기록해 주세요.", "amber");
+          renderResult("hold", { isAiResult: true, materialCandidates: result.value.materialCandidates, cautions: result.value.visibleCautions });
           return;
         }
-        renderResult(top.itemId, { isAiResult: true, candidates: result.value.objectCandidates });
-        if (result.value.visibleCautions.length) showVisualAlert(`⚠️ ${result.value.visibleCautions[0]}`, "amber");
+        renderResult(top.itemId, {
+          isAiResult: true,
+          candidates: result.value.objectCandidates,
+          aiLabel: top.label,
+          materialCandidates: result.value.materialCandidates,
+          cautions: result.value.visibleCautions
+        });
       });
   }
 
@@ -344,7 +363,41 @@
   // -----------------------------------------------------------------
   // Quiz
   // -----------------------------------------------------------------
+  const QUIZ_RANK_RANGES = [
+    { min: 0, label: "0~2개" }, { min: 3, label: "3~4개" }, { min: 5, label: "5~6개" },
+    { min: 7, label: "7~8개" }, { min: 9, label: "9개" }, { min: 10, label: "10개" }
+  ];
+
+  function renderQuizRankLadder() {
+    const container = $("quizRankLadder");
+    container.replaceChildren();
+    QUIZ_RANK_RANGES.forEach(range => {
+      const rank = DATA.quizRank(range.min);
+      const chip = document.createElement("div");
+      chip.className = "bg-white border border-blue-100 rounded-xl py-1.5 px-1 text-center";
+      chip.innerHTML = `<div class="text-base">${rank.emoji}</div><div class="text-[9px] font-bold text-slate-600">${range.label}</div><div class="text-[8px] text-slate-400 leading-tight">${rank.title}</div>`;
+      container.append(chip);
+    });
+  }
+
+  let autoAdvanceTimer = null;
+  function clearAutoAdvance() {
+    if (autoAdvanceTimer) { clearInterval(autoAdvanceTimer); autoAdvanceTimer = null; }
+    $("nextQuizBtn").textContent = "다음 문제 풀기 ➔";
+  }
+  function startAutoAdvance() {
+    clearAutoAdvance();
+    let remaining = 3;
+    $("nextQuizBtn").textContent = `${remaining}초 뒤 다음 문제 ➔`;
+    autoAdvanceTimer = setInterval(() => {
+      remaining -= 1;
+      if (remaining <= 0) { clearAutoAdvance(); nextQuiz(); return; }
+      $("nextQuizBtn").textContent = `${remaining}초 뒤 다음 문제 ➔`;
+    }, 1000);
+  }
+
   function startQuiz() {
+    clearAutoAdvance();
     currentQuizSet = DATA.pickQuizSet();
     currentQuizIndex = 0;
     userQuizScore = 0;
@@ -354,6 +407,7 @@
   }
 
   function showCurrentQuizQuestion() {
+    clearAutoAdvance();
     const data = currentQuizSet[currentQuizIndex];
     $("quiz-progress").textContent = `질문 ${currentQuizIndex + 1} / ${currentQuizSet.length}`;
     $("quiz-score").textContent = `현재 점수: ${userQuizScore}점`;
@@ -384,6 +438,7 @@
     expDesc.textContent = data.explanation;
     $("quiz-buttons").classList.add("hidden");
     $("quiz-explanation-panel").classList.remove("hidden");
+    startAutoAdvance();
   }
 
   function nextQuiz() {
@@ -421,6 +476,7 @@
     initSearchAutocomplete();
     initPhotoCapture();
     restoreLocal();
+    renderQuizRankLadder();
     startQuiz();
 
     $("searchInput").addEventListener("keyup", handleSearch);
@@ -462,7 +518,7 @@
     $("modalCancelBtn").addEventListener("click", closeCustomModal);
     $("modalConfirmBtn").addEventListener("click", () => { modalActionCallback?.(); closeCustomModal(); });
     document.querySelectorAll("[data-quiz-answer]").forEach(btn => btn.addEventListener("click", () => submitQuizAnswer(btn.dataset.quizAnswer === "true")));
-    $("nextQuizBtn").addEventListener("click", nextQuiz);
+    $("nextQuizBtn").addEventListener("click", () => { clearAutoAdvance(); nextQuiz(); });
     $("restartQuizBtn").addEventListener("click", startQuiz);
   }
 

@@ -2424,17 +2424,9 @@
     let scrollTicking = false;
     let scrollDebounce = 0;
     let clickLockUntil = 0;
-    let dashboardLockUntil = Date.now() + 520;
-    let pendingLightTimer = 0;
-    let pendingLightFrame = 0;
+    let dashboardLockUntil = Date.now() + 260;
     let rewindActive = false;
     let rewindCooldownUntil = 0;
-
-    function cancelPendingLight() {
-      window.clearTimeout(pendingLightTimer);
-      if (pendingLightFrame) cancelAnimationFrame(pendingLightFrame);
-      pendingLightFrame = 0;
-    }
 
     function activate(section, force = false, options = {}) {
       if (!section) return;
@@ -2486,26 +2478,6 @@
         callback();
       }
       requestAnimationFrame(check);
-    }
-
-    function activateAfterSettle(section, delay = 40) {
-      if (!section) return;
-      cancelPendingLight();
-      const startedAt = performance.now();
-      const maxWait = 300;
-      const tolerance = Math.max(24, Math.round(window.innerHeight * 0.05));
-
-      function waitForSettle(now) {
-        const rect = section.getBoundingClientRect();
-        const settled = Math.abs(rect.top) <= tolerance || now - startedAt > maxWait;
-        if (!settled) {
-          pendingLightFrame = requestAnimationFrame(waitForSettle);
-          return;
-        }
-        pendingLightTimer = window.setTimeout(() => activate(section, true), delay);
-      }
-
-      pendingLightFrame = requestAnimationFrame(waitForSettle);
     }
 
     function nearestSection() {
@@ -2585,17 +2557,45 @@
       return false;
     }
 
+    // Chrome ramps native smooth-scroll duration with distance, which reads as
+    // drifting over to the next scene rather than snapping onto it. Drive the
+    // scroll ourselves on a short, sharply decelerating curve instead. Every
+    // scrollTo below must pass behavior:"instant" because style.css sets
+    // html{scroll-behavior:smooth}, which would otherwise animate each of our
+    // own frames and fight the curve.
+    let snapScrollFrame = 0;
+    function snapScrollTo(section, duration = 360) {
+      if (snapScrollFrame) cancelAnimationFrame(snapScrollFrame);
+      const startY = window.scrollY;
+      const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      const endY = Math.min(maxY, Math.max(0, startY + section.getBoundingClientRect().top));
+      const distance = endY - startY;
+      if (Math.abs(distance) < 2) {
+        window.scrollTo({ top: endY, behavior: "instant" });
+        return;
+      }
+      const startedAt = performance.now();
+      const ease = t => 1 - Math.pow(1 - t, 5);
+      function step(now) {
+        const progress = Math.min(1, (now - startedAt) / duration);
+        window.scrollTo({ top: startY + distance * ease(progress), behavior: "instant" });
+        snapScrollFrame = progress < 1 ? requestAnimationFrame(step) : 0;
+      }
+      snapScrollFrame = requestAnimationFrame(step);
+    }
+
     function rewindFromLastSection() {
       if (rewindActive || Date.now() < rewindCooldownUntil) return;
       rewindActive = true;
       snapLocked = true;
-      clickLockUntil = Date.now() + 1800;
+      clickLockUntil = Date.now() + 820;
 
       const first = sections[0];
       history.replaceState(null, "", "#" + first.id);
-      first.scrollIntoView({ behavior: "smooth", block: "start" });
-      activate(first, true, { sectionLight: false });
-      activateAfterSettle(first, 75);
+      snapScrollTo(first, 480);
+      // Light the destination as the move starts, not after it lands: the
+      // 0.3s opacity/filter fade then runs under the scroll instead of after it.
+      activate(first, true);
       waitForScrollSettle(first, () => {
         activate(first, true);
         // Reaching the top by rewinding means the visitor has seen the whole
@@ -2606,7 +2606,7 @@
         snapLocked = false;
         clickLockUntil = 0;
         rewindCooldownUntil = Date.now() + 900;
-      }, 1600);
+      }, 700);
     }
 
   function snapByWheel(event) {
@@ -2624,36 +2624,31 @@
         }
         event.preventDefault();
         snapLocked = true;
-        clickLockUntil = Date.now() + 420;
+        clickLockUntil = Date.now() + 300;
         const edgeTarget = sections[currentIndex] || active;
-        edgeTarget.scrollIntoView({ behavior: "smooth", block: "start" });
-        activate(edgeTarget, true, { sectionLight: false });
-        activateAfterSettle(edgeTarget, 80);
+        snapScrollTo(edgeTarget, 300);
+        activate(edgeTarget, true);
         window.setTimeout(() => {
           snapLocked = false;
           clickLockUntil = 0;
-        }, 500);
+        }, 320);
         return;
       }
 
       event.preventDefault();
       snapLocked = true;
-      clickLockUntil = Date.now() + 820;
+      clickLockUntil = Date.now() + 420;
       const target = sections[nextIndex];
       history.replaceState(null, "", "#" + target.id);
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-      activate(target, true, { sectionLight: false });
-      activateAfterSettle(target, 105);
+      snapScrollTo(target);
+      activate(target, true);
       waitForScrollSettle(target, () => {
         snapLocked = false;
         clickLockUntil = 0;
         const rect = target.getBoundingClientRect();
-        const tolerance = Math.max(8, Math.round(window.innerHeight * 0.014));
-        if (Math.abs(rect.top) > tolerance) {
-          target.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-        activateAfterSettle(target, 65);
-      }, 820);
+        const tolerance = Math.max(24, Math.round(window.innerHeight * 0.05));
+        if (Math.abs(rect.top) > tolerance) snapScrollTo(target, 220);
+      }, 420);
     }
 
     if (!sections.length) return;
@@ -2661,15 +2656,13 @@
     function navigateToSection(id) {
       const section = document.getElementById(id);
       if (!section) return false;
-      clickLockUntil = Date.now() + 760;
+      clickLockUntil = Date.now() + 420;
       history.replaceState(null, "", "#" + id);
-      section.scrollIntoView({ behavior: "smooth", block: "start" });
-      activate(section, true, { sectionLight: false });
-      activateAfterSettle(section, 105);
+      snapScrollTo(section);
+      activate(section, true);
       window.setTimeout(() => {
         clickLockUntil = 0;
-        activateAfterSettle(section, 65);
-      }, 700);
+      }, 420);
       return true;
     }
 

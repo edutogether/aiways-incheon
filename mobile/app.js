@@ -64,7 +64,7 @@
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "flex flex-col items-center gap-1 p-2.5 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95";
-      btn.innerHTML = `<span class="text-xl">${item.emoji}</span><span class="text-[10px] font-bold text-slate-700 text-center leading-tight">${item.label.split(" / ")[0]}</span>`;
+      btn.innerHTML = `<span class="text-xl">${item.emoji}</span><span class="text-xs font-bold text-slate-700 text-center leading-tight">${item.label.split(" / ")[0]}</span><span class="text-[9px] font-semibold text-slate-400 text-center leading-tight">${item.category}</span>`;
       btn.addEventListener("click", () => renderResult(id));
       grid.append(btn);
     });

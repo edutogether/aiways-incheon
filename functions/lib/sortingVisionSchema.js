@@ -9,7 +9,7 @@ const ITEM_TYPES = Object.freeze({
   "pet-bottle": "pet-bottle", "plastic-cup": "plastic-cup", "paper-cup": "paper-cup",
   "milk-carton": "milk-carton", can: "can", "glass-bottle": "glass-bottle",
   "snack-wrapper": "snack-wrapper", "vinyl-bag": "vinyl-bag",
-  "ramen-container": "ramen-container", receipt: "receipt", "tape-box": "tape-box", hold: "hold"
+  "ramen-container": "ramen-container", receipt: "receipt", "tape-box": "tape-box", battery: "battery", hold: "hold"
 });
 const CONFIDENCE_BANDS = new Set(["high", "medium", "low", "unknown"]);
 const UNCERTAINTY_BANDS = new Set(["low", "medium", "high"]);

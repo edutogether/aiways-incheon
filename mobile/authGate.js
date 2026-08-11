@@ -30,16 +30,31 @@
     requestAnimationFrame(() => window.AIWaysMobileApp?.syncTabHeights?.());
   }
 
+  // Same brand header shown once inside #appRoot (badge + title + subtitle),
+  // reused here so the pre-auth screen doesn't look like a bare loading spinner.
+  function appendBrandHeader(container) {
+    const header = el("div", "text-center mb-5");
+    const badge = el("div", "inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 px-3.5 py-1 rounded-full text-[11px] font-bold mb-3 shadow-sm border border-blue-100");
+    badge.append(el("span", "inline-block w-2 h-2 rounded-full bg-blue-500 animate-ping"), document.createTextNode("AI Ways Incheon - 버리는 순간을 바꾸다."));
+    const title = el("h1", "text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 flex justify-center items-center gap-2");
+    title.append(document.createTextNode("♻️ "), el("span", "text-blue-600", "3초 판단"), document.createTextNode(" 도우미"));
+    const subtitle = el("p", "text-xs sm:text-sm text-slate-500 mt-1.5 font-medium", "AI와 데이터로 실천하는 학교 자원순환 UX 개선 프로젝트");
+    header.append(badge, title, subtitle);
+    container.append(header);
+  }
+
   function renderLoading() {
     gateContent.replaceChildren();
-    const box = el("div", "text-center py-10 space-y-3");
-    box.append(el("p", "text-3xl", "♻️"), el("p", "text-sm font-semibold text-slate-500", "접속을 준비하고 있습니다."));
+    appendBrandHeader(gateContent);
+    const box = el("div", "flex items-center justify-center gap-2 pt-1 pb-2");
+    box.append(el("span", "inline-block w-4 h-4 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"), el("span", "text-sm font-semibold text-slate-500", "접속을 준비하고 있습니다."));
     gateContent.append(box);
   }
 
   function renderRetry(code) {
     gateContent.replaceChildren();
-    const box = el("div", "text-center py-8 space-y-4");
+    appendBrandHeader(gateContent);
+    const box = el("div", "text-center space-y-4 pt-1");
     box.append(
       el("p", "text-3xl", "🔄"),
       el("p", "text-sm font-semibold text-slate-700", "접속 확인에 실패했습니다."),

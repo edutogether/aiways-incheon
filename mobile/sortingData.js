@@ -82,6 +82,12 @@
       tip: "테이프·코팅·오염이 많이 남아 있으면 선별 효율이 떨어지니 최대한 제거해 주세요.",
       holdReasons: ["테이프·코팅·오염이 많이 남아 있음"], searchKeywords: ["박스", "상자", "택배상자", "테이프", "종이", "종이류", "cardboard"]
     }),
+    battery: judgementItem({
+      label: "건전지", emoji: "🔋", objectType: "battery", category: "폐건전지 전용 수거함", carbonSaved: 9,
+      guide: "건전지·배터리류는 재활용 쓰레기가 아닌 폐건전지 전용 수거함(교내 또는 주민센터)에 배출합니다.",
+      tip: "다른 재활용품과 섞이면 화재·중금속 오염 위험이 있으니 반드시 별도로 배출하세요.",
+      holdReasons: ["전용 수거함을 찾을 수 없음", "배터리 종류를 확인할 수 없음"], searchKeywords: ["건전지", "배터리", "보조배터리", "battery"]
+    }),
     hold: judgementItem({
       label: "판단 보류", emoji: "❓", objectType: "hold", category: "기준 확인 필요", carbonSaved: 0, isHold: true,
       guide: "복합 재질이거나 오염 상태가 애매하면 아무 데나 버리지 말고 학교 판단 보류함에 기록합니다.",
@@ -91,7 +97,7 @@
   };
   Object.entries(sortingDbV2).forEach(([id, item]) => { item.id = id; });
 
-  const QUICK_SELECT_ORDER = ["milk-carton", "tape-box", "plastic-cup", "ramen-container", "snack-wrapper", "can", "pet-bottle", "glass-bottle"];
+  const QUICK_SELECT_ORDER = ["milk-carton", "tape-box", "plastic-cup", "ramen-container", "snack-wrapper", "can", "pet-bottle", "glass-bottle", "paper-cup", "vinyl-bag", "receipt", "battery"];
 
   // Unbiased Fisher-Yates -- Array.sort(() => Math.random() - 0.5) is a
   // well-known non-uniform shuffle that leaves elements biased toward their

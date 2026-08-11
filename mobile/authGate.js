@@ -25,7 +25,10 @@
   function deviceNoun() {
     const kind = detectDeviceKind();
     const platform = client().getPlatformLabel();
-    const byKind = { mobile: platform === "iOS" ? "아이폰" : `${platform} 휴대폰`, tablet: platform === "iOS" ? "아이패드" : `${platform} 태블릿`, desktop: `${platform} PC` };
+    // Keep this short: once a name is prepended ("OOO이의 "), a verbose
+    // platform-prefixed label (e.g. "Android 휴대폰") truncates mid-word
+    // inside the 12-Korean-character limit.
+    const byKind = { mobile: platform === "iOS" ? "아이폰" : "휴대폰", tablet: platform === "iOS" ? "아이패드" : "태블릿", desktop: "PC" };
     return byKind[kind] || "기기";
   }
   function defaultDeviceName() { return truncateDeviceName(deviceNoun()); }

@@ -610,5 +610,12 @@
         <p class="save-state" id="saveState" aria-live="polite"></p>
       </div>
     </dialog>
+    <script>
+      if (new URLSearchParams(location.search).has("tune")) {
+        const s = document.createElement("script");
+        s.src = "./visual-tuner.js";
+        document.body.appendChild(s);
+      }
+    </script>
   </body>
 </html>

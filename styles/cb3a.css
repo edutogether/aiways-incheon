@@ -172,8 +172,9 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   body.is-rewound .upload-panel .upload-highlights { display:none; }
   /* With the checklist gone the panel has spare height: pull Powered-by up,
      grow the frame vertically so the QR sits inside with clear margins. */
-  body.is-rewound .portal-powered { margin-block-start:-.35rem; }
-  body.is-rewound .portal-frame { padding:1.5rem 1.4rem; min-block-size:clamp(7rem,23svh,15.5rem); }
+  body.is-rewound .portal-powered { margin-block-start:-.5rem; }
+  body.is-rewound .portal-frame { padding:1rem 1.4rem .85rem; min-block-size:clamp(6.5rem,18svh,12.5rem); }
+  body.is-rewound .upload-panel > small { margin-block-start:.6rem; }
   body.is-rewound .dashboard-scene .qr-invite { display:flex; align-items:center; gap:1.1rem; margin:0; padding:.3rem 0; border:0; background:transparent; box-shadow:none; animation:qr-invite-reveal .62s cubic-bezier(.2,.7,.2,1) both; }
   body.is-rewound .dashboard-scene .qr-invite img { inline-size:clamp(9rem,10.2vw,12.5rem); block-size:auto; border-radius:.9rem; }
   body.is-rewound .dashboard-scene .qr-invite p { color:#dff2fb; font-size:clamp(.95rem,.8vw,1.18rem); font-weight:750; line-height:1.7; word-break:keep-all; }
@@ -204,6 +205,37 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   /* Per-scene copy-to-content gaps live with each scene's own layout rules
      further down (search "D gap"); only the shared rhythm lives here. */
 
+  /* Ranking modal: its styling died in the Stage 7.5-0 CSS purge while the
+     app.js that builds it survived, so it rendered as bare block elements.
+     Recostumed to the deck's glass language. */
+  .ranking-modal { position:fixed; inset:0; z-index:80; display:grid; place-items:center; padding:2rem; background:rgb(2 8 18 / 64%); backdrop-filter:blur(7px); opacity:0; pointer-events:none; transition:opacity .18s ease; }
+  .ranking-modal.is-open { opacity:1; pointer-events:auto; }
+  .ranking-modal[hidden] { display:none; }
+  .ranking-dialog { position:relative; inline-size:min(46rem,92vw); max-block-size:min(80vh,46rem); overflow:auto; overscroll-behavior:contain; display:grid; gap:.9rem; padding:1.7rem 1.9rem; border:1px solid rgb(131 224 255 / 26%); border-radius:1.4rem; background:linear-gradient(160deg,#0e2a45,#081326); box-shadow:0 40px 90px rgb(0 6 16 / 60%), inset 0 1px rgb(255 255 255 / 7%); }
+  .ranking-close { position:absolute; inset-block-start:1rem; inset-inline-end:1rem; inline-size:2.2rem; block-size:2.2rem; min-block-size:0; display:grid; place-items:center; padding:0; border:1px solid rgb(131 224 255 / 25%); border-radius:999px; background:rgb(255 255 255 / 6%); color:#dff2fb; font-size:1.05rem; }
+  .ranking-dialog h2 { font-size:1.45rem; }
+  .ranking-tabs { display:flex; gap:.4rem; flex-wrap:wrap; }
+  .ranking-tab { min-block-size:2.1rem; padding:.3rem .9rem; border:1px solid rgb(131 224 255 / 22%); border-radius:999px; background:transparent; color:#9eb3c7; font-size:.85rem; font-weight:800; }
+  .ranking-tab.is-active { color:#06111c; background:linear-gradient(135deg,#5ef7cd,#64eaff); border-color:transparent; }
+  .ranking-podium { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.7rem; }
+  .podium-card { display:grid; justify-items:center; gap:.15rem; padding:.85rem .5rem; border:1px solid rgb(131 224 255 / 20%); border-radius:1rem; background:rgb(255 255 255 / 4%); }
+  .podium-card b { font-size:1.6rem; }
+  .podium-card em { color:#5ef7cd; font-style:normal; font-weight:900; }
+  .podium-card.is-current { border-color:rgb(94 247 205 / 55%); box-shadow:0 0 18px rgb(94 247 205 / 14%); }
+  .ranking-race-head { color:#9eb3c7; font-size:.8rem; font-weight:850; }
+  .ranking-race-list { display:grid; gap:.55rem; }
+  .race-row { display:grid; grid-template-columns:1.6rem 1.8rem minmax(0,1fr); align-items:center; gap:.55rem; padding:.55rem .7rem; border:1px solid rgb(131 224 255 / 14%); border-radius:.9rem; background:rgb(255 255 255 / 3%); }
+  .race-row.is-current { border-color:rgb(94 247 205 / 50%); background:rgb(94 247 205 / 7%); }
+  .race-rank { color:#9eb3c7; font-weight:900; text-align:center; }
+  .race-mascot { font-size:1.2rem; text-align:center; }
+  .race-body { display:grid; gap:.3rem; min-inline-size:0; }
+  .race-title { display:flex; align-items:baseline; gap:.6rem; min-inline-size:0; }
+  .race-title strong { font-size:.95rem; }
+  .race-title small { flex:1; min-inline-size:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#9eb3c7; font-size:.72rem; }
+  .race-title b { color:#5ef7cd; font-size:.9rem; }
+  .race-body i { display:block; block-size:.5rem; border-radius:999px; background:rgb(255 255 255 / 8%); }
+  .race-body i em { display:block; block-size:100%; max-inline-size:100%; border-radius:999px; background:linear-gradient(90deg,#5ef7cd,#64eaff); }
+
   /* Cue that another scene sits below: a double chevron drawn as an inline SVG
      (gradient stroke, ghosted leading stroke) with a mint glow, bobbing on the
      active scene. Suppressed on the last scene - its finale hint takes over. */
@@ -225,7 +257,9 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
 
   /* Finale hint: floats in the resources scene's empty top-right, telling the
      visitor one more scroll rewinds the deck and reveals the hand-off QR. */
-  .scroll-finale-hint { position:absolute; z-index:2; inset-block-start:calc(9rem + 8vw); inset-inline-end:clamp(24rem,34vw,58rem); display:grid; justify-items:center; gap:.7rem; max-inline-size:31rem; padding:2rem 2.6rem 1.7rem; text-align:center; border-radius:1.6rem; border:1px solid rgb(94 247 205 / 30%); background:linear-gradient(155deg,rgb(13 48 66 / 74%),rgb(7 22 42 / 84%)); box-shadow:0 24px 60px rgb(0 6 16 / 45%), inset 0 1px rgb(255 255 255 / 8%), 0 0 44px rgb(94 247 205 / 10%); backdrop-filter:blur(10px); animation:finale-hint-float 3.4s ease-in-out infinite; }
+  /* Anchored to resource card 03's column: scene inline pad + two columns and
+     two gaps of the 5-col grid below. */
+  .scroll-finale-hint { position:absolute; z-index:2; inset-block-start:calc(8.2rem + 7.6vw); inset-inline-start:calc((2.38rem + 4.38vw) + 2 * ((100vw - 2 * (2.38rem + 4.38vw) - 4rem) / 5) + 2rem); display:grid; justify-items:center; gap:.7rem; max-inline-size:31rem; padding:2rem 2.6rem 1.7rem; text-align:center; border-radius:1.6rem; border:1px solid rgb(94 247 205 / 30%); background:linear-gradient(155deg,rgb(13 48 66 / 74%),rgb(7 22 42 / 84%)); box-shadow:0 24px 60px rgb(0 6 16 / 45%), inset 0 1px rgb(255 255 255 / 8%), 0 0 44px rgb(94 247 205 / 10%); backdrop-filter:blur(10px); animation:finale-hint-float 3.4s ease-in-out infinite; }
   .scroll-finale-hint .hint-kicker { display:inline-flex; padding:.34rem .85rem; border-radius:999px; border:1px solid rgb(94 247 205 / 32%); background:rgb(94 247 205 / 10%); color:#5ef7cd; font-size:.74rem; font-weight:850; letter-spacing:.11em; }
   .scroll-finale-hint .hint-title { margin:0; color:#f6fbff; font-size:clamp(1.45rem,1.22vw,1.85rem); font-weight:900; letter-spacing:-.02em; }
   .scroll-finale-hint .hint-sub { margin:0; color:#9eb3c7; font-size:clamp(1rem,.84vw,1.22rem); font-weight:700; line-height:1.6; }
@@ -243,7 +277,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .dashboard-grid { padding:clamp(.875rem,calc(1.202vw - .423rem),1.5rem); border:1px solid rgb(116 189 255 / 20%); border-radius:clamp(1.875rem,calc(1.442vw + .318rem),2.625rem); background:linear-gradient(145deg,rgb(24 52 88 / 72%),rgb(5 13 29 / 38%)); box-shadow:0 26px 90px rgb(0 0 0 / 34%),inset 0 1px rgb(255 255 255 / 5%); }
   .dashboard-grid>.panel { border-color:rgb(131 224 255 / 18%); box-shadow:0 20px 70px rgb(14 28 54 / 34%),inset 0 1px rgb(255 255 255 / 6%); }
   .dashboard-grid>.panel:hover { box-shadow:0 28px 80px rgb(6 18 36 / 48%),0 0 34px rgb(94 247 205 / 16%),inset 0 1px rgb(255 255 255 / 8%); background:linear-gradient(145deg,rgb(255 255 255 / 10.6%),rgb(94 247 205 / 6.7%),rgb(100 169 255 / 4.3%)); }
-  .dashboard-grid>.panel .panel-head h2 { font-size:clamp(1.05rem,1.4vw,2.05rem); line-height:1.22; }
+  .dashboard-grid>.panel .panel-head h2 { font-size:clamp(1.05rem,1.25vw,1.9rem); line-height:1.22; word-break:keep-all; }
   .dashboard-grid>.panel .panel-head p { font-size:clamp(.72rem,.62vw,.95rem); }
   .project-scene,.curriculum-scene,.hah-scene,.flow-scene,.gallery-scene,.sorting-scene,.resources-scene { isolation:isolate; }
   .project-statement,.standards-panel,.sorting-app { box-shadow:0 24px 56px rgb(0 7 20 / 25%); }
@@ -321,12 +355,12 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .curriculum-title { display:grid; gap:.1em; font-size:clamp(3.825rem,calc(5.1643vw - .823rem),7.44rem); line-height:1.11; }
   .curriculum-title span { display:block; }
   .subject-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(1.035rem,calc(.598rem + .4857vw),1.375rem); border:0; }
-  .subject-card { position:relative; display:flex; flex-direction:column; gap:.6rem; min-block-size:0; padding:clamp(1.9rem,calc(.5rem + 1.6vw),3.1rem) clamp(1.53rem,calc(.122rem + 1.5643vw),2.625rem) 4.6rem; border:1px solid rgb(131 224 255 / 18%); border-radius:clamp(1.5rem,calc(.857rem + .7143vw),2rem); background:linear-gradient(145deg,rgb(13 31 61 / 86%),rgb(5 13 29 / 66%)); box-shadow:0 24px 64px rgb(0 0 0 / 28%),inset 0 1px rgb(255 255 255 / 6%); }
+  .subject-card { position:relative; display:flex; flex-direction:column; gap:.6rem; min-block-size:0; padding:clamp(1.9rem,calc(.5rem + 1.6vw),3.1rem) clamp(1rem,1vw,1.5rem) 4.6rem; border:1px solid rgb(131 224 255 / 18%); border-radius:clamp(1.5rem,calc(.857rem + .7143vw),2rem); background:linear-gradient(145deg,rgb(13 31 61 / 86%),rgb(5 13 29 / 66%)); box-shadow:0 24px 64px rgb(0 0 0 / 28%),inset 0 1px rgb(255 255 255 / 6%); }
   .subject-card em { position:absolute; inset-inline-end:1.125rem; inset-block-end:1.125rem; margin-block-start:0; opacity:0; transform:translateY(.5rem); transition:opacity .18s,transform .18s; }
   .subject-card:hover em, .subject-card:focus-within em { opacity:1; transform:none; }
   /* Right-column readability pass (user feedback): the cards ran short and the
      copy small next to the enlarged left column. */
-  .subject-card h3 { font-size:clamp(1.32rem,1.12vw,1.68rem); }
+  .subject-card h3 { font-size:clamp(1.22rem,1.02vw,1.55rem); word-break:keep-all; }
   .subject-card p { font-size:clamp(.97rem,.83vw,1.2rem); line-height:1.66; }
   .standards-panel { grid-template-columns:1fr; gap:1.5rem; padding:clamp(1.485rem,calc(.662rem + .9143vw),2.125rem); margin-block-start:1.25rem; border:1px solid rgb(131 224 255 / 18%); border-radius:clamp(1.5rem,calc(.857rem + .7143vw),2rem); background:linear-gradient(145deg,rgb(9 22 44 / 78%),rgb(5 13 29 / 62%)); box-shadow:none; }
   .standards-panel>div:first-child { display:flex; justify-content:space-between; align-items:baseline; gap:1rem; }
@@ -375,7 +409,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .project-subtitle { font-weight:400; font-size:clamp(1rem,calc(.666rem + .3714vw),1.26rem); margin-block:.625rem 0; }
   .curriculum-description { font-size:clamp(1.02rem,calc(.377rem + .7143vw),1.52rem); line-height:1.78; }
   .hah-description { font-size:clamp(.94rem,calc(.67rem + .3vw),1.15rem); line-height:1.5; }
-  .gallery-description { font-size:clamp(.684rem,calc(.406rem + .3086vw),.9rem); line-height:1.7; }
+  .gallery-description { font-size:clamp(.8rem,calc(.5rem + .36vw),1.05rem); line-height:1.7; }
   .project-statement { margin-block-start:clamp(2.16rem,calc(1.401rem + .8429vw),2.75rem); }
   .project-cards { gap:clamp(1.89rem,calc(.945rem + 1.05vw),2.625rem); }
   .resource-grid { box-shadow:none; gap:clamp(.75rem,calc(.268rem + .5357vw),1.125rem); }
@@ -441,7 +475,10 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .hero-actions .primary-btn, .hero-actions .secondary-btn { min-block-size:clamp(3.15rem,2.5vw,3.9rem); padding-inline:clamp(1.7rem,1.5vw,2.4rem); font-size:clamp(1.02rem,.82vw,1.3rem); }
   /* The markup already carries the intended line breaks as spans - let them break. */
   .project-statement h2 span { display:block; }
-  .curriculum-description span { display:block; }.brand-mark img { inline-size:100%; block-size:100%; object-fit:contain; }
+  .curriculum-description span { display:block; }
+  .hero-fixed-line { display:block; }
+  /* Whole-word wrapping across the deck: no more mid-word breaks. */
+  .scene h1, .scene h2, .scene h3, .scene p, .scene li, .panel-head h2 { word-break:keep-all; overflow-wrap:anywhere; }.brand-mark img { inline-size:100%; block-size:100%; object-fit:contain; }
   .ai-modal { inline-size:min(65rem,calc(100vw - 2.25rem)); border-radius:1.75rem; background:#071326; border-color:rgb(100 234 255 / 25%); }
 
   /* 2 & 7. Grade/class selects: the base rule `.select-line { grid-column:2;
@@ -455,8 +492,8 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .school-panel, .class-panel { position:relative; }
   /* The select drops to the title's line and its right edge matches the grade
      numbers' column (both sit at the panel's content inset). */
-  .school-panel .select-line, .class-panel .select-line { position:absolute; inset-block-start:2.95rem; inset-inline-end:var(--panel-pad); grid-column:auto; grid-row:auto; z-index:2; }
-  .school-panel .panel-head, .class-panel .panel-head { padding-inline-end:7rem; }
+  .school-panel .select-line, .class-panel .select-line { position:absolute; inset-block-start:2.2rem; inset-inline-end:var(--panel-pad); grid-column:auto; grid-row:auto; z-index:2; }
+  .school-panel .panel-head, .class-panel .panel-head { padding-inline-end:5.4rem; }
   .landfill-panel .panel-head, .upload-panel .panel-head { padding-inline-end:0; margin-block-end:.875rem; }
   .school-panel .select-line select, .class-panel .select-line select { min-block-size:2.15rem; padding:.32rem .65rem; font-size:clamp(.82rem,.7vw,1.05rem); font-weight:850; border-radius:.8rem; }
 
@@ -579,11 +616,12 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .landfill-kpi-ring--secondary { background:conic-gradient(#ad8cff calc(var(--pct) * 1%), rgb(126 116 177 / 20%) 0); box-shadow:0 0 14px rgb(173 140 255 / 14%); }
   .landfill-kpi-ring--secondary > span { text-shadow:0 0 12px rgb(173 140 255 / 30%); }
   .landfill-kpi-ring > span, .landfill-kpi-ring > small { position:relative; z-index:1; grid-area:1 / 1; text-align:center; }
-  .landfill-kpi-ring > span { align-self:center; padding:0; margin-block-start:0; color:#f3fffe; font-size:clamp(.5rem,.42vw,.62rem); font-weight:950; line-height:1; text-shadow:0 0 12px rgb(94 247 205 / 22%);}
-  /* The two-line metric name moves out of the ring into a small plate at its
-     side, so the ring keeps only its percentage and can grow uncropped. */
-  .landfill-kpi-ring > small { position:absolute; inset-inline-end:calc(100% + .55rem); inset-block-start:50%; translate:0 -50%; align-self:auto; margin:0; padding:.35rem .6rem; max-inline-size:none; inline-size:max-content; border:1px solid rgb(131 224 255 / 22%); border-radius:.65rem; background:rgb(10 26 46 / 78%); color:#c9dbe6; font-size:clamp(.68rem,.58vw,.85rem); font-weight:850; line-height:1.3; text-align:center; }
-  .landfill-kpi-ring--secondary > small { border-color:rgb(173 140 255 / 30%); }
+  .landfill-kpi-ring > span { align-self:center; padding:0; margin-block-start:0; color:#f3fffe; font-size:clamp(.62rem,.52vw,.8rem); font-weight:950; line-height:1; text-shadow:0 0 12px rgb(94 247 205 / 22%);}
+  /* Simple one-word name (반입량/잔여량) directly under the percentage, both
+     stacked inside the ring - the side plates are gone (user call). */
+  .landfill-kpi-ring { grid-template-rows:auto auto; align-content:center; justify-items:center; row-gap:.14rem; }
+  .landfill-kpi-ring > span, .landfill-kpi-ring > small { position:static; grid-area:auto; translate:none; align-self:auto; margin:0; padding:0; border:0; background:transparent; }
+  .landfill-kpi-ring > small { max-inline-size:none; inline-size:auto; color:rgb(219 241 249 / 80%); font-size:clamp(.56rem,.47vw,.72rem); font-weight:850; line-height:1.1; text-align:center; }
   .landfill-kpi-legend { inline-size:min(100%,8.3rem); min-inline-size:0; display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:.4375rem .5625rem; margin-block-end:.3125rem; border:1px solid rgb(173 140 255 / 26%); border-radius:999px; color:rgb(226 218 255 / 86%); background:linear-gradient(135deg,rgb(173 140 255 / 9%),rgb(100 169 255 / 3.5%)); font-size:.6rem; font-weight:850; white-space:nowrap; }
   .landfill-kpi-legend span { min-inline-size:0; display:inline-flex; align-items:center; gap:.3rem; }
   .landfill-kpi-legend i { inline-size:.4rem; block-size:.4rem; flex:0 0 auto; border-radius:999px; background:#ad8cff; box-shadow:0 0 9px rgb(173 140 255 / 62%); }
@@ -609,11 +647,11 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .class-panel .class-kpis span { margin-block-start:.05rem; }
   .class-panel .class-kpis strong { font-size:clamp(1.25rem,1.5vw,2.2rem); }
   .class-panel .confusion { grid-area:visual; }
-  .class-panel .confusion > div { grid-template-columns:10.6rem minmax(0,1fr) 2.4rem; align-items:center; column-gap:.6rem; }
+  .class-panel .confusion > div { grid-template-columns:fit-content(11rem) minmax(0,1fr) 2.2rem; align-items:center; column-gap:.55rem; }
   /* The TOP5 box runs the full height of the KPI column (down to 전환 사례's
      plate) and spreads its rows into the room; every bar starts at one x
      because the label column is fixed, not content-sized. */
-  .class-panel .confusion { row-gap:.75rem; min-block-size:0; align-content:space-between; align-self:stretch; margin-block-start:0; padding:1.05rem 1.15rem; }
+  .class-panel .confusion { row-gap:.9rem; min-block-size:0; align-content:space-between; align-self:stretch; margin-block-start:0; padding:1.05rem .9rem 1.15rem 1.05rem; }
   .class-panel .confusion > div { min-block-size:0; }
   .class-panel .rank-note { margin-block-start:1.6rem; padding-block:.45rem; }
   .class-panel .confusion span { word-break:keep-all; }

@@ -2578,6 +2578,9 @@
       return 1 - Math.pow(1 - smooth, 3);
     };
     const GLIDE_MS = 720;
+    // The rewind travels the whole deck, so it carries a little more weight
+    // than a single-section glide.
+    const REWIND_MS = 620;
 
     // The glide is driven from rAF on the main thread, so anything the browser
     // has to re-rasterise per frame shows up as stutter. The worst offender is
@@ -2656,14 +2659,21 @@
       if (rewindActive || Date.now() < rewindCooldownUntil) return;
       rewindActive = true;
       snapLocked = true;
-      clickLockUntil = Date.now() + 820;
+      clickLockUntil = Date.now() + REWIND_MS + 260;
 
       const first = sections[0];
       history.replaceState(null, "", "#" + first.id);
       activate(first, true, { sectionLight: false });
-      snapScrollTo(first, 480, () => activate(first, true));
+      // The whole-deck rewind reads better a touch slower and on the same
+      // soft-in/long-tail curve as the per-section glide, so it winds up
+      // rather than snapping back. Gliding also stands the sticky header's
+      // backdrop blur down for the ride, which matters most here: this is by
+      // far the longest travel on the page.
+      beginGlide(sections[sections.length - 1], first);
+      snapScrollTo(first, REWIND_MS, () => activate(first, true), glideEase);
       waitForScrollSettle(first, () => {
         activate(first, true);
+        endGlide();
         // Reaching the top by rewinding means the visitor has seen the whole
         // deck, so this is the moment to offer the phone hand-off QR. A first
         // visit to the dashboard does not get it.
@@ -2672,7 +2682,11 @@
         snapLocked = false;
         clickLockUntil = 0;
         rewindCooldownUntil = Date.now() + 900;
-      }, 700);
+        // The first scene rests with the page at 0, so its own top never gets
+        // within the settle tolerance - this wait always runs its full length.
+        // It therefore has to outlast the ride, or the lights would come up
+        // while the page is still winding.
+      }, REWIND_MS + 140);
     }
 
   function snapByWheel(event) {

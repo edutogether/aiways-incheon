@@ -82,6 +82,17 @@
   .bar-list > div, .confusion > div, .progress-stack label { display: grid; grid-template-columns: 4.4rem 1fr auto; align-items: center; gap: .6rem; font-size: .82rem; }
   .bar-list i, .confusion i, .progress-stack i { display: block; border-radius: var(--radius-pill); background: var(--elevated-bg); }
   .bar-list i::after, .confusion i::after, .progress-stack em { content: ""; display: block; inline-size: var(--value, 0%); min-block-size: .5rem; border-radius: inherit; background: var(--brand); }
+  /* These <i>/<em> fill bars are freshly re-created (innerHTML template)
+     every render with their final width already baked in, so a CSS
+     transition never fires on them -- an animation does, since it plays
+     on insertion regardless of whether the value ever visibly "changed". */
+  @keyframes inlineBarFill { from { opacity: .55; transform: scaleX(0); } to { opacity: 1; transform: scaleX(1); } }
+  .bar-list i::after, .confusion i::after, .progress-stack em { transform-origin: left center; animation: inlineBarFill 720ms cubic-bezier(.22,1,.36,1) both; }
+  /* Chart marker dots are also rebuilt from scratch on every combo-chart
+     render (renderLandfillChart does svg.innerHTML = ""), so they pop in
+     with a keyframe animation the same way instead of a transition. */
+  @keyframes chartMarkerPop { from { opacity: 0; transform: scale(.55); } to { opacity: 1; transform: scale(1); } }
+  .combo-chart .chart-points circle { transform-box: fill-box; transform-origin: center; animation: chartMarkerPop 820ms cubic-bezier(.22,1,.36,1) both; animation-delay: 640ms; }
   .progress-stack em { inline-size: 0; }
   .donut-pair { display: flex; gap: 1rem; flex-wrap: wrap; }
   .donut { display: grid; place-items: center; align-content: center; aspect-ratio: 1; inline-size: 8rem; border-radius: 50%; background: conic-gradient(var(--brand) calc(var(--pct) * 1%), var(--elevated-bg) 0); }

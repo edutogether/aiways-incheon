@@ -173,9 +173,9 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   /* With the checklist gone the panel has spare height: pull Powered-by up,
      grow the frame vertically so the QR sits inside with clear margins. */
   body.is-rewound .portal-powered { margin-block-start:-.5rem; }
-  body.is-rewound .portal-frame { padding:1rem 1.4rem .85rem; min-block-size:clamp(6.5rem,18svh,12.5rem); }
+  body.is-rewound .portal-frame { padding:1.1rem 1.4rem; min-block-size:clamp(7rem,21svh,14.5rem); place-content:center; row-gap:0; }
   body.is-rewound .upload-panel > small { margin-block-start:.6rem; }
-  body.is-rewound .dashboard-scene .qr-invite { display:flex; align-items:center; gap:1.1rem; margin:0; padding:.3rem 0; border:0; background:transparent; box-shadow:none; animation:qr-invite-reveal .62s cubic-bezier(.2,.7,.2,1) both; }
+  body.is-rewound .dashboard-scene .qr-invite { display:flex; align-items:center; gap:1.1rem; margin:-.5rem 0 0; padding:0; border:0; background:transparent; box-shadow:none; animation:qr-invite-reveal .62s cubic-bezier(.2,.7,.2,1) both; }
   body.is-rewound .dashboard-scene .qr-invite img { inline-size:clamp(9rem,10.2vw,12.5rem); block-size:auto; border-radius:.9rem; }
   body.is-rewound .dashboard-scene .qr-invite p { color:#dff2fb; font-size:clamp(.95rem,.8vw,1.18rem); font-weight:750; line-height:1.7; word-break:keep-all; }
   body.is-rewound .dashboard-scene .qr-invite p strong { color:#5ef7cd; font-weight:850; }
@@ -406,10 +406,11 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .footer-credit { display:grid; grid-template-columns:1fr auto; justify-content:space-between; gap:1.5rem; border-block-start:1px solid rgb(132 220 255 / 20%); padding-block-start:1.5rem; margin-block-start:.75rem; color:#9eb3c7; font-weight:760; }.footer-credit p:last-child { justify-self:end; text-align:end; }
   .resource-pending { cursor:default; color:rgb(180 197 210 / 70%); background:rgb(255 255 255 / 3.5%); }
   .project-subtitle,.curriculum-description,.hah-description,.gallery-description,.resources-description,.flow-scene .scene-copy>p:not(.eyebrow) { color:#9eb3c7; font-weight:760; margin-block:1em; }
+  .flow-scene .scene-copy>p:not(.eyebrow) { font-size:clamp(1rem,.9vw,1.3rem); }
   .project-subtitle { font-weight:400; font-size:clamp(1rem,calc(.666rem + .3714vw),1.26rem); margin-block:.625rem 0; }
   .curriculum-description { font-size:clamp(1.02rem,calc(.377rem + .7143vw),1.52rem); line-height:1.78; }
   .hah-description { font-size:clamp(.94rem,calc(.67rem + .3vw),1.15rem); line-height:1.5; }
-  .gallery-description { font-size:clamp(.8rem,calc(.5rem + .36vw),1.05rem); line-height:1.7; }
+  .gallery-description { font-size:clamp(.92rem,calc(.58rem + .42vw),1.2rem); line-height:1.7; }
   .project-statement { margin-block-start:clamp(2.16rem,calc(1.401rem + .8429vw),2.75rem); }
   .project-cards { gap:clamp(1.89rem,calc(.945rem + 1.05vw),2.625rem); }
   .resource-grid { box-shadow:none; gap:clamp(.75rem,calc(.268rem + .5357vw),1.125rem); }
@@ -431,7 +432,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   /* D pins the "바로가기" button to the card's bottom-right corner as a pill. */
   .gallery-grid article button { position:absolute; inset-inline-end:1.125rem; inset-block-end:1.125rem; min-block-size:2.375rem; padding:0 1rem; border-radius:999px; border:1px solid rgb(94 247 205 / 28%); color:#06111c; background:linear-gradient(135deg,#5ef7cd,#64eaff); opacity:0; transform:translateY(.5rem); transition:opacity .18s,transform .18s; }
   .gallery-grid article:hover button, .gallery-grid article:focus-within button { opacity:1; transform:none; }
-  .gallery-grid article>span { color:rgb(164 191 216 / 78%); font-weight:800; font-size:.78rem; }
+  .gallery-grid article>span { color:rgb(164 191 216 / 78%); font-weight:800; font-size:clamp(.9rem,.76vw,1.08rem); }
   .gallery-detail { display:none; min-block-size:0; padding:1.25rem; margin-block-start:1.125rem; border:1px solid rgb(94 247 205 / 22%); border-radius:1.375rem; background:rgb(94 247 205 / 7%); }
   .gallery-stage.is-detail .gallery-grid { display:none; }
   .gallery-stage.is-detail .gallery-detail { display:grid; }
@@ -521,7 +522,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .school-panel .bar-list i { block-size:.68rem; }
   .school-panel .bar-list>div.is-selected span, .school-panel .bar-list>div.is-selected b { color:#5ef7cd; }
   .school-panel .bar-list>div.is-selected i { box-shadow:0 0 12px rgb(94 247 205 / 45%); }
-  .school-panel .donut-pair { align-items:center; justify-content:center; gap:clamp(1.6rem,1.8vw,2.6rem); padding-block-end:0; align-self:center; }
+  .school-panel .donut-pair { align-items:center; justify-content:center; gap:clamp(2.2rem,2.6vw,3.6rem); inline-size:100%; padding-block-end:0; align-self:center; }
   .class-panel { column-gap:1rem; row-gap:.625rem; }
   .school-panel .kpi-row { grid-template-columns:1fr; gap:clamp(1rem,1.1vw,1.5rem); }
   .school-panel .kpi-row > div { padding:.5rem .55rem; }
@@ -545,7 +546,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
      pie slice. The old base .donut relies on a small per-child dark circle
      instead, which leaves almost no room for the label -> this D-revival
      override replaces the fill technique entirely for this context. */
-  .school-panel .donut { inline-size:clamp(6rem,7.8vw,8rem); block-size:clamp(6rem,7.8vw,8rem); grid-template-rows:1fr; align-content:stretch; background:radial-gradient(circle at center,#081326 46%,transparent 47%),conic-gradient(#5ef7cd calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 1.5rem rgb(255 255 255 / 6%),0 0 1.5rem rgb(94 247 205 / 12%); }
+  .school-panel .donut { inline-size:clamp(5.6rem,6.6vw,7rem); block-size:clamp(5.6rem,6.6vw,7rem); grid-template-rows:1fr; align-content:stretch; background:radial-gradient(circle at center,#081326 46%,transparent 47%),conic-gradient(#5ef7cd calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 1.5rem rgb(255 255 255 / 6%),0 0 1.5rem rgb(94 247 205 / 12%); }
   .school-panel .donut.violet { background:radial-gradient(circle at center,#081326 46%,transparent 47%),conic-gradient(#ad8cff calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 .875rem rgb(255 255 255 / 6%),0 0 .875rem rgb(173 140 255 / 12%); }
   .school-panel .donut>* { background:none; }
   .school-panel .donut span { align-self:center; padding:0; margin-block-end:-.55rem; font-size:1rem; font-weight:950; }
@@ -612,16 +613,16 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .landfill-kpi-ring { position:relative; isolation:isolate; inline-size:clamp(5.1rem,5.7vw,6.2rem); block-size:clamp(5.1rem,5.7vw,6.2rem); flex:0 0 auto; aspect-ratio:1; grid-template-rows:1fr; align-content:stretch; background:conic-gradient(rgb(94 247 205 / 78%) calc(var(--pct) * 1%), rgb(87 117 154 / 22%) 0); box-shadow:0 0 14px rgb(94 247 205 / 8%), inset 0 0 18px rgb(255 255 255 / 3.5%); }
   .landfill-kpi-ring::before, .landfill-kpi-ring::after { content:""; position:absolute; border-radius:inherit; pointer-events:none; }
   .landfill-kpi-ring::before { content:none; }
-  .landfill-kpi-ring::after { z-index:-1; inset:22%; background:radial-gradient(circle at 36% 28%, rgb(33 64 102 / 98%), #0a1830 72%); box-shadow:inset 0 0 0 1px rgb(173 214 255 / 8%); }
+  .landfill-kpi-ring::after { z-index:-1; inset:15%; background:radial-gradient(circle at 36% 28%, rgb(33 64 102 / 98%), #0a1830 72%); box-shadow:inset 0 0 0 1px rgb(173 214 255 / 8%); }
   .landfill-kpi-ring--secondary { background:conic-gradient(#ad8cff calc(var(--pct) * 1%), rgb(126 116 177 / 20%) 0); box-shadow:0 0 14px rgb(173 140 255 / 14%); }
   .landfill-kpi-ring--secondary > span { text-shadow:0 0 12px rgb(173 140 255 / 30%); }
   .landfill-kpi-ring > span, .landfill-kpi-ring > small { position:relative; z-index:1; grid-area:1 / 1; text-align:center; }
-  .landfill-kpi-ring > span { align-self:center; padding:0; margin-block-start:0; color:#f3fffe; font-size:clamp(.62rem,.52vw,.8rem); font-weight:950; line-height:1; text-shadow:0 0 12px rgb(94 247 205 / 22%);}
+  .landfill-kpi-ring > span { align-self:center; padding:0; margin-block-start:0; color:#f3fffe; font-size:clamp(.72rem,.6vw,.92rem); font-weight:950; line-height:1; text-shadow:0 0 12px rgb(94 247 205 / 22%);}
   /* Simple one-word name (반입량/잔여량) directly under the percentage, both
      stacked inside the ring - the side plates are gone (user call). */
   .landfill-kpi-ring { grid-template-rows:auto auto; align-content:center; justify-items:center; row-gap:.14rem; }
   .landfill-kpi-ring > span, .landfill-kpi-ring > small { position:static; grid-area:auto; translate:none; align-self:auto; margin:0; padding:0; border:0; background:transparent; }
-  .landfill-kpi-ring > small { max-inline-size:none; inline-size:auto; color:rgb(219 241 249 / 80%); font-size:clamp(.56rem,.47vw,.72rem); font-weight:850; line-height:1.1; text-align:center; }
+  .landfill-kpi-ring > small { max-inline-size:none; inline-size:auto; color:rgb(219 241 249 / 80%); font-size:clamp(.64rem,.54vw,.82rem); font-weight:850; line-height:1.1; text-align:center; }
   .landfill-kpi-legend { inline-size:min(100%,8.3rem); min-inline-size:0; display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:.4375rem .5625rem; margin-block-end:.3125rem; border:1px solid rgb(173 140 255 / 26%); border-radius:999px; color:rgb(226 218 255 / 86%); background:linear-gradient(135deg,rgb(173 140 255 / 9%),rgb(100 169 255 / 3.5%)); font-size:.6rem; font-weight:850; white-space:nowrap; }
   .landfill-kpi-legend span { min-inline-size:0; display:inline-flex; align-items:center; gap:.3rem; }
   .landfill-kpi-legend i { inline-size:.4rem; block-size:.4rem; flex:0 0 auto; border-radius:999px; background:#ad8cff; box-shadow:0 0 9px rgb(173 140 255 / 62%); }
@@ -647,7 +648,10 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .class-panel .class-kpis span { margin-block-start:.05rem; }
   .class-panel .class-kpis strong { font-size:clamp(1.25rem,1.5vw,2.2rem); }
   .class-panel .confusion { grid-area:visual; }
-  .class-panel .confusion > div { grid-template-columns:fit-content(11rem) minmax(0,1fr) 2.2rem; align-items:center; column-gap:.55rem; }
+  /* Fixed label column on purpose: each row is its own grid, so fit-content
+     would size per-row and scatter the bar start points. */
+  .class-panel .confusion > div { grid-template-columns:10.6rem minmax(0,1fr) 1.8rem; align-items:center; column-gap:.45rem; }
+  .class-panel .confusion > div b { text-align:right; min-inline-size:0; }
   /* The TOP5 box runs the full height of the KPI column (down to 전환 사례's
      plate) and spreads its rows into the room; every bar starts at one x
      because the label column is fixed, not content-sized. */

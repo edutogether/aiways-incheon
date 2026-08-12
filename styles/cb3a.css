@@ -847,6 +847,10 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .project-cards article { min-block-size:19rem; align-content:center; gap:.9rem; padding:2.1rem 1.9rem; }
   .project-cards article h3 { line-height:1.42; }
   .project-cards article p { line-height:1.82; }
+  /* 대시보드: 학년/학급 선택 바가 글자에 딱 붙어 답답했다. 이 바는 패널
+     오른쪽에 고정돼 있어 폭을 키우면 왼쪽으로 자란다. 폭은 유동으로 잡는다 —
+     고정 7.5rem으로 키우면 1440에서 패널 제목과 겹친다. */
+  .select-line select, .class-panel .select-line select { min-inline-size:clamp(6.5rem, 4.5rem + 2.5vw, 9rem); padding-inline:.95rem; }
   /* HAH: 박스 안 글자 행간을 늘려 숨통 */
   .hah-grid .panel { line-height:1.9; }
   .hah-grid .panel p { line-height:1.92; }

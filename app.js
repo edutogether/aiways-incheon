@@ -2607,6 +2607,17 @@
       glidingScenes = [];
     }
 
+    // Where a section is meant to come to rest. The first scene starts below
+    // the in-flow sticky header, so parking it at the viewport top would slide
+    // it back under the header; the whole page lands at 0 instead, leaving the
+    // header and the scene both fully visible. Every place that positions the
+    // page must agree on this, or the landing correction will undo the ride.
+    function snapTargetY(section) {
+      if (section === sections[0]) return 0;
+      const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      return Math.min(maxY, Math.max(0, window.scrollY + section.getBoundingClientRect().top));
+    }
+
     function snapScrollTo(section, duration = 640, onLanded, easing) {
       if (snapScrollFrame) cancelAnimationFrame(snapScrollFrame);
       const root = document.documentElement;
@@ -2620,13 +2631,7 @@
         if (landed && onLanded) onLanded();
       };
       const startY = window.scrollY;
-      const maxY = Math.max(0, root.scrollHeight - window.innerHeight);
-      // The first scene starts below the in-flow sticky header, so snapping it
-      // to the viewport top would slide it back under the header; land the
-      // whole page at 0 instead so header and scene are both fully visible.
-      const endY = section === sections[0]
-        ? 0
-        : Math.min(maxY, Math.max(0, startY + section.getBoundingClientRect().top));
+      const endY = snapTargetY(section);
       const distance = endY - startY;
       if (Math.abs(distance) < 2) {
         window.scrollTo(0, endY);
@@ -2726,9 +2731,12 @@
       snapScrollTo(target, GLIDE_MS, () => {
         // Absorb any sub-pixel drift instantly, so the scene comes to rest
         // exactly on the edge rather than easing into an approximate stop.
-        const rect = target.getBoundingClientRect();
-        if (Math.abs(rect.top) > 1) {
-          window.scrollTo({ top: Math.round(window.scrollY + rect.top), left: 0, behavior: "auto" });
+        // This must aim at the same resting place the ride did: measuring the
+        // section's own top instead would drag the first scene down under the
+        // header, which read as the page catching and then dropping a notch.
+        const restingY = snapTargetY(target);
+        if (Math.abs(window.scrollY - restingY) > 1) {
+          window.scrollTo({ top: restingY, left: 0, behavior: "auto" });
         }
         // A beat of stillness before the lights: arrival and illumination read
         // as two separate events, which is what makes the landing feel solid.

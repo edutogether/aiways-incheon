@@ -1790,7 +1790,7 @@
     const chartTop = 4;
     const chartBottom = 220;
     const chartLeft = 40;
-    const chartRight = 442;
+    const chartRight = 416;
     const chartHeight = chartBottom - chartTop;
     const yMin = 15000;
     const yMax = 23000;

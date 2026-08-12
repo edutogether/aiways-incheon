@@ -1695,8 +1695,8 @@
     const remainingGauge = $("[data-landfill-remaining-gauge]");
 
     [
-      { value: LANDFILL_INCOMING_PERCENT, label: "총량 대비<br />반입량" },
-      { value: LANDFILL_REMAINING_PERCENT, label: "잔여 관리<br />여력" }
+      { value: LANDFILL_INCOMING_PERCENT, label: "반입량" },
+      { value: LANDFILL_REMAINING_PERCENT, label: "잔여량" }
     ].forEach((item, index) => {
       const pct = Math.max(0, Math.min(100, item.value));
       const progress = progressLabels[index];

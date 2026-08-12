@@ -690,11 +690,38 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .school-panel .donut-pair { gap:1rem; margin-block-end:1.3rem; }
   .school-panel .donut small { margin-block-start:.28rem; }
   .landfill-kpi-ring { inline-size:4.6rem; block-size:4.6rem; }
-  .class-panel .confusion > div { grid-template-columns:6.9rem minmax(0,1fr) 2.2rem; }
+  /* Narrow panels (~310px at 1280): a fixed 6.9rem label column left the bar
+     track at literal 0px. Let labels wrap and hand the bars real width. */
+  .class-panel .confusion > div { grid-template-columns:minmax(4rem,max-content) minmax(2.2rem,1fr) 2rem; }
+  .class-panel .confusion span { word-break:normal; overflow-wrap:break-word; }
+  /* Tracks were collapsing to content width at ~1280, zeroing the bar column;
+     pin the panel templates (double-class selectors outrank the stray rule
+     that shrank col2 to min-content) and every row container to full width. */
+  .dashboard-grid > .school-panel { grid-template-columns:7rem minmax(0,1fr); }
+  .dashboard-grid > .class-panel { grid-template-columns:5rem minmax(0,1fr); }
+  .school-panel .school-visuals { display:grid; grid-template-columns:minmax(0,1fr); justify-items:stretch; inline-size:100%; }
+  .school-panel .bar-list, .school-panel .bar-list>div, .class-panel .confusion>div { inline-size:100%; min-inline-size:0; }
+  .school-panel .bar-list>div { grid-template-columns:2.9rem minmax(0,1fr) 2.4rem; }
   .portal-frame { padding-block:.5rem .75rem; min-block-size:0; }
   .portal-teaser { line-height:1.45; }
   body.is-rewound .portal-frame { min-block-size:clamp(6rem,19svh,15.5rem); padding-block:.9rem; }
   body.is-rewound .dashboard-scene .qr-invite img { inline-size:clamp(6.8rem,8.6vw,12.5rem); }
+}
+
+/* Short PC viewports (1080p at OS scaling, small laptops): the height-locked
+   dashboard has no budget below ~850px and everything spills out of its
+   panel. Unlock the heights - panels size to content, the scene grows, and
+   app.js lets the wheel free-scroll through the overflow before snapping. */
+@media (min-width:64rem) and (max-height:53rem) {
+  .dashboard-grid { block-size:auto; min-block-size:0; grid-template-rows:auto auto; margin-block-start:.6rem; }
+  .landfill-panel .chart-wrap { grid-template-rows:auto auto; }
+  .combo-chart { inline-size:100%; block-size:auto; max-block-size:8.5rem; }
+  .school-panel .donut { inline-size:4.6rem; block-size:4.6rem; }
+  .school-panel .donut-pair { gap:.9rem; margin-block-end:1.2rem; }
+  .landfill-kpi-ring { inline-size:4.2rem; block-size:4.2rem; }
+  .kpi-row strong, .class-kpis strong, .landfill-metrics strong { font-size:clamp(1.2rem,1.5vw,1.9rem); }
+  .dashboard-grid>.panel .panel-head h2 { font-size:clamp(1rem,1.15vw,1.5rem); }
+  .scroll-cue { display:none; }
 }
 
 @keyframes scene-scroll-cue {

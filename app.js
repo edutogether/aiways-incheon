@@ -2635,6 +2635,12 @@
       const active = sections.find(section => section.id === currentId) || nearestSection();
       const direction = event.deltaY > 0 ? 1 : -1;
       if (canContinueInternalScroll(event.target, direction)) return;
+      // A scene taller than the viewport (short screens unlock the dashboard's
+      // height) must be scrollable through before the snap kicks in, or its
+      // lower half would be unreachable.
+      const activeRect = active.getBoundingClientRect();
+      if (direction > 0 && activeRect.bottom > window.innerHeight + 60) return;
+      if (direction < 0 && activeRect.top < -60) return;
       const currentIndex = currentSectionIndex(direction);
       const nextIndex = Math.min(sections.length - 1, Math.max(0, currentIndex + direction));
       if (nextIndex === currentIndex) {

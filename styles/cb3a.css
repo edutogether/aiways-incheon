@@ -866,3 +866,7 @@ body.is-snapping .scroll-finale-hint { backdrop-filter:none; }
 /* 활강에 관여하는 두 씬만 레이어로 올려, 어둡게 깔린 그라디언트 면을
    다시 그리는 대신 옮기기만 하도록 한다. */
 .scene.is-gliding { will-change:opacity, filter; }
+
+/* 성취기준 문구에서 가운뎃점(·)으로 이어진 낱말은 한 덩어리로 읽히도록
+   그 지점에서 줄이 갈라지지 않게 묶는다. */
+.keep-together { white-space:nowrap; }

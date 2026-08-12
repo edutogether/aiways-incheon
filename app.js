@@ -2647,12 +2647,16 @@
       const active = sections.find(section => section.id === currentId) || nearestSection();
       const direction = event.deltaY > 0 ? 1 : -1;
       if (canContinueInternalScroll(event.target, direction)) return;
-      // A scene taller than the viewport (short screens unlock the dashboard's
-      // height) must be scrollable through before the snap kicks in, or its
-      // lower half would be unreachable.
+      // A scene genuinely taller than the viewport must be scrollable through
+      // before the snap kicks in, or its lower half would be unreachable. The
+      // old 60px margin handed almost every scene to the browser's raw wheel
+      // scrolling - tiny rigid steps instead of the glide - because scenes
+      // routinely overhang by a few dozen pixels. Only a substantial overhang
+      // (a quarter of the viewport) is worth reading through manually.
+      const manualScrollMargin = Math.max(120, Math.round(window.innerHeight * 0.25));
       const activeRect = active.getBoundingClientRect();
-      if (direction > 0 && activeRect.bottom > window.innerHeight + 60) return;
-      if (direction < 0 && activeRect.top < -60) return;
+      if (direction > 0 && activeRect.bottom > window.innerHeight + manualScrollMargin) return;
+      if (direction < 0 && activeRect.top < -manualScrollMargin) return;
       const currentIndex = currentSectionIndex(direction);
       const nextIndex = Math.min(sections.length - 1, Math.max(0, currentIndex + direction));
       if (nextIndex === currentIndex) {
@@ -2676,21 +2680,35 @@
 
       event.preventDefault();
       snapLocked = true;
-      clickLockUntil = Date.now() + GLIDE_MS + 60;
+      clickLockUntil = Date.now() + GLIDE_MS + 160;
       const target = sections[nextIndex];
       history.replaceState(null, "", "#" + target.id);
-      // Travel dark, light on landing: the nav highlight moves immediately but
-      // the destination scene stays dimmed for the whole ride and snaps on the
-      // instant the scroll locks in - the eye reads "off, arrived, ON".
+      // Travel dark, land, then light: the nav highlight moves immediately but
+      // the destination scene stays dimmed for the whole ride and only comes on
+      // once it has come to rest - the eye reads "off, arrived, ON".
+      //
+      // The lock must be held for the entire ride. Releasing it on arrival
+      // *position* (what waitForScrollSettle does) frees it about two thirds of
+      // the way in, because the long decelerating tail creeps the last few
+      // pixels - so the next wheel event, which one physical notch of a mouse
+      // wheel readily produces, cancelled the tail and launched the following
+      // snap. That is what made the glide feel chopped off instead of settling.
       activate(target, true, { sectionLight: false });
-      snapScrollTo(target, GLIDE_MS, () => activate(target, true), glideEase);
-      waitForScrollSettle(target, () => {
-        snapLocked = false;
-        clickLockUntil = 0;
+      snapScrollTo(target, GLIDE_MS, () => {
+        // Absorb any sub-pixel drift instantly, so the scene comes to rest
+        // exactly on the edge rather than easing into an approximate stop.
         const rect = target.getBoundingClientRect();
-        const tolerance = Math.max(24, Math.round(window.innerHeight * 0.05));
-        if (Math.abs(rect.top) > tolerance) snapScrollTo(target, 220);
-      }, GLIDE_MS + 120);
+        if (Math.abs(rect.top) > 1) {
+          window.scrollTo({ top: Math.round(window.scrollY + rect.top), left: 0, behavior: "auto" });
+        }
+        // A beat of stillness before the lights: arrival and illumination read
+        // as two separate events, which is what makes the landing feel solid.
+        window.setTimeout(() => {
+          activate(target, true);
+          snapLocked = false;
+          clickLockUntil = 0;
+        }, 90);
+      }, glideEase);
     }
 
     if (!sections.length) return;

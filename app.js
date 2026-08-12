@@ -1790,12 +1790,12 @@
     const chartTop = 4;
     const chartBottom = 220;
     const chartLeft = 40;
-    const chartRight = 416;
+    const chartRight = 435;
     const chartHeight = chartBottom - chartTop;
     const yMin = 15000;
     const yMax = 23000;
-    const ticks = Array.from({ length: 9 }, (_, index) => yMin + index * 1000);
-    const minorTicks = Array.from({ length: 8 }, (_, index) => yMin + 500 + index * 1000);
+    const ticks = Array.from({ length: 5 }, (_, index) => yMin + index * 2000);
+    const minorTicks = Array.from({ length: 4 }, (_, index) => yMin + 1000 + index * 2000);
     const xs = chartDays.map((_, index) => chartLeft + ((chartRight - chartLeft) / Math.max(1, chartDays.length - 1)) * index);
     const yScale = value => chartBottom - ((Math.min(yMax, Math.max(yMin, value)) - yMin) / (yMax - yMin)) * chartHeight;
     const points = chartDays.map((day, index) => ({

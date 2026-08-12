@@ -62,7 +62,7 @@ html { background: #020611; }
 .standards article { background: linear-gradient(145deg, rgb(13 31 61 / 86%), rgb(5 13 29 / 66%)); box-shadow: 0 24px 64px rgb(0 0 0 / 28%), inset 0 1px rgb(255 255 255 / 6%); }
 .standards-grid article { background: rgb(2 10 26 / 48%); transition: transform 180ms ease, border-color 180ms ease, background 180ms ease; }
 .standards-grid article:hover { transform: translateY(-3px); border-color: rgb(94 247 205 / 32%); background: rgb(255 255 255 / 7.5%); }
-.standards-grid span { background: linear-gradient(135deg, #5ef7cd, #64eaff); }
+.standards-grid article > span { background: linear-gradient(135deg, #5ef7cd, #64eaff); }
 
 /* ---------- 갤러리 / 자료실 그리드 ---------- */
 .gallery-grid article { background: linear-gradient(145deg, rgb(13 31 61 / 86%), rgb(5 13 29 / 66%)); transition: transform 180ms ease, border-color 180ms ease, background 180ms ease; }

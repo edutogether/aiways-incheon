@@ -367,7 +367,9 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .standards-panel>div:first-child p { color:#9eb3c7; font-size:1rem; }
   .standards-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.05rem; margin-block-start:0; }
   .standards-grid article { display:grid; gap:.5rem; padding:1.05rem 1.2rem; border:1px solid rgb(105 174 255 / 30%); border-radius:1rem; background:rgb(79 147 255 / 8%); }
-  .standards-grid article span { display:inline-flex; inline-size:fit-content; padding:.3rem .7rem; border-radius:999px; background:linear-gradient(135deg,#5ef7cd,#64eaff); color:#06111c; font-size:.85rem; font-weight:950; }
+  /* 카드의 직계 span(성취기준 코드)만 배지로 만든다. 본문 문단 안의 span까지
+     잡으면 문장 일부가 배지처럼 보인다. */
+  .standards-grid article > span { display:inline-flex; inline-size:fit-content; padding:.3rem .7rem; border-radius:999px; background:linear-gradient(135deg,#5ef7cd,#64eaff); color:#06111c; font-size:.85rem; font-weight:950; }
   .standards-grid article p { font-size:clamp(.92rem,.76vw,1.08rem); font-weight:760; color:#9eb3c7; line-height:1.55; }
 
   /* H-A-H → D: centered copy, three bordered glass cards, pill callout. */

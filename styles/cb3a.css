@@ -799,3 +799,39 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   from { opacity:0; transform:translateY(.55rem) scale(.96); }
   to { opacity:1; transform:none; }
 }
+
+/* ============================================================
+   2026-08-12 사용자 피드백 폴리시 (PC 전용)
+   ============================================================ */
+@media (min-width:64rem) {
+  /* 대시보드: 학교 패널 링그래프를 살짝 위로 */
+  .school-panel .donut-pair { translate:0 -.6rem; }
+  /* 대시보드: 매립지 반입량/잔여량 링을 살짝 왼쪽으로 */
+  .landfill-kpi-module { translate:-.5rem 0; }
+  /* 대시보드: '버려지는 순간' 점선 박스 — 조금 내려앉은 위치에서 위아래로 살아 움직이게 */
+  .upload-panel .portal-frame { margin-block-start:.6rem; animation:portal-live-float 3.2s ease-in-out infinite; }
+  /* 대시보드: '기록' 박스 확대 */
+  a.source-link { display:inline-grid; place-items:center; min-block-size:2.35rem; padding-inline:1.05rem; font-size:.95rem; }
+  /* 대시보드: 새로고침 버튼 리디자인 (유리질감 + 글로우) */
+  .data-refresh-btn { inline-size:2.95rem; block-size:2.95rem; border-color:rgb(100 234 255 / 45%); background:radial-gradient(circle at 32% 26%, rgb(100 234 255 / 26%), transparent 46%), linear-gradient(145deg, rgb(100 234 255 / 16%), rgb(6 20 38 / 55%)); box-shadow:inset 0 1px 0 rgb(255 255 255 / 16%), 0 6px 16px rgb(0 8 18 / 28%), 0 0 16px rgb(100 234 255 / 15%); }
+  .data-refresh-btn svg { stroke-width:2; }
+  .data-refresh-btn:hover { border-color:rgb(94 247 205 / 60%); box-shadow:inset 0 1px 0 rgb(255 255 255 / 20%), 0 8px 20px rgb(0 8 18 / 32%), 0 0 24px rgb(94 247 205 / 30%); }
+  /* 프로젝트: 01/02/03 번호 배지를 세로로 여유있는 칩으로 */
+  .project-cards article>span { display:inline-grid; place-items:center; min-block-size:2.5rem; min-inline-size:2.5rem; padding:.3rem .85rem; border:1px solid rgb(94 247 205 / 38%); border-radius:.95rem; background:rgb(94 247 205 / 12%); box-shadow:0 0 16px rgb(94 247 205 / 14%); justify-self:start; font-size:1.02rem; }
+  /* 교육과정: 성취기준 박스 숨통 */
+  .standards-grid article { padding:1.35rem 1.45rem; gap:.65rem; }
+  /* 차시흐름: 은은한 배경 격자무늬 (D의 씬 그리드 텍스처) */
+  .flow-scene { background-image:linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); background-size:88px 88px; }
+  /* 차시흐름 제목바: 카드 폭이 좁아 긴 제목(2·4·6차시)만 두 줄로 접히면서 8장의
+     제목바 높이가 제각각이었다. 카드 폭에 맞춰 한 줄로 고정하고 폭도 통일한다. */
+  .flow-card>span { justify-self:stretch; inline-size:auto; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; justify-content:center; padding-inline:.5rem; font-size:clamp(.6rem,.64vw,.8rem); }
+  /* 자료실: ONE MORE SCROLL 힌트를 3번째 열(차시별 활동지) 중심축에 정렬 */
+  .scroll-finale-hint { inset-inline-start:calc((2.38rem + 4.38vw) + 2.5 * ((100vw - 2 * (2.38rem + 4.38vw) - 4rem) / 5) + 1.5rem); translate:-50% 0; }
+  /* HAH: 박스를 D보다 한 단계 더 넉넉하게 (사용자 요청) */
+  .hah-grid .panel { min-block-size:clamp(19rem, 40svh, 26rem); }
+}
+
+@keyframes portal-live-float {
+  0%, 100% { transform:translateY(-.25rem); }
+  50% { transform:translateY(.45rem); }
+}

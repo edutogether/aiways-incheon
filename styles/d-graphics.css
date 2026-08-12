@@ -41,19 +41,22 @@ html { background: #020611; }
 /* ---------- 교과(과목 카드) / 흐름(flow) ---------- */
 .subject-card { transition: transform 180ms ease, border-color 180ms ease; }
 .subject-card:hover { transform: translateY(-3px); border-color: rgb(94 247 205 / 34%); }
-.subject-card em { background: linear-gradient(135deg, #5ef7cd, #64eaff); }
+.subject-card em { display: inline-flex; inline-size: max-content; min-block-size: 34px; align-items: center; justify-content: center; padding: 0 14px; border-radius: 999px; color: #07111c; background: linear-gradient(135deg, #5ef7cd, #64eaff); font-style: normal; font-weight: 870; font-size: .82rem; }
 .subject-card:focus { outline: none; }
 .subject-card:focus-visible { outline: 2px solid rgb(94 247 205 / 72%); outline-offset: 5px; }
 .subject-card:hover:not(.is-hover-suppressed) em, .subject-card:focus-visible em { opacity: 1 !important; transform: translateY(0) !important; }
 .subject-card.is-hover-suppressed:hover:not(:focus-visible) em, .subject-card.is-hover-suppressed:focus-within:not(:focus-visible) em { opacity: 0 !important; transform: translateY(8px) !important; }
 .flow-card { opacity: 1; transition: transform 180ms ease, border-color 180ms ease, background 180ms ease; }
+.flow-card em { display: inline-flex; inline-size: max-content; min-block-size: 34px; align-items: center; justify-content: center; padding: 0 14px; border-radius: 999px; color: #07111c; font-style: normal; font-weight: 870; font-size: .82rem; }
 .flow-card:hover { transform: translateY(-4px); border-color: rgb(94 247 205 / 34%); background: rgb(255 255 255 / 8%); box-shadow: 0 0 24px rgb(94 247 205 / 12%); }
 .flow-card[href="./miniapp/3second.html"]:hover { border-color: rgb(94 247 205 / 38%); }
 .flow-card[data-miniapp-missing="true"] { border-color: rgb(131 224 255 / 18%); background: rgb(255 255 255 / 6%); box-shadow: none; opacity: 1; }
 .flow-card[data-miniapp-missing="true"]:hover { transform: translateY(-4px); border-color: rgb(94 247 205 / 34%); background: rgb(255 255 255 / 8%); box-shadow: 0 0 24px rgb(94 247 205 / 12%); }
 .flow-grid article { background: linear-gradient(145deg, rgb(13 31 61 / 86%), rgb(5 13 29 / 66%)); box-shadow: 0 24px 64px rgb(0 0 0 / 28%), inset 0 1px rgb(255 255 255 / 6%); transition: transform 180ms ease, border-color 180ms ease, background 180ms ease; }
 .flow-grid article:hover { transform: translateY(-4px); border-color: rgb(94 247 205 / 42%); background: linear-gradient(145deg, rgb(17 43 82 / 92%), rgb(7 19 38 / 74%)); }
-.flow-grid span { background: linear-gradient(135deg, #5ef7cd, #64eaff); }
+/* .flow-grid span 그라디언트는 이식하지 않는다 — D 라이브에서 차시 제목바는
+   .flow-card>span의 은은한 칩(민트 8%)이 최종 승자라서, 그라디언트를 넣으면
+   민트 글자가 민트 배경에 묻힌다 (2026-08-12 제목바 깨짐 원인). */
 
 /* ---------- 성취기준(standards) ---------- */
 .standards article { background: linear-gradient(145deg, rgb(13 31 61 / 86%), rgb(5 13 29 / 66%)); box-shadow: 0 24px 64px rgb(0 0 0 / 28%), inset 0 1px rgb(255 255 255 / 6%); }
@@ -76,13 +79,14 @@ html { background: #020611; }
 /* ---------- 콜아웃 / H-A-H 그리드 ---------- */
 .callout { opacity: 1 !important; transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease; }
 .callout:hover { transform: translateY(-2px); border-color: rgb(94 247 205 / 34%); box-shadow: 0 0 26px rgb(94 247 205 / 14%); }
-.hah-scene .callout { transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease; }
+.hah-scene .callout { inline-size: min(1780px, 100%); text-align: center; transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease; }
 .hah-scene .callout:hover { transform: translateY(-3px); border-color: rgb(94 247 205 / 38%); background: rgb(94 247 205 / 9%); box-shadow: 0 0 30px rgb(94 247 205 / 15%); }
+/* 세로 크기는 cb3a.css의 사용자 피드백 블록이 D보다 넉넉하게 잡는다 (여기서 지정하지 않음). */
 .hah-grid .panel { position: relative; transition: transform 190ms ease, border-color 190ms ease, background 190ms ease, box-shadow 190ms ease; }
 .hah-grid .panel::before { content: ""; position: absolute; inset: 0 0 auto; block-size: 4px; background: linear-gradient(90deg, rgb(94 247 205 / 18%), rgb(94 247 205 / 72%), rgb(100 234 255 / 18%)); opacity: .72; transition: opacity 190ms ease, filter 190ms ease; }
 .hah-grid .panel:nth-child(2)::before { background: linear-gradient(90deg, rgb(100 169 255 / 18%), rgb(100 234 255 / 78%), rgb(173 140 255 / 18%)); }
 .hah-grid .panel:nth-child(3)::before { background: linear-gradient(90deg, rgb(65 245 194 / 14%), rgb(46 225 184 / 72%), rgb(100 234 255 / 16%)); }
-.hah-grid .panel>span { border-color: rgb(94 247 205 / 42%); background: rgb(94 247 205 / 13%); box-shadow: 0 0 18px rgb(94 247 205 / 16%); }
+.hah-grid .panel>span { color: #c4fff0; border-color: rgb(94 247 205 / 42%); background: rgb(94 247 205 / 13%); box-shadow: 0 0 18px rgb(94 247 205 / 16%); }
 .hah-grid .panel:nth-child(2)>span { border-color: rgb(100 169 255 / 46%); background: rgb(100 169 255 / 15%); box-shadow: 0 0 18px rgb(100 234 255 / 18%); }
 .hah-grid .panel:nth-child(3)>span { border-color: rgb(46 225 184 / 42%); background: rgb(46 225 184 / 12%); box-shadow: 0 0 18px rgb(46 225 184 / 15%); }
 .hah-grid li, .hah-grid .panel span, .hah-grid .panel h3, .hah-grid .panel p { transition: color 180ms ease, text-shadow 180ms ease, transform 180ms ease; }
@@ -126,7 +130,7 @@ html { background: #020611; }
 .landfill-panel.is-dashboard-repaint .chart-bars rect, .landfill-panel.is-dashboard-repaint .chart-area, .landfill-panel.is-dashboard-repaint .chart-line { animation: none !important; }
 
 /* ---------- 업로드 패널 ---------- */
-.upload-actions button:first-child { background: linear-gradient(135deg, #5ef7cd, #64eaff); box-shadow: 0 18px 46px rgb(94 247 205 / 18%); }
+.upload-actions button:first-child { color: #06111c; background: linear-gradient(135deg, #5ef7cd, #64eaff); box-shadow: 0 18px 46px rgb(94 247 205 / 18%); }
 .upload-actions button:last-child { background: rgb(255 255 255 / 6%); }
 .upload-panel .upload-actions button { background: linear-gradient(145deg, rgb(94 247 205 / 22%), rgb(67 137 255 / 12%)); }
 .upload-icon { background: rgb(2 6 17 / 18%); }
@@ -149,13 +153,13 @@ html { background: #020611; }
 .modal-cancel-action { background: rgb(255 255 255 / 5.5%); }
 .modal-cancel-action:hover { border-color: rgb(94 247 205 / 38%); color: #fff; background: rgb(94 247 205 / 11%); }
 .decision-grid button:hover { color: #06111c; background: linear-gradient(135deg, #5ef7cd, #64eaff); }
-.decision-grid button:last-child { background: linear-gradient(135deg, #5ef7cd, #64eaff); }
+.decision-grid button:last-child { color: #06111c; background: linear-gradient(135deg, #5ef7cd, #64eaff); }
 .decision-grid button.is-selected { border-color: rgb(94 247 205 / 72%); box-shadow: 0 0 18px rgb(94 247 205 / 22%); }
 .decision-confirm { background: rgb(94 247 205 / 8%); }
 #cancelDecision { background: rgb(255 255 255 / 6%); }
 
 /* ---------- 3초판단(분리배출) 검색 / 퀵버튼 / 스캔 ---------- */
-.search-line button { background: linear-gradient(135deg, #5ef7cd, #64eaff); }
+.search-line button { color: #06111c; background: linear-gradient(135deg, #5ef7cd, #64eaff); font-weight: 850; }
 #searchButton { background: radial-gradient(circle at 32% 24%, rgb(94 247 205 / 22%), transparent 40%), rgb(94 247 205 / 9%) !important; }
 .sorting-upload button { background: radial-gradient(circle at 30% 18%, rgb(94 247 205 / 12%), transparent 40%), linear-gradient(145deg, rgb(255 255 255 / 7.5%), rgb(6 17 35 / 62%)) !important; box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%); transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease; }
 .sorting-upload button:hover { transform: translateY(-3px); border-color: rgb(94 247 205 / 48%) !important; background: radial-gradient(circle at 28% 18%, rgb(94 247 205 / 18%), transparent 42%), linear-gradient(145deg, rgb(94 247 205 / 10.5%), rgb(9 24 47 / 78%)) !important; box-shadow: 0 16px 36px rgb(0 0 0 / 22%), 0 0 22px rgb(94 247 205 / 10%); }
@@ -173,7 +177,7 @@ html { background: #020611; }
 .quick-scan-meter i { background: linear-gradient(90deg, rgb(94 247 205 / 10%), rgb(94 247 205 / 94%), rgb(90 194 255 / 78%)); animation: quickScanMeter 1.08s cubic-bezier(.22, 1, .36, 1) infinite; }
 .quick-tip { background: linear-gradient(135deg, rgb(94 247 205 / 7.5%), rgb(100 169 255 / 3.5%)), rgb(255 255 255 / 2.8%) !important; }
 .quick-tip strong { background: rgb(94 247 205 / 8.5%); }
-.quick-result>span em { background: linear-gradient(135deg, #5ef7cd, #64eaff); }
+.quick-result>span em { padding: 4px 9px; border-radius: 999px; color: #081421; background: linear-gradient(135deg, #5ef7cd, #64eaff); font-size: .72rem; font-style: normal; }
 .quick-result>span b { background: rgb(94 247 205 / 6.5%); }
 .quick-action-row button { background: rgb(94 247 205 / 8%); }
 .quick-action-row button:disabled { opacity: .42; }
@@ -215,7 +219,7 @@ html { background: #020611; }
 .quiz-result strong.is-bad { color: #ffadc3; text-shadow: 0 0 16px rgb(255 129 164 / 20%); }
 .quiz-rank-table span { background: rgb(255 255 255 / 2.8%); }
 .quiz-rank-table span.is-current { color: rgb(238 254 255 / 96%); border-color: rgb(94 247 205 / 32%); background: rgb(94 247 205 / 8%); box-shadow: 0 0 18px rgb(94 247 205 / 10%); }
-.quiz-retry-btn { background: linear-gradient(135deg, #5ef7cd, #64eaff); }
+.quiz-retry-btn { min-block-size: 38px; padding: 0 18px; border: 1px solid rgb(94 247 205 / 22%); border-radius: 999px; color: #06111c; background: linear-gradient(135deg, #5ef7cd, #64eaff); font-weight: 950; cursor: pointer; }
 .quiz-card.is-finished { border-color: rgb(255 219 112 / 28%); box-shadow: 0 0 34px rgb(255 219 112 / 8%), inset 0 1px 0 rgb(255 255 255 / 8%); }
 .quiz-card.is-finished #quizResult { background: transparent; }
 .quiz-card.is-finished .quiz-rank-table span { border-radius: 17px !important; }
@@ -250,7 +254,7 @@ html { background: #020611; }
 .race-mascot { background: rgb(255 255 255 / 7%); }
 .race-body i em { background: linear-gradient(90deg, #5ef7cd, #64eaff, #ad8cff); }
 .ranking-race-wrap { background: repeating-linear-gradient(90deg, rgb(255 255 255 / 3.5%) 0 1px, transparent 1px 52px), rgb(255 255 255 / 3.5%); }
-.ranking-race-head em { background: linear-gradient(135deg, #5ef7cd, #64eaff); }
+.ranking-race-head em { display: none !important; } /* D 최종본이 숨긴 요소 */
 
 /* ---------- 기다림 목록(hold) / 타임라인 ---------- */
 .hold-list-head { background: rgb(255 255 255 / 3.5%); }
@@ -264,7 +268,7 @@ html { background: #020611; }
 .hold-emoji { background: rgb(94 247 205 / 10%); }
 .hold-input-line { background: rgb(255 255 255 / 3.2%); }
 .hold-input-line input { border-color: transparent; background: rgb(3 13 29 / 42%); }
-.hold-input-line button { background: linear-gradient(135deg, #5ef7cd, #64eaff); }
+.hold-input-line button { min-block-size: 48px; padding-inline: 18px; border: 1px solid rgb(94 247 205 / 28%); border-radius: 14px !important; color: #06111c; background: linear-gradient(135deg, #5ef7cd, #64eaff); font-weight: 950; }
 .hold-entry-card, .hold-guide-card { background: radial-gradient(circle at 12% 0%, rgb(94 247 205 / 10%), transparent 42%), rgb(255 255 255 / 3.5%); }
 .hold-entry-emoji { background: rgb(94 247 205 / 9%); transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease; }
 .hold-entry-emoji.is-cycling { box-shadow: 0 0 22px rgb(94 247 205 / 10%); }
@@ -295,6 +299,6 @@ html { background: #020611; }
 .source-link:hover { color: #fff; border-color: rgb(94 247 205 / 48%); background: rgb(94 247 205 / 12%); box-shadow: 0 0 18px rgb(94 247 205 / 12%); }
 .tm-model-line { background: linear-gradient(135deg, rgb(173 140 255 / 7%), rgb(94 247 205 / 3.5%)); }
 .tm-model-controls input { background: rgb(3 12 24 / 48%); }
-.tm-model-controls button { background: linear-gradient(135deg, #5ef7cd, #64eaff); }
+.tm-model-controls button { min-block-size: 30px; padding-inline: 11px; border: 1px solid rgb(94 247 205 / 28%); border-radius: 10px; color: #071521; background: linear-gradient(135deg, #5ef7cd, #64eaff); font-weight: 900; }
 
 }

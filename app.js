@@ -136,8 +136,8 @@
       ["빨대", 15]
     ],
     "4학년 3반": [
-      ["스티커 붙은 종이상자", 29],
-      ["테이프 붙은 박스", 24],
+      ["택배 상자", 29],
+      ["아이스팩", 24],
       ["코팅종이", 20],
       ["영수증", 16],
       ["휴지", 11]
@@ -153,14 +153,14 @@
       ["배달용기", 34],
       ["컵라면 용기", 31],
       ["과자봉지", 26],
-      ["테이프 붙은 박스", 20],
+      ["아이스팩", 20],
       ["빨대", 16]
     ],
     "5학년 2반": [
       ["코팅종이", 32],
       ["영수증", 27],
       ["종이컵", 22],
-      ["스티커 붙은 종이상자", 18],
+      ["택배 상자", 18],
       ["물티슈", 13]
     ],
     "5학년 3반": [
@@ -179,7 +179,7 @@
     ],
     "6학년 1반": [
       ["배달용기", 38],
-      ["테이프 붙은 박스", 33],
+      ["아이스팩", 33],
       ["컵라면 용기", 28],
       ["건전지", 22],
       ["전구", 17]
@@ -1469,8 +1469,8 @@
   function normalizeConfusionItemName(value) {
     const text = cleanText(value);
     if (!text) return "";
-    if (text.includes("스티커")) return "스티커 붙은 종이상자";
-    if (text.includes("테이프")) return "테이프 붙은 박스";
+    if (text.includes("스티커")) return "택배 상자";
+    if (text.includes("테이프")) return "택배 상자";
     if (text.includes("멸균")) return "멸균팩";
     if (text.includes("우유") || text.includes("종이팩")) return "우유갑";
     if (text.includes("컵라면") || text.includes("라면용기")) return "컵라면 용기";
@@ -1539,6 +1539,7 @@
     if (text.includes("코팅") || text.includes("휴지")) return "📄";
     if (text.includes("빨대")) return "🥤";
     if (text.includes("물티슈")) return "🧻";
+    if (text.includes("아이스팩")) return "🧊";
     if (text.includes("캔")) return "🥫";
     if (text.includes("유리")) return "🍾";
     if (text.includes("플라스틱") || text.includes("페트") || text.includes("생수") || text.includes("요구르트") || text.includes("뚜껑")) return "🧴";
@@ -2567,7 +2568,18 @@
     // duration of our animation and restore whatever was there afterwards -
     // more reliable than passing behavior:"instant" per call.
     let snapScrollFrame = 0;
-    function snapScrollTo(section, duration = 640, onLanded) {
+    // A wheel notch should read like D: soft push-off, long damped glide, the
+    // scene settling in rather than stopping. easeInOutQuart (the default
+    // below) peaks hard in the middle and lands short, which is what made the
+    // per-section snap feel rigid; this curve eases in gently and spends most
+    // of its time decelerating.
+    const glideEase = t => {
+      const smooth = t * t * (3 - 2 * t);
+      return 1 - Math.pow(1 - smooth, 3);
+    };
+    const GLIDE_MS = 720;
+
+    function snapScrollTo(section, duration = 640, onLanded, easing) {
       if (snapScrollFrame) cancelAnimationFrame(snapScrollFrame);
       const root = document.documentElement;
       root.style.scrollBehavior = "auto";
@@ -2597,7 +2609,7 @@
       // Apple-style: a longer ride on easeInOutQuart - soft start, fast middle,
       // long heavily-damped landing, zero overshoot. The back-curve variants
       // (tried at c1 0.95 and 0.42) both read as jitter, not weight.
-      const ease = t => (t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2);
+      const ease = easing || (t => (t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2));
       function step(now) {
         const progress = Math.min(1, (now - startedAt) / duration);
         window.scrollTo(0, Math.round(startY + distance * ease(progress)));
@@ -2664,21 +2676,21 @@
 
       event.preventDefault();
       snapLocked = true;
-      clickLockUntil = Date.now() + 420;
+      clickLockUntil = Date.now() + GLIDE_MS + 60;
       const target = sections[nextIndex];
       history.replaceState(null, "", "#" + target.id);
       // Travel dark, light on landing: the nav highlight moves immediately but
       // the destination scene stays dimmed for the whole ride and snaps on the
       // instant the scroll locks in - the eye reads "off, arrived, ON".
       activate(target, true, { sectionLight: false });
-      snapScrollTo(target, 440, () => activate(target, true));
+      snapScrollTo(target, GLIDE_MS, () => activate(target, true), glideEase);
       waitForScrollSettle(target, () => {
         snapLocked = false;
         clickLockUntil = 0;
         const rect = target.getBoundingClientRect();
         const tolerance = Math.max(24, Math.round(window.innerHeight * 0.05));
         if (Math.abs(rect.top) > tolerance) snapScrollTo(target, 220);
-      }, 420);
+      }, GLIDE_MS + 120);
     }
 
     if (!sections.length) return;
@@ -2686,13 +2698,13 @@
     function navigateToSection(id) {
       const section = document.getElementById(id);
       if (!section) return false;
-      clickLockUntil = Date.now() + 420;
+      clickLockUntil = Date.now() + GLIDE_MS + 60;
       history.replaceState(null, "", "#" + id);
       activate(section, true, { sectionLight: false });
-      snapScrollTo(section, 420, () => activate(section, true));
+      snapScrollTo(section, GLIDE_MS, () => activate(section, true), glideEase);
       window.setTimeout(() => {
         clickLockUntil = 0;
-      }, 440);
+      }, GLIDE_MS + 40);
       return true;
     }
 

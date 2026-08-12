@@ -807,7 +807,9 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   /* 대시보드: 학교 패널 링그래프를 살짝 위로 */
   .school-panel .donut-pair { translate:0 -.6rem; }
   /* 대시보드: 매립지 반입량/잔여량 링을 살짝 왼쪽으로 */
-  .landfill-kpi-module { translate:-1rem 0; }
+  .landfill-kpi-module { translate:-1.5rem 0; }
+  /* 잔여량 링만 살짝 아래로 */
+  .landfill-kpi-ring--secondary { translate:0 .45rem; }
   /* 대시보드: '버려지는 순간' 점선 박스 — 조금 내려앉은 위치에서 위아래로 살아 움직이게 */
   .upload-panel .portal-frame { margin-block-start:1.2rem; animation:portal-live-float 3.2s ease-in-out infinite; }
   /* 대시보드: '기록' 박스 확대 */
@@ -836,3 +838,27 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   0%, 100% { transform:translateY(-.25rem); }
   50% { transform:translateY(.45rem); }
 }
+
+/* ============================================================
+   2026-08-13 2차 피드백 (PC 전용)
+   ============================================================ */
+@media (min-width:64rem) {
+  /* 프로젝트: 세 개의 메인 박스를 세로로 키우고 행간을 풀어 여유있게 */
+  .project-cards article { min-block-size:19rem; align-content:center; gap:.9rem; padding:2.1rem 1.9rem; }
+  .project-cards article h3 { line-height:1.42; }
+  .project-cards article p { line-height:1.82; }
+  /* HAH: 박스 안 글자 행간을 늘려 숨통 */
+  .hah-grid .panel { line-height:1.9; }
+  .hah-grid .panel p { line-height:1.92; }
+  .hah-grid .panel li { line-height:1.85; margin-block-end:.28rem; }
+}
+
+/* 스냅 이동 중에는 매 프레임 다시 계산되는 효과를 잠시 내려둔다.
+   특히 상단 헤더의 backdrop blur는 화면에 고정돼 있어서, 뒤로 지나가는
+   내용을 프레임마다 다시 블러 처리하느라 활강이 버벅이는 주된 원인이었다.
+   멈춰 있을 때의 모습은 그대로이고, 움직이는 동안에만 적용된다. */
+body.is-snapping .site-header,
+body.is-snapping .scroll-finale-hint { backdrop-filter:none; }
+/* 활강에 관여하는 두 씬만 레이어로 올려, 어둡게 깔린 그라디언트 면을
+   다시 그리는 대신 옮기기만 하도록 한다. */
+.scene.is-gliding { will-change:opacity, filter; }

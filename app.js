@@ -2579,6 +2579,34 @@
     };
     const GLIDE_MS = 720;
 
+    // The glide is driven from rAF on the main thread, so anything the browser
+    // has to re-rasterise per frame shows up as stutter. The worst offender is
+    // the sticky header's backdrop blur: it re-blurs whatever passes behind it
+    // on every single frame of the ride. Marking the ride lets the stylesheet
+    // stand those costs down while the page is in motion, and promote just the
+    // two scenes involved so their dimmed, gradient-heavy surfaces are moved
+    // rather than repainted.
+    let glidingScenes = [];
+    let glideSafetyTimer = 0;
+
+    function beginGlide(from, to) {
+      endGlide();
+      document.body.classList.add("is-snapping");
+      glidingScenes = [from, to].filter(Boolean);
+      glidingScenes.forEach(scene => scene.classList.add("is-gliding"));
+      // A ride cancelled mid-flight never reaches its landing callback, so the
+      // stood-down effects would stay off for good. Always hand them back.
+      glideSafetyTimer = window.setTimeout(endGlide, GLIDE_MS + 900);
+    }
+
+    function endGlide() {
+      window.clearTimeout(glideSafetyTimer);
+      glideSafetyTimer = 0;
+      document.body.classList.remove("is-snapping");
+      glidingScenes.forEach(scene => scene.classList.remove("is-gliding"));
+      glidingScenes = [];
+    }
+
     function snapScrollTo(section, duration = 640, onLanded, easing) {
       if (snapScrollFrame) cancelAnimationFrame(snapScrollFrame);
       const root = document.documentElement;
@@ -2694,6 +2722,7 @@
       // wheel readily produces, cancelled the tail and launched the following
       // snap. That is what made the glide feel chopped off instead of settling.
       activate(target, true, { sectionLight: false });
+      beginGlide(active, target);
       snapScrollTo(target, GLIDE_MS, () => {
         // Absorb any sub-pixel drift instantly, so the scene comes to rest
         // exactly on the edge rather than easing into an approximate stop.
@@ -2705,6 +2734,7 @@
         // as two separate events, which is what makes the landing feel solid.
         window.setTimeout(() => {
           activate(target, true);
+          endGlide();
           snapLocked = false;
           clickLockUntil = 0;
         }, 90);
@@ -2719,7 +2749,11 @@
       clickLockUntil = Date.now() + GLIDE_MS + 60;
       history.replaceState(null, "", "#" + id);
       activate(section, true, { sectionLight: false });
-      snapScrollTo(section, GLIDE_MS, () => activate(section, true), glideEase);
+      beginGlide(nearestSection(), section);
+      snapScrollTo(section, GLIDE_MS, () => {
+        activate(section, true);
+        endGlide();
+      }, glideEase);
       window.setTimeout(() => {
         clickLockUntil = 0;
       }, GLIDE_MS + 40);

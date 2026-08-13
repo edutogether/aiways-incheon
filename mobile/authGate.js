@@ -22,12 +22,25 @@
     return node;
   }
 
+  // The boot splash markup that ships inside the gate. It is captured before
+  // anything replaces it so the retry path can put it back verbatim.
+  const splashMarkup = gateContent.innerHTML;
+
   function showApp() {
-    gate.classList.add("hidden");
     appRoot.classList.remove("hidden");
     // app.js measures tab heights at DOMContentLoaded, while #appRoot is
     // still display:none (pre-auth) -- re-measure now that it's real.
     requestAnimationFrame(() => window.AIWaysMobileApp?.syncTabHeights?.());
+    // Fade the splash out over the app rather than cutting to it. The gate
+    // carries inline styles so it can paint before the stylesheets arrive,
+    // and an inline display beats the .hidden class - hence hiding it inline
+    // too once the fade has finished.
+    gate.style.opacity = "0";
+    gate.style.pointerEvents = "none";
+    window.setTimeout(() => {
+      gate.classList.add("hidden");
+      gate.style.display = "none";
+    }, 420);
   }
 
   // Same brand header shown once inside #appRoot (badge + title + subtitle),
@@ -43,12 +56,12 @@
     container.append(header);
   }
 
+  // Waiting is what the boot splash already depicts, so loading leaves it in
+  // place instead of swapping in a second spinner: opening the app shows one
+  // screen that resolves, not a splash that is replaced a moment later.
+  // Restoring the markup matters only on the way back from the retry view.
   function renderLoading() {
-    gateContent.replaceChildren();
-    appendBrandHeader(gateContent);
-    const box = el("div", "flex items-center justify-center gap-2.5 pb-3");
-    box.append(el("span", "inline-block w-4 h-4 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"), el("span", "text-sm font-semibold text-slate-500", "접속을 준비하고 있습니다."));
-    gateContent.append(box);
+    if (gateContent.innerHTML !== splashMarkup) gateContent.innerHTML = splashMarkup;
   }
 
   function renderRetry(code) {

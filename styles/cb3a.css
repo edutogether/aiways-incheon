@@ -1182,3 +1182,13 @@ html { background: #020611; }
 .tm-model-controls button { min-block-size: 30px; padding-inline: 11px; border: 1px solid rgb(94 247 205 / 28%); border-radius: 10px; color: #071521; background: linear-gradient(135deg, #5ef7cd, #64eaff); font-weight: 900; }
 
 }
+
+/* 좁은 화면(<64rem)에서 H-A-H 제목이 페이지를 가로로 밀어내던 문제.
+   이 제목은 전시용 대형 화면을 겨냥해 줄바꿈을 금지하고 글자 최소 크기를
+   4.95rem으로 잡아둔다. 885px 폭에서는 그 한 줄이 1000px가 되어 8개 씬 전체가
+   가로로 177px 밀려났다(씬들이 같은 그리드 트랙을 공유하기 때문). 좁은
+   화면에서는 줄바꿈을 허용하고 크기를 화면에 맞춘다 — PC 조판은 건드리지 않는다. */
+@media (max-width:63.99rem) {
+  .hah-title { inline-size:100%; font-size:clamp(1.9rem,6.4vw,3.2rem); }
+  .hah-title span { white-space:normal; }
+}

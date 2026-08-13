@@ -1135,7 +1135,14 @@ html { background: #020611; }
 
 /* ---------- 6. PC 중 낮은 화면 (높이 ~848px) ---------- */
 @media (min-width:64rem) and (max-height:53rem) {
-.dashboard-grid { block-size:auto; min-block-size:0; grid-template-rows:auto auto; margin-block-start:.6rem; }
+  /* project/curriculum/hah/flow/gallery/resources 여섯 씬이 공유하는
+     padding-block-start가 뷰포트 너비에만 비례해 커지고(calc(6.39rem +
+     3.04vw)) 높이는 전혀 고려하지 않아, 화면이 좁지 않아도 세로로 짧으면
+     (예: 1366x768) 씬 하나가 100svh를 넘어버렸다. 씬 하나가 넘치면 그
+     뒤로 이어지는 모든 스크롤 스냅 위치가 넘친 만큼씩 밀린다 — 화면
+     세로가 짧을 때만 여백을 줄여 씬이 한 화면 안에 다시 들어오게 한다. */
+  .project-scene, .curriculum-scene, .hah-scene, .flow-scene, .gallery-scene, .resources-scene { padding-block-start:5.25rem; padding-block-end:2.5rem; }
+  .dashboard-grid { block-size:auto; min-block-size:0; grid-template-rows:auto auto; margin-block-start:.6rem; }
   .landfill-panel .chart-wrap { grid-template-rows:auto auto; }
   .combo-chart { inline-size:100%; block-size:auto; max-block-size:8.5rem; }
   .school-panel .donut { inline-size:4.6rem; block-size:4.6rem; }

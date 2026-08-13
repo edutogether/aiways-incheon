@@ -1100,7 +1100,10 @@ html { background: #020611; }
   .dashboard-grid > .class-panel { grid-template-columns:3.75rem minmax(0,1fr); }
   .school-panel .school-visuals { display:grid; grid-template-columns:minmax(0,1fr); justify-items:stretch; inline-size:100%; }
   .school-panel .bar-list, .school-panel .bar-list>div, .class-panel .confusion>div { inline-size:100%; min-inline-size:0; }
-  .school-panel .bar-list>div { grid-template-columns:2.9rem minmax(0,1fr) 2.4rem; }
+  /* 학년 라벨(예: "5학년")이 칸 폭에 거의 딱 맞아서(2.9rem) 막대와 사이 간격이
+     column-gap(.7rem)뿐이었다 — 선택된 학년일수록 글자가 막대에 바짝 붙어
+     보였다. 라벨 칸을 넓혀 글자 뒤로 실제 여백을 준다. */
+  .school-panel .bar-list>div { grid-template-columns:3.75rem minmax(0,1fr) 2.4rem; }
   .portal-frame { padding-block:.5rem .75rem; min-block-size:0; }
   .portal-teaser { line-height:1.45; }
   body.is-rewound .portal-frame { min-block-size:clamp(6rem,19svh,15.5rem); padding-block:.9rem; }

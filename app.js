@@ -2582,15 +2582,15 @@
     // duration of our animation and restore whatever was there afterwards -
     // more reliable than passing behavior:"instant" per call.
     let snapScrollFrame = 0;
-    // A wheel notch should read like D: soft push-off, long damped glide, the
-    // scene settling in rather than stopping. easeInOutQuart (the default
-    // below) peaks hard in the middle and lands short, which is what made the
-    // per-section snap feel rigid; this curve eases in gently and spends most
-    // of its time decelerating.
-    const glideEase = t => {
-      const smooth = t * t * (3 - 2 * t);
-      return 1 - Math.pow(1 - smooth, 3);
-    };
+    // A wheel notch should read like a spring being let go, not a rusty
+    // clock spring winding up: an immediate, decisive push-off that then
+    // decelerates smoothly into the landing. Wrapping an ease-out in a
+    // smoothstep (the previous curve) gave the ride a literal zero velocity
+    // at t=0 - technically gentle, but it read as sluggish, not snappy.
+    // Plain ease-out-quart has real velocity from the first frame and still
+    // decelerates the whole way, so it never hits the hard mid-ride peak
+    // that made easeInOutQuart feel rigid either.
+    const glideEase = t => 1 - Math.pow(1 - t, 4);
     const GLIDE_MS = 720;
     // The rewind travels the whole deck, so it carries a little more weight
     // than a single-section glide.

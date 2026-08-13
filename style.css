@@ -50,20 +50,20 @@
   .scene { inline-size: min(100% - (var(--gutter) * 2), var(--content)); margin-inline: auto; scroll-margin-block-start: 5rem; }
   .dashboard-scene { display: grid; gap: var(--space); padding-block-start: clamp(2rem, 6vw, 5rem); }
   .dashboard-grid, .curriculum-layout, .sorting-layout { display: grid; gap: var(--space); }
-  .hero-copy, .scene-copy, .project-intro, .sorting-copy { display: grid; gap: 1rem; max-inline-size: 51rem; }
+  .hero-copy, .scene-copy, .project-intro { display: grid; gap: 1rem; max-inline-size: 51rem; }
   .hero-copy { max-inline-size: 64rem; }
-  .project-cards, .subject-grid, .hah-grid, .flow-grid, .gallery-grid, .resource-grid, .kpi-row, .class-kpis, .landfill-metrics, .app-tabs, .sorting-mode-switch, .quick-buttons, .quick-action-row, .decision-grid, .modal-actions { display: grid; gap: .8rem; }
+  .project-cards, .subject-grid, .hah-grid, .flow-grid, .gallery-grid, .resource-grid, .kpi-row, .class-kpis, .landfill-metrics, .app-tabs, .sorting-mode-switch, .quick-buttons, .quick-action-row, .decision-grid { display: grid; gap: .8rem; }
   .school-visuals, .chart-wrap, .gallery-stage, .sorting-app, .tab-panel, .modal-body { display: grid; gap: 1rem; }
 }
 
 @layer components {
-  .panel, .project-cards article, .hah-card, .flow-card, .gallery-card, .resource-card, .standards-panel, .sorting-app, .quiz-card, .stats-card, .hold-card, .ai-modal { background: linear-gradient(145deg, rgb(25 62 86 / 88%), var(--card)); border: 1px solid var(--line-subtle); border-radius: var(--radius); box-shadow: var(--shadow-low); }
-  .panel, .project-cards article, .hah-card, .flow-card, .gallery-card, .resource-card, .standards-panel, .sorting-app, .quiz-card, .stats-card, .hold-card { display: grid; align-content: start; gap: clamp(.75rem, 1.8vw, 1.2rem); padding: clamp(1rem, 3vw, 1.65rem); }
+  .panel, .project-cards article, .flow-card, .standards-panel, .sorting-app, .quiz-card, .hold-card, .ai-modal { background: linear-gradient(145deg, rgb(25 62 86 / 88%), var(--card)); border: 1px solid var(--line-subtle); border-radius: var(--radius); box-shadow: var(--shadow-low); }
+  .panel, .project-cards article, .flow-card, .standards-panel, .sorting-app, .quiz-card, .hold-card { display: grid; align-content: start; gap: clamp(.75rem, 1.8vw, 1.2rem); padding: clamp(1rem, 3vw, 1.65rem); }
   .panel-head, .chart-title-row, .hold-list-head, .quiz-status, .landfill-actions, .gallery-detail-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
   .panel h2 { font-size: var(--type-card); }
   .panel-head p, .eyebrow, .project-origin, .sorting-mode-status { color: var(--brand-dark); font-size: .82rem; font-weight: 800; letter-spacing: .035em; }
   .panel-head span, .panel small, .rank-note, .sorting-app small, .gallery-detail p, .save-state { color: var(--muted); }
-  .primary-btn, .secondary-btn, .quick-action-row button, .decision-grid button, .modal-actions button, .tm-model-line button, .hold-input-line button, #searchButton, #tmApplyButton { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; padding: .7rem 1rem; font-weight: 800; }
+  .primary-btn, .secondary-btn, .quick-action-row button, .decision-grid button, .tm-model-line button, .hold-input-line button, #searchButton, #tmApplyButton { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; padding: .7rem 1rem; font-weight: 800; }
   .primary-btn, .quick-action-row button:first-child, #confirmDecision { color: var(--canvas-bg); background: var(--brand); border-color: var(--brand); box-shadow: var(--glow-subtle); }
   .secondary-btn, .quick-action-row button, .decision-grid button, .tm-model-line button, .hold-input-line button { background: var(--surface-2); color: var(--ink); border-color: var(--line-default); }
   .primary-btn:hover, .quick-action-row button:first-child:hover, #confirmDecision:hover { background: var(--success); transform: translateY(-2px); }
@@ -75,7 +75,7 @@
   #searchButton { grid-column: 2; grid-row: 2; align-self: stretch; inline-size: 2.75rem; }
   .select-line { display: grid; gap: .4rem; color: var(--muted); font-size: .88rem; font-weight: 750; }
   .select-line select, .search-line input, .tm-model-line input, .hold-input-line input { inline-size: 100%; padding: .7rem .8rem; color: var(--ink); background: var(--elevated-bg); border-color: var(--line-default); }
-  .kpi-row > div, .class-kpis > div, .landfill-metrics > div, .stats-card > div { display: grid; align-content: start; gap: .2rem; padding: .8rem; border-radius: var(--radius-small); background: var(--surface-2); }
+  .kpi-row > div, .class-kpis > div, .landfill-metrics > div { display: grid; align-content: start; gap: .2rem; padding: .8rem; border-radius: var(--radius-small); background: var(--surface-2); }
   .kpi-row strong, .class-kpis strong, .landfill-metrics strong { display: block; font-size: 1.45rem; }
   .kpi-row span, .class-kpis span, .landfill-metrics span { color: var(--muted); font-size: .78rem; }
   .bar-list, .confusion, .progress-stack { display: grid; gap: .7rem; }
@@ -109,19 +109,14 @@
   .donut small { padding: .1rem .55rem 1.5rem; color: var(--muted); font-size: .65rem; }
   .violet { background: conic-gradient(var(--violet) calc(var(--pct) * 1%), var(--elevated-bg) 0); }
   .combo-chart { inline-size: 100%; background: var(--elevated-bg); border: 1px solid var(--line-subtle); border-radius: var(--radius-small); }
-  .landfill-status-card { display: grid; gap: .45rem; padding: 1rem; border: 1px solid var(--line); border-radius: .75rem; }
-  .landfill-status-value { font-size: 2rem; }
-  .landfill-status-gauge { display: flex; min-block-size: .55rem; border-radius: 999px; background: #e5edf2; }
-  .landfill-status-gauge i { display: block; border-radius: inherit; background: var(--brand); }
-  .landfill-gauge-remaining { background: #c9dbe5; }
   .upload-actions button { display: grid; place-items: center; gap: .5rem; padding: 1rem; background: var(--surface-2); color: var(--text-primary); border-color: var(--line-default); font-weight: 800; text-align: center; }
   .upload-icon, .sorting-upload-icon { inline-size: 2rem; block-size: 2rem; }
   .data-refresh-btn { display: grid; place-items: center; flex: 0 0 auto; inline-size: 2.75rem; block-size: 2.75rem; padding: .55rem; }
   .data-refresh-btn svg { inline-size: 1.25rem; block-size: 1.25rem; }
   .upload-icon svg, .sorting-upload-icon svg, .data-refresh-btn svg, #searchButton svg { inline-size: 100%; block-size: 100%; fill: none; stroke: currentColor; stroke-width: 1.8; }
   .project-cards span, .flow-card > span, .gallery-grid article > span { color: var(--brand); font-weight: 900; }
-  .project-cards p, .subject-card p, .hah-card p, .flow-card p, .resource-card p { color: var(--muted); }
-  .subject-card, .resource-card { display: grid; gap: .75rem; }
+  .project-cards p, .subject-card p, .flow-card p { color: var(--muted); }
+  .subject-card { display: grid; gap: .75rem; }
   .subject-card em { color: var(--brand); font-style: normal; font-weight: 800; }
   .standards-grid { display: grid; gap: .75rem; margin-block-start: 1rem; }
   .standards-grid article { padding: .75rem; border-inline-start: 4px solid var(--brand); background: var(--surface-2); }
@@ -172,7 +167,6 @@
   .judgement-skill-evidence li { display:grid; gap:.15rem; padding:.55rem .65rem; border:1px solid var(--line-subtle); border-radius:.5rem; background:var(--surface-3); }
   .judgement-skill-evidence li small,.skill-evidence-signal { color:var(--muted); }
   .skill-evidence-signal { margin:0; font-weight:700; }
-  .skill-evidence-signal.is-conflict { color:var(--warning); }
   .judgement-checklist, .judgement-corrections { border: 1px solid var(--line-default); }
   .judgement-chip-row, .judgement-corrections > div { display: flex; gap: .5rem; flex-wrap: wrap; }
   .judgement-chip { display: grid; gap: .15rem; padding: .45rem .6rem; border-radius: .5rem; background: var(--surface-3); border: 1px solid var(--line-subtle); }
@@ -185,29 +179,21 @@
   .judgement-check span { display: grid; place-items: center; inline-size: 1.25rem; block-size: 1.25rem; border: 1px solid currentColor; border-radius: 50%; }
   .judgement-recommendation.is-ready { color: var(--text-primary); background: color-mix(in srgb, var(--success) 18%, var(--surface-2)); border: 1px solid var(--success); }
   .judgement-recommendation.is-hold, .decision-confirm { color: var(--text-primary); background: color-mix(in srgb, var(--caution) 16%, var(--surface-2)); border: 1px solid var(--caution); }
-  .quiz-card, .stats-card, .hold-card { display: grid; gap: 1rem; }
+  .quiz-card, .hold-card { display: grid; gap: 1rem; }
   .quiz-choice-row { display: flex; gap: .75rem; }
   .quiz-choice-row button { flex: 1; font-size: 1.2rem; font-weight: 900; color: var(--ink); background: var(--surface-2); }
   .quiz-status i, .quiz-card > i { display: block; flex: 1; border-radius: var(--radius-pill); background: var(--elevated-bg); }
   #quizBar { display: block; min-block-size: .55rem; background: var(--brand); border-radius: inherit; }
-  .hold-list { display: grid; gap: .6rem; }
-  .hold-list li { display: flex; justify-content: space-between; gap: .75rem; flex-wrap: wrap; padding: .75rem; border: 1px solid var(--line-subtle); border-radius: var(--radius-small); background: var(--surface-2); }
   .empty-state { color: var(--muted); }
   .ai-modal { inline-size: min(100% - 2rem, 43rem); padding: 0; color: var(--ink); border-color: var(--line-strong); box-shadow: var(--shadow-high); }
   .ai-modal::backdrop { background: rgb(2 10 18 / 76%); }
-  .modal-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem; border-block-end: 1px solid var(--line); }
   .modal-body { padding: 1rem; overflow: auto; }
   .modal-preview { background: var(--elevated-bg); border: 1px solid var(--line-subtle); border-radius: var(--radius-small); }
   .modal-preview img { inline-size: 100%; aspect-ratio: 16 / 9; object-fit: contain; }
   .close-btn { inline-size: var(--control-height); padding: 0; border-radius: 50%; color: var(--ink); background: var(--surface-2); font-size: 1.4rem; }
-  .modal-draft { display: grid; gap: .75rem; }
-  .modal-draft dl { display: grid; gap: .6rem; }
-  .modal-draft dl div { display: grid; grid-template-columns: 6rem 1fr; gap: .75rem; padding-block-end: .55rem; border-block-end: 1px solid var(--line); }
-  .modal-draft dt { color: var(--muted); }
   .decision-grid { grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); }
   .decision-confirm { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; padding: .75rem; border-radius: var(--radius-small); }
   .modal-cancel-action { background: transparent; color: var(--muted); border: 0; text-decoration: underline; }
-  .site-footer { inline-size: min(100% - (var(--gutter) * 2), var(--content)); margin-inline: auto; color: var(--muted); font-size: .85rem; }
 }
 
 @layer sections {
@@ -229,8 +215,6 @@
   .panel:hover, .project-cards article:hover, .gallery-grid article:hover, .resource-grid a:hover { border-color: var(--line-strong); box-shadow: var(--shadow-medium), var(--glow-subtle); transform: translateY(-2px); }
   .panel:focus-within, .sorting-app:focus-within { border-color: var(--focus); }
   .save-state.is-error, .error-state { color: var(--error); border-color: var(--error); }
-  .save-state.is-success, .success-state { color: var(--success); border-color: var(--success); }
-  .caution-state { color: var(--caution); border-color: var(--caution); }
   @keyframes spin { to { transform: rotate(1turn); } }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms; animation-iteration-count: 1; scroll-behavior: auto; transition-duration: 1ms; } }
   @media (max-width: 34rem) { .class-profile-form { grid-template-columns:1fr; } .class-profile-form label:nth-child(1), .class-profile-form label:nth-child(2) { grid-column:auto; } }
@@ -272,11 +256,8 @@
     .brand > span:last-child { display: none; }
     .main-nav { max-inline-size: calc(100vw - 4rem); }
     .hero-actions > *, .upload-actions > *, .quick-action-row > * { flex-basis: 100%; }
-    .modal-draft dl div { grid-template-columns: 1fr; gap: .15rem; }
   }
 }
 
 @layer utilities {
-  .sr-only { position: absolute; inline-size: 1px; block-size: 1px; clip-path: inset(50%); }
-  .text-brand { color: var(--brand); }
 }

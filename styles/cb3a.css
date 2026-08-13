@@ -624,7 +624,7 @@ body { color:#202124; background:#f8fafd; }
      the drawing exactly - no dead background trailing to the panel's right.
      The freed width goes to the two rings. max-block-size is bumped from the
      original 10.4rem so the enlarged axis/label fonts above have room. */
-  .combo-chart { grid-area:chart; inline-size:auto; block-size:100%; aspect-ratio:456/252; min-block-size:0; max-block-size:11.6rem; max-inline-size:100%; justify-self:start; align-self:center; overflow:visible; padding-inline:.45rem; padding-block:.15rem .5rem; box-sizing:content-box; }
+  .combo-chart { grid-area:chart; inline-size:auto; block-size:100%; aspect-ratio:456/252; min-block-size:0; max-block-size:11.6rem; max-inline-size:100%; justify-self:start; align-self:center; overflow:visible; padding-inline:.8rem .45rem; padding-block:.35rem .75rem; box-sizing:content-box; }
   .upload-panel { display:flex; flex-direction:column; min-block-size:0; }
   .upload-panel .experience-portal { flex:1 1 auto; block-size:auto; min-block-size:0; }
   .chart-axis text { font-variant-numeric:tabular-nums; }

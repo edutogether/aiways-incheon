@@ -1070,6 +1070,12 @@
       }
       beginDashboardIntro();
       applyDashboard(allStoredRecords());
+      // The splash's job is to cover the reset-to-zero flash, not to wait out
+      // the count-up. This is the first frame with real (seed) numbers on
+      // screen, so it hides here - not on the animation frame right after
+      // boot() merely starts the data fetch, which used to fire before the
+      // fetch had even resolved and left nothing for the fade to reveal.
+      window.__aiwaysHideBootSplash?.();
     });
   }
 
@@ -2273,9 +2279,20 @@
 
   function loadRemoteRecords(options = {}) {
     return new Promise(resolve => {
+      // applyDashboard() unconditionally tears down and rebuilds the chart
+      // SVG and the confusion/hold lists, so calling it after every poll -
+      // including the ones every 20s that come back with exactly the same
+      // rows - repainted the dashboard for no reason. That read as the
+      // screen flickering on its own. Only re-render when the fetched set
+      // actually differs from what's already on screen.
+      const applyIfChanged = next => {
+        const changed = JSON.stringify(next) !== JSON.stringify(remoteRecords);
+        remoteRecords = next;
+        if (changed) applyDashboard(allStoredRecords());
+      };
+
       if (!DATA_CONFIG.appsScriptUrl) {
-        remoteRecords = [];
-        if (!options.skipApplyWhenUnavailable) applyDashboard(allStoredRecords());
+        if (options.skipApplyWhenUnavailable) { remoteRecords = []; } else { applyIfChanged([]); }
         resolve([]);
         return;
       }
@@ -2289,8 +2306,7 @@
         settled = true;
         const records = Array.isArray(data) ? data : data.rows || data.records || data.data || [];
         const normalized = normalizeRecords(records);
-        remoteRecords = normalized;
-        applyDashboard(allStoredRecords());
+        applyIfChanged(normalized);
         cleanup();
         resolve(normalized);
       };
@@ -2303,8 +2319,7 @@
       script.onerror = () => {
         if (settled) return;
         settled = true;
-        remoteRecords = [];
-        applyDashboard(allStoredRecords());
+        applyIfChanged([]);
         cleanup();
         resolve([]);
       };
@@ -2315,8 +2330,7 @@
       window.setTimeout(() => {
         if (settled) return;
         settled = true;
-        remoteRecords = [];
-        applyDashboard(allStoredRecords());
+        applyIfChanged([]);
         cleanup();
         resolve([]);
       }, 6500);
@@ -4887,10 +4901,13 @@
     prepareDashboardIntroState();
     renderLandfillTimeNow();
     loadDashboardRows({ animateIntro: true });
-    // Hand the screen over once the first scene is laid out. Waiting for the
-    // dashboard data instead would hide the count-up intro, which is the part
-    // worth watching - the splash only has to cover the load.
-    requestAnimationFrame(() => window.__aiwaysHideBootSplash?.());
+    // The splash is hidden from playDashboardIntroForCurrentData once the
+    // first real (seed) render actually lands - see the comment there. This
+    // used to hide on the very next animation frame after this call, which
+    // is before the seed fetch this triggers has even resolved: the fade
+    // played out over a still-empty, zeroed-out dashboard, so by the time a
+    // person could react the splash was already gone and there was nothing
+    // behind it yet to reveal.
   }
 
   if (document.readyState === "loading") {

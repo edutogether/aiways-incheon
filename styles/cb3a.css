@@ -1,6 +1,41 @@
-/* CB-3A: final product composition. This module owns visual overrides for the beta shell. */
+/* ============================================================
+   CB-3A — AI Ways Incheon 제품 조판
+   ------------------------------------------------------------
+   구성 (위에서 아래로 읽으면 됩니다):
+
+     1. 기본 조판            모든 화면에 적용되는 바탕
+     2. 좁은 화면            폰·태블릿 크기의 밝은 테마
+     3. PC / 전시용 화면     실제 시연에 쓰이는 주 무대
+     4. PC 세부 조건         폭이 좁거나 높이가 낮은 PC
+     5. 애니메이션 정의
+     6. 상태 클래스          JS가 켜고 끄는 것들
+
+   같은 화면 조건은 반드시 한 곳에만 있습니다. 어떤 값을 고칠 때는
+   해당 조건 구역만 보면 되고, 한 구역 안에서는 아래쪽이 이깁니다.
+   (2026-08-13 정리: 같은 조건 블록이 6곳에 흩어져 있던 것을 합쳤습니다.
+   규칙 문구와 구역 안 순서는 그대로 두었으므로 화면은 변하지 않습니다.)
+   ============================================================ */
+
+
+/* ---------- 0. 조건 없는 규칙 (상태 클래스 등) ---------- */
+/* M2 HOME keeps the live dashboard data, but gives phones a concise D+C card view. */
+.mobile-home-summary,.mobile-home-status { display:none; }
+/* 스냅 이동 중에는 매 프레임 다시 계산되는 효과를 잠시 내려둔다.
+   특히 상단 헤더의 backdrop blur는 화면에 고정돼 있어서, 뒤로 지나가는
+   내용을 프레임마다 다시 블러 처리하느라 활강이 버벅이는 주된 원인이었다.
+   멈춰 있을 때의 모습은 그대로이고, 움직이는 동안에만 적용된다. */
+body.is-snapping .site-header,
+body.is-snapping .scroll-finale-hint { backdrop-filter:none; }
+/* 활강에 관여하는 두 씬만 레이어로 올려, 어둡게 깔린 그라디언트 면을
+   다시 그리는 대신 옮기기만 하도록 한다. */
+.scene.is-gliding { will-change:opacity, filter; }
+/* 성취기준 문구에서 가운뎃점(·)으로 이어진 낱말은 한 덩어리로 읽히도록
+   그 지점에서 줄이 갈라지지 않게 묶는다. */
+.keep-together { white-space:nowrap; }
+
+/* ---------- 1. 기본 조판 — 모든 화면 공통 (cb3a 레이어) ---------- */
 @layer cb3a {
-  :root { --scene-content-max: 112rem; --scene-inline-space: clamp(1rem,3.4vw,4rem); --scene-block-space: clamp(4.5rem,8vw,9rem); --header-size:4.875rem; --header-inline-space:clamp(1.375rem,4vw,4.5rem); --nav-link-pad:.75rem; --scene-gap:clamp(1rem,1.65vw,1.5rem); --panel-pad:clamp(1.035rem,calc(1.5571vw - .366rem),2.125rem); --copy-max:49.375rem; }
+:root { --scene-content-max: 112rem; --scene-inline-space: clamp(1rem,3.4vw,4rem); --scene-block-space: clamp(4.5rem,8vw,9rem); --header-size:4.875rem; --header-inline-space:clamp(1.375rem,4vw,4.5rem); --nav-link-pad:.75rem; --scene-gap:clamp(1rem,1.65vw,1.5rem); --panel-pad:clamp(1.035rem,calc(1.5571vw - .366rem),2.125rem); --copy-max:49.375rem; }
   /* D's .scene never caps total width (confirmed live: max-width:100%,
      width:100%) - it controls margins purely through side padding, which
      scales as clamp(48px,5.4vw,138px) and locks to a flat 180px at
@@ -77,10 +112,9 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   @media (max-width:22.5rem) { .brand>span:last-child { font-size:.82rem; }.main-nav a { padding-inline:.52rem; font-size:.76rem; }.dashboard-scene h1 { font-size:3rem; }.chart-wrap { grid-template-columns:1fr; grid-template-areas:"title" "chart" "status" "progress"; } }
 }
 
-/* Closed-beta learners use a deliberately lighter application surface on
-   phones; the desktop presentation language above remains untouched. */
+/* ---------- 2. 아주 좁은 화면 (~767px) ---------- */
 @media (max-width:47.99rem) {
-  body { color:#202124; background:#f8fafd; }
+body { color:#202124; background:#f8fafd; }
   body::before { background:linear-gradient(180deg,#fff,transparent 18rem); }
   .site-header { background:#fff; border-block-end-color:#e8eaed; }
   .brand,.main-nav a { color:#174ea6; }
@@ -95,9 +129,9 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .snap-root { display:flex; flex-direction:column; }.sorting-scene { order:-1; min-block-size:calc(100svh - var(--header-size)); padding-block:1.15rem 2rem; }.sorting-scene .scene-copy { gap:.55rem; }.sorting-scene .scene-copy h2 { max-inline-size:none; font-size:clamp(2rem,10vw,2.75rem); }.sorting-scene .scene-copy>p:not(.eyebrow) { display:none; }.sorting-features { display:none; }.sorting-app { gap:.8rem; padding:1rem; }.upload-actions.sorting-upload { grid-template-columns:repeat(2,minmax(0,1fr)); }.upload-actions.sorting-upload button { min-block-size:8.25rem; }.dashboard-scene { padding-block-start:2rem; }.dashboard-grid { gap:.75rem; }.dashboard-grid>.panel { padding:1rem; }.school-panel,.class-panel,.landfill-panel { scroll-margin-block-start:calc(var(--header-size) + 1rem); }.flow-grid { gap:.7rem; }.flow-card { min-block-size:auto; border:1px solid #e8eaed; border-radius:.85rem; background:#fff; }.gallery-stage { gap:.75rem; background:transparent; }.gallery-grid { gap:.75rem; background:transparent; }.gallery-grid article,.gallery-detail { border:1px solid #e8eaed; border-radius:.85rem; background:#fff; }.resource-grid { gap:.75rem; border:0; }.resource-grid a,.resource-grid a:first-child { min-block-size:0; border:1px solid #e8eaed; border-radius:.85rem; background:#fff; box-shadow:0 2px 8px rgb(60 64 67 / 10%); }
 }
 
-/* M1 mobile shell: intentionally scoped below the desktop contract. */
+/* ---------- 3. 좁은 화면 (~1023px) — 밝은 테마 ---------- */
 @media (max-width:63.99rem) {
-  :root { --mobile-shell-nav-size:4.75rem; }
+:root { --mobile-shell-nav-size:4.75rem; }
   body { padding-block-end:calc(var(--mobile-shell-nav-size) + env(safe-area-inset-bottom)); }
   .site-header { position:sticky; inset-block-start:0; z-index:30; flex-wrap:wrap; align-items:center; padding-block-start:calc(.45rem + env(safe-area-inset-top)); background:#fff; border-block-end:1px solid #e8eaed; box-shadow:0 2px 10px rgb(60 64 67 / 10%); }
   .brand { color:#174ea6; }
@@ -117,12 +151,46 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .mobile-quick-nav a[aria-current] { color:#0b57d0; border-color:#a8c7fa; background:#e8f0fe; }
   .mobile-quick-nav a:focus-visible { outline:3px solid #f9ab00; outline-offset:2px; }
   .scene { scroll-margin-block-start:calc(var(--header-size) + 4.8rem); }
+.sorting-scene { order:initial; }
+  .mobile-home-summary { display:block; margin:0; color:#5f6368; font-size:.92rem; line-height:1.55; }
+  .dashboard-scene { display:block; padding-block:1.35rem 2.25rem; }
+  .dashboard-scene .hero-copy { gap:.75rem; padding:0; }
+  .dashboard-scene .eyebrow { color:#1a73e8; font-size:.68rem; }
+  .dashboard-scene h1 { max-inline-size:10ch; color:#202124; font-size:clamp(2.15rem,10.5vw,3.2rem); line-height:1.04; letter-spacing:-.055em; }
+  .dashboard-scene .hero-description,.dashboard-scene .hero-actions { display:none; }
+  .mobile-home-status { display:block; margin:1rem 0 0; padding:.68rem .78rem; border:1px solid #d2e3fc; border-radius:.75rem; color:#174ea6; background:#f8fafd; font-size:.82rem; line-height:1.45; }
+  .mobile-home-status[hidden] { display:none; }
+  .mobile-home-status[data-state="offline"],.mobile-home-status[data-state="error"] { color:#a50e0e; border-color:#f6aea9; background:#fce8e6; }
+  .dashboard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:1fr; gap:.75rem; margin-block-start:1.3rem; }
+  .dashboard-grid>.panel { display:flex; min-block-size:0; padding:.9rem; gap:.65rem; align-items:flex-start; border-color:#e8eaed; background:#fff; box-shadow:0 2px 8px rgb(60 64 67 / 14%); }
+  .dashboard-grid>.panel .panel-head { display:block; }
+  .dashboard-grid>.panel .panel-head p,.dashboard-grid>.panel .select-line,.school-panel .school-visuals,.landfill-panel .chart-wrap,.class-panel .confusion,.class-panel .rank-note,.upload-panel .upload-actions,.upload-panel small { display:none; }
+  .dashboard-grid>.panel .panel-head h2 { color:#202124; font-size:.88rem; line-height:1.32; }
+  .dashboard-grid>.panel .kpi-row,.dashboard-grid>.panel .class-kpis,.dashboard-grid>.panel .landfill-metrics { display:block; margin:0; }
+  .dashboard-grid>.panel .kpi-row>div:not(:first-child),.dashboard-grid>.panel .class-kpis>div:not(:first-child),.dashboard-grid>.panel .landfill-metrics>div:not(:first-child) { display:none; }
+  .dashboard-grid>.panel .kpi-row>div,.dashboard-grid>.panel .class-kpis>div,.dashboard-grid>.panel .landfill-metrics>div { min-block-size:0; padding:0; background:transparent; }
+  .school-panel .kpi-row strong { color:#0b57d0; font-size:clamp(2rem,10vw,2.8rem); line-height:1; }
+  .dashboard-grid>.panel .kpi-row span,.dashboard-grid>.panel .class-kpis span,.dashboard-grid>.panel .landfill-metrics span { display:block; margin-block-start:.32rem; color:#5f6368; font-size:.72rem; line-height:1.35; }
+  .landfill-panel .landfill-actions { display:none; }
+  .landfill-panel .landfill-metrics strong,.class-panel .class-kpis strong { color:#202124; font-size:clamp(1.45rem,7vw,2rem); line-height:1.08; }
+  .upload-panel>p { margin:0; color:rgb(223 236 250 / 78%); font-size:1rem; line-height:1.45; }
+  .upload-panel::after { content:"3초 판단"; inline-size:100%; margin-block-start:auto; color:#0b57d0; font-size:1rem; font-weight:850; white-space:nowrap; }
+  .mobile-quick-nav a::before { display:block; margin-block-end:.14rem; font-size:.9rem; line-height:1; }
+  .mobile-quick-nav a[href="#dashboard"]::before { content:"⌂"; }
+  .mobile-quick-nav a[href="#ranking"]::before { content:"★"; }
+  .mobile-quick-nav a[href="#landfill"]::before { content:"◒"; }
+.scroll-finale-hint, .scroll-cue { display:none; }
+  /* Below 64rem the portal wrappers dissolve so the QR flows exactly where it
+     always sat in the mobile panel; the PC-only teaser copy disappears. */
+  .experience-portal, .portal-frame { display:contents; }
+  .portal-powered, .portal-teaser { display:none; }
+.hah-title { inline-size:100%; font-size:clamp(1.9rem,6.4vw,3.2rem); }
+  .hah-title span { white-space:normal; }
 }
 
-/* Exhibition desktop finish: keeps the approved D/E presentation language
-   together without altering the closed-beta mobile application below 64rem. */
+/* ---------- 4. PC / 전시용 대형 화면 (1024px~) — 이 앱의 주 무대 ---------- */
 @media (min-width:64rem) {
-  /* The last nav item's *text* should line up with the right edge of the scene
+/* The last nav item's *text* should line up with the right edge of the scene
      content below it, so the header stops short of the scene inset by exactly
      the link's own inline padding. Verified at both widths: 180-20=160 at
      2560px, 77.76-12=65.6 at 1440px. */
@@ -288,53 +356,8 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .sorting-csv-export { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-block-start:1rem; padding-block-start:1rem; border-block-start:1px solid rgb(111 212 232 / 18%); }
   .sorting-csv-export button { min-block-size:2.85rem; padding-inline:1rem; }
   .sorting-csv-export p { margin:0; color:#a8bfcd; font-size:.78rem; }
-}
-
-@media (min-width:64rem) {
-  .mobile-shell-bar,.mobile-shell-state,.mobile-quick-nav { display:none; }
-}
-
-/* M2 HOME keeps the live dashboard data, but gives phones a concise D+C card view. */
-.mobile-home-summary,.mobile-home-status { display:none; }
-@media (max-width:63.99rem) {
-  .sorting-scene { order:initial; }
-  .mobile-home-summary { display:block; margin:0; color:#5f6368; font-size:.92rem; line-height:1.55; }
-  .dashboard-scene { display:block; padding-block:1.35rem 2.25rem; }
-  .dashboard-scene .hero-copy { gap:.75rem; padding:0; }
-  .dashboard-scene .eyebrow { color:#1a73e8; font-size:.68rem; }
-  .dashboard-scene h1 { max-inline-size:10ch; color:#202124; font-size:clamp(2.15rem,10.5vw,3.2rem); line-height:1.04; letter-spacing:-.055em; }
-  .dashboard-scene .hero-description,.dashboard-scene .hero-actions { display:none; }
-  .mobile-home-status { display:block; margin:1rem 0 0; padding:.68rem .78rem; border:1px solid #d2e3fc; border-radius:.75rem; color:#174ea6; background:#f8fafd; font-size:.82rem; line-height:1.45; }
-  .mobile-home-status[hidden] { display:none; }
-  .mobile-home-status[data-state="offline"],.mobile-home-status[data-state="error"] { color:#a50e0e; border-color:#f6aea9; background:#fce8e6; }
-  .dashboard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:1fr; gap:.75rem; margin-block-start:1.3rem; }
-  .dashboard-grid>.panel { display:flex; min-block-size:0; padding:.9rem; gap:.65rem; align-items:flex-start; border-color:#e8eaed; background:#fff; box-shadow:0 2px 8px rgb(60 64 67 / 14%); }
-  .dashboard-grid>.panel .panel-head { display:block; }
-  .dashboard-grid>.panel .panel-head p,.dashboard-grid>.panel .select-line,.school-panel .school-visuals,.landfill-panel .chart-wrap,.class-panel .confusion,.class-panel .rank-note,.upload-panel .upload-actions,.upload-panel small { display:none; }
-  .dashboard-grid>.panel .panel-head h2 { color:#202124; font-size:.88rem; line-height:1.32; }
-  .dashboard-grid>.panel .kpi-row,.dashboard-grid>.panel .class-kpis,.dashboard-grid>.panel .landfill-metrics { display:block; margin:0; }
-  .dashboard-grid>.panel .kpi-row>div:not(:first-child),.dashboard-grid>.panel .class-kpis>div:not(:first-child),.dashboard-grid>.panel .landfill-metrics>div:not(:first-child) { display:none; }
-  .dashboard-grid>.panel .kpi-row>div,.dashboard-grid>.panel .class-kpis>div,.dashboard-grid>.panel .landfill-metrics>div { min-block-size:0; padding:0; background:transparent; }
-  .school-panel .kpi-row strong { color:#0b57d0; font-size:clamp(2rem,10vw,2.8rem); line-height:1; }
-  .dashboard-grid>.panel .kpi-row span,.dashboard-grid>.panel .class-kpis span,.dashboard-grid>.panel .landfill-metrics span { display:block; margin-block-start:.32rem; color:#5f6368; font-size:.72rem; line-height:1.35; }
-  .landfill-panel .landfill-actions { display:none; }
-  .landfill-panel .landfill-metrics strong,.class-panel .class-kpis strong { color:#202124; font-size:clamp(1.45rem,7vw,2rem); line-height:1.08; }
-  .upload-panel>p { margin:0; color:rgb(223 236 250 / 78%); font-size:1rem; line-height:1.45; }
-  .upload-panel::after { content:"3초 판단"; inline-size:100%; margin-block-start:auto; color:#0b57d0; font-size:1rem; font-weight:850; white-space:nowrap; }
-  .mobile-quick-nav a::before { display:block; margin-block-end:.14rem; font-size:.9rem; line-height:1; }
-  .mobile-quick-nav a[href="#dashboard"]::before { content:"⌂"; }
-  .mobile-quick-nav a[href="#ranking"]::before { content:"★"; }
-  .mobile-quick-nav a[href="#landfill"]::before { content:"◒"; }
-}
-
-/* ============================================================
-   D REVIVAL — PC page layouts (min-width:64rem only). Restores
-   PC Visual Master D composition over the closed-beta shell.
-   Mobile (<64rem) is intentionally untouched.
-   PROJECT page → D full-width editorial layout.
-   ============================================================ */
-@media (min-width:64rem) {
-  .project-scene { grid-template-columns:1fr; gap:calc(.8rem + 1.61vw); background:none; } /* D gap 36->54; align comes from the D-revival rhythm block */
+.mobile-shell-bar,.mobile-shell-state,.mobile-quick-nav { display:none; }
+.project-scene { grid-template-columns:1fr; gap:calc(.8rem + 1.61vw); background:none; } /* D gap 36->54; align comes from the D-revival rhythm block */
   .project-intro { max-inline-size:none; }
   .project-statement { padding:0; border:0; border-radius:0; background:none; box-shadow:none; }
   .project-statement h2 { max-inline-size:none; font-size:clamp(3rem,4.85vw,7.1rem); line-height:.96; font-weight:950; letter-spacing:normal; }
@@ -723,86 +746,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .brand-mark img { object-fit:contain; }
   .data-refresh-btn { border-radius:50%; border:1px solid rgb(100 234 255 / 28%);color:rgb(100 234 255); padding:.0625rem .375rem; }
   .close-btn { border-radius:999px; border:1px solid rgb(255 255 255 / 16%); background:rgb(255 255 255 / 8%); color:#f2fdff; }
-}
-
-/* Mid-width PCs (64-100rem): the viewport-scaled donuts and rings outgrow
-   their stacked columns and the fixed TOP5 label column runs too wide. This
-   block sits at the end of the file on purpose - it must outrank every
-   component rule above it. */
-@media (min-width:64rem) and (max-width:100rem) {
-  .school-panel .donut { inline-size:5rem; block-size:5rem; }
-  .school-panel .donut-pair { gap:1rem; margin-block-end:1.3rem; }
-  .school-panel .donut small { margin-block-start:.28rem; }
-  .landfill-kpi-ring { inline-size:4.6rem; block-size:4.6rem; }
-  /* Narrow panels (~310px at 1280): a fixed 6.9rem label column left the bar
-     track at literal 0px. Let labels wrap and hand the bars real width. */
-  .class-panel .confusion > div { grid-template-columns:minmax(4rem,max-content) minmax(2.2rem,1fr) 2rem; }
-  .class-panel .confusion span { word-break:normal; overflow-wrap:break-word; }
-  /* Tracks were collapsing to content width at ~1280, zeroing the bar column;
-     pin the panel templates (double-class selectors outrank the stray rule
-     that shrank col2 to min-content) and every row container to full width. */
-  .dashboard-grid > .school-panel { grid-template-columns:7rem minmax(0,1fr); }
-  .dashboard-grid > .class-panel { grid-template-columns:3.75rem minmax(0,1fr); }
-  .school-panel .school-visuals { display:grid; grid-template-columns:minmax(0,1fr); justify-items:stretch; inline-size:100%; }
-  .school-panel .bar-list, .school-panel .bar-list>div, .class-panel .confusion>div { inline-size:100%; min-inline-size:0; }
-  .school-panel .bar-list>div { grid-template-columns:2.9rem minmax(0,1fr) 2.4rem; }
-  .portal-frame { padding-block:.5rem .75rem; min-block-size:0; }
-  .portal-teaser { line-height:1.45; }
-  body.is-rewound .portal-frame { min-block-size:clamp(6rem,19svh,15.5rem); padding-block:.9rem; }
-  body.is-rewound .dashboard-scene .qr-invite img { inline-size:clamp(6.8rem,8.6vw,12.5rem); }
-}
-
-/* Short PC viewports (1080p at OS scaling, small laptops): the height-locked
-   dashboard has no budget below ~850px and everything spills out of its
-   panel. Unlock the heights - panels size to content, the scene grows, and
-   app.js lets the wheel free-scroll through the overflow before snapping. */
-@media (min-width:64rem) and (max-height:53rem) {
-  .dashboard-grid { block-size:auto; min-block-size:0; grid-template-rows:auto auto; margin-block-start:.6rem; }
-  .landfill-panel .chart-wrap { grid-template-rows:auto auto; }
-  .combo-chart { inline-size:100%; block-size:auto; max-block-size:8.5rem; }
-  .school-panel .donut { inline-size:4.6rem; block-size:4.6rem; }
-  .school-panel .donut-pair { gap:.9rem; margin-block-end:1.2rem; }
-  .landfill-kpi-ring { inline-size:4.2rem; block-size:4.2rem; }
-  .kpi-row strong, .class-kpis strong, .landfill-metrics strong { font-size:clamp(1.2rem,1.5vw,1.9rem); }
-  .dashboard-grid>.panel .panel-head h2 { font-size:clamp(1rem,1.15vw,1.5rem); }
-  .scroll-cue { display:none; }
-}
-
-@keyframes scene-scroll-cue {
-  0%, 100% { translate:-50% 0; opacity:.5; }
-  50% { translate:-50% .6rem; opacity:1; }
-}
-
-@keyframes finale-arrow-bob {
-  0%, 100% { translate:0 0; opacity:.55; }
-  50% { translate:0 .45rem; opacity:1; }
-}
-
-@keyframes finale-hint-float {
-  0%, 100% { transform:translateY(0); }
-  50% { transform:translateY(.45rem); }
-}
-
-/* The finale hint is a PC-only device; the sub-64rem closed-beta app keeps
-   its own flow and must never see it. */
-@media (max-width:63.99rem) {
-  .scroll-finale-hint, .scroll-cue { display:none; }
-  /* Below 64rem the portal wrappers dissolve so the QR flows exactly where it
-     always sat in the mobile panel; the PC-only teaser copy disappears. */
-  .experience-portal, .portal-frame { display:contents; }
-  .portal-powered, .portal-teaser { display:none; }
-}
-
-@keyframes qr-invite-reveal {
-  from { opacity:0; transform:translateY(.55rem) scale(.96); }
-  to { opacity:1; transform:none; }
-}
-
-/* ============================================================
-   2026-08-12 사용자 피드백 폴리시 (PC 전용)
-   ============================================================ */
-@media (min-width:64rem) {
-  /* 대시보드: 학교 패널 링그래프를 살짝 위로 */
+/* 대시보드: 학교 패널 링그래프를 살짝 위로 */
   .school-panel .donut-pair { translate:0 -.6rem; }
   /* 대시보드: 매립지 반입량/잔여량 링을 살짝 왼쪽으로 */
   .landfill-kpi-module { translate:-1.5rem 0; }
@@ -831,18 +775,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   /* HAH: 세 박스는 내용(제목·설명·목록 3줄)에 맞춰 세우고 아래로 한 숨만 남긴다.
      이전 값(최대 26rem)은 1080 높이에서 내용 아래로 165px가 비어 보였다. */
   .hah-grid .panel { min-block-size:clamp(15rem, 26svh, 18.5rem); }
-}
-
-@keyframes portal-live-float {
-  0%, 100% { transform:translateY(-.25rem); }
-  50% { transform:translateY(.45rem); }
-}
-
-/* ============================================================
-   2026-08-13 2차 피드백 (PC 전용)
-   ============================================================ */
-@media (min-width:64rem) {
-  /* 프로젝트: 세 개의 메인 박스를 세로로 키우고 행간을 풀어 여유있게 */
+/* 프로젝트: 세 개의 메인 박스를 세로로 키우고 행간을 풀어 여유있게 */
   .project-cards article { min-block-size:19rem; align-content:center; gap:.9rem; padding:2.1rem 1.9rem; }
   .project-cards article h3 { line-height:1.42; }
   .project-cards article p { line-height:1.82; }
@@ -854,38 +787,6 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .hah-grid .panel { line-height:1.9; }
   .hah-grid .panel p { line-height:1.92; }
   .hah-grid .panel li { line-height:1.85; margin-block-end:.28rem; }
-}
-
-/* 스냅 이동 중에는 매 프레임 다시 계산되는 효과를 잠시 내려둔다.
-   특히 상단 헤더의 backdrop blur는 화면에 고정돼 있어서, 뒤로 지나가는
-   내용을 프레임마다 다시 블러 처리하느라 활강이 버벅이는 주된 원인이었다.
-   멈춰 있을 때의 모습은 그대로이고, 움직이는 동안에만 적용된다. */
-body.is-snapping .site-header,
-body.is-snapping .scroll-finale-hint { backdrop-filter:none; }
-/* 활강에 관여하는 두 씬만 레이어로 올려, 어둡게 깔린 그라디언트 면을
-   다시 그리는 대신 옮기기만 하도록 한다. */
-.scene.is-gliding { will-change:opacity, filter; }
-
-/* 성취기준 문구에서 가운뎃점(·)으로 이어진 낱말은 한 덩어리로 읽히도록
-   그 지점에서 줄이 갈라지지 않게 묶는다. */
-.keep-together { white-space:nowrap; }
-
-/* ============================================================
-   아래 블록은 styles/d-graphics.css를 그대로 옮겨온 것이다.
-   (2026-08-13 통합: 스타일시트를 4장 → 3장으로 줄이면서, 파일이
-   나뉘어 있을 때의 로드 순서를 그대로 보존하려고 파일 맨 끝에 붙였다.
-   레이어 밖 규칙이라는 성격도 동일하므로 우선순위는 변하지 않는다.)
-   ============================================================ */
-/* ============================================================
-   D 그래픽 파리티 (참조: 커밋 0bb2443 "Polish dashboard sections and restore TM controls")
-   - D의 최종 유효 스타일 중 현재 빌드에 빠져 있던 시각 속성(그라디언트/섀도/트랜지션/호버/애니메이션)만 이식.
-   - PC 전용(min-width:64rem): PC 페이지의 좁은 화면(밝은 테마) 모드는 건드리지 않는다.
-   - 레이아웃 지오메트리(섹션 translateY, 차트 미세 오프셋 등)는 의도적으로 제외 — 브라우저 대조 후 별도 반영.
-   - D가 스스로 최종적으로 꺼둔 장치(.app-tabs 밑줄 애니메이션, .project-intro::before 오라)는 이식하지 않음.
-   - 이번 세션 승인 폴리시(c749ed5: source-link 테두리 두께, landfill 차트 gap, class-panel 열 너비)는 유지.
-   ============================================================ */
-@media (min-width: 64rem) {
-
 /* ---------- 키프레임 ---------- */
 @keyframes refreshSpin { to { transform: rotate(360deg); } }
 @keyframes scanLine { 0% { transform: translateY(-20%); } 100% { transform: translateY(520%); } }
@@ -1180,15 +1081,63 @@ html { background: #020611; }
 .tm-model-line { background: linear-gradient(135deg, rgb(173 140 255 / 7%), rgb(94 247 205 / 3.5%)); }
 .tm-model-controls input { background: rgb(3 12 24 / 48%); }
 .tm-model-controls button { min-block-size: 30px; padding-inline: 11px; border: 1px solid rgb(94 247 205 / 28%); border-radius: 10px; color: #071521; background: linear-gradient(135deg, #5ef7cd, #64eaff); font-weight: 900; }
-
 }
 
-/* 좁은 화면(<64rem)에서 H-A-H 제목이 페이지를 가로로 밀어내던 문제.
-   이 제목은 전시용 대형 화면을 겨냥해 줄바꿈을 금지하고 글자 최소 크기를
-   4.95rem으로 잡아둔다. 885px 폭에서는 그 한 줄이 1000px가 되어 8개 씬 전체가
-   가로로 177px 밀려났다(씬들이 같은 그리드 트랙을 공유하기 때문). 좁은
-   화면에서는 줄바꿈을 허용하고 크기를 화면에 맞춘다 — PC 조판은 건드리지 않는다. */
-@media (max-width:63.99rem) {
-  .hah-title { inline-size:100%; font-size:clamp(1.9rem,6.4vw,3.2rem); }
-  .hah-title span { white-space:normal; }
+/* ---------- 5. PC 중 좁은 폭 (1024~1600px) ---------- */
+@media (min-width:64rem) and (max-width:100rem) {
+.school-panel .donut { inline-size:5rem; block-size:5rem; }
+  .school-panel .donut-pair { gap:1rem; margin-block-end:1.3rem; }
+  .school-panel .donut small { margin-block-start:.28rem; }
+  .landfill-kpi-ring { inline-size:4.6rem; block-size:4.6rem; }
+  /* Narrow panels (~310px at 1280): a fixed 6.9rem label column left the bar
+     track at literal 0px. Let labels wrap and hand the bars real width. */
+  .class-panel .confusion > div { grid-template-columns:minmax(4rem,max-content) minmax(2.2rem,1fr) 2rem; }
+  .class-panel .confusion span { word-break:normal; overflow-wrap:break-word; }
+  /* Tracks were collapsing to content width at ~1280, zeroing the bar column;
+     pin the panel templates (double-class selectors outrank the stray rule
+     that shrank col2 to min-content) and every row container to full width. */
+  .dashboard-grid > .school-panel { grid-template-columns:7rem minmax(0,1fr); }
+  .dashboard-grid > .class-panel { grid-template-columns:3.75rem minmax(0,1fr); }
+  .school-panel .school-visuals { display:grid; grid-template-columns:minmax(0,1fr); justify-items:stretch; inline-size:100%; }
+  .school-panel .bar-list, .school-panel .bar-list>div, .class-panel .confusion>div { inline-size:100%; min-inline-size:0; }
+  .school-panel .bar-list>div { grid-template-columns:2.9rem minmax(0,1fr) 2.4rem; }
+  .portal-frame { padding-block:.5rem .75rem; min-block-size:0; }
+  .portal-teaser { line-height:1.45; }
+  body.is-rewound .portal-frame { min-block-size:clamp(6rem,19svh,15.5rem); padding-block:.9rem; }
+  body.is-rewound .dashboard-scene .qr-invite img { inline-size:clamp(6.8rem,8.6vw,12.5rem); }
+}
+
+/* ---------- 6. PC 중 낮은 화면 (높이 ~848px) ---------- */
+@media (min-width:64rem) and (max-height:53rem) {
+.dashboard-grid { block-size:auto; min-block-size:0; grid-template-rows:auto auto; margin-block-start:.6rem; }
+  .landfill-panel .chart-wrap { grid-template-rows:auto auto; }
+  .combo-chart { inline-size:100%; block-size:auto; max-block-size:8.5rem; }
+  .school-panel .donut { inline-size:4.6rem; block-size:4.6rem; }
+  .school-panel .donut-pair { gap:.9rem; margin-block-end:1.2rem; }
+  .landfill-kpi-ring { inline-size:4.2rem; block-size:4.2rem; }
+  .kpi-row strong, .class-kpis strong, .landfill-metrics strong { font-size:clamp(1.2rem,1.5vw,1.9rem); }
+  .dashboard-grid>.panel .panel-head h2 { font-size:clamp(1rem,1.15vw,1.5rem); }
+  .scroll-cue { display:none; }
+}
+
+/* ---------- 애니메이션 정의 ---------- */
+@keyframes scene-scroll-cue {
+  0%, 100% { translate:-50% 0; opacity:.5; }
+  50% { translate:-50% .6rem; opacity:1; }
+}
+@keyframes finale-arrow-bob {
+  0%, 100% { translate:0 0; opacity:.55; }
+  50% { translate:0 .45rem; opacity:1; }
+}
+@keyframes finale-hint-float {
+  0%, 100% { transform:translateY(0); }
+  50% { transform:translateY(.45rem); }
+}
+@keyframes qr-invite-reveal {
+  from { opacity:0; transform:translateY(.55rem) scale(.96); }
+  to { opacity:1; transform:none; }
+}
+@keyframes portal-live-float {
+  0%, 100% { transform:translateY(-.25rem); }
+  50% { transform:translateY(.45rem); }
 }

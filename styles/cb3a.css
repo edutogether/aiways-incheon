@@ -548,7 +548,7 @@ body { color:#202124; background:#f8fafd; }
   .school-panel .bar-list b { min-inline-size:0; text-align:right; }
   /* 라벨 칸을 넓혀 막대와 사이 여백을 준 뒤, 글자가 패널 왼쪽 끝에 너무 붙어
      보였다 — 칸 너비는 그대로 두고 글자만 10px 오른쪽으로 민다. */
-  .school-panel .bar-list > div span { padding-inline-start:18px; }
+  .school-panel .bar-list > div span { padding-inline-start:23px; }
   .school-panel .bar-list i { block-size:.68rem; }
   .school-panel .bar-list>div.is-selected span, .school-panel .bar-list>div.is-selected b { color:#5ef7cd; }
   .school-panel .bar-list>div.is-selected i { box-shadow:0 0 12px rgb(94 247 205 / 45%); }
@@ -576,7 +576,7 @@ body { color:#202124; background:#f8fafd; }
      pie slice. The old base .donut relies on a small per-child dark circle
      instead, which leaves almost no room for the label -> this D-revival
      override replaces the fill technique entirely for this context. */
-  .school-panel .donut { inline-size:clamp(5.6rem,6.6vw,7rem); block-size:clamp(5.6rem,6.6vw,7rem); grid-template-rows:1fr; align-content:stretch; background:radial-gradient(circle at center,#081326 46%,transparent 47%),conic-gradient(#5ef7cd calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 1.5rem rgb(255 255 255 / 6%),0 0 1.5rem rgb(94 247 205 / 12%); transform:translateY(-10px); }
+  .school-panel .donut { inline-size:clamp(5.6rem,6.6vw,7rem); block-size:clamp(5.6rem,6.6vw,7rem); grid-template-rows:1fr; align-content:stretch; background:radial-gradient(circle at center,#081326 46%,transparent 47%),conic-gradient(#5ef7cd calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 1.5rem rgb(255 255 255 / 6%),0 0 1.5rem rgb(94 247 205 / 12%); transform:translateY(-15px); }
   .school-panel .donut.violet { background:radial-gradient(circle at center,#081326 46%,transparent 47%),conic-gradient(#ad8cff calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 .875rem rgb(255 255 255 / 6%),0 0 .875rem rgb(173 140 255 / 12%); }
   .school-panel .donut>* { background:none; }
   .school-panel .donut span { align-self:center; padding:0; margin-block-end:-.55rem; font-size:1rem; font-weight:950; }
@@ -584,7 +584,7 @@ body { color:#202124; background:#f8fafd; }
      caption back onto the ring): the label floats fully below the donut. */
   /* .donut 자체를 5px 위로 올렸으므로(요청: 링+퍼센테이지만 이동, 캡션은 제자리),
      absolute 캡션은 부모를 따라 같이 5px 올라간다 — 그만큼 아래로 되돌린다. */
-  .school-panel .donut small { position:absolute; inset-block-start:100%; inset-inline-start:50%; translate:-50% 10px; align-self:auto; padding:0; margin:0; margin-block-start:.5rem; max-inline-size:none; white-space:nowrap; font-size:clamp(.76rem,.64vw,.95rem); font-weight:850; line-height:1.15; }
+  .school-panel .donut small { position:absolute; inset-block-start:100%; inset-inline-start:50%; translate:-50% 15px; align-self:auto; padding:0; margin:0; margin-block-start:.5rem; max-inline-size:none; white-space:nowrap; font-size:clamp(.76rem,.64vw,.95rem); font-weight:850; line-height:1.15; }
 
   /* 4. Landfill: the four metric boxes were letting "16,400t" run into the
      next box ("-9.4%"); the title/time row needed a hard nowrap so it can
@@ -1156,4 +1156,26 @@ html { background: #020611; }
 @keyframes portal-live-float {
   0%, 100% { transform:translateY(-.25rem); }
   50% { transform:translateY(.45rem); }
+}
+
+/* 8개 씬 배경 정리 (요청: 갤러리의 은은한 초록빛과 차시흐름의 격자무늬를
+   전 씬에 반영, 단 전부 같은 자리에 중심을 찍지 않게).
+   실측해보니 이 배경 장식이 실제로 켜져 있던 건 project-scene(글로우)과
+   flow-scene(격자무늬) 둘뿐이었다 — 나머지 6개 씬(대시보드/교육과정/HAH/
+   갤러리/3초판단/자료실)에 있던 배경 규칙은 전부 뒤에 나오는 다른 규칙에
+   덮여 죽어 있었다. 파일 맨 끝에서 8개 씬 전부에 공통 격자무늬 + 씬마다
+   다른 좌표의 브랜드색 글로우 3개를 다시 지정한다 — 다른 모든 배경
+   규칙보다 소스 순서상 뒤이므로 확실히 이긴다. */
+@media (min-width:64rem) {
+  .dashboard-scene, .project-scene, .curriculum-scene, .hah-scene, .flow-scene, .gallery-scene, .sorting-scene, .resources-scene {
+    background-size: auto, auto, auto, 88px 88px, 88px 88px;
+  }
+  .dashboard-scene { background-image: radial-gradient(circle at 12% 82%, rgb(94 247 205 / 12%), transparent 34%), radial-gradient(circle at 84% 20%, rgb(100 169 255 / 10%), transparent 40%), radial-gradient(circle at 46% 8%, rgb(173 140 255 / 8%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
+  .project-scene { background-image: radial-gradient(circle at 16% 28%, rgb(94 247 205 / 18%), transparent 34%), radial-gradient(circle at 68% 52%, rgb(100 169 255 / 13%), transparent 44%), radial-gradient(circle at 92% 18%, rgb(173 140 255 / 11%), transparent 36%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
+  .curriculum-scene { background-image: radial-gradient(circle at 80% 22%, rgb(94 247 205 / 14%), transparent 36%), radial-gradient(circle at 28% 70%, rgb(100 169 255 / 12%), transparent 42%), radial-gradient(circle at 8% 12%, rgb(173 140 255 / 9%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
+  .hah-scene { background-image: radial-gradient(circle at 20% 78%, rgb(94 247 205 / 13%), transparent 34%), radial-gradient(circle at 86% 26%, rgb(100 169 255 / 11%), transparent 40%), radial-gradient(circle at 54% 6%, rgb(173 140 255 / 9%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
+  .flow-scene { background-image: radial-gradient(circle at 88% 32%, rgb(94 247 205 / 12%), transparent 34%), radial-gradient(circle at 14% 62%, rgb(100 169 255 / 10%), transparent 40%), radial-gradient(circle at 48% 92%, rgb(173 140 255 / 8%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
+  .gallery-scene { background-image: radial-gradient(circle at 10% 46%, rgb(94 247 205 / 14%), transparent 34%), radial-gradient(circle at 76% 14%, rgb(100 169 255 / 11%), transparent 40%), radial-gradient(circle at 40% 86%, rgb(173 140 255 / 9%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
+  .sorting-scene { background-image: radial-gradient(circle at 62% 10%, rgb(94 247 205 / 13%), transparent 34%), radial-gradient(circle at 16% 80%, rgb(100 169 255 / 11%), transparent 40%), radial-gradient(circle at 90% 56%, rgb(173 140 255 / 8%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
+  .resources-scene { background-image: radial-gradient(circle at 26% 16%, rgb(94 247 205 / 13%), transparent 34%), radial-gradient(circle at 72% 82%, rgb(100 169 255 / 11%), transparent 40%), radial-gradient(circle at 6% 52%, rgb(173 140 255 / 8%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
 }

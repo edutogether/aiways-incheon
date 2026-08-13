@@ -4887,6 +4887,10 @@
     prepareDashboardIntroState();
     renderLandfillTimeNow();
     loadDashboardRows({ animateIntro: true });
+    // Hand the screen over once the first scene is laid out. Waiting for the
+    // dashboard data instead would hide the count-up intro, which is the part
+    // worth watching - the splash only has to cover the load.
+    requestAnimationFrame(() => window.__aiwaysHideBootSplash?.());
   }
 
   if (document.readyState === "loading") {

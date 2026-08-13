@@ -546,6 +546,9 @@ body { color:#202124; background:#f8fafd; }
   .school-panel .donut-pair { }
   .school-panel .bar-list { min-inline-size:0; }
   .school-panel .bar-list b { min-inline-size:0; text-align:right; }
+  /* 라벨 칸을 넓혀 막대와 사이 여백을 준 뒤, 글자가 패널 왼쪽 끝에 너무 붙어
+     보였다 — 칸 너비는 그대로 두고 글자만 10px 오른쪽으로 민다. */
+  .school-panel .bar-list > div span { padding-inline-start:10px; }
   .school-panel .bar-list i { block-size:.68rem; }
   .school-panel .bar-list>div.is-selected span, .school-panel .bar-list>div.is-selected b { color:#5ef7cd; }
   .school-panel .bar-list>div.is-selected i { box-shadow:0 0 12px rgb(94 247 205 / 45%); }
@@ -573,13 +576,15 @@ body { color:#202124; background:#f8fafd; }
      pie slice. The old base .donut relies on a small per-child dark circle
      instead, which leaves almost no room for the label -> this D-revival
      override replaces the fill technique entirely for this context. */
-  .school-panel .donut { inline-size:clamp(5.6rem,6.6vw,7rem); block-size:clamp(5.6rem,6.6vw,7rem); grid-template-rows:1fr; align-content:stretch; background:radial-gradient(circle at center,#081326 46%,transparent 47%),conic-gradient(#5ef7cd calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 1.5rem rgb(255 255 255 / 6%),0 0 1.5rem rgb(94 247 205 / 12%); }
+  .school-panel .donut { inline-size:clamp(5.6rem,6.6vw,7rem); block-size:clamp(5.6rem,6.6vw,7rem); grid-template-rows:1fr; align-content:stretch; background:radial-gradient(circle at center,#081326 46%,transparent 47%),conic-gradient(#5ef7cd calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 1.5rem rgb(255 255 255 / 6%),0 0 1.5rem rgb(94 247 205 / 12%); transform:translateY(-5px); }
   .school-panel .donut.violet { background:radial-gradient(circle at center,#081326 46%,transparent 47%),conic-gradient(#ad8cff calc(var(--pct) * 1%),rgb(255 255 255 / 10%) 0); box-shadow:inset 0 0 .875rem rgb(255 255 255 / 6%),0 0 .875rem rgb(173 140 255 / 12%); }
   .school-panel .donut>* { background:none; }
   .school-panel .donut span { align-self:center; padding:0; margin-block-end:-.55rem; font-size:1rem; font-weight:950; }
   /* One rule only (a duplicate above used to win the cascade and drag the
      caption back onto the ring): the label floats fully below the donut. */
-  .school-panel .donut small { position:absolute; inset-block-start:100%; inset-inline-start:50%; translate:-50% 0; align-self:auto; padding:0; margin:0; margin-block-start:.5rem; max-inline-size:none; white-space:nowrap; font-size:clamp(.76rem,.64vw,.95rem); font-weight:850; line-height:1.15; }
+  /* .donut 자체를 5px 위로 올렸으므로(요청: 링+퍼센테이지만 이동, 캡션은 제자리),
+     absolute 캡션은 부모를 따라 같이 5px 올라간다 — 그만큼 아래로 되돌린다. */
+  .school-panel .donut small { position:absolute; inset-block-start:100%; inset-inline-start:50%; translate:-50% 5px; align-self:auto; padding:0; margin:0; margin-block-start:.5rem; max-inline-size:none; white-space:nowrap; font-size:clamp(.76rem,.64vw,.95rem); font-weight:850; line-height:1.15; }
 
   /* 4. Landfill: the four metric boxes were letting "16,400t" run into the
      next box ("-9.4%"); the title/time row needed a hard nowrap so it can
@@ -611,7 +616,10 @@ body { color:#202124; background:#f8fafd; }
   .landfill-panel .landfill-metrics span { font-size:clamp(.72rem,.6vw,.9rem); }
   .landfill-panel .chart-title-row { grid-area:title; }
   .landfill-panel .combo-chart { grid-area:chart; }
-  .combo-chart .weekday-label { font-size:14.5px; font-weight:850; }
+  .combo-chart .weekday-label { font-size:16px; font-weight:850; }
+  .combo-chart .date-label { font-size:14px; }
+  /* y축 맨 아래에 그리드 눈금과 별개로 찍히던 "0" 라벨 제거 (요청) */
+  .combo-chart .y-zero { display:none; }
   /* aspect-ratio breaks the width/height circularity, so the svg's box hugs
      the drawing exactly - no dead background trailing to the panel's right.
      The freed width goes to the two rings. */

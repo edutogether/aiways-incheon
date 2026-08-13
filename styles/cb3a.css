@@ -375,7 +375,7 @@ body { color:#202124; background:#f8fafd; }
   /* CURRICULUM → D: copy left, subject cards + standards panel right. */
   .curriculum-scene { grid-template-columns:minmax(0,.71fr) minmax(0,1fr); gap:calc(.84rem + 3.07vw); background:none; } /* D gap 57.6->92 */
   .curriculum-layout { grid-template-columns:1fr; gap:1.125rem; }
-  .curriculum-title { display:grid; gap:.1em; font-size:clamp(3.825rem,calc(5.1643vw - .823rem),7.44rem); line-height:1.11; }
+  .curriculum-title { display:grid; gap:.1em; font-size:clamp(4.4rem,5.4vw,7.15rem); line-height:1.11; }
   .curriculum-title span { display:block; }
   .subject-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(1.035rem,calc(.598rem + .4857vw),1.375rem); border:0; }
   .subject-card { position:relative; display:flex; flex-direction:column; gap:.6rem; min-block-size:0; padding:clamp(1.9rem,calc(.5rem + 1.6vw),3.1rem) clamp(1rem,1vw,1.5rem) 4.6rem; border:1px solid rgb(131 224 255 / 18%); border-radius:clamp(1.5rem,calc(.857rem + .7143vw),2rem); background:linear-gradient(145deg,rgb(13 31 61 / 86%),rgb(5 13 29 / 66%)); box-shadow:0 24px 64px rgb(0 0 0 / 28%),inset 0 1px rgb(255 255 255 / 6%); }
@@ -433,7 +433,7 @@ body { color:#202124; background:#f8fafd; }
   .project-subtitle,.curriculum-description,.hah-description,.gallery-description,.resources-description,.flow-scene .scene-copy>p:not(.eyebrow) { color:#9eb3c7; font-weight:760; margin-block:1em; }
   .flow-scene .scene-copy>p:not(.eyebrow) { font-size:clamp(1rem,.9vw,1.3rem); }
   .project-subtitle { font-weight:400; font-size:clamp(1rem,calc(.666rem + .3714vw),1.26rem); margin-block:.625rem 0; }
-  .curriculum-description { font-size:clamp(1.02rem,calc(.377rem + .7143vw),1.52rem); line-height:1.78; }
+  .curriculum-description { font-size:clamp(.92rem,calc(.277rem + .7143vw),1.42rem); line-height:1.65; }
   .hah-description { font-size:clamp(.94rem,calc(.67rem + .3vw),1.15rem); line-height:1.5; }
   .gallery-description { font-size:clamp(.9rem,calc(.55rem + .4vw),.98rem); line-height:1.7; }
   .project-statement { margin-block-start:clamp(2.16rem,calc(1.401rem + .8429vw),2.75rem); }
@@ -616,14 +616,15 @@ body { color:#202124; background:#f8fafd; }
   .landfill-panel .landfill-metrics span { font-size:clamp(.72rem,.6vw,.9rem); }
   .landfill-panel .chart-title-row { grid-area:title; }
   .landfill-panel .combo-chart { grid-area:chart; }
-  .combo-chart .weekday-label { font-size:16px; font-weight:850; }
-  .combo-chart .date-label { font-size:14px; }
+  .combo-chart .weekday-label { font-size:17.5px; font-weight:850; }
+  .combo-chart .date-label { font-size:15.5px; }
   /* y축 맨 아래에 그리드 눈금과 별개로 찍히던 "0" 라벨 제거 (요청) */
   .combo-chart .y-zero { display:none; }
   /* aspect-ratio breaks the width/height circularity, so the svg's box hugs
      the drawing exactly - no dead background trailing to the panel's right.
-     The freed width goes to the two rings. */
-  .combo-chart { grid-area:chart; inline-size:auto; block-size:100%; aspect-ratio:456/252; min-block-size:0; max-block-size:10.4rem; max-inline-size:100%; justify-self:start; align-self:center; overflow:visible; padding-inline:.45rem; box-sizing:content-box; }
+     The freed width goes to the two rings. max-block-size is bumped from the
+     original 10.4rem so the enlarged axis/label fonts above have room. */
+  .combo-chart { grid-area:chart; inline-size:auto; block-size:100%; aspect-ratio:456/252; min-block-size:0; max-block-size:11.6rem; max-inline-size:100%; justify-self:start; align-self:center; overflow:visible; padding-inline:.45rem; box-sizing:content-box; }
   .upload-panel { display:flex; flex-direction:column; min-block-size:0; }
   .upload-panel .experience-portal { flex:1 1 auto; block-size:auto; min-block-size:0; }
   .chart-axis text { font-variant-numeric:tabular-nums; }
@@ -765,7 +766,12 @@ body { color:#202124; background:#f8fafd; }
   a.source-link { display:inline-grid; place-items:center; min-block-size:2.35rem; padding-inline:1.05rem; font-size:.95rem; }
   /* 대시보드: 새로고침 버튼 리디자인 (유리질감 + 글로우) */
   .data-refresh-btn { inline-size:2.95rem; block-size:2.95rem; border-color:rgb(100 234 255 / 45%); background:radial-gradient(circle at 32% 26%, rgb(100 234 255 / 26%), transparent 46%), linear-gradient(145deg, rgb(100 234 255 / 16%), rgb(6 20 38 / 55%)); box-shadow:inset 0 1px 0 rgb(255 255 255 / 16%), 0 6px 16px rgb(0 8 18 / 28%), 0 0 16px rgb(100 234 255 / 15%); }
-  .data-refresh-btn svg { stroke-width:2; }
+  /* 화살표 두 개가 서로 꼬리를 무는 SVG 아이콘을 세 번 시도했는데, 이 크기의
+     원형 버튼 안에서는 아무리 대칭적인 호를 그려도 "두 개의 원"으로 보이는
+     문제를 벗어나지 못했다. SVG 경로 계산을 아예 버리고, 웹에서 가장 흔히
+     쓰이는 검증된 패턴(테두리 기반 원형 링, 한쪽만 밝게)으로 바꾼다 — 순수
+     CSS라 호 모양이 잘못 그려질 여지 자체가 없다. */
+  .data-refresh-ring { display:block; inline-size:1.15rem; block-size:1.15rem; border-radius:50%; border:2.4px solid rgb(100 234 255 / 22%); border-block-start-color:#5ef7cd; border-inline-end-color:#5ef7cd; }
   .data-refresh-btn:hover { border-color:rgb(94 247 205 / 60%); box-shadow:inset 0 1px 0 rgb(255 255 255 / 20%), 0 8px 20px rgb(0 8 18 / 32%), 0 0 24px rgb(94 247 205 / 30%); }
   /* 프로젝트: 01/02/03 번호 배지 — 세로로 넉넉한 타일. 또렷한 테두리 대신
      은은한 그라디언트와 안쪽 하이라이트로 카드 표면에서 자연스럽게 솟은 느낌. */
@@ -907,7 +913,11 @@ html { background: #020611; }
    끊겼다 — "이상하게 동작한다"는 게 그 스냅백이었다. 2바퀴(1520ms)면
    1600ms 시점엔 이미 애니메이션이 스스로 끝나 회전 없는 원위치에서
    멈춰 있으므로, 클래스 제거는 이미 멈춘 뒤라 아무 영향이 없다. */
-.data-refresh-btn.is-loading svg { animation: refreshSpin 760ms linear 2; }
+.data-refresh-btn.is-loading .data-refresh-ring { animation: refreshSpin 760ms linear 2; }
+/* 클릭/포커스 시 뜨는 골드색 접근성 링이 버튼 자체의 원형 테두리, 그리고
+   그 안의 링 아이콘과 겹쳐 "겹겹의 원"처럼 보였다. 포커스 표시는 유지하되
+   브랜드 민트로 맞춰 아이콘과 하나의 색 계열로 읽히게 한다. */
+.data-refresh-btn:focus-visible { outline-color: rgb(94 247 205 / 85%); outline-offset: 2px; }
 .combo-chart .chart-area { opacity: .16; filter: none !important; }
 .combo-chart .chart-bars rect { opacity: .98; filter: none !important; }
 .combo-chart .chart-line { filter: drop-shadow(0 0 5px rgb(94 247 205 / 24%)); }
@@ -1190,7 +1200,7 @@ html { background: #020611; }
    간격(.9rem=14px)이 너무 좁아, 배지가 콘텐츠 덩어리 맨 위에 붙은 채로
    카드 중앙 정렬 때문에 오히려 아래로 처져 보였다. 배지를 위로 당긴다. */
 @media (min-width:64rem) {
-  .project-cards article>span { margin-block-start:-1.6rem; margin-block-end:.4rem; }
+  .project-cards article>span { margin-block-start:-1.6rem; margin-block-end:1.125rem; }
 }
 
 /* 갤러리 설명문("학생들이 발견한 불편함..."): 요청한 확대가 실제로는 한

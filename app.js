@@ -1875,7 +1875,7 @@
     });
 
     const grid = appendSvg(svg, "g", { class: "chart-grid", stroke: "rgba(220,245,255,.15)", "stroke-width": "1" });
-    const yAxis = appendSvg(svg, "g", { class: "chart-axis chart-y-axis", fill: "rgba(220,245,255,.7)", "font-size": "13.5", "font-weight": "800" });
+    const yAxis = appendSvg(svg, "g", { class: "chart-axis chart-y-axis", fill: "rgba(220,245,255,.7)", "font-size": "15", "font-weight": "800" });
     ticks.slice().reverse().forEach(tick => {
       const y = Math.round(yScale(tick));
       appendSvg(grid, "path", { d: `M${chartLeft - 8} ${y} H${chartRight + 12}` });
@@ -1940,7 +1940,7 @@
       "stroke-dasharray": "7 6",
       "stroke-linecap": "round"
     });
-    appendSvg(averageGroup, "text", { x: String(chartRight + 8), y: String(averageY - 10), "text-anchor": "end", "font-size": "12.5", "font-weight": "800", fill: "rgba(255,232,128,.96)" }, "주간 평균");
+    appendSvg(averageGroup, "text", { x: String(chartRight + 8), y: String(averageY - 10), "text-anchor": "end", "font-size": "14", "font-weight": "800", fill: "rgba(255,232,128,.96)" }, "주간 평균");
 
     const xAxis = appendSvg(svg, "g", { class: "chart-axis chart-x-axis", fill: "rgba(220,245,255,.75)", "font-size": "12.5", "font-weight": "800" });
     points.forEach(point => {

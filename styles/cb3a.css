@@ -545,7 +545,6 @@ body { color:#202124; background:#f8fafd; }
   .school-panel .donut { overflow:visible; position:relative; }
   .school-panel .donut-pair { }
   .school-panel .bar-list { min-inline-size:0; }
-  .school-panel .bar-list>div { grid-template-columns:2.9rem minmax(0,1fr) 2.4rem;}
   .school-panel .bar-list b { min-inline-size:0; text-align:right; }
   .school-panel .bar-list i { block-size:.68rem; }
   .school-panel .bar-list>div.is-selected span, .school-panel .bar-list>div.is-selected b { color:#5ef7cd; }

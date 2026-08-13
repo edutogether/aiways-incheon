@@ -828,8 +828,9 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
   .flow-card>span { justify-self:stretch; inline-size:auto; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; justify-content:center; padding-inline:.5rem; font-size:clamp(.6rem,.64vw,.8rem); }
   /* 자료실: ONE MORE SCROLL 힌트를 3번째 열(차시별 활동지) 중심축에 정렬 */
   .scroll-finale-hint { inset-inline-start:calc((2.38rem + 4.38vw) + 2.5 * ((100vw - 2 * (2.38rem + 4.38vw) - 4rem) / 5) + 1.5rem); translate:-50% 0; }
-  /* HAH: 박스를 D보다 한 단계 더 넉넉하게 (사용자 요청) */
-  .hah-grid .panel { min-block-size:clamp(19rem, 40svh, 26rem); }
+  /* HAH: 세 박스는 내용(제목·설명·목록 3줄)에 맞춰 세우고 아래로 한 숨만 남긴다.
+     이전 값(최대 26rem)은 1080 높이에서 내용 아래로 165px가 비어 보였다. */
+  .hah-grid .panel { min-block-size:clamp(15rem, 26svh, 18.5rem); }
 }
 
 @keyframes portal-live-float {
@@ -895,9 +896,11 @@ body.is-snapping .scroll-finale-hint { backdrop-filter:none; }
 /* ---------- 전역 / 헤더 / 브랜드 / 네비 ---------- */
 html { background: #020611; }
 .site-header { background: linear-gradient(180deg, rgb(2 6 17 / 90%), rgb(2 6 17 / 42%)); }
-.brand-mark { position: relative; border-color: rgb(116 255 226 / 64%) !important; background: radial-gradient(circle at 34% 24%, rgb(255 255 255 / 34%), transparent 31%), radial-gradient(circle at 72% 76%, rgb(94 247 205 / 24%), transparent 42%), linear-gradient(145deg, rgb(102 255 222 / 26%), rgb(24 79 116 / 42%) 54%, rgb(132 118 234 / 20%)) !important; box-shadow: 0 0 34px rgb(94 247 205 / 32%), 0 0 20px rgb(100 234 255 / 22%), inset 0 1px 0 rgb(255 255 255 / 24%), inset 0 -16px 28px rgb(1 11 24 / 16%) !important; }
-.brand-mark::before { content: ""; position: absolute; inset: 5px; border-radius: inherit; background: linear-gradient(135deg, rgb(255 255 255 / 18%), transparent 44%); opacity: .72; pointer-events: none; z-index: 0; }
-.brand-mark img { position: relative; z-index: 1; filter: brightness(1.5) contrast(1.2) saturate(1.22) drop-shadow(0 0 8px rgb(94 247 205 / 20%)) !important; }
+/* 로고 타일은 흰 바탕에 은은한 그라데이션을 유지한다. D 참조본은 어두운 유리
+   타일이었지만, 이 앱의 로고는 흰 배경 위에서 읽히도록 만들어져 있어 어두운
+   타일에서는 로고가 배경에 묻힌다. 위쪽 .brand-mark 규칙(흰색 그라데이션)이
+   최종값이며, 여기서는 D의 발광 테두리만 아주 옅게 얹는다. */
+.brand-mark { position: relative; box-shadow: 0 2px 10px rgb(0 0 0 / 22%), inset 0 1px rgb(255 255 255 / 90%), 0 0 22px rgb(94 247 205 / 18%); }
 .main-nav a { background: transparent !important; border-color: transparent !important; box-shadow: none !important; transition: color 180ms ease, background 180ms ease, box-shadow 180ms ease; }
 .main-nav a.is-active, .main-nav a[aria-current="page"] { color: #f6fdff; background: transparent !important; border-color: transparent !important; border-radius: 0; box-shadow: none !important; text-shadow: 0 0 14px rgb(100 234 255 / 54%); }
 .main-nav a.is-active::after, .main-nav a[aria-current="page"]::after { content: ""; position: absolute; inset-inline: 1rem; inset-block-end: -.5rem; block-size: 2px; border-radius: 999px; background: linear-gradient(90deg, transparent, #64eaff, #5ef7cd, transparent); box-shadow: 0 0 16px rgb(100 234 255 / 46%); }

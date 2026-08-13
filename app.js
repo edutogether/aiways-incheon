@@ -2580,7 +2580,7 @@
     const GLIDE_MS = 720;
     // The rewind travels the whole deck, so it carries a little more weight
     // than a single-section glide.
-    const REWIND_MS = 620;
+    const REWIND_MS = 700;
 
     // The glide is driven from rAF on the main thread, so anything the browser
     // has to re-rasterise per frame shows up as stutter. The worst offender is

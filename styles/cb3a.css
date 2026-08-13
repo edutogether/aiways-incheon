@@ -624,7 +624,7 @@ body { color:#202124; background:#f8fafd; }
      the drawing exactly - no dead background trailing to the panel's right.
      The freed width goes to the two rings. max-block-size is bumped from the
      original 10.4rem so the enlarged axis/label fonts above have room. */
-  .combo-chart { grid-area:chart; inline-size:auto; block-size:100%; aspect-ratio:456/252; min-block-size:0; max-block-size:11.6rem; max-inline-size:100%; justify-self:start; align-self:center; overflow:visible; padding-inline:.8rem .45rem; padding-block:.35rem .75rem; box-sizing:content-box; }
+  .combo-chart { grid-area:chart; inline-size:auto; block-size:100%; aspect-ratio:456/252; min-block-size:0; max-block-size:11.6rem; max-inline-size:100%; justify-self:start; align-self:center; overflow:visible; padding-inline:1.1125rem .45rem; padding-block:.6625rem .75rem; box-sizing:content-box; }
   .upload-panel { display:flex; flex-direction:column; min-block-size:0; }
   .upload-panel .experience-portal { flex:1 1 auto; block-size:auto; min-block-size:0; }
   .chart-axis text { font-variant-numeric:tabular-nums; }
@@ -757,7 +757,7 @@ body { color:#202124; background:#f8fafd; }
 /* 대시보드: 학교 패널 링그래프를 살짝 위로 */
   .school-panel .donut-pair { translate:0 -.6rem; }
   /* 대시보드: 매립지 반입량/잔여량 링을 살짝 왼쪽으로 */
-  .landfill-kpi-module { translate:-1.5rem 0; }
+  .landfill-kpi-module { translate:-.5625rem 0; }
   /* 잔여량 링만 살짝 아래로 */
   .landfill-kpi-ring--secondary { translate:0 .45rem; }
   /* 대시보드: '버려지는 순간' 점선 박스 — 조금 내려앉은 위치에서 위아래로 살아 움직이게 */

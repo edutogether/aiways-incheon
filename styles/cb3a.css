@@ -766,13 +766,12 @@ body { color:#202124; background:#f8fafd; }
   a.source-link { display:inline-grid; place-items:center; min-block-size:2.35rem; padding-inline:1.05rem; font-size:.95rem; }
   /* 대시보드: 새로고침 버튼 리디자인 (유리질감 + 글로우) */
   .data-refresh-btn { inline-size:2.95rem; block-size:2.95rem; border-color:rgb(100 234 255 / 45%); background:radial-gradient(circle at 32% 26%, rgb(100 234 255 / 26%), transparent 46%), linear-gradient(145deg, rgb(100 234 255 / 16%), rgb(6 20 38 / 55%)); box-shadow:inset 0 1px 0 rgb(255 255 255 / 16%), 0 6px 16px rgb(0 8 18 / 28%), 0 0 16px rgb(100 234 255 / 15%); }
-  /* 순수 CSS 원형 링으로 바꿔도 여전히 "두 개의 원"으로 보였던 진짜 원인:
-     .data-refresh-btn 자체가 이미 원형 테두리(위 border-radius:50%)를 갖고
-     있어서, 그 안에 또 원(링이든 SVG 호든)을 넣으면 항상 동심원 두 개가
-     겹친다. 원형이 아닌 화살표 아이콘(Heroicons arrow-path, MIT 라이선스
-     오픈소스)을 써야 바깥 버튼 테두리 하나 + 안쪽 화살표 아이콘 하나로만
-     보인다. */
-  .data-refresh-btn svg { inline-size:1.3rem; block-size:1.3rem; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+  /* 화살표 아이콘(Heroicons arrow-path)은 버튼 테두리를 없앤 뒤에도 여전히
+     "두 조각"으로 보였다 — 경로 자체가 화살촉 두 개(위/아래)로 이루어져
+     있어서, 이 크기에서는 위쪽 조각과 아래쪽 조각이 서로 다른 도형처럼
+     읽힌다. 화살표를 완전히 버리고, 애매하게 읽힐 수 없는 단순 원형 링
+     스피너로 확정한다 — 테두리가 없는 지금은 동심원 문제도 없다. */
+  .data-refresh-ring { display:block; inline-size:1.3rem; block-size:1.3rem; border-radius:50%; border:2.6px solid rgb(100 234 255 / 22%); border-block-start-color:#5ef7cd; border-inline-end-color:#5ef7cd; }
   .data-refresh-btn:hover { border-color:rgb(94 247 205 / 60%); box-shadow:inset 0 1px 0 rgb(255 255 255 / 20%), 0 8px 20px rgb(0 8 18 / 32%), 0 0 24px rgb(94 247 205 / 30%); }
   /* 프로젝트: 01/02/03 번호 배지 — 세로로 넉넉한 타일. 또렷한 테두리 대신
      은은한 그라디언트와 안쪽 하이라이트로 카드 표면에서 자연스럽게 솟은 느낌. */
@@ -914,7 +913,7 @@ html { background: #020611; }
    끊겼다 — "이상하게 동작한다"는 게 그 스냅백이었다. 2바퀴(1520ms)면
    1600ms 시점엔 이미 애니메이션이 스스로 끝나 회전 없는 원위치에서
    멈춰 있으므로, 클래스 제거는 이미 멈춘 뒤라 아무 영향이 없다. */
-.data-refresh-btn.is-loading svg { animation: refreshSpin 760ms linear 2; }
+.data-refresh-btn.is-loading .data-refresh-ring { animation: refreshSpin 760ms linear 2; }
 /* 클릭/포커스 시 뜨는 골드색 접근성 링이 버튼 자체의 원형 테두리와 겹쳐
    "겹겹의 원"처럼 보였다. 포커스 표시는 유지하되 브랜드 민트로 맞춘다. */
 .data-refresh-btn:focus-visible { outline-color: rgb(94 247 205 / 85%); outline-offset: 2px; }

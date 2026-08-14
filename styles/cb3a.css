@@ -918,7 +918,11 @@ html { background: #020611; }
 .data-refresh-btn.is-loading .data-refresh-ring { animation: refreshSpin 760ms linear 2; }
 /* 클릭/포커스 시 뜨는 골드색 접근성 링이 버튼 자체의 원형 테두리와 겹쳐
    "겹겹의 원"처럼 보였다. 포커스 표시는 유지하되 브랜드 민트로 맞춘다. */
-.data-refresh-btn:focus-visible { outline-color: rgb(94 247 205 / 85%); outline-offset: 2px; }
+/* outline-color만 바꿨을 뿐 outline 자체는 그대로 살아있었다 - 브라우저
+   기본 포커스 링(클릭 시에도 버튼에는 뜬다)이 로딩 스피너 링과 겹쳐서
+   "원 두 개"로 보인 진짜 원인이었다. 링 모양 자체를 없애고, 포커스는
+   배경을 밝히는 방식으로 표시한다. */
+.data-refresh-btn:focus-visible { outline: none; background-color: rgb(100 234 255 / 14%); }
 /* 화살표 아이콘 자체는 이제 괜찮은데도 "동심원 두 개"로 계속 보인 진짜
    이유: 버튼 자체가 처음부터 원형 테두리(1px solid, border-radius:50%)를
    갖고 있었다 — 안에 어떤 아이콘을 넣어도 원형 버튼 테두리와 겹쳐 원이 두

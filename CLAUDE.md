@@ -1,6 +1,14 @@
-# CLAUDE.md — aiways-incheon-closed-beta
+# CLAUDE.md — aiways-incheon
 
-이 폴더가 **정본(canonical) 작업 저장소**다. `ssamkang/aiways-incheon`(최상위 CLAUDE.md의 인덱스에 남아있는 이름)은 실제로는 이 저장소의 git 메인 클론일 뿐이며, 활성 개발은 전부 여기서 진행한다.
+이 폴더가 **정본(canonical) 작업 저장소**다. 활성 개발은 전부 여기서 진행한다.
+
+## 폴더 정리 이력 (2026-08-14)
+
+한동안 `aiways-incheon`(폴더 이름은 "본체" 같았지만 실제로는 오래된 `feature/owner-visual-recovery` 브랜치를 체크아웃 중이었음)과 `aiways-incheon-closed-beta`(실제 `main`을 체크아웃 중이던, 진짜 활성 작업 폴더)가 분리되어 있어 혼란이 있었다. 아래와 같이 정리해 **이 폴더 하나로 통합**했다:
+- `aiways-incheon-closed-beta` 워크트리를 제거하고, 이 폴더(`aiways-incheon`)를 `main`으로 전환 — 지금 이 폴더가 곧 예전 closed-beta다.
+- `feature/owner-visual-recovery`는 삭제하지 않고 `archive/owner-visual-recovery-20260814`로 이름만 옮겨 보관(커밋 보존, 활성 브랜치 목록에서만 제외).
+- `aiways-pc-design-worktree`(브랜치 `feature/pc-frontend-design`, 이미 main에 전부 병합 확인됨)와 `D:\Project\_review-packages`/`_review-tools`/`_handoff`(git 추적 안 되는 순수 스크래치 파일, 총 5.3GB+)를 삭제.
+- D 참조본(`_visual-recovery/aiways-candidate-d`)은 아래 섹션대로 그대로 보존.
 
 ## D (PC Visual Master) 참조본 — 언제든 복원 가능
 

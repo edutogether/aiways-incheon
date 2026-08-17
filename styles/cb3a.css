@@ -501,7 +501,9 @@ body { color:#202124; background:#f8fafd; }
      brings the ink to ~93% of the tile; the tile's overflow:hidden guarantees
      nothing escapes. */
   .brand-mark img { scale:1.22; }
-  .hero-actions .primary-btn, .hero-actions .secondary-btn { min-block-size:clamp(3.15rem,2.5vw,3.9rem); padding-inline:clamp(1.7rem,1.5vw,2.4rem); font-size:clamp(1.02rem,.82vw,1.3rem); }
+  .hero-actions .primary-btn, .hero-actions .secondary-btn { min-block-size:clamp(3.15rem,2.5vw,3.9rem); padding-inline:clamp(1.7rem,1.5vw,2.4rem); font-size:clamp(1.02rem,.82vw,1.3rem); transition:transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease; }
+  .hero-actions .primary-btn:hover { transform:translateY(-3px); box-shadow:0 1.5rem 3.2rem rgb(94 247 205 / 32%); }
+  .hero-actions .secondary-btn:hover { transform:translateY(-3px); border-color:rgb(94 247 205 / 55%); background:rgb(255 255 255 / 11%); }
   /* The markup already carries the intended line breaks as spans - let them break. */
   .project-statement h2 span { display:block; }
   .curriculum-description span { display:block; }
@@ -739,6 +741,7 @@ body { color:#202124; background:#f8fafd; }
      had no background rule anywhere and were falling back to the browser's
      native grey button chrome. */
   .select-line select, .search-line input, .tm-model-line input, .hold-input-line input { border-radius:.75rem; border-color:rgb(100 234 255 / 22%); background:rgb(255 255 255 / 7%); }
+  .select-line select:focus-visible, .search-line input:focus-visible, .tm-model-line input:focus-visible, .hold-input-line input:focus-visible { outline:none; border-color:rgb(94 247 205 / 70%); background:rgb(94 247 205 / 10%); }
   #searchButton { border-radius:1rem; border:0; background:rgb(94 247 205 / 9%); color:#f2fdff; }
   /* Exhibition desktop is kiosk-only (3-second-sort demo); the cross-app
      closed-beta login is a mobile-only concern now, auto-opened instead

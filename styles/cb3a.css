@@ -40,7 +40,10 @@ body.is-snapping .scroll-finale-hint { backdrop-filter:none; }
      width:100%) - it controls margins purely through side padding, which
      scales as clamp(48px,5.4vw,138px) and locks to a flat 180px at
      2560px+. No --scene-content-max cap belongs at desktop widths. */
-  body { color:#f6fbff; line-height:normal; background:radial-gradient(circle at 72% 16%,rgb(86 141 255 / 22%),transparent 34vw),radial-gradient(circle at 14% 78%,rgb(80 255 207 / 14%),transparent 30vw),linear-gradient(135deg,#020611 0%,#071223 44%,#030712 100%); }
+  /* 포탈처럼 진하고 채도 높은 배경으로 - 파랑/민트 두 개뿐이던 글로우에
+     브랜드 세 번째 색(보라)을 더하고 다들 더 진하게, 베이스도 완전 검정에
+     가깝던 걸 살짝 띄워서 유리 패널이 채도를 끌어올릴 색 자체를 늘린다. */
+  body { color:#f6fbff; line-height:normal; background:radial-gradient(circle at 72% 16%,rgb(86 141 255 / 38%),transparent 42vw),radial-gradient(circle at 14% 78%,rgb(80 255 207 / 28%),transparent 38vw),radial-gradient(circle at 50% 96%,rgb(173 140 255 / 22%),transparent 40vw),linear-gradient(135deg,#050a1c 0%,#0c1b38 44%,#070f24 100%); }
   body::before { background:none; }
   .site-header { min-block-size:var(--header-size); padding:.875rem var(--header-inline-space); gap:.7rem 1.15rem; background:rgb(2 6 17 / 88%); border-block-end-color:rgb(122 213 237 / 16%); backdrop-filter:blur(18px); }
   .brand { gap:.65rem; font-size:1.08rem; white-space:nowrap; }.brand-mark { inline-size:2.45rem; block-size:2.45rem; padding:.25rem; border:1px solid rgb(96 239 224 / 56%); background:linear-gradient(145deg,#65e9de,#24759d); box-shadow:0 0 24px rgb(75 222 208 / 17%); }

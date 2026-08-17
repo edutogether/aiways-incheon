@@ -32,7 +32,7 @@ exports.analyzeSortingText = onRequest({
   region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 20, minInstances: 0, maxInstances: 2, concurrency: 2,
   secrets: [geminiApiKey], cors: false
 }, createAnalyzeSortingTextHandler({ getApiKey: () => geminiApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, analysisRequests, logAppCheck }));
-exports.analyzeSortingSafetyObserver = onRequest({ region:"asia-northeast3", memory:"256MiB", timeoutSeconds:30, minInstances:0, maxInstances:2, concurrency:1, secrets:[geminiApiKey], cors:false }, createSortingSafetyObserverHandler({getApiKey:()=>geminiApiKey.value(),access:deviceAccess,rateLimiter,actorRateLimiter,logAppCheck}));
+exports.analyzeSortingSafetyObserver = onRequest({ region:"asia-northeast3", memory:"256MiB", timeoutSeconds:30, minInstances:0, maxInstances:2, concurrency:1, secrets:[geminiApiKey], cors:false }, createSortingSafetyObserverHandler({getApiKey:()=>geminiApiKey.value(),access:deviceAccess,rateLimiter,actorRateLimiter,analysisRequests,logAppCheck}));
 const recordStore = {
   async createOrGet(actorId, idempotencyKey, record, response) {
     const actor = db.collection("actors").doc(actorId);

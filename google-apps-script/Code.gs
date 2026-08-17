@@ -30,6 +30,11 @@ const LOG_SHEET_NAME = "판단기록";
 const SUMMARY_SHEET_NAME = "반별요약";
 const EXPO_CHANNEL_TAG = "expo_kiosk";
 
+// 이 웹앱은 인증 없는 공개 엔드포인트다 - URL이 app.js에 그대로 노출되므로
+// 진짜 비밀은 아니지만, 이 토큰이 없는 요청(자동화된 무작위 스팸 등)은
+// 최소한 걸러낸다. app.js가 보내는 값과 반드시 같아야 한다.
+const SHARED_SUBMIT_TOKEN = "aiways-2026-expo-9f3c";
+
 // 내부 필드명(app.js가 실제로 보내는 키) → 시트에 표시될 한글 헤더.
 // 순서가 곧 시트의 열 순서입니다. 더미데이터/EDU+WEEK/판단기록 모두 같은 구조를 씁니다.
 const FIELDS = [
@@ -60,6 +65,9 @@ const HEADER_ROW = FIELDS.map(function (field) { return field.label; });
 function doPost(e) {
   try {
     const payload = parsePayload_(e);
+    if (payload.shared_token !== SHARED_SUBMIT_TOKEN) {
+      return json_({ ok: false, error: "unauthorized" });
+    }
     const targetSheetName = payload.event_channel === EXPO_CHANNEL_TAG ? EXPO_SHEET_NAME : LOG_SHEET_NAME;
     appendLog_(targetSheetName, payload);
     if (targetSheetName === EXPO_SHEET_NAME) rebuildSummary_();

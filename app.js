@@ -11,6 +11,11 @@
 
   const DATA_CONFIG = {
     appsScriptUrl: "https://script.google.com/macros/s/AKfycbykh5VyFwzbA55nLTFNsWlhSoqiFl49JA1o3UUBHHsSOTOC9YaNj_e9rCnwZIEsLKR8/exec",
+    // 이 URL 자체가 이미 공개돼 있어 이 토큰도 완전한 비밀은 아니지만,
+    // Code.gs의 SHARED_SUBMIT_TOKEN과 같은 값이어야 임의의 스팸 POST를
+    // 최소한 걸러낼 수 있다. 값을 바꾸면 반드시 Code.gs 쪽도 같이 바꿔서
+    // Apps Script 편집기에서 재배포해야 한다.
+    submitToken: "aiways-2026-expo-9f3c",
     seedUrl: "./base-data-seed.tsv",
     currentSchool: "AIWays초",
     currentGrade: "5학년",
@@ -2379,6 +2384,7 @@
       action: record.hold_flag ? "hold" : "confirm",
       image_saved: false,
       app_version: "clean-2026-07",
+      shared_token: DATA_CONFIG.submitToken,
       ...(kioskEventTag ? { event_channel: kioskEventTag } : {})
     };
 

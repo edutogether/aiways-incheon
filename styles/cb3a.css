@@ -773,12 +773,12 @@ body { color:#202124; background:#f8fafd; }
      그려질 여지가 없음), 로딩 중에만 링 스피너로 바꾼다 — 하나의 도형이
      "평소엔 화살표처럼, 도는 동안엔 원처럼" 두 가지로 다 읽혀야 하는
      무리한 요구를 아예 없앤다. */
-  .data-refresh-arrow { display:grid; place-items:center; inline-size:1.3rem; block-size:1.3rem; font-size:1.05rem; line-height:1; }
+  .data-refresh-arrow { display:grid; place-items:center; inline-size:1.6rem; block-size:1.6rem; font-size:1.3rem; line-height:1; }
   /* border 방식(한쪽 면만 밝게)은 모서리에서 두 색이 뚝 끊기며 섞여
      20px 크기에서 "밝은 조각 + 흐린 원"처럼 두 개로 갈라져 보였다.
      conic-gradient는 경계 없이 부드럽게 이어지는 하나의 원이라 이 문제가
      구조적으로 생길 수 없다. mask로 안쪽을 뚫어 링 모양만 남긴다. */
-  .data-refresh-ring { display:none; inline-size:1.3rem; block-size:1.3rem; border-radius:50%; background:conic-gradient(from 0deg, #5ef7cd 0deg, rgb(100 234 255 / 22%) 90deg, rgb(100 234 255 / 22%) 360deg); -webkit-mask-image:radial-gradient(circle, transparent 62%, #000 63%); mask-image:radial-gradient(circle, transparent 62%, #000 63%); }
+  .data-refresh-ring { display:none; inline-size:1.6rem; block-size:1.6rem; border-radius:50%; background:conic-gradient(from 0deg, #5ef7cd 0deg, rgb(100 234 255 / 22%) 200deg, rgb(100 234 255 / 22%) 360deg); -webkit-mask-image:radial-gradient(circle, transparent 55%, #000 68%); mask-image:radial-gradient(circle, transparent 55%, #000 68%); }
   .data-refresh-btn.is-loading .data-refresh-arrow { display:none; }
   .data-refresh-btn.is-loading .data-refresh-ring { display:block; }
   .data-refresh-btn:hover { border-color:rgb(94 247 205 / 60%); box-shadow:inset 0 1px 0 rgb(255 255 255 / 20%), 0 8px 20px rgb(0 8 18 / 32%), 0 0 24px rgb(94 247 205 / 30%); }

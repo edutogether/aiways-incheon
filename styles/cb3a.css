@@ -768,7 +768,11 @@ body { color:#202124; background:#f8fafd; }
   /* 대시보드: '기록' 박스 확대 */
   a.source-link { display:inline-grid; place-items:center; min-block-size:2.35rem; padding-inline:1.05rem; font-size:.95rem; }
   /* 대시보드: 새로고침 버튼 리디자인 (유리질감 + 글로우) */
-  .data-refresh-btn { inline-size:2.95rem; block-size:2.95rem; border-color:rgb(100 234 255 / 45%); background:radial-gradient(circle at 32% 26%, rgb(100 234 255 / 26%), transparent 46%), linear-gradient(145deg, rgb(100 234 255 / 16%), rgb(6 20 38 / 55%)); box-shadow:inset 0 1px 0 rgb(255 255 255 / 16%), 0 6px 16px rgb(0 8 18 / 28%), 0 0 16px rgb(100 234 255 / 15%); }
+  /* 버튼 자체 배경의 방사형 글로우가 중심(50%/50%)이 아니라 좌상단(32%/26%)에
+     치우쳐 있었다 - 그 자체로 비대칭적인 밝은 원형 얼룩을 만들어서, 안의
+     링/화살표와 별개로 "또 하나의 원"처럼 보였을 가능성이 있다. 중심으로
+     맞춘다. */
+  .data-refresh-btn { inline-size:2.95rem; block-size:2.95rem; border-color:rgb(100 234 255 / 45%); background:radial-gradient(circle at 50% 50%, rgb(100 234 255 / 16%), transparent 60%), linear-gradient(145deg, rgb(100 234 255 / 16%), rgb(6 20 38 / 55%)); box-shadow:inset 0 1px 0 rgb(255 255 255 / 16%), 0 6px 16px rgb(0 8 18 / 28%), 0 0 16px rgb(100 234 255 / 15%); }
   /* 평소엔 화살표(글리프, 손으로 그린 경로가 전혀 아니라서 이상하게
      그려질 여지가 없음), 로딩 중에만 링 스피너로 바꾼다 — 하나의 도형이
      "평소엔 화살표처럼, 도는 동안엔 원처럼" 두 가지로 다 읽혀야 하는
@@ -1207,11 +1211,11 @@ html { background: #020611; }
   .dashboard-scene, .project-scene, .curriculum-scene, .hah-scene, .flow-scene, .gallery-scene, .sorting-scene, .resources-scene {
     background-size: auto, auto, auto, 88px 88px, 88px 88px;
   }
-  .project-scene { background-image: radial-gradient(circle at 14% 32%, rgb(94 247 205 / 28%), transparent 60%), radial-gradient(circle at 84% 50%, rgb(100 169 255 / 22%), transparent 64%), radial-gradient(circle at 92% 18%, rgb(173 140 255 / 11%), transparent 36%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
+  .project-scene { background-image: radial-gradient(circle at 10% 26%, rgb(94 247 205 / 22%), transparent 42%), radial-gradient(circle at 90% 58%, rgb(100 169 255 / 17%), transparent 46%), radial-gradient(circle at 92% 18%, rgb(173 140 255 / 11%), transparent 36%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
   .curriculum-scene { background-image: radial-gradient(circle at 12% 28%, rgb(94 247 205 / 22%), transparent 58%), radial-gradient(circle at 82% 65%, rgb(100 169 255 / 19%), transparent 62%), radial-gradient(circle at 8% 12%, rgb(173 140 255 / 9%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
   .hah-scene { background-image: radial-gradient(circle at 20% 72%, rgb(94 247 205 / 21%), transparent 58%), radial-gradient(circle at 84% 28%, rgb(100 169 255 / 18%), transparent 60%), radial-gradient(circle at 54% 6%, rgb(173 140 255 / 9%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
   .flow-scene { background-image: radial-gradient(circle at 14% 36%, rgb(94 247 205 / 20%), transparent 58%), radial-gradient(circle at 86% 64%, rgb(100 169 255 / 16%), transparent 60%), radial-gradient(circle at 48% 92%, rgb(173 140 255 / 8%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
-  .gallery-scene { background-image: radial-gradient(circle at 12% 45%, rgb(94 247 205 / 22%), transparent 58%), radial-gradient(circle at 76% 20%, rgb(100 169 255 / 18%), transparent 60%), radial-gradient(circle at 40% 86%, rgb(173 140 255 / 9%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
+  .gallery-scene { background-image: radial-gradient(circle at 3% 12%, rgb(94 247 205 / 13%), transparent 40%), radial-gradient(circle at 76% 20%, rgb(100 169 255 / 18%), transparent 55%), radial-gradient(circle at 40% 86%, rgb(173 140 255 / 9%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
   .sorting-scene { background-image: radial-gradient(circle at 20% 72%, rgb(94 247 205 / 21%), transparent 58%), radial-gradient(circle at 80% 22%, rgb(100 169 255 / 18%), transparent 60%), radial-gradient(circle at 90% 56%, rgb(173 140 255 / 8%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
   .resources-scene { background-image: radial-gradient(circle at 24% 22%, rgb(94 247 205 / 21%), transparent 58%), radial-gradient(circle at 74% 76%, rgb(100 169 255 / 18%), transparent 60%), radial-gradient(circle at 6% 52%, rgb(173 140 255 / 8%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
   /* 대시보드만 격자가 안 보였다: body 자체가 이미 22% 밝기의 파란 글로우를

@@ -45,7 +45,7 @@ body.is-snapping .scroll-finale-hint { backdrop-filter:none; }
      가깝던 걸 살짝 띄워서 유리 패널이 채도를 끌어올릴 색 자체를 늘린다. */
   body { color:#f6fbff; line-height:normal; background:radial-gradient(circle at 72% 16%,rgb(86 141 255 / 38%),transparent 42vw),radial-gradient(circle at 14% 78%,rgb(80 255 207 / 28%),transparent 38vw),radial-gradient(circle at 50% 96%,rgb(173 140 255 / 22%),transparent 40vw),linear-gradient(135deg,#050a1c 0%,#0c1b38 44%,#070f24 100%); }
   body::before { background:none; }
-  .site-header { min-block-size:var(--header-size); padding:.875rem var(--header-inline-space); gap:.7rem 1.15rem; background:rgb(2 6 17 / 88%); border-block-end-color:rgb(122 213 237 / 16%); backdrop-filter:blur(18px); }
+  .site-header { min-block-size:var(--header-size); padding:.875rem var(--header-inline-space); gap:.7rem 1.15rem; background:rgb(2 6 17 / 88%); border-block-end-color:rgb(122 213 237 / 16%); backdrop-filter:blur(18px) saturate(160%); }
   .brand { gap:.65rem; font-size:1.08rem; white-space:nowrap; }.brand-mark { inline-size:2.45rem; block-size:2.45rem; padding:.25rem; border:1px solid rgb(96 239 224 / 56%); background:linear-gradient(145deg,#65e9de,#24759d); box-shadow:0 0 24px rgb(75 222 208 / 17%); }
   .main-nav { flex:1 1 auto; justify-content:flex-end; gap:.1rem; overflow:visible; }.main-nav a { min-block-size:2.375rem; display:grid; place-items:center; padding-inline:var(--nav-link-pad); color:#b9cddb; font-size:.92rem; font-weight:760; }.edu2g-beta-trigger { flex:0 0 auto; min-block-size:2.375rem; }
   .responsive-nav-trigger { display:none; min-block-size:2.65rem; padding-inline:.82rem; color:#dffaff; background:transparent; border-color:rgb(111 212 232 / 34%); }
@@ -1246,9 +1246,11 @@ html { background: #020611; }
      격자선(4~5%)이 상대적으로 묻혔다. 다른 씬은 스크롤로 body 글로우
      중심에서 멀어지니 상대적으로 잘 보였다. 대시보드만 격자 진하기를
      올려 같은 자리에서도 보이게 한다. */
-  /* 포탈처럼 격자선 없이 부드러운 빛 번짐만 - 이 기술적인 격자무늬가
-     "완전히 다르다"고 느껴진 가장 큰 원인으로 보여 대시보드에서 뺐다. */
-  .dashboard-scene { background-image: radial-gradient(circle at 12% 75%, rgb(94 247 205 / 24%), transparent 58%), radial-gradient(circle at 84% 25%, rgb(100 169 255 / 20%), transparent 62%), radial-gradient(circle at 46% 8%, rgb(173 140 255 / 14%), transparent 40%); }
+  /* 포탈은 씬 개념이 없어서 body 배경 + 오브, 딱 2겹만 쌓는다. 여기에
+     씬 전용 글로우까지 더하면(예전 이 규칙) body+오브+씬 3겹이 겹쳐 전부
+     뭉개져서 밝은 부분과 어두운 여백의 대비가 안 났다. 씬 자체 글로우는
+     빼고 body 배경 + .dashboard-orbs 두 겹으로만 간다. */
+  .dashboard-scene { background-image: none; }
 }
 
 /* 프로젝트: 01/02/03 배지가 카드 위쪽 여백(63px)에 비해 바로 아래 제목과의

@@ -840,7 +840,11 @@ html { background: #020611; }
 /* 대시보드 4개 패널만: 테두리를 없애고 반투명 + 블러로 유리질감을 낸다.
    나머지 씬의 .panel(프로젝트 카드, HAH 등)은 그대로 둔다 - 이번 요청은
    대시보드 카드 4개로 범위를 한정했다. */
-.dashboard-grid > .panel { border-style: none; background: linear-gradient(145deg, rgb(255 255 255 / 9%), rgb(255 255 255 / 3%)); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); box-shadow: 0 24px 64px rgb(0 0 0 / 24%), inset 0 1px 0 rgb(255 255 255 / 14%); }
+/* 포탈의 유리 카드는 blur만 쓴 게 아니라 saturate까지 같이 걸어서, 뒤가
+   흐려져도 색이 오히려 또렷해지는 애플식 글래스모피즘이다. blur만 쓰면
+   색이 평균화되어 "씻겨나간" 느낌이 난다 - saturate로 보정하고, 순백
+   대신 브랜드색(민트/블루)을 옅게 섞어 이 앱 팔레트에 맞춘다. */
+.dashboard-grid > .panel { border-style: none; background: linear-gradient(145deg, rgb(94 247 205 / 12%), rgb(100 169 255 / 8%), rgb(255 255 255 / 5%)); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); box-shadow: 0 28px 72px rgb(0 0 0 / 32%), inset 0 1px 0 rgb(255 255 255 / 20%), inset 0 0 0 1px rgb(255 255 255 / 8%); }
 .dashboard-grid > .panel:hover { box-shadow: 0 28px 72px rgb(0 0 0 / 30%), inset 0 1px 0 rgb(255 255 255 / 18%), 0 0 28px rgb(94 247 205 / 12%); }
 .project-intro { background: transparent; box-shadow: none; }
 .curriculum-description, .gallery-description { background: transparent !important; box-shadow: none !important; }

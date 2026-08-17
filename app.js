@@ -1102,7 +1102,7 @@
     list.innerHTML = holdRecords
       .slice(-6)
       .reverse()
-      .map(record => `<li><strong>${record.mapped_item || "미확인 물건"}</strong><span>${record.suggested_category || "분류 검토"} · ${record.local_time || "임시 기록"}</span></li>`)
+      .map(record => `<li><strong>${escapeHtml(record.mapped_item || "미확인 물건")}</strong><span>${escapeHtml(record.suggested_category || "분류 검토")} · ${escapeHtml(record.local_time || "임시 기록")}</span></li>`)
       .join("");
   }
 

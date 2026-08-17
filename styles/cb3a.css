@@ -769,18 +769,11 @@ body { color:#202124; background:#f8fafd; }
   a.source-link { display:inline-grid; place-items:center; min-block-size:2.35rem; padding-inline:1.05rem; font-size:.95rem; }
   /* 대시보드: 새로고침 버튼 리디자인 (유리질감 + 글로우) */
   .data-refresh-btn { inline-size:2.95rem; block-size:2.95rem; border-color:rgb(100 234 255 / 45%); background:radial-gradient(circle at 32% 26%, rgb(100 234 255 / 26%), transparent 46%), linear-gradient(145deg, rgb(100 234 255 / 16%), rgb(6 20 38 / 55%)); box-shadow:inset 0 1px 0 rgb(255 255 255 / 16%), 0 6px 16px rgb(0 8 18 / 28%), 0 0 16px rgb(100 234 255 / 15%); }
-  /* 평소엔 화살표(글리프, 손으로 그린 경로가 전혀 아니라서 이상하게
-     그려질 여지가 없음), 로딩 중에만 링 스피너로 바꾼다 — 하나의 도형이
-     "평소엔 화살표처럼, 도는 동안엔 원처럼" 두 가지로 다 읽혀야 하는
-     무리한 요구를 아예 없앤다. */
+  /* 원형 버튼 안에 원형 스피너를 넣는 구조 자체가 문제였다 - 링이든
+     conic-gradient든, 원 안에 또 다른 원을 그리면 항상 "원이 두 개"로
+     읽힌다. 새 모양을 아예 만들지 않고, 평소에도 마음에 든다고 확인받은
+     화살표 글리프를 로딩 중에도 그대로 두고 회전만 시킨다. */
   .data-refresh-arrow { display:grid; place-items:center; inline-size:1.3rem; block-size:1.3rem; font-size:1.05rem; line-height:1; }
-  /* border 방식(한쪽 면만 밝게)은 모서리에서 두 색이 뚝 끊기며 섞여
-     20px 크기에서 "밝은 조각 + 흐린 원"처럼 두 개로 갈라져 보였다.
-     conic-gradient는 경계 없이 부드럽게 이어지는 하나의 원이라 이 문제가
-     구조적으로 생길 수 없다. mask로 안쪽을 뚫어 링 모양만 남긴다. */
-  .data-refresh-ring { display:none; inline-size:1.3rem; block-size:1.3rem; border-radius:50%; background:conic-gradient(from 0deg, #5ef7cd 0deg, rgb(100 234 255 / 22%) 90deg, rgb(100 234 255 / 22%) 360deg); -webkit-mask-image:radial-gradient(circle, transparent 62%, #000 63%); mask-image:radial-gradient(circle, transparent 62%, #000 63%); }
-  .data-refresh-btn.is-loading .data-refresh-arrow { display:none; }
-  .data-refresh-btn.is-loading .data-refresh-ring { display:block; }
   .data-refresh-btn:hover { border-color:rgb(94 247 205 / 60%); box-shadow:inset 0 1px 0 rgb(255 255 255 / 20%), 0 8px 20px rgb(0 8 18 / 32%), 0 0 24px rgb(94 247 205 / 30%); }
   /* 프로젝트: 01/02/03 번호 배지 — 세로로 넉넉한 타일. 또렷한 테두리 대신
      은은한 그라디언트와 안쪽 하이라이트로 카드 표면에서 자연스럽게 솟은 느낌. */
@@ -919,7 +912,7 @@ html { background: #020611; }
    끊겼다 — "이상하게 동작한다"는 게 그 스냅백이었다. 2바퀴(1520ms)면
    1600ms 시점엔 이미 애니메이션이 스스로 끝나 회전 없는 원위치에서
    멈춰 있으므로, 클래스 제거는 이미 멈춘 뒤라 아무 영향이 없다. */
-.data-refresh-btn.is-loading .data-refresh-ring { animation: refreshSpin 760ms linear 2; }
+.data-refresh-btn.is-loading .data-refresh-arrow { animation: refreshSpin 760ms linear 2; }
 /* 클릭/포커스 시 뜨는 골드색 접근성 링이 버튼 자체의 원형 테두리와 겹쳐
    "겹겹의 원"처럼 보였다. 포커스 표시는 유지하되 브랜드 민트로 맞춘다. */
 /* outline-color만 바꿨을 뿐 outline 자체는 그대로 살아있었다 - 브라우저

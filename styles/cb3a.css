@@ -79,7 +79,7 @@ a.source-link:hover { border-color:rgb(94 247 205 / 48%); background:rgb(94 247 
 
   .project-scene { grid-template-columns:minmax(17rem,.82fr) minmax(0,1.18fr); align-items:center; }.project-statement { border-inline-start:.28rem solid #67ead9; border-radius:0 var(--radius-large) var(--radius-large) 0; background:linear-gradient(90deg,rgb(62 217 199 / 12%),transparent); }.project-cards article { }.project-cards article:nth-child(2) { }.curriculum-scene { grid-template-columns:minmax(15rem,.58fr) minmax(0,1.42fr); align-items:center; }.subject-grid { }.subject-card { }.standards-panel { padding:clamp(1.25rem,2.5vw,2.3rem); border-inline-start:3px solid #58d7c3; }.standards-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .hah-scene { text-align:center; }.hah-scene .scene-copy { justify-items:center; max-inline-size:none; margin-inline:auto; }.hah-scene h2.hah-title { max-inline-size:none; inline-size:min(111.25rem,100%); margin-inline:0; line-height:1.14; font-size:clamp(4.95rem,5.48vw,7.45rem); word-break:keep-all; overflow-wrap:normal; }.hah-title span { display:block; white-space:nowrap; }.hah-grid .panel {padding:clamp(1.3rem,2.7vw,2.15rem); text-align:left; }.hah-grid .panel:nth-child(2) {border-color:rgb(102 234 214 / 68%);}.hah-grid .panel>span { display:inline-grid; place-items:center; inline-size:2.3rem; block-size:2.3rem; border-radius:50%; color:#061522; background:#6beedb; font-weight:900; }.callout { max-inline-size:66rem; margin-inline:auto; padding:1.1rem 1.45rem; border:1px solid rgb(102 234 214 / 36%);color:#c6dae5; }
-  .flow-scene { grid-template-columns:minmax(15rem,.5fr) minmax(0,1.5fr); align-items:start; }.flow-scene>.scene-copy, .gallery-scene>.scene-copy { position:sticky; inset-block-start:calc(var(--header-size) + 1.5rem); }.flow-grid { }.flow-card {border-color:rgb(131 224 255 / 18%); }.flow-card:nth-child(3n + 2) { }.flow-card.ai-badge { border-color:rgb(100 234 255 / 30%); }.flow-card.h2-badge { border-color:rgb(173 140 255 / 34%); }.flow-card em { font-style:normal; }.flow-card h3 { min-block-size:0; font-size:clamp(1.08rem,1.05vw,1.38rem); line-height:1.24; }.flow-card p { font-size:clamp(.82rem,.76vw,.98rem); line-height:1.54; }
+  .flow-scene { grid-template-columns:minmax(15rem,.5fr) minmax(0,1.5fr); align-items:start; }.flow-grid { }.flow-card {border-color:rgb(131 224 255 / 18%); }.flow-card:nth-child(3n + 2) { }.flow-card.ai-badge { border-color:rgb(100 234 255 / 30%); }.flow-card.h2-badge { border-color:rgb(173 140 255 / 34%); }.flow-card em { font-style:normal; }.flow-card h3 { min-block-size:0; font-size:clamp(1.08rem,1.05vw,1.38rem); line-height:1.24; }.flow-card p { font-size:clamp(.82rem,.76vw,.98rem); line-height:1.54; }
   .flow-scene .scene-copy h2,.gallery-scene .scene-copy h2,.sorting-scene .scene-copy h2,.resources-scene .scene-copy h2 { font-size:clamp(4.4rem,5.4vw,7.15rem); }
   .gallery-scene { grid-template-columns:minmax(13rem,.42fr) minmax(0,1.58fr); align-items:start; }.gallery-stage { grid-template-columns:minmax(0,.9fr) minmax(20rem,1.1fr); }.gallery-grid { grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:1fr; }.gallery-grid article {padding:1rem; }.gallery-grid article:nth-child(3n) { }.gallery-detail {padding:clamp(1rem,2vw,1.6rem);}
   .resources-scene { }.resources-scene .scene-copy {max-inline-size:47rem;}.resource-grid {text-align:left; }.resource-grid a { }.resource-grid a:nth-child(5n + 2) { }
@@ -260,10 +260,32 @@ body { color:#202124; background:#f8fafd; }
      gaps than the rebuild kept. The dashboard is deliberately excluded:
      its right column is viewport-height-locked, so centering does nothing
      and its own layout is still under discussion. */
-  .project-scene, .curriculum-scene, .hah-scene, .flow-scene, .gallery-scene, .resources-scene {
+  .project-scene, .curriculum-scene, .hah-scene, .resources-scene {
     align-items:center;
     padding-block-start:calc(6.39rem + 3.04vw);   /* D 146 -> 180 */
   }
+  /* flow-scene/gallery-scene are excluded above on purpose: their card grid
+     has 2 rows, so align-items:center pushed the title/description down to
+     match the grid's taller vertical center instead of lining up with its
+     actual top edge. align-items:start (already set per-scene below) fixes
+     that as long as this shared padding still applies to keep the vertical
+     rhythm consistent with the other scenes. */
+  /* align-items:start만 걸면 두 칸의 "위쪽"은 맞지만, 행 자체가 씬 맨 위에
+     쩍 달라붙어 아래쪽에 큰 빈 공간이 남는다(방금 실측/캡처로 확인됨).
+     align-content:center로 행 전체(칸 중 더 큰 카드그리드 기준 높이)를
+     씬 안에서 다시 세로 중앙으로 되돌리고, align-items:start는 그대로 둬서
+     두 칸의 위쪽끼리는 계속 맞춘다. */
+  .flow-scene, .gallery-scene { align-content:center; padding-block-start:0; }
+  /* 위/아래 여백을 사용자가 실측 지정한 값(차시흐름 350/327, 갤러리 390/399)에
+     맞춘다 - align-content:center에서 padding-block-start를 P만큼 늘리면
+     위쪽 여백이 정확히 P/2만큼 늘어나는 성질을 이용(전체 위+아래 합은 그대로
+     유지되므로 아래쪽도 같이 맞아떨어짐). */
+  .flow-scene { padding-block-start:130px; }
+  .gallery-scene { padding-block-start:98px; }
+  /* .gallery-stage was computing align-self:center despite no rule setting it
+     (verified live via full stylesheet scan) - forcing it here so the card
+     grid's top lines up with the copy block's top like every other scene. */
+  .gallery-stage, .flow-grid { align-self:start; }
   .project-scene, .curriculum-scene { padding-block-end:3.625rem; }          /* D 58 flat */
   .hah-scene, .flow-scene, .gallery-scene { padding-block-end:calc(.96rem + 2.05vw); } /* D 45 -> 68 */
   .project-scene { padding-inline:calc(2.05rem + 4.73vw); }                  /* D 101 -> 154 */
@@ -823,7 +845,27 @@ body { color:#202124; background:#f8fafd; }
 
 /* ---------- 전역 / 헤더 / 브랜드 / 네비 ---------- */
 html { background: #020611; }
-.site-header { background: linear-gradient(180deg, rgb(2 6 17 / 90%), rgb(2 6 17 / 42%)); }
+/* style.css의 헤더 배경(불투명 92%)과 blur(14px)만 있고 saturate가 없던 것이
+   아래 body 배경의 진한 색을 다 걸러내 검은 띠처럼 끊겨 보이던 원인이었다.
+   패널/오브와 같은 처방(진한 반투명 + blur+saturate)으로 맞춘다. */
+/* 헤더는 씬과 달리 뒤에 걸칠 스크롤 콘텐츠가 없어서(sticky로 맨 위 고정,
+   씬들과 겹치지 않고 그냥 위에 쌓임) blur만으로는 비출 색 자체가 없어 계속
+   flat한 띠로 보였다. 헤더 자체에 오브와 같은 브랜드색 radial-gradient를
+   옅게 깔아서 자체적으로 톤을 갖게 한다. backdrop-filter는 일부러 뺐다 -
+   각 씬 맨 위에 걸린 거대 orb-xl이 헤더 바로 아래서 잘려 있어서, saturate와
+   합쳐지면 오히려 진한 단색 띠처럼 보이는 역효과가 났다. */
+.site-header {
+  background:
+    radial-gradient(circle 260px at 6% 120%, rgb(94 247 205 / 30%), transparent 100%),
+    radial-gradient(circle 300px at 94% 130%, rgb(100 169 255 / 30%), transparent 100%),
+    radial-gradient(circle 220px at 52% -60%, rgb(173 140 255 / 20%), transparent 100%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-block-end-style: none;
+}
+/* 배경 오버레이를 거의 없앤 대신, 씬 배경이 밝아지는 구간에서도 네비 글자가
+   읽히도록 안전판으로 은은한 텍스트 그림자를 건다. */
+.brand, .main-nav a { text-shadow: 0 1px 6px rgb(2 6 17 / 65%); }
 /* 로고 타일은 흰 바탕에 은은한 그라데이션을 유지한다. D 참조본은 어두운 유리
    타일이었지만, 이 앱의 로고는 흰 배경 위에서 읽히도록 만들어져 있어 어두운
    타일에서는 로고가 배경에 묻힌다. 위쪽 .brand-mark 규칙(흰색 그라데이션)이
@@ -856,10 +898,16 @@ html { background: #020611; }
    훨씬 부드럽고 자연스러운 빛 번짐이 나온다(radial-gradient의 transparent
    falloff는 가장자리가 티가 남). 대부분 애니메이션 없이 고정(성능 - 이미
    패널 4개가 backdrop-filter를 쓰는 중이라 움직이는 원까지 겹치면 무겁다). */
-.dashboard-orbs { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; border-radius: inherit; }
-.dashboard-orbs .orb { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .3; }
-.dashboard-orbs .orb-sm { filter: blur(40px); opacity: .34; }
-.dashboard-scene > *:not(.dashboard-orbs) { position: relative; z-index: 1; }
+.scene-orbs { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; border-radius: inherit; }
+.scene-orbs span { position: absolute; border-radius: 50%; }
+/* 포탈(edutogether/portal)의 실제 오브 5단 티어를 그대로 이식 - 클수록 더
+   흐리고 옅게, 작을수록 더 또렷하고 진하게 (blur와 opacity가 반비례). */
+.scene-orbs .orb-xl { filter: blur(100px); opacity: .3; }
+.scene-orbs .orb { filter: blur(44px); opacity: .32; }
+.scene-orbs .orb2 { filter: blur(24px); opacity: .34; }
+.scene-orbs .orb-md { filter: blur(30px); opacity: .42; }
+.scene-orbs .orb-sm { filter: blur(16px); opacity: .5; }
+.scene > *:not(.scene-orbs):not(.scroll-finale-hint) { position: relative; z-index: 1; }
 .project-intro { background: transparent; box-shadow: none; }
 .curriculum-description, .gallery-description { background: transparent !important; box-shadow: none !important; }
 .project-cards article { background: linear-gradient(145deg, rgb(13 31 61 / 78%), rgb(5 13 29 / 58%)); transition: transform 190ms ease, border-color 190ms ease, background 190ms ease, box-shadow 190ms ease; }
@@ -869,6 +917,18 @@ html { background: #020611; }
 .subject-card { transition: transform 180ms ease, border-color 180ms ease; }
 .subject-card:hover { transform: translateY(-3px); border-color: rgb(94 247 205 / 34%); }
 .subject-card em { display: inline-flex; inline-size: max-content; min-block-size: 34px; align-items: center; justify-content: center; padding: 0 14px; border-radius: 999px; color: #07111c; background: linear-gradient(135deg, #5ef7cd, #64eaff); font-style: normal; font-weight: 870; font-size: .82rem; }
+/* 과목명("실과" 등): 원래 굵기/색 지정이 전혀 없어 본문 글자와 다를 게 없었다 -
+   브랜드 그라디언트로 색을 입혀 눈에 띄는 소제목처럼 만든다. */
+.subject-card > span {
+  display: inline-block;
+  background: linear-gradient(135deg, #5ef7cd, #64eaff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 900;
+  font-size: 1.05rem;
+  letter-spacing: .01em;
+}
 .subject-card:focus { outline: none; }
 .subject-card:focus-visible { outline: 2px solid rgb(94 247 205 / 72%); outline-offset: 5px; }
 .subject-card:hover:not(.is-hover-suppressed) em, .subject-card:focus-visible em { opacity: 1 !important; transform: translateY(0) !important; }
@@ -927,6 +987,142 @@ html { background: #020611; }
 .hah-grid .panel:nth-child(3):hover>span { box-shadow: 0 0 24px rgb(46 225 184 / 28%); }
 .hah-grid .panel:hover li { text-shadow: 0 0 16px rgb(100 234 255 / 28%); transform: translateX(4px); }
 .hah-grid .panel:hover span, .hah-grid .panel:hover h3, .hah-grid .panel:hover p { text-shadow: 0 0 16px rgb(100 234 255 / 28%); }
+
+/* ---------- 전 페이지 유리질감 확장 (대시보드 4개 패널에서 검증된 처방을
+   모든 씬의 카드/호버 버튼에 동일 적용) ----------
+   테두리(border)는 없애고, 대신 호버 시 각 카드가 이미 갖고 있던 색상별
+   글로우(box-shadow)로 경계를 표현한다 - 포탈 카드와 같은 원리. */
+.project-cards article, .flow-grid article, .standards-grid article, .standards article,
+.gallery-grid article, .resource-grid a, .resource-grid a:first-child,
+.sorting-features article, .hah-grid .panel, .subject-card, .flow-card, .callout {
+  border-style: none;
+  background: linear-gradient(160deg, rgb(28 46 74 / 56%), rgb(10 22 42 / 50%));
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  box-shadow: 0 24px 64px rgb(0 0 0 / 30%), inset 0 0 0 1px rgb(255 255 255 / 16%), inset 0 1px 0 rgb(255 255 255 / 10%);
+}
+/* 갤러리는 카드 8개가 2x4로 화면 대부분을 채워서, 다른 씬과 같은 파란기 도는
+   유리 톤(rgb(28 46 74))이 카드 하나일 때보다 훨씬 넓게 깔려 전체 화면이
+   "푸르딩딩"하게 보였다 - 갤러리 카드만 파란기를 빼고 중성적인 남색으로. */
+.gallery-grid article {
+  background: linear-gradient(160deg, rgb(20 24 40 / 56%), rgb(8 10 20 / 50%));
+}
+/* 보조(고스트) 버튼류 - 카드보다 작으니 블러를 살짝 줄인다. */
+.quick-buttons button, .app-tabs button, .close-btn, .ranking-close {
+  border-style: none;
+  background: rgb(10 22 42 / 40%);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 12%);
+}
+.app-tabs button.is-active, .quick-buttons button.is-active { backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none; }
+/* secondary-btn("수업 설계 보기" 등)은 primary-btn과 나란히 있어서 존재감이
+   있으면 안 된다 - 배경 자체가 거의 안 보일 만큼 옅은 유리로, 테두리도 없앤다. */
+.secondary-btn {
+  border-style: none;
+  background: rgb(10 22 42 / 14%);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 8%);
+  transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+.secondary-btn:hover {
+  background: rgb(94 247 205 / 10%);
+  box-shadow: inset 0 0 0 1px rgb(94 247 205 / 22%), 0 0 24px rgb(94 247 205 / 14%);
+  transform: translateY(-3px);
+}
+/* 대시보드 상단의 드롭다운(학년/반 선택)과 "기록" 링크도 같은 원칙:
+   테두리 없애고 옅은 유리로. */
+.select-line select, a.source-link {
+  border-style: none;
+  background: rgb(10 22 42 / 22%);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%);
+}
+a.source-link:hover {
+  border-style: none;
+  background: rgb(94 247 205 / 10%);
+  box-shadow: inset 0 0 0 1px rgb(94 247 205 / 24%);
+}
+/* 01/02/03 번호 배지: 테두리 없애고 안쪽 하이라이트만 남긴다. */
+.project-cards article > span { border-style: none; }
+/* H1 / AI / H2 배지: 프로젝트 01/02/03 배지와 동일한 유리 타일 구조로 통일
+   (고정 원형 + 밝은 단색 배경 -> 자동 크기 + 옅은 그라디언트 유리 타일). */
+.hah-grid .panel > span {
+  display: inline-grid;
+  place-items: center;
+  inline-size: auto;
+  block-size: auto;
+  min-block-size: 3.6rem;
+  min-inline-size: 3.6rem;
+  padding: .55rem .95rem;
+  border-style: none;
+  border-radius: 1.15rem;
+  background: linear-gradient(160deg, rgb(94 247 205 / 17%), rgb(100 169 255 / 7%) 62%, rgb(255 255 255 / 3%));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 14%), 0 10px 24px rgb(0 8 18 / 22%), 0 0 20px rgb(94 247 205 / 10%);
+  color: #f6fbff;
+  font-size: .95rem;
+}
+.hah-grid .panel:nth-child(2) > span { background: linear-gradient(160deg, rgb(100 169 255 / 17%), rgb(94 247 205 / 7%) 62%, rgb(255 255 255 / 3%)); box-shadow: inset 0 1px 0 rgb(255 255 255 / 14%), 0 10px 24px rgb(0 8 18 / 22%), 0 0 20px rgb(100 234 255 / 12%); }
+.hah-grid .panel:nth-child(3) > span { background: linear-gradient(160deg, rgb(46 225 184 / 17%), rgb(100 169 255 / 7%) 62%, rgb(255 255 255 / 3%)); box-shadow: inset 0 1px 0 rgb(255 255 255 / 14%), 0 10px 24px rgb(0 8 18 / 22%), 0 0 20px rgb(46 225 184 / 12%); }
+/* eyebrow(각 씬 제목 위 "Project Frame" 같은 알약 배지): 테두리 없애고 유리 + 호버. */
+.eyebrow {
+  border-style: none;
+  background: rgb(94 247 205 / 12%);
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+  box-shadow: inset 0 0 0 1px rgb(94 247 205 / 18%);
+  transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+.eyebrow:hover {
+  background: rgb(94 247 205 / 18%);
+  box-shadow: inset 0 0 0 1px rgb(94 247 205 / 30%), 0 0 18px rgb(94 247 205 / 16%);
+  transform: translateY(-1px);
+}
+/* "지금 분류하기" 히어로 CTA: 예전엔 진한 단색 민트-블루 그라디언트라 촌스러웠다
+   - 위 eyebrow 배지와 같은 옅은 유리 톤으로 맞춘다(색만 입힌 텍스트 + 은은한 배경). */
+.hero-actions .primary-btn {
+  border-style: none;
+  background: rgb(8 18 36 / 55%);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow: inset 0 0 0 1px rgb(94 247 205 / 30%);
+  color: #5ef7cd;
+  font-weight: 850;
+  text-shadow: 0 1px 6px rgb(0 0 0 / 40%);
+}
+.hero-actions .primary-btn:hover {
+  background: rgb(94 247 205 / 18%);
+  box-shadow: inset 0 0 0 1px rgb(94 247 205 / 32%), 0 0 22px rgb(94 247 205 / 16%);
+}
+/* "연계 성취기준" 안의 "6실02-03" 같은 코드 배지도 같은 진한 단색 그라디언트라
+   촌스러웠다 - eyebrow와 같은 옅은 유리 톤으로 통일. */
+.standards-grid article > span {
+  background: rgb(94 247 205 / 12%);
+  backdrop-filter: blur(8px) saturate(180%);
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
+  box-shadow: inset 0 0 0 1px rgb(94 247 205 / 22%);
+  color: #5ef7cd;
+}
+/* 호버해야 나오는 태그/버튼("E-book", "수업자료", "바로가기")도 같은 진한
+   단색 그라디언트였다 - eyebrow와 같은 옅은 유리 톤으로 통일. */
+.subject-card em, .flow-card em, .gallery-grid article button {
+  background: rgb(94 247 205 / 14%);
+  backdrop-filter: blur(8px) saturate(180%);
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
+  box-shadow: inset 0 0 0 1px rgb(94 247 205 / 24%);
+  color: #5ef7cd;
+  border-style: none;
+}
+/* "연계 성취기준" 바깥 박스: 테두리 없애고 카드류와 같은 유리 처방. */
+.standards-panel {
+  border-style: none;
+  background: linear-gradient(160deg, rgb(28 46 74 / 50%), rgb(10 22 42 / 44%));
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  box-shadow: 0 24px 64px rgb(0 0 0 / 26%), inset 0 0 0 1px rgb(255 255 255 / 14%);
+}
 
 /* ---------- 대시보드 패널 ---------- */
 .dashboard-grid>.panel { transition: transform 190ms ease, border-color 190ms ease, box-shadow 190ms ease, background 190ms ease, filter 190ms ease; }
@@ -1234,13 +1430,9 @@ html { background: #020611; }
   .dashboard-scene, .project-scene, .curriculum-scene, .hah-scene, .flow-scene, .gallery-scene, .sorting-scene, .resources-scene {
     background-size: auto, auto, auto, 88px 88px, 88px 88px;
   }
-  .project-scene { background-image: radial-gradient(circle at 10% 26%, rgb(94 247 205 / 22%), transparent 42%), radial-gradient(circle at 90% 58%, rgb(100 169 255 / 17%), transparent 46%), radial-gradient(circle at 92% 18%, rgb(173 140 255 / 11%), transparent 36%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
-  .curriculum-scene { background-image: radial-gradient(circle at 12% 28%, rgb(94 247 205 / 22%), transparent 58%), radial-gradient(circle at 82% 65%, rgb(100 169 255 / 19%), transparent 62%), radial-gradient(circle at 8% 12%, rgb(173 140 255 / 9%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
-  .hah-scene { background-image: radial-gradient(circle at 20% 72%, rgb(94 247 205 / 21%), transparent 58%), radial-gradient(circle at 84% 28%, rgb(100 169 255 / 18%), transparent 60%), radial-gradient(circle at 54% 6%, rgb(173 140 255 / 9%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
-  .flow-scene { background-image: radial-gradient(circle at 14% 36%, rgb(94 247 205 / 20%), transparent 58%), radial-gradient(circle at 86% 64%, rgb(100 169 255 / 16%), transparent 60%), radial-gradient(circle at 48% 92%, rgb(173 140 255 / 8%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
-  .gallery-scene { background-image: radial-gradient(circle at 3% 12%, rgb(94 247 205 / 13%), transparent 40%), radial-gradient(circle at 76% 20%, rgb(100 169 255 / 18%), transparent 55%), radial-gradient(circle at 40% 86%, rgb(173 140 255 / 9%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
-  .sorting-scene { background-image: radial-gradient(circle at 20% 72%, rgb(94 247 205 / 21%), transparent 58%), radial-gradient(circle at 80% 22%, rgb(100 169 255 / 18%), transparent 60%), radial-gradient(circle at 90% 56%, rgb(173 140 255 / 8%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
-  .resources-scene { background-image: radial-gradient(circle at 24% 22%, rgb(94 247 205 / 21%), transparent 58%), radial-gradient(circle at 74% 76%, rgb(100 169 255 / 18%), transparent 60%), radial-gradient(circle at 6% 52%, rgb(173 140 255 / 8%), transparent 30%), linear-gradient(90deg, rgb(100 234 255 / 5%) 1px, transparent 1px), linear-gradient(180deg, rgb(100 234 255 / 4.5%) 1px, transparent 1px); }
+  /* 대시보드와 같은 이유로 전부 없앤다 - body 배경 + 씬마다 있는 오브
+     요소(아래 .scene-orbs) 2겹만 남겨서 명암 대비를 살린다. */
+  .project-scene, .curriculum-scene, .hah-scene, .flow-scene, .gallery-scene, .sorting-scene, .resources-scene { background-image: none; }
   /* 대시보드만 격자가 안 보였다: body 자체가 이미 22% 밝기의 파란 글로우를
      깔고 있는데, 대시보드는 스크롤 없이 늘 그 글로우 바로 아래 있어서
      격자선(4~5%)이 상대적으로 묻혔다. 다른 씬은 스크롤로 body 글로우
@@ -1249,7 +1441,7 @@ html { background: #020611; }
   /* 포탈은 씬 개념이 없어서 body 배경 + 오브, 딱 2겹만 쌓는다. 여기에
      씬 전용 글로우까지 더하면(예전 이 규칙) body+오브+씬 3겹이 겹쳐 전부
      뭉개져서 밝은 부분과 어두운 여백의 대비가 안 났다. 씬 자체 글로우는
-     빼고 body 배경 + .dashboard-orbs 두 겹으로만 간다. */
+     빼고 body 배경 + .scene-orbs 두 겹으로만 간다(전 씬 공통 적용). */
   .dashboard-scene { background-image: none; }
 }
 

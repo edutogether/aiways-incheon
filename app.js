@@ -2429,7 +2429,6 @@
       ["H-A-H", "hah"],
       ["차시흐름", "flow"],
       ["갤러리", "gallery"],
-      ["3초판단", "sorting"],
       ["자료실", "resources"]
     ];
     const labels = new Set(navPairs.map(pair => pair[0]));
@@ -2825,14 +2824,11 @@
     window.addEventListener("scroll", () => scheduleActiveUpdate(110), { passive: true });
     window.addEventListener("wheel", snapByWheel, { passive: false });
 
-    // PC dropped the sorting scene - the deck funnels visitors to the mobile
-    // app through the QR portal. So on PC the hero's "지금 분류하기" opens the
-    // portal in place (the QR reveal in the upload panel, already on screen)
-    // instead of scrolling to a display:none scene. Below 64rem the anchor
-    // keeps its native behavior and reaches the real scene.
+    // sorting-scene is gone from the page entirely now - the hero's "지금
+    // 분류하기" always opens the QR portal in place (already on screen)
+    // instead of scrolling to a section that no longer exists.
     $$(".hero-actions a[href='#sorting']").forEach(anchor => {
       anchor.addEventListener("click", event => {
-        if (window.innerWidth < 1024) return;
         event.preventDefault();
         document.body.classList.add("is-rewound");
       });
@@ -4006,6 +4002,7 @@
   function initQuickButtons() {
     const buttons = $$("[data-quick-item]");
     const result = $("[data-sorting-result]");
+    if (!result) return;
     const modeButtons = $$("button[data-sorting-mode]");
     const modeStatus = $("[data-sorting-mode-status]");
     const modeCopy = {
@@ -4781,6 +4778,7 @@
   function initClassroomSkills() {
     if (!classroomSkillRegistry) return;
     const form = $("#classroomSkillForm"), list = $("#classroomSkillList"), preview = $("#classroomSkillPreview"), status = $("#classroomSkillStatus"), count = $("#classroomSkillCount"), seedButton = $("#classroomSeedSkillButton");
+    if (!form || !list) return;
     const profileForm = $("#classProfileForm"), profileStatus = $("#classProfileStatus"), profileActions = $("#classProfileActions"), profileChange = $("#classProfileChangeButton"), profileClear = $("#classProfileClearButton");
     let pending = null;
     const scope = classroomSkillScope;

@@ -1,9 +1,21 @@
-# 세션 핸드오프 — AI Ways Incheon PC 대시보드 (2026-08-18 갱신)
+# 세션 핸드오프 — AI Ways Incheon PC 대시보드 (2026-08-19 갱신)
+
+## 0. 2026-08-19 라운드 — 전 페이지 배경/유리 리디자인, 커밋·push·프리즈 완료
+사용자가 "포기, 커밋 푸시 배포 깃발꼽고 프리즈하자"로 이번 라운드를 마감. 반영된 것:
+- 8개 씬(대시보드 제외 7개, 대시보드 포함 총 7개 - sorting 삭제로 8→7) 배경 오브를 포탈(edutogether/portal) 실제 소스에서 뽑은 5단 티어(orb-xl/orb/orb2/orb-md/orb-sm, 블러·불투명도 반비례)로 통일, 씬당 12개(4/4/2/2)로 확장. 사용자 실측 요청에 맞춰 차시흐름/갤러리 씬의 좌우 상단 정렬 버그(`.flow-grid`/`.gallery-stage`가 원인 불명으로 `align-self:center`를 갖고 있던 것 - 스타일시트 전체를 스캔해도 소스 규칙을 못 찾음, `align-self:start`로 강제 수정) + 위/아래 여백을 `align-content:center`와 `padding-block-start` px 값으로 정밀 튜닝(차시흐름 위370/아래327, 갤러리 위390/아래399 - 사용자가 준 정확한 px에 맞춤).
+- 헤더가 검은 띠처럼 분절돼 보이던 문제: 헤더 자체에 반경을 명시한 radial-gradient 3개(브랜드 3색)를 심어서 해결 — body 배경이 헤더 위치까지 닿지 않는 게 근본 원인이었음(구조적으로 검증함).
+- 모든 "촌스러운" 진한 단색 mint-blue 그라디언트 버튼/배지(H1·AI·H2, 실과/사회/국어/창체 과목명, 지금 분류하기, 연계 성취기준 코드 배지, E-book/수업자료/바로가기 호버 태그)를 eyebrow 배지와 같은 옅은 유리 톤으로 통일.
+- 갤러리 카드(8개, 화면 대부분 차지)만 유리 톤에서 파란기를 빼고 중성 남색으로 조정("푸르딩딩" 피드백 반영).
+- "수업 설계 보기" 버튼 삭제(사용자 요청, 불필요 판단).
+- **아직 검증 못 한 것**: 새로고침 버튼 "원 두 개" 문제는 이번 라운드에서 손 안 댐(1번 항목 그대로 유효). 태블릿 3단 티어는 여전히 미착수(1.5절 계획만 있음).
 
 ## 1. 앱 요약
 `aiways-incheon` — 학교 자원순환(분리배출) 교육용 PC 대시보드 웹앱(vanilla JS/HTML/CSS + Firebase Functions + Google Apps Script). 8/12~14 학교 박람회 시연 완료, 현재는 박람회 이후 정리·보안 점검 단계. 배포: GitHub Pages, `https://edutogether.github.io/aiways-incheon/`, `main` 브랜치 push 시 자동(legacy branch-deploy).
 
 **폴더 이름이 바뀌었다**: 예전 `aiways-incheon-closed-beta`(정본이었음)와 `aiways-incheon`(오래된 브랜치 체크아웃)이 8/14에 통합되어, 지금은 이 폴더(`aiways-incheon`) 하나가 곧 `main`이다. 다른 문서에 `-closed-beta` 경로가 나오면 낡은 참조다.
+
+## 1.5. 3단 기기 전략 확정 (2026-08-18)
+사용자가 확정: **PC**=발표 슬라이드용(대시보드 1페이지만 실제 데이터 연동, 나머지 씬은 정적 슬라이드에 가까움, 3초판단 앱 구동 의도 없음) / **태블릿**(아직 미구현, ~768-1023px)=PC와 동일한 다크 대시보드만 실시간 상시 노출용 / **개인 폰**(`mobile/`)=3초판단 앱 전용. 이 원칙에 따라 `index.html`의 `sorting-scene` 전체(DOM+nav+관련 JS)를 삭제함 — 상세는 아래 완료 항목 참고. 근거 메모: `aiways-device-tier-architecture` (auto-memory).
 
 ## 2. 완료 (배포·테스트·라이브 확인 완료)
 - **박람회 대비 PC 대시보드 다듬기**: 갤러리 이미지 압축(6.0MB→1.9MB), 교육과정 제목/설명 폰트·줄바꿈, HAH 슬로건 바 위치, 랜드필 차트 배경박스 여백, KPI 링 위치, 짧은 세로 화면 스크롤 오버플로 수정.
@@ -16,6 +28,7 @@
   - `index.html`에 CSP meta 태그 추가, 로컬에서 `securitypolicyviolation` 리스너로 검증(JSONP·Firebase SDK 로딩 정상).
   - `analyzeSortingSafetyObserver`가 배포 이후 계속 503만 반환하던 죽은 기능 수정 — `functions/lib/globalRateLimit.js`의 `RATE_LIMITS` 테이블에 키가 아예 빠져 있었음. rate limit 추가 + idempotency 배선(메인 분석과 키 충돌 안 나게 `safety:` 접두사로 분리)까지 같이 처리해서 Gemini API 호출 2배 증가 없이 해결. **사용자가 `firebase deploy --only functions`까지 직접 완료.**
 - **워크트리/폴더 정리 (8/14)**: `aiways-incheon-closed-beta`+`aiways-incheon` 통합, 안 쓰는 워크트리 2개 제거, 스크래치 폴더 5.3GB+ 삭제, 오래된 브랜치는 `archive/owner-visual-recovery-20260814`로 보관.
+- **`index.html`에서 `sorting-scene`(3초판단) 섹션 전체 삭제 (2026-08-18, 사용자 명시적 승인, 1.5절 기기 전략 참고)**: HTML 섹션(473~627행대), nav 링크, `app.js`의 `navPairs` 항목과 `.hero-actions a[href='#sorting']` 폭 분기(이제 항상 QR 리빌) 삭제. 삭제 과정에서 `initQuickButtons()`/`initClassroomSkills()`가 사라진 DOM을 향해 무가드로 `innerHTML`/`replaceChildren`을 호출해 **`boot()`가 중간에 죽어 대시보드 전체가 로드 안 되는 크래시**를 라이브 확인 전 로컬에서 잡아 수정함(두 함수에 표준 가드 패턴 `if (!target) return;` 추가) — **아직 push 전, 다음 세션에서 라이브 재확인 필수.** 삭제한 섹션 안에는 3초판단과 무관한 "우리 반이 AI에게 가르친 것"(Teachable Machine 모델 등록)+"반 연결"(class profile) 패널이 같이 얹혀 있었는데, 사용자가 **PC에서는 삭제 유지, 나중에 `mobile/`에 이 기능을 새로 만들어 넣기로 확정**함 — 미완료 섹션 참고.
 - `pc-expo-freeze-20260814`, `pc-expo-freeze-20260817` 태그 생성·push 완료.
 - 매 커밋마다 `functions/`에서 `npm run check && npm test`(81개 테스트) 통과 확인 후 커밋.
 - **분기말 정기 감사 예약됨** (다른 세션이 설정): 3/31, 6/30, 9/30, 12/31에 이 저장소 포함 5개 앱 자동 재감사.
@@ -27,6 +40,8 @@
 3. **글래스모피즘 재작업, 사용자 최종 확인 대기 중** (2번 항목 참고) — push까지는 이번에 같이 나갈 예정이지만, 실제 라이브에서 "이제 포탈이랑 비슷하다"는 확인은 아직.
 4. **`functions/test/splitSafetyObserver.test.js`가 `npm test`에 안 묶여 있음** — 안전 관찰자 기능 테스트 파일이 있는데 `package.json`의 `test` 스크립트 목록에서 빠져 있어, 실제로는 한 번도 실행된 적 없는 죽은 테스트.
 5. **스타일시트 전체 중복/죽은 규칙 감사 — 8개 씬 배경만 훑었을 뿐, 전체는 아직.** 사용자가 명시적으로 물어봤던 항목이니 다음에 우선순위 높게 잡을 것.
+6. **"우리 반이 AI에게 가르친 것"(Teachable Machine 모델 등록) + "반 연결"(class profile) 기능을 `mobile/`에 새로 구현.** PC `index.html`에서 sorting-scene을 통째로 지우면서 같이 사라짐(사용자 확정 결정, 위 1.5절/2절 참고). 원래 HTML은 `git show HEAD:index.html`로 삭제 직전 커밋에서 복원 가능 — `classroom-skill-panel`, `class-profile-panel` 클래스로 검색. app.js 쪽 관련 함수(`initClassroomSkills`, `classroomSkillRegistry` 연동, `classroomSkillRegistry.js` 파일 자체)는 아직 루트에 그대로 남아있고 지금은 그냥 가드 처리(`if (!form || !list) return;`)로 무력화만 된 상태 — `mobile/`에 이식할 때 참고재료로 쓸 수 있음.
+7. **태블릿(768~1023px) 3번째 화면 티어 신설 — 사용자가 방향은 확정, 착수는 보류(2026-08-18).** 사용자의 실제 사용 시나리오가 확정됨: PC(발표용, 다크 전체 대시보드) / 패드(교실에 항상 띄워두는 실시간 대시보드 — **PC와 동일한 다크 대시보드 화면**이어야 함, 지금처럼 밝은 테마 축소판이면 안 됨) / 개인 폰(3초판단 미니앱만). 현재 구조는 `index.html`(PC용, cb3a.css의 1023px 이하 반응형이 밝은 테마 축소판으로 전환됨)과 `mobile/index.html`(3초판단 전용, QR 클릭으로만 도달, 폭 기반 자동 전환 없음) 둘뿐이라, 태블릿 폭에서 그냥 `index.html`을 열면 어중간한 3번째 상태(밝은 테마 + 전체 메뉴)가 뜬다. 다음에 착수할 때: `index.html`의 1023px 이하 반응형 breakpoint(section 2, 3 — 라이트 테마)를 태블릿 폭에서는 건너뛰고 PC 다크 레이아웃을 그대로 유지시키는 방향(또는 별도 태블릿 전용 뷰)으로 설계.
 
 **해결됨(참고용으로 남김)**:
 - D 참조본 대비 "박스 디자인/호버 효과 품질" 비교 — `d-reference-8246` 설정(`.claude/launch.json`, `ssamkang/` 레벨)으로 D를 로컬에 띄워 사용자가 직접 눈으로 비교, "이미 D를 거의 다 구현했고 오히려 대부분이 더 낫다"고 확인. 추가 작업 불필요.

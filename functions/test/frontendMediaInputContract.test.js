@@ -30,7 +30,7 @@ test("photo handling rejects non-images and releases preview resources", () => {
 });
 
 test("photo contract keeps non-camera fallback and avoids original-image persistence", () => {
-  assert.match(html, /data-upload="file"[\s\S]*?(?:찍은 사진 올리기|저장된 사진 선택)/);
+  assert.match(html, /data-upload="file"[\s\S]*?찍은 사진[\s\S]{0,20}올리기/);
   assert.match(app, /\[cameraInput, uploadInput\]\.forEach/);
   assert.doesNotMatch(html + app, /localStorage\.setItem\([^\n]*(?:base64|data:image)/i);
 });

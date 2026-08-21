@@ -8,13 +8,16 @@ const test = require("node:test");
 const root = path.resolve(__dirname, "..", "..");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const app = fs.readFileSync(path.join(root, "app.js"), "utf8");
-const requiredIds = ["dashboard", "gradeSelect", "classSelect", "cameraInput", "uploadInput", "galleryStage", "galleryDetail", "sorting", "searchInput", "searchButton", "tmModelInput", "tmApplyButton", "sortingTimeline", "holdList", "aiModal", "modalPreview", "confirmDecision", "cancelDecision", "saveState"];
-const requiredData = ["data-nav", "data-upload", "data-tab", "data-panel", "data-sorting-mode", "data-sorting-mode-panel", "data-quick-item", "data-sorting-result", "data-judgement-correction", "data-judgement-check", "data-judgement-action", "data-final-category", "data-close-analysis"];
+// sorting/searchInput/searchButton/tmModelInput/tmApplyButton/sortingTimeline/holdList
+// lived only inside the PC sorting-scene, which was deliberately removed in the
+// PC/tablet/phone device-tier split (3-second judgment is mobile/-only now).
+const requiredIds = ["dashboard", "gradeSelect", "classSelect", "cameraInput", "uploadInput", "galleryStage", "galleryDetail", "aiModal", "modalPreview", "confirmDecision", "cancelDecision", "saveState"];
+const requiredData = ["data-nav", "data-upload", "data-tab", "data-panel"];
 
 test("frontend DOM keeps the app event contract", () => {
   requiredIds.forEach((id) => assert.match(html, new RegExp(`id=["']${id}["']`), id));
   requiredData.forEach((attribute) => assert.match(html + app, new RegExp(attribute), attribute));
-  ["#sorting", "[data-sorting-result]", "#aiModal", "[data-judgement-action]"].forEach((selector) => assert.match(app, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), selector));
+  ["#aiModal", "[data-judgement-action]"].forEach((selector) => assert.match(app, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), selector));
 });
 
 test("frontend preserves learner-facing decision boundaries", () => {

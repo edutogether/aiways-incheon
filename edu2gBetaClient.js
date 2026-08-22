@@ -3,7 +3,7 @@
 (() => {
   const REGION = "asia-northeast3";
   const EMULATOR_PROJECT = "demo-aiways-incheon";
-  const ALLOWED = new Set(["redeemEdu2gPass", "getEdu2gSession", "listEdu2gTrustedDevices", "revokeEdu2gTrustedDevice", "analyzeSortingImage", "analyzeSortingText", "analyzeSortingSafetyObserver", "saveSortingRecord", "listSortingRecords", "resolveSortingRecord", "getSchoolDashboard", "checkStudentProfile", "registerStudentProfile", "checkCampusLocation"]);
+  const ALLOWED = new Set(["redeemEdu2gPass", "getEdu2gSession", "listEdu2gTrustedDevices", "revokeEdu2gTrustedDevice", "analyzeSortingImage", "analyzeSortingText", "analyzeSortingSafetyObserver", "saveSortingRecord", "listSortingRecords", "resolveSortingRecord", "getSchoolDashboard", "checkStudentProfile", "registerStudentProfile", "checkCampusLocation", "changeStudentClass"]);
   const LOCAL = new Set(["localhost", "127.0.0.1"]);
 
   function usingEmulator() {
@@ -77,6 +77,8 @@
     checkStudentProfile: () => request("checkStudentProfile", {}),
     previewStudentProfile: ({ schoolId, grade, classNum, studentNumber, name }) => request("registerStudentProfile", { schoolId, grade, classNum, studentNumber, name, confirm: false }),
     registerStudentProfile: ({ schoolId, grade, classNum, studentNumber, name }) => request("registerStudentProfile", { schoolId, grade, classNum, studentNumber, name, confirm: true }),
-    checkCampusLocation: ({ schoolId, lat, lng }) => request("checkCampusLocation", { schoolId, lat, lng })
+    checkCampusLocation: ({ schoolId, lat, lng }) => request("checkCampusLocation", { schoolId, lat, lng }),
+    previewClassChange: ({ grade, classNum }) => request("changeStudentClass", { grade, classNum, confirm: false }),
+    changeStudentClass: ({ grade, classNum }) => request("changeStudentClass", { grade, classNum, confirm: true })
   };
 })();

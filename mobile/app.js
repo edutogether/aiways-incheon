@@ -102,9 +102,65 @@
         <span>🎓</span><span>가입 완료</span>
       </div>
       <p class="text-xs font-semibold text-blue-700">${profile.schoolId} ${profile.grade}학년 ${profile.classNum}반 ${profile.studentNumber}번 ${profile.name}</p>
-      <p class="text-[10px] text-blue-500 leading-snug">이 기기에 영구히 저장됐어요. 반이 바뀌었다면 선생님께 말씀해 주세요.</p>
+      <button id="classChangeToggleButton" type="button" class="text-[10px] font-bold text-blue-600 underline">반이 바뀌었어요</button>
+      <div id="classChangeForm" class="hidden space-y-2 pt-1">
+        <div class="grid grid-cols-2 gap-2">
+          <input type="text" inputmode="numeric" id="classChangeGradeInput" placeholder="새 학년" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+          <input type="text" inputmode="numeric" id="classChangeClassInput" placeholder="새 반" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+        </div>
+        <button id="classChangeSubmitButton" type="button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 rounded-xl transition-all">반 변경 요청</button>
+        <p id="classChangeStatus" class="text-[10px] font-semibold text-blue-500"></p>
+      </div>
+      <p class="text-[10px] text-blue-500 leading-snug">학교/번호/이름은 못 바꿔요(선생님께 말씀해 주세요). 반은 하루에 한 번만 바꿀 수 있어요.</p>
     `;
     $("interimClassCard")?.classList.add("hidden");
+    initClassChangeControls();
+  }
+
+  function formatCooldownWait(retryAfterSeconds) {
+    const hours = Math.ceil((retryAfterSeconds || 0) / 3600);
+    return hours > 1 ? `${hours}시간 뒤에 다시 시도해 주세요.` : "잠시 뒤에 다시 시도해 주세요.";
+  }
+
+  function initClassChangeControls() {
+    const toggleBtn = $("classChangeToggleButton");
+    const form = $("classChangeForm");
+    const submitBtn = $("classChangeSubmitButton");
+    const status = $("classChangeStatus");
+    if (!toggleBtn || !form || !submitBtn || !status) return;
+    const client = window.AIWaysEdu2gClient;
+
+    toggleBtn.addEventListener("click", () => form.classList.toggle("hidden"));
+
+    submitBtn.addEventListener("click", async () => {
+      const grade = cleanForSignup($("classChangeGradeInput")?.value);
+      const classNum = cleanForSignup($("classChangeClassInput")?.value);
+      if (!grade || !classNum) { status.textContent = "학년/반을 모두 입력해 주세요."; return; }
+      if (!client?.previewClassChange || !client?.changeStudentClass) { status.textContent = "지금은 변경을 처리할 수 없어요."; return; }
+      submitBtn.disabled = true;
+      status.textContent = "확인 중입니다...";
+      const preview = await client.previewClassChange({ grade, classNum });
+      submitBtn.disabled = false;
+      if (!preview.ok) {
+        status.textContent = preview.data?.code === "cooldown_active" ? formatCooldownWait(preview.data.retryAfterSeconds)
+          : preview.data?.code === "no_change" ? "이미 그 반으로 등록돼 있어요."
+          : "입력 내용을 다시 확인해 주세요.";
+        return;
+      }
+      const p = preview.data.preview;
+      openCustomModal(
+        "반 변경 확인",
+        `정말 "${p.schoolId} ${p.grade}학년 ${p.classNum}반"으로 바꾸시겠어요? 반 변경은 하루에 한 번만 할 수 있어요.`,
+        "🔄",
+        "bg-blue-600 hover:bg-blue-700",
+        async () => {
+          status.textContent = "변경하는 중입니다...";
+          const result = await client.changeStudentClass({ grade, classNum });
+          if (result.ok) { showSignupLocked(result.data.profile); showVisualAlert(`🔄 ${p.grade}학년 ${p.classNum}반으로 변경 완료!`, "emerald"); }
+          else status.textContent = result.data?.code === "cooldown_active" ? formatCooldownWait(result.data.retryAfterSeconds) : "변경에 실패했어요. 다시 시도해 주세요.";
+        }
+      );
+    });
   }
 
   function initSignupForm() {

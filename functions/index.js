@@ -12,6 +12,7 @@ const { createSortingRecordAggregator } = require("./lib/schoolDashboardAggregat
 const { createGetSchoolDashboardHandler } = require("./lib/schoolDashboard");
 const { createCheckStudentProfileHandler, createRegisterStudentProfileHandler, createChangeStudentClassHandler } = require("./lib/studentProfile");
 const { createCheckCampusLocationHandler } = require("./lib/campusLocation");
+const { createGetNationalRankingHandler } = require("./lib/nationalRanking");
 const { getApps, initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
@@ -85,6 +86,9 @@ exports.checkCampusLocation = onRequest({ region: "asia-northeast3", memory: "25
 }));
 exports.changeStudentClass = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createChangeStudentClassHandler({
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, serverTimestamp: () => FieldValue.serverTimestamp()
+}));
+exports.getNationalRanking = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createGetNationalRankingHandler({
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck
 }));
 const edu2gHandlers = createEdu2gHandlers({
   registry: createEdu2gPassRegistry({ getSecret: () => edu2gPassRegistrySecret.value() }),

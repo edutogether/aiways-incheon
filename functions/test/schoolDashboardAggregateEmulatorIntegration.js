@@ -159,6 +159,15 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
     assert.equal(badSelector.status, 400);
     assert.equal(badSelector.body.code, "invalid_class_selector");
 
+    // This actor's first getSchoolDashboard call above locked it to SCHOOL_ID
+    // (actors/{actorId}.dashboardSchoolId) -- any other schoolId must now be
+    // rejected outright, even though App Check/auth are otherwise valid.
+    const otherSchool = await call(dashboard, token, { schoolId: "some_other_school" });
+    assert.equal(otherSchool.status, 403);
+    assert.equal(otherSchool.body.code, "school_mismatch");
+    const sameSchoolAgain = await call(dashboard, token, { schoolId: SCHOOL_ID });
+    assert.equal(sameSchoolAgain.status, 200);
+
     process.stdout.write(JSON.stringify({ schoolDashboardAggregateEmulatorIntegration: "passed" }) + "\n");
   } finally {
     const batch = db.batch();

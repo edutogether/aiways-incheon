@@ -3464,16 +3464,24 @@
     }
     try {
       const imagePayload = await prepareSortingVisionImage(image);
-      const [recognitionResult, observerResult] = await Promise.allSettled([sortingVisionProviders.futureGemini.analyze({ requestMetadata, imagePayload }), requestSortingSafetyObserver({ requestMetadata, imagePayload })]);
-      const remote = recognitionResult.status === "fulfilled" ? recognitionResult.value : { ok:false, code:"analysis_failed" };
-      const observer = observerResult.status === "fulfilled" ? observerResult.value : { ok:false };
-      if (observer.ok && observer.safety) safety = observer.safety;
+      const remote = await sortingVisionProviders.futureGemini.analyze({ requestMetadata, imagePayload });
       if (remote.ok && activeSortingVisionRequestId === requestMetadata.requestId) {
         liveGemini = true;
         geminiCandidate = remote.value.objectCandidates?.[0] || null;
         remote.value.objectCandidates.forEach(candidate => hints.push(createSortingVisionHint(candidate, SORTING_VISION_SOURCES.FUTURE_GEMINI, {
           provider: "future_gemini", confidenceBand: candidate.confidenceBand, requestId: requestMetadata.requestId, schemaVersion: remote.value.schemaVersion
         })));
+        // 안전관찰자 조건부 호출(7단계 결정): 메인 판별이 이미 확실하면(대부분의
+        // 경우) 같은 사진을 화질/구도 확인용으로 Gemini에 두 번째로 또 보낼
+        // 필요가 없다 - 메인 판별 스스로 애매하다고 표시한 경우에만 "다시
+        // 찍어야 할지" 안전관찰자에게 물어본다. 이게 사진 1장당 Gemini 호출
+        // 2회였던 걸 대부분의 경우 1회로 줄이는 지점이다.
+        if (remote.state === SORTING_VISION_STATES.UNCERTAIN) {
+          const observer = await requestSortingSafetyObserver({ requestMetadata, imagePayload });
+          if (observer.ok && observer.safety) safety = observer.safety;
+        } else {
+          safety = { safetyLevel: "SAFE", retakeRecommended: false, directSelectionRecommended: true, reasons: [], uxState: "safe" };
+        }
       } else if (!remote.ok) analysisCode = remote.code || "analysis_failed";
     } catch {
       analysisCode = "analysis_failed";

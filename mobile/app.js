@@ -115,11 +115,55 @@
     `;
     $("interimClassCard")?.classList.add("hidden");
     initClassChangeControls();
+    loadNationalRanking();
   }
 
   function formatCooldownWait(retryAfterSeconds) {
     const hours = Math.ceil((retryAfterSeconds || 0) / 3600);
     return hours > 1 ? `${hours}시간 뒤에 다시 시도해 주세요.` : "잠시 뒤에 다시 시도해 주세요.";
+  }
+
+  // -----------------------------------------------------------------
+  // 전국 랭킹 (8단계) — 학교 단위 총점만 표시한다. 백엔드(getNationalRanking)가
+  // 애초에 반 단위 데이터를 응답에 담지 않으므로, 여기서도 다른 학교의
+  // 반/학생 상세는 절대 볼 수 없다.
+  // -----------------------------------------------------------------
+  async function loadNationalRanking() {
+    const list = $("nationalRankingList");
+    const status = $("nationalRankingStatus");
+    if (!list || !status) return;
+    const client = window.AIWaysEdu2gClient;
+    if (!client?.getNationalRanking) { status.textContent = "지금은 랭킹을 불러올 수 없어요."; return; }
+    status.textContent = "불러오는 중입니다...";
+    list.replaceChildren();
+    const schoolId = currentSchoolId();
+    const result = await client.getNationalRanking({ schoolId });
+    if (!result.ok) {
+      status.textContent = client.errorMessageFor?.(result.data?.code) || "랭킹을 불러오지 못했어요. 다시 시도해 주세요.";
+      return;
+    }
+    const schools = Array.isArray(result.data?.schools) ? result.data.schools : [];
+    if (!schools.length) { status.textContent = "아직 등록된 학교 기록이 없어요."; return; }
+    status.textContent = schoolId ? "우리 학교는 굵게 표시돼요." : "학교/반을 연결하면 우리 학교 순위가 굵게 표시돼요.";
+    const top = schools.slice(0, 5);
+    const mine = schools.find(school => school.isMine);
+    const rows = mine && !top.includes(mine) ? [...top, null, mine] : top;
+    rows.forEach(school => {
+      const item = document.createElement("li");
+      if (!school) {
+        item.className = "text-center text-[10px] text-indigo-300";
+        item.textContent = "⋯";
+        list.append(item);
+        return;
+      }
+      item.className = `flex items-center justify-between rounded-xl px-3 py-2 text-xs ${school.isMine ? "bg-indigo-600 text-white font-bold" : "bg-white text-slate-600 font-semibold"}`;
+      const left = document.createElement("span");
+      left.textContent = `${school.rank}위 · ${school.schoolId}`;
+      const right = document.createElement("span");
+      right.textContent = `${school.score}회`;
+      item.append(left, right);
+      list.append(item);
+    });
   }
 
   function initClassChangeControls() {
@@ -873,6 +917,8 @@
     restoreLocal();
     initClassContextForm();
     initSignupForm();
+    loadNationalRanking();
+    $("nationalRankingRefreshBtn")?.addEventListener("click", loadNationalRanking);
     renderQuizRankLadder();
     startQuiz();
     syncTabHeights();

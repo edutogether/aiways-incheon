@@ -87,6 +87,21 @@
         <!-- 1. 3초 판단 탭 -->
         <div id="tab-judge" class="tab-content space-y-5">
 
+            <!-- 첫 진입 가입 유도 배너: 가입은 여전히 선택(강제 게이트 아님)이지만,
+                 '통계' 탭 안에 숨어있어서 아무도 안 누르면 그 학생 기록이 우리반
+                 랭킹에 영영 안 잡히는 문제가 있어 눈에 띄게 배너로 유도한다.
+                 가입 완료되거나 '나중에'를 누르면 다시 안 뜬다. -->
+            <div id="signupBanner" class="hidden bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 space-y-2 shadow-sm">
+                <div class="flex items-center gap-1.5 text-xs font-extrabold text-white">
+                    <span>🎓</span><span>아직 가입 전이에요!</span>
+                </div>
+                <p class="text-[11px] text-blue-100 leading-snug">한 번만 가입하면 내 기록이 우리반 순위·전국 랭킹에 정확히 반영돼요. 안 해도 판단/퀴즈는 그대로 쓸 수 있어요.</p>
+                <div class="flex gap-2">
+                    <button id="signupBannerGoBtn" type="button" class="flex-1 bg-white hover:bg-blue-50 text-blue-700 font-bold text-xs py-2 rounded-xl transition-all">지금 가입하기 →</button>
+                    <button id="signupBannerDismissBtn" type="button" class="text-blue-100 hover:text-white font-bold text-xs px-3 py-2 rounded-xl transition-all">나중에</button>
+                </div>
+            </div>
+
             <!-- 오늘의 실천 현황 (통계 탭과 동일한 실데이터) -->
             <div class="bg-teal-50 border border-teal-100 rounded-2xl p-3.5">
                 <div class="flex items-center gap-2 mb-2.5">

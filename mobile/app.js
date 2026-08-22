@@ -4,6 +4,7 @@
   const STATS_KEY = "aiways_mobile_stats_v1";
   const HOLD_KEY = "aiways_mobile_hold_v1";
   const CLASS_KEY = "aiways_mobile_class_v1";
+  const SIGNUP_BANNER_DISMISS_KEY = "aiways_mobile_signup_banner_dismissed_v1";
 
   let practiceStats = { totalCount: 0, carbonReduction: 0, logs: [] };
   let holdBoxList = [];
@@ -93,8 +94,29 @@
     return registeredSchoolId || loadClassContext()?.schoolId || "";
   }
 
+  function hideSignupBanner() {
+    $("signupBanner")?.classList.add("hidden");
+  }
+
+  function initSignupBanner() {
+    const banner = $("signupBanner");
+    if (!banner) return;
+    let dismissed = false;
+    try { dismissed = localStorage.getItem(SIGNUP_BANNER_DISMISS_KEY) === "1"; } catch {}
+    if (!dismissed) banner.classList.remove("hidden");
+    $("signupBannerGoBtn")?.addEventListener("click", () => {
+      switchTab("tab-stats");
+      $("signupSchoolInput")?.focus();
+    });
+    $("signupBannerDismissBtn")?.addEventListener("click", () => {
+      hideSignupBanner();
+      try { localStorage.setItem(SIGNUP_BANNER_DISMISS_KEY, "1"); } catch {}
+    });
+  }
+
   function showSignupLocked(profile) {
     registeredSchoolId = profile.schoolId;
+    hideSignupBanner();
     const card = $("signupCard");
     if (!card) return;
     card.innerHTML = `
@@ -216,7 +238,8 @@
 
     client?.checkStudentProfile?.().then(response => {
       if (response.ok && response.data?.hasProfile) showSignupLocked(response.data.profile);
-    }).catch(() => {});
+      else initSignupBanner();
+    }).catch(() => initSignupBanner());
 
     submitBtn.addEventListener("click", async () => {
       const schoolId = cleanForSignup($("signupSchoolInput")?.value);

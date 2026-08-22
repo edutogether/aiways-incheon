@@ -3,7 +3,10 @@
 const SCHEMA_VERSION = "sorting-record-v1";
 const DAY_MS = 24 * 60 * 60 * 1000;
 const MAX_BODY_BYTES = 24 * 1024;
-const FORBIDDEN_KEY = /(?:image|base64|data:image|url|authorization|api[_-]?key|secret|prompt|raw.*response|email|name|access.*code)/i;
+// \bname\b (word-boundary), not a bare "name" substring match -- otherwise
+// legitimate keys like classContext.schoolName would false-positive as PII
+// (schoolName isn't a student's real name, just a school's display label).
+const FORBIDDEN_KEY = /(?:image|base64|data:image|url|authorization|api[_-]?key|secret|prompt|raw.*response|email|\bname\b|access.*code)/i;
 const ALLOWED_ORIGIN = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
 const { observeAppCheck } = require("./appCheckProtection");
 const { protectActorRequest } = require("./protectedActor");
@@ -53,9 +56,10 @@ function normalizeClassContext(value) {
   if (value === null || value === undefined) return null;
   if (typeof value !== "object" || Array.isArray(value) || hasForbiddenKey(value)) return undefined;
   const schoolId = cleanText(value.schoolId, 80);
+  const schoolName = cleanText(value.schoolName, 80);
   const grade = cleanText(String(value.grade ?? ""), 10);
   const classNum = cleanText(String(value.classNum ?? ""), 10);
-  return schoolId && grade && classNum ? { schoolId, grade, classNum } : undefined;
+  return schoolId && grade && classNum ? { schoolId, ...(schoolName ? { schoolName } : {}), grade, classNum } : undefined;
 }
 function validateRecordRequest(body) {
   if (!body || typeof body !== "object" || Array.isArray(body) || hasForbiddenKey(body)) return reject("invalid_request");
@@ -133,7 +137,7 @@ function createSaveSortingRecordHandler(dependencies = {}) {
     if (db) {
       const actorSnap = await db.collection("actors").doc(actorId).get();
       const profile = actorSnap.exists ? actorSnap.data()?.studentProfile : null;
-      if (profile) record.classContext = { schoolId: profile.schoolId, grade: profile.grade, classNum: profile.classNum };
+      if (profile) record.classContext = { schoolId: profile.schoolId, ...(profile.schoolName ? { schoolName: profile.schoolName } : {}), grade: profile.grade, classNum: profile.classNum };
     }
     // GPS 교내판정(5단계): campusCheckId가 있으면 그 일회용 판정 결과를 소비해서
     // record.onCampus에 반영한다 - 좌표 자체는 이 함수도, 그 이전 어떤 단계도

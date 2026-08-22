@@ -37,12 +37,12 @@ function call(handler, token, body) {
   return handler({ method: "POST", headers: { origin: "http://localhost:5173", "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) }, body }, res).then(() => out);
 }
 
-function recordPayload(key, schoolId, grade, classNum, selectedItemId = "pet-bottle") {
+function recordPayload(key, schoolId, grade, classNum, selectedItemId = "pet-bottle", schoolName = "") {
   return {
     schemaVersion: "sorting-record-v1", status: "completed", provider: "manual_select",
     analysis: { objectCandidates: [], materialCandidates: [], visibleCautions: [] }, checklist: [],
     userDecision: { selectedItemId, action: "recorded", userConfirmed: true }, hold: null,
-    classContext: { schoolId, grade, classNum }, idempotencyKey: key
+    classContext: { schoolId, ...(schoolName ? { schoolName } : {}), grade, classNum }, idempotencyKey: key
   };
 }
 
@@ -106,9 +106,9 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
     await call(save, token, recordPayload(String(key++), SCHOOL_B, "5", "1", "pet-bottle"));
     // idempotencyKey must look like a UUID for validateRecordRequest -- reuse the working pattern.
     const keys = ["123e4567-e89b-42d3-a456-426614175201", "123e4567-e89b-42d3-a456-426614175202", "123e4567-e89b-42d3-a456-426614175203", "123e4567-e89b-42d3-a456-426614175204"];
-    const r1 = await call(save, token, { ...recordPayload(keys[0], SCHOOL_A, "5", "1", "pet-bottle"), campusCheckId: await seedOnCampusCheck() });
-    const r2 = await call(save, token, { ...recordPayload(keys[1], SCHOOL_A, "5", "1", "milk-carton"), campusCheckId: await seedOnCampusCheck() });
-    const r3 = await call(save, token, { ...recordPayload(keys[2], SCHOOL_A, "6", "2", "can"), campusCheckId: await seedOnCampusCheck() });
+    const r1 = await call(save, token, { ...recordPayload(keys[0], SCHOOL_A, "5", "1", "pet-bottle", "가온초등학교"), campusCheckId: await seedOnCampusCheck() });
+    const r2 = await call(save, token, { ...recordPayload(keys[1], SCHOOL_A, "5", "1", "milk-carton", "가온초등학교"), campusCheckId: await seedOnCampusCheck() });
+    const r3 = await call(save, token, { ...recordPayload(keys[2], SCHOOL_A, "6", "2", "can", "가온초등학교"), campusCheckId: await seedOnCampusCheck() });
     const r4 = await call(save, token, { ...recordPayload(keys[3], SCHOOL_B, "5", "1", "pet-bottle"), campusCheckId: await seedOnCampusCheck() });
     assert.equal(r1.status, 201); assert.equal(r2.status, 201); assert.equal(r3.status, 201); assert.equal(r4.status, 201);
 
@@ -126,8 +126,10 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
     assert.equal(bySchool.get(SCHOOL_A).score, 3);
     assert.equal(bySchool.get(SCHOOL_A).rank, 1);
     assert.equal(bySchool.get(SCHOOL_A).isMine, true);
+    assert.equal(bySchool.get(SCHOOL_A).schoolName, "가온초등학교", "schoolName written via classContext must surface in the ranking response");
     assert.equal(bySchool.get(SCHOOL_B).score, 1);
     assert.equal(bySchool.get(SCHOOL_B).isMine, false);
+    assert.equal(bySchool.get(SCHOOL_B).schoolName, "", "a school that never sent schoolName must not crash, just show empty");
     assert.ok(bySchool.get(SCHOOL_B).rank > bySchool.get(SCHOOL_A).rank, "school B must rank below school A");
     assert.equal(SCHOOL_C in Object.fromEntries(bySchool), false, "a school with zero records should not need to appear");
 

@@ -35,13 +35,13 @@ function call(handler, token, body) {
   return handler({ method: "POST", headers: { origin: "http://localhost:5173", "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) }, body }, res).then(() => out);
 }
 
-function recordPayload(key, { status = "completed", selectedItemId = "pet-bottle", grade = "5", classNum = "1", campusCheckId = "" } = {}) {
+function recordPayload(key, { status = "completed", selectedItemId = "pet-bottle", grade = "5", classNum = "1", campusCheckId = "", schoolName = "" } = {}) {
   return {
     schemaVersion: "sorting-record-v1", status, provider: status === "held" ? "manual_hold" : "manual_select",
     analysis: { objectCandidates: [], materialCandidates: [], visibleCautions: [] }, checklist: [],
     userDecision: { selectedItemId, action: status === "held" ? "held" : "recorded", userConfirmed: true },
     hold: status === "held" ? { recommended: true, reasons: ["check"] } : null,
-    classContext: { schoolId: SCHOOL_ID, grade, classNum }, idempotencyKey: key,
+    classContext: { schoolId: SCHOOL_ID, ...(schoolName ? { schoolName } : {}), grade, classNum }, idempotencyKey: key,
     ...(campusCheckId ? { campusCheckId } : {})
   };
 }
@@ -119,7 +119,7 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
 
     // Two completed records in 5학년 1반, one in 5학년 2반, one held record
     // in 5학년 1반 later resolved to completed (tests the conversion path).
-    const r1 = await call(save, token, recordPayload("123e4567-e89b-42d3-a456-426614174501", { selectedItemId: "pet-bottle", campusCheckId: await seedOnCampusCheck() }));
+    const r1 = await call(save, token, recordPayload("123e4567-e89b-42d3-a456-426614174501", { selectedItemId: "pet-bottle", campusCheckId: await seedOnCampusCheck(), schoolName: "실측초등학교" }));
     const r2 = await call(save, token, recordPayload("123e4567-e89b-42d3-a456-426614174502", { selectedItemId: "pet-bottle", campusCheckId: await seedOnCampusCheck() }));
     const r3 = await call(save, token, recordPayload("123e4567-e89b-42d3-a456-426614174503", { grade: "5", classNum: "2", selectedItemId: "milk-carton", campusCheckId: await seedOnCampusCheck() }));
     const held = await call(save, token, recordPayload("123e4567-e89b-42d3-a456-426614174504", { status: "held", selectedItemId: "이상한 물건", campusCheckId: await seedOnCampusCheck() }));
@@ -150,6 +150,7 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
 
     const schoolView = await call(dashboard, token, { schoolId: SCHOOL_ID });
     assert.equal(schoolView.status, 200);
+    assert.equal(schoolView.body.schoolName, "실측초등학교", "schoolName written via classContext must surface on the parent school doc");
     assert.equal(schoolView.body.classCount, 2);
     assert.equal(schoolView.body.school.observedToday, 4);
     assert.equal(schoolView.body.school.completedTotal, 4);

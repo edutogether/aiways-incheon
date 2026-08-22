@@ -40,8 +40,13 @@ function createSortingRecordAggregator({ db, serverTimestamp, now = () => new Da
     // (e.g. an idempotent re-save of the same completed record) is a no-op.
     if (!isNew && !(wasHeld && isCompleted)) return;
 
-    const classRef = db.collection("schools").doc(schoolId).collection("classes").doc(classDocId(grade, classNum));
+    const schoolRef = db.collection("schools").doc(schoolId);
+    const classRef = schoolRef.collection("classes").doc(classDocId(grade, classNum));
     const today = seoulDateString(now());
+    // schoolId는 나이스 학교코드라 그 자체로는 사람이 못 읽는다 - 대시보드/
+    // 랭킹 화면에 보여줄 표시용 이름을 학교 문서(부모) 하나에만 저장해둔다
+    // (반마다 중복 저장할 필요 없음).
+    const schoolName = typeof classContext.schoolName === "string" && classContext.schoolName.trim() ? classContext.schoolName.trim() : "";
 
     await db.runTransaction(async (transaction) => {
       const snap = await transaction.get(classRef);
@@ -70,6 +75,7 @@ function createSortingRecordAggregator({ db, serverTimestamp, now = () => new Da
         completedTotal, heldTotal, convertedTotal, itemCounts,
         updatedAt: serverTimestamp()
       }, { merge: true });
+      if (schoolName) transaction.set(schoolRef, { schoolName, updatedAt: serverTimestamp() }, { merge: true });
     });
   };
 }

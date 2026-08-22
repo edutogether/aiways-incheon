@@ -34,7 +34,7 @@ function call(handler, token, body) {
   return handler({ method: "POST", headers: { origin: "http://localhost:5173", "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) }, body }, res).then(() => out);
 }
 
-const student = { schoolId: "테스트초등학교", grade: "5", classNum: "1", studentNumber: "12", name: "홍길동" };
+const student = { schoolId: "7321071", schoolName: "테스트초등학교", grade: "5", classNum: "1", studentNumber: "12", name: "홍길동" };
 
 (async () => {
   const app = getApps()[0] || initializeApp({ projectId });
@@ -89,14 +89,14 @@ const student = { schoolId: "테스트초등학교", grade: "5", classNum: "1", 
     const preview = await call(change, token, { grade: "6", classNum: "3", confirm: false });
     assert.equal(preview.status, 200);
     assert.equal(preview.body.confirmed, false);
-    assert.deepEqual(preview.body.preview, { schoolId: student.schoolId, grade: "6", classNum: "3", studentNumber: student.studentNumber, name: student.name });
+    assert.deepEqual(preview.body.preview, { schoolId: student.schoolId, schoolName: student.schoolName, grade: "6", classNum: "3", studentNumber: student.studentNumber, name: student.name });
     const stillPreChange = await call(check, token, {});
     assert.deepEqual(stillPreChange.body.profile, student, "preview must not write anything");
 
     const committed = await call(change, token, { grade: "6", classNum: "3", confirm: true });
     assert.equal(committed.status, 200);
     assert.equal(committed.body.confirmed, true);
-    assert.deepEqual(committed.body.profile, { schoolId: student.schoolId, grade: "6", classNum: "3", studentNumber: student.studentNumber, name: student.name });
+    assert.deepEqual(committed.body.profile, { schoolId: student.schoolId, schoolName: student.schoolName, grade: "6", classNum: "3", studentNumber: student.studentNumber, name: student.name });
 
     const afterChange = await call(check, token, {});
     assert.equal(afterChange.body.profile.grade, "6");

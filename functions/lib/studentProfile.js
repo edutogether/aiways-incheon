@@ -35,8 +35,8 @@ function applyCors(req, res) {
 
 function publicProfile(profile) {
   if (!profile) return null;
-  const { schoolId, grade, classNum, studentNumber, name } = profile;
-  return { schoolId, grade, classNum, studentNumber, name };
+  const { schoolId, schoolName, grade, classNum, studentNumber, name } = profile;
+  return { schoolId, schoolName, grade, classNum, studentNumber, name };
 }
 
 async function guardedActor(req, res, functionName, dependencies) {
@@ -74,14 +74,19 @@ function createRegisterStudentProfileHandler(dependencies = {}) {
     const protectedActor = await guardedActor(req, res, "registerStudentProfile", dependencies);
     if (!protectedActor) return;
     const body = req.body || {};
-    const allowed = new Set(["schoolId", "grade", "classNum", "studentNumber", "name", "confirm"]);
+    const allowed = new Set(["schoolId", "schoolName", "grade", "classNum", "studentNumber", "name", "confirm"]);
     if (Object.keys(body).some((key) => !allowed.has(key))) return res.status(400).json({ ok: false, code: "unknown_field" });
-    const schoolId = cleanText(body.schoolId, 80);
+    // schoolId는 이제 사람이 친 학교 이름이 아니라 나이스(NEIS) 학교기본정보
+    // API의 표준학교코드(SD_SCHUL_CODE, 숫자 문자열)다 - searchSchool로 검색해
+    // 목록에서 고른 값만 여기로 들어오므로 오타로 다른 학교가 되는 일이 없다.
+    // schoolName은 그 코드에 딸린 표시용 이름(대시보드/랭킹 화면에만 씀).
+    const schoolId = typeof body.schoolId === "string" && /^\d{1,12}$/.test(body.schoolId) ? body.schoolId : "";
+    const schoolName = cleanText(body.schoolName, 80);
     const grade = typeof body.grade === "string" && DIGITS.test(body.grade) ? body.grade : "";
     const classNum = typeof body.classNum === "string" && DIGITS.test(body.classNum) ? body.classNum : "";
     const studentNumber = typeof body.studentNumber === "string" && DIGITS.test(body.studentNumber) ? body.studentNumber : "";
     const name = cleanText(body.name, 20);
-    if (!schoolId || !grade || !classNum || !studentNumber || !name) return res.status(400).json({ ok: false, code: "invalid_request" });
+    if (!schoolId || !schoolName || !grade || !classNum || !studentNumber || !name) return res.status(400).json({ ok: false, code: "invalid_request" });
     if (typeof body.confirm !== "boolean") return res.status(400).json({ ok: false, code: "invalid_request" });
 
     const actorRef = db.collection("actors").doc(protectedActor.actorId);
@@ -93,18 +98,18 @@ function createRegisterStudentProfileHandler(dependencies = {}) {
       // Preview only -- nothing written yet. The client shows this back to
       // the student ("정말 OO초 5학년 1반 홍길동 맞나요?") before calling again
       // with confirm:true.
-      return res.status(200).json({ ok: true, confirmed: false, preview: { schoolId, grade, classNum, studentNumber, name } });
+      return res.status(200).json({ ok: true, confirmed: false, preview: { schoolId, schoolName, grade, classNum, studentNumber, name } });
     }
 
     const result = await db.runTransaction(async (transaction) => {
       const snap = await transaction.get(actorRef);
       const already = snap.exists ? snap.data()?.studentProfile : null;
       if (already) return { code: "already_registered", profile: already };
-      transaction.set(actorRef, { studentProfile: { schoolId, grade, classNum, studentNumber, name, registeredAt: serverTimestamp() } }, { merge: true });
+      transaction.set(actorRef, { studentProfile: { schoolId, schoolName, grade, classNum, studentNumber, name, registeredAt: serverTimestamp() } }, { merge: true });
       return { ok: true };
     });
     if (result.code === "already_registered") return res.status(409).json({ ok: false, code: "already_registered", profile: publicProfile(result.profile) });
-    return res.status(201).json({ ok: true, confirmed: true, profile: { schoolId, grade, classNum, studentNumber, name } });
+    return res.status(201).json({ ok: true, confirmed: true, profile: { schoolId, schoolName, grade, classNum, studentNumber, name } });
   };
 }
 
@@ -151,7 +156,7 @@ function createChangeStudentClassHandler(dependencies = {}) {
     }
 
     if (!body.confirm) {
-      return res.status(200).json({ ok: true, confirmed: false, preview: { schoolId: existingProfile.schoolId, grade, classNum, studentNumber: existingProfile.studentNumber, name: existingProfile.name } });
+      return res.status(200).json({ ok: true, confirmed: false, preview: { schoolId: existingProfile.schoolId, schoolName: existingProfile.schoolName, grade, classNum, studentNumber: existingProfile.studentNumber, name: existingProfile.name } });
     }
 
     const result = await db.runTransaction(async (transaction) => {
@@ -171,7 +176,7 @@ function createChangeStudentClassHandler(dependencies = {}) {
     });
     if (result.code === "not_registered") return res.status(409).json({ ok: false, code: "not_registered" });
     if (result.code === "cooldown_active") return res.status(429).json({ ok: false, code: "cooldown_active" });
-    return res.status(200).json({ ok: true, confirmed: true, profile: { schoolId: existingProfile.schoolId, grade, classNum, studentNumber: existingProfile.studentNumber, name: existingProfile.name } });
+    return res.status(200).json({ ok: true, confirmed: true, profile: { schoolId: existingProfile.schoolId, schoolName: existingProfile.schoolName, grade, classNum, studentNumber: existingProfile.studentNumber, name: existingProfile.name } });
   };
 }
 

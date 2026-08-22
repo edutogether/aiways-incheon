@@ -65,8 +65,18 @@ function createGetNationalRankingHandler(dependencies = {}) {
       current.observedTotal += completedTotal + heldTotal;
       totals.set(schoolId, current);
     }
+    // schoolId는 나이스 학교코드라 그 자체로는 사람이 못 읽는다 - 학교 문서
+    // (부모, schoolDashboardAggregate.js가 채워둔 schoolName)를 한 번 더
+    // 읽어 표시용 이름을 붙인다. 학교 수가 적은 규모라 school당 1회 추가
+    // 조회는 무시할 만한 비용이다.
+    const schoolNamePairs = await Promise.all([...totals.keys()].map(async (schoolId) => {
+      const snap = await db.collection("schools").doc(schoolId).get();
+      return [schoolId, cleanText(snap.exists ? snap.data()?.schoolName : "", 80)];
+    }));
+    const schoolNames = new Map(schoolNamePairs);
+
     const ranked = [...totals.values()].sort((a, b) => b.score - a.score);
-    const schools = ranked.map((item, index) => ({ schoolId: item.schoolId, score: item.score, rank: index + 1, isMine: item.schoolId === highlightSchoolId }));
+    const schools = ranked.map((item, index) => ({ schoolId: item.schoolId, schoolName: schoolNames.get(item.schoolId) || "", score: item.score, rank: index + 1, isMine: item.schoolId === highlightSchoolId }));
 
     return res.status(200).json({ ok: true, schoolCount: schools.length, schools });
   };

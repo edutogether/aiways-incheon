@@ -32,7 +32,7 @@ function call(handler, token, body) {
   return handler({ method: "POST", headers: { origin: "http://localhost:5173", "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) }, body }, res).then(() => out);
 }
 
-const student = { schoolId: "테스트초등학교", grade: "5", classNum: "1", studentNumber: "12", name: "홍길동" };
+const student = { schoolId: "7321071", schoolName: "테스트초등학교", grade: "5", classNum: "1", studentNumber: "12", name: "홍길동" };
 
 (async () => {
   const app = getApps()[0] || initializeApp({ projectId });
@@ -93,13 +93,13 @@ const student = { schoolId: "테스트초등학교", grade: "5", classNum: "1", 
       schemaVersion: "sorting-record-v1", status: "completed", provider: "manual_select",
       analysis: { objectCandidates: [], materialCandidates: [], visibleCautions: [] }, checklist: [],
       userDecision: { selectedItemId: "pet-bottle", action: "recorded", userConfirmed: true }, hold: null,
-      classContext: { schoolId: "가짜학교", grade: "9", classNum: "9" },
+      classContext: { schoolId: "9999999", schoolName: "가짜학교", grade: "9", classNum: "9" },
       idempotencyKey: "123e4567-e89b-42d3-a456-426614174701"
     };
     const saved = await call(save, token, spoofedPayload);
     assert.equal(saved.status, 201);
     const savedDoc = await db.collection("actors").doc(ACTOR_ID).collection("records").doc(saved.body.recordId).get();
-    assert.deepEqual(savedDoc.data().classContext, { schoolId: student.schoolId, grade: student.grade, classNum: student.classNum });
+    assert.deepEqual(savedDoc.data().classContext, { schoolId: student.schoolId, schoolName: student.schoolName, grade: student.grade, classNum: student.classNum });
 
     const after = await call(check, token, {});
     assert.equal(after.status, 200);

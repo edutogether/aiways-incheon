@@ -13,6 +13,7 @@ const { createGetSchoolDashboardHandler } = require("./lib/schoolDashboard");
 const { createCheckStudentProfileHandler, createRegisterStudentProfileHandler, createChangeStudentClassHandler } = require("./lib/studentProfile");
 const { createCheckCampusLocationHandler } = require("./lib/campusLocation");
 const { createGetNationalRankingHandler } = require("./lib/nationalRanking");
+const { createSearchSchoolHandler } = require("./lib/schoolSearch");
 const { getApps, initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
@@ -23,6 +24,7 @@ const { createEdu2gDeviceAccess } = require("./lib/edu2gDeviceAccess");
 const { createFirestoreDeviceStore, createEdu2gHandlers } = require("./lib/edu2gPassHandlers");
 const geminiApiKey = defineSecret("GEMINI_API_KEY");
 const edu2gPassRegistrySecret = defineSecret("EDU2G_PASS_REGISTRY_JSON");
+const neisApiKey = defineSecret("NEIS_API_KEY");
 if (!getApps().length) initializeApp();
 const db = getFirestore();
 const rateLimiter = createGlobalRateLimiter({ db, serverTimestamp: () => FieldValue.serverTimestamp() });
@@ -89,6 +91,9 @@ exports.changeStudentClass = onRequest({ region: "asia-northeast3", memory: "256
 }));
 exports.getNationalRanking = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createGetNationalRankingHandler({
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck
+}));
+exports.searchSchool = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, secrets: [neisApiKey], cors: false }, createSearchSchoolHandler({
+  getApiKey: () => neisApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck
 }));
 const edu2gHandlers = createEdu2gHandlers({
   registry: createEdu2gPassRegistry({ getSecret: () => edu2gPassRegistrySecret.value() }),

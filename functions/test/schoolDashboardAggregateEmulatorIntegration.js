@@ -35,13 +35,14 @@ function call(handler, token, body) {
   return handler({ method: "POST", headers: { origin: "http://localhost:5173", "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) }, body }, res).then(() => out);
 }
 
-function recordPayload(key, { status = "completed", selectedItemId = "pet-bottle", grade = "5", classNum = "1" } = {}) {
+function recordPayload(key, { status = "completed", selectedItemId = "pet-bottle", grade = "5", classNum = "1", campusCheckId = "" } = {}) {
   return {
     schemaVersion: "sorting-record-v1", status, provider: status === "held" ? "manual_hold" : "manual_select",
     analysis: { objectCandidates: [], materialCandidates: [], visibleCautions: [] }, checklist: [],
     userDecision: { selectedItemId, action: status === "held" ? "held" : "recorded", userConfirmed: true },
     hold: status === "held" ? { recommended: true, reasons: ["check"] } : null,
-    classContext: { schoolId: SCHOOL_ID, grade, classNum }, idempotencyKey: key
+    classContext: { schoolId: SCHOOL_ID, grade, classNum }, idempotencyKey: key,
+    ...(campusCheckId ? { campusCheckId } : {})
   };
 }
 
@@ -103,16 +104,25 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
       }
     };
     const appCheck = async () => ({ status: "valid" });
-    const save = createSaveSortingRecordHandler({ access, rateLimiter, actorRateLimiter, appCheck, store, serverTimestamp: () => FieldValue.serverTimestamp() });
+    const save = createSaveSortingRecordHandler({ access, rateLimiter, actorRateLimiter, appCheck, store, db, serverTimestamp: () => FieldValue.serverTimestamp() });
     const resolve = createResolveSortingRecordHandler({ store, access, appCheck, serverTimestamp: () => FieldValue.serverTimestamp(), rateLimiter, actorRateLimiter, logAppCheck: () => {} });
     const dashboard = createGetSchoolDashboardHandler({ db, access, appCheck, rateLimiter, actorRateLimiter, logAppCheck: () => {} });
 
+    // This suite is about aggregation math, not GPS (that's campusLocationEmulatorIntegration.js's
+    // job) -- seed already-verified on-campus checks directly rather than going through
+    // checkCampusLocation, since step 5 now requires onCampus===true for anything to count.
+    async function seedOnCampusCheck() {
+      const ref = db.collection("actors").doc("dashboard_test_actor").collection("campusChecks").doc();
+      await ref.set({ onCampus: true, consumed: false, createdAt: FieldValue.serverTimestamp(), expiresAt: new Date(Date.now() + 120000) });
+      return ref.id;
+    }
+
     // Two completed records in 5학년 1반, one in 5학년 2반, one held record
     // in 5학년 1반 later resolved to completed (tests the conversion path).
-    const r1 = await call(save, token, recordPayload("123e4567-e89b-42d3-a456-426614174501", { selectedItemId: "pet-bottle" }));
-    const r2 = await call(save, token, recordPayload("123e4567-e89b-42d3-a456-426614174502", { selectedItemId: "pet-bottle" }));
-    const r3 = await call(save, token, recordPayload("123e4567-e89b-42d3-a456-426614174503", { grade: "5", classNum: "2", selectedItemId: "milk-carton" }));
-    const held = await call(save, token, recordPayload("123e4567-e89b-42d3-a456-426614174504", { status: "held", selectedItemId: "이상한 물건" }));
+    const r1 = await call(save, token, recordPayload("123e4567-e89b-42d3-a456-426614174501", { selectedItemId: "pet-bottle", campusCheckId: await seedOnCampusCheck() }));
+    const r2 = await call(save, token, recordPayload("123e4567-e89b-42d3-a456-426614174502", { selectedItemId: "pet-bottle", campusCheckId: await seedOnCampusCheck() }));
+    const r3 = await call(save, token, recordPayload("123e4567-e89b-42d3-a456-426614174503", { grade: "5", classNum: "2", selectedItemId: "milk-carton", campusCheckId: await seedOnCampusCheck() }));
+    const held = await call(save, token, recordPayload("123e4567-e89b-42d3-a456-426614174504", { status: "held", selectedItemId: "이상한 물건", campusCheckId: await seedOnCampusCheck() }));
     assert.equal(r1.status, 201); assert.equal(r2.status, 201); assert.equal(r3.status, 201); assert.equal(held.status, 201);
 
     const classRef = db.collection("schools").doc(SCHOOL_ID).collection("classes").doc("5_1");
@@ -173,7 +183,7 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
     const batch = db.batch();
     if (uid) batch.delete(db.collection("edu2gDeviceBindings").doc(uid));
     const actorRoot = db.collection("actors").doc("dashboard_test_actor");
-    for (const name of ["records", "_idempotency", "_resolutions", "trustedDevices"]) {
+    for (const name of ["records", "_idempotency", "_resolutions", "trustedDevices", "campusChecks"]) {
       const snap = await actorRoot.collection(name).get();
       snap.docs.forEach((d) => batch.delete(d.ref));
     }

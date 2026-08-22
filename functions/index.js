@@ -11,6 +11,7 @@ const { createListSortingRecordsHandler, createResolveSortingRecordHandler } = r
 const { createSortingRecordAggregator } = require("./lib/schoolDashboardAggregate");
 const { createGetSchoolDashboardHandler } = require("./lib/schoolDashboard");
 const { createCheckStudentProfileHandler, createRegisterStudentProfileHandler } = require("./lib/studentProfile");
+const { createCheckCampusLocationHandler } = require("./lib/campusLocation");
 const { getApps, initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
@@ -77,6 +78,9 @@ exports.checkStudentProfile = onRequest({ region: "asia-northeast3", memory: "25
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck
 }));
 exports.registerStudentProfile = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createRegisterStudentProfileHandler({
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, serverTimestamp: () => FieldValue.serverTimestamp()
+}));
+exports.checkCampusLocation = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckCampusLocationHandler({
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, serverTimestamp: () => FieldValue.serverTimestamp()
 }));
 const edu2gHandlers = createEdu2gHandlers({

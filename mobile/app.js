@@ -12,6 +12,9 @@
   let currentQuizSet = [];
   let currentQuizIndex = 0;
   let userQuizScore = 0;
+  // GPS 교내판정(5단계)이 어느 학교를 기준으로 검사할지 알아야 하는데,
+  // 가입한 학생이면 서버가 확인한 학교명이 더 신뢰도 높다.
+  let registeredSchoolId = "";
 
   const $ = id => document.getElementById(id);
   const normalize = value => (value || "").toString().normalize("NFKC").trim().toLowerCase();
@@ -86,7 +89,12 @@
   // -----------------------------------------------------------------
   // 정식 가입 (최초 1회, 기기 영구고정) — 이중 확인창까지 포함한 흐름
   // -----------------------------------------------------------------
+  function currentSchoolId() {
+    return registeredSchoolId || loadClassContext()?.schoolId || "";
+  }
+
   function showSignupLocked(profile) {
+    registeredSchoolId = profile.schoolId;
     const card = $("signupCard");
     if (!card) return;
     card.innerHTML = `
@@ -165,10 +173,36 @@
   // missing ("mobile/에 fetch가 단 한 줄도 없다"). It never blocks the UI --
   // the student's confirmation is already reflected locally before this
   // resolves, matching the "사진찍는 것도 귀찮은데" no-friction requirement.
+  // GPS 교내판정(5단계): 좌표는 이 함수 밖으로 절대 안 나간다 - 서버에
+  // checkCampusLocation을 한 번 호출해서 참/거짓 판정 + 일회용 확인ID만
+  // 받아오고, 좌표 자체는 어디에도 저장하지 않는다. 권한 거부/타임아웃/학교
+  // 미확인 등 뭐가 실패하든 그냥 ""를 돌려주고 제출은 계속 진행한다(그
+  // 기록은 개인 기록으로만 남고 우리반 경쟁에는 반영 안 됨 - 결정된 사항).
+  function getCurrentPosition(timeoutMs) {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) { reject(new Error("no_geolocation")); return; }
+      navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: timeoutMs, maximumAge: 60000 });
+    });
+  }
+
+  async function resolveCampusCheckId() {
+    const client = window.AIWaysEdu2gClient;
+    const schoolId = currentSchoolId();
+    if (!schoolId || !client?.checkCampusLocation) return "";
+    try {
+      const position = await getCurrentPosition(4000);
+      const response = await client.checkCampusLocation({ schoolId, lat: position.coords.latitude, lng: position.coords.longitude });
+      return response.ok && response.data?.campusCheckId ? response.data.campusCheckId : "";
+    } catch {
+      return "";
+    }
+  }
+
   async function submitSortingRecord({ status, selectedItemId, provider, objectCandidates = [], holdReasons = [] }) {
     const client = window.AIWaysEdu2gClient;
     if (!client?.saveSortingRecord || !selectedItemId) return;
     const classContext = loadClassContext();
+    const campusCheckId = await resolveCampusCheckId();
     const payload = {
       schemaVersion: "sorting-record-v1",
       status,
@@ -178,6 +212,7 @@
       userDecision: { selectedItemId: selectedItemId.slice(0, 40), action: status === "held" ? "held" : "recorded", userConfirmed: true },
       hold: status === "held" ? { recommended: true, reasons: holdReasons.slice(0, 5) } : null,
       ...(classContext ? { classContext } : {}),
+      ...(campusCheckId ? { campusCheckId } : {}),
       idempotencyKey: createRecordIdempotencyKey()
     };
     try { await client.saveSortingRecord(payload); } catch { /* best-effort; local UI already reflects the action */ }

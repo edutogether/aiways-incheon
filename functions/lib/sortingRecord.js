@@ -59,7 +59,7 @@ function normalizeClassContext(value) {
 }
 function validateRecordRequest(body) {
   if (!body || typeof body !== "object" || Array.isArray(body) || hasForbiddenKey(body)) return reject("invalid_request");
-  const allowed = new Set(["schemaVersion", "status", "provider", "model", "appVersion", "sourceSchemaVersion", "analysis", "checklist", "userDecision", "hold", "idempotencyKey", "classContext"]);
+  const allowed = new Set(["schemaVersion", "status", "provider", "model", "appVersion", "sourceSchemaVersion", "analysis", "checklist", "userDecision", "hold", "idempotencyKey", "classContext", "campusCheckId"]);
   if (Object.keys(body).some((key) => !allowed.has(key))) return reject("unknown_field");
   if (body.schemaVersion !== SCHEMA_VERSION || !["completed", "held"].includes(body.status)) return reject("invalid_schema");
   const provider = cleanText(body.provider, 80);
@@ -94,6 +94,8 @@ function validateRecordRequest(body) {
   if (body.status === "held" && (action !== "held" || !normalizedHold?.recommended)) return reject("invalid_held_state");
   const classContext = normalizeClassContext(body.classContext);
   if (classContext === undefined) return reject("invalid_class_context");
+  const campusCheckId = body.campusCheckId === undefined ? "" : cleanText(body.campusCheckId, 80);
+  if (body.campusCheckId !== undefined && !campusCheckId) return reject("invalid_campus_check");
   return { valid: true, value: {
     schemaVersion: SCHEMA_VERSION, status: body.status, provider,
     ...(cleanText(body.model, 80) ? { model: cleanText(body.model, 80) } : {}),
@@ -101,7 +103,7 @@ function validateRecordRequest(body) {
     ...(cleanText(body.sourceSchemaVersion, 80) ? { sourceSchemaVersion: cleanText(body.sourceSchemaVersion, 80) } : {}),
     analysis: { objectCandidates, materialCandidates, visibleCautions }, checklist,
     userDecision: { selectedItemId, ...(selectedCorrectionType ? { selectedCorrectionType } : {}), action, userConfirmed: true },
-    hold: normalizedHold, ...(classContext ? { classContext } : {}), idempotencyKey
+    hold: normalizedHold, ...(classContext ? { classContext } : {}), idempotencyKey, campusCheckId
   } };
 }
 function createSaveSortingRecordHandler(dependencies = {}) {
@@ -133,7 +135,24 @@ function createSaveSortingRecordHandler(dependencies = {}) {
       const profile = actorSnap.exists ? actorSnap.data()?.studentProfile : null;
       if (profile) record.classContext = { schoolId: profile.schoolId, grade: profile.grade, classNum: profile.classNum };
     }
+    // GPS 교내판정(5단계): campusCheckId가 있으면 그 일회용 판정 결과를 소비해서
+    // record.onCampus에 반영한다 - 좌표 자체는 이 함수도, 그 이전 어떤 단계도
+    // 저장/기록하지 않는다(checkCampusLocation에서 이미 boolean만 남기고 버림).
+    // 아이디가 없거나, 없거나, 만료/중복사용이면 안전하게 교외(false)로 취급한다.
+    if (db && record.campusCheckId) {
+      const checkRef = db.collection("actors").doc(actorId).collection("campusChecks").doc(record.campusCheckId);
+      record.onCampus = await db.runTransaction(async (transaction) => {
+        const snap = await transaction.get(checkRef);
+        if (!snap.exists) return false;
+        const data = snap.data() || {};
+        const expiresAt = data.expiresAt?.toDate ? data.expiresAt.toDate() : new Date(data.expiresAt);
+        if (data.consumed === true || !(expiresAt instanceof Date) || Number.isNaN(expiresAt.getTime()) || expiresAt.getTime() < now().getTime()) return false;
+        transaction.update(checkRef, { consumed: true });
+        return data.onCampus === true;
+      });
+    }
     delete record.idempotencyKey;
+    delete record.campusCheckId;
     const result = await store.createOrGet(actorId, checked.value.idempotencyKey, record, { createdAt: createdAt.toISOString(), expireAt: expireAt.toISOString() });
     logger({ recordId: result.recordId, status: result.status, provider: record.provider, schemaVersion: SCHEMA_VERSION, duplicate: result.duplicate === true });
     return res.status(result.duplicate ? 200 : 201).json({ recordId: result.recordId, status: result.status, createdAt: result.createdAt, expireAt: result.expireAt, schemaVersion: SCHEMA_VERSION, duplicate: result.duplicate === true });

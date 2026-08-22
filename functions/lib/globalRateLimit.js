@@ -11,7 +11,8 @@ const RATE_LIMITS = Object.freeze({
   listSortingRecords: { perMinute: 120 },
   resolveSortingRecord: { perMinute: 60 },
   getSchoolDashboard: { perMinute: 120 },
-  checkStudentProfile: { perMinute: 30 }, registerStudentProfile: { perMinute: 10 }
+  checkStudentProfile: { perMinute: 30 }, registerStudentProfile: { perMinute: 10 },
+  checkCampusLocation: { perMinute: 60 }
   ,redeemEdu2gPass: { perMinute: 5 }, getEdu2gSession: { perMinute: 60 }, listEdu2gTrustedDevices: { perMinute: 60 }, revokeEdu2gTrustedDevice: { perMinute: 20 }
 });
 
@@ -72,6 +73,7 @@ const ACTOR_RATE_LIMITS = Object.freeze({
   listSortingRecords: { perMinute: 60, perDay: 500 }, resolveSortingRecord: { perMinute: 20, perDay: 100 },
   getSchoolDashboard: { perMinute: 30, perDay: 2000 },
   checkStudentProfile: { perMinute: 10, perDay: 200 }, registerStudentProfile: { perMinute: 5, perDay: 20 },
+  checkCampusLocation: { perMinute: 15, perDay: 300 },
   redeemEdu2gPass: { perMinute: 5 }
 });
 function hashRateLimitScope(value) { return createHash("sha256").update(String(value)).digest("hex"); }

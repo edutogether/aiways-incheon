@@ -302,6 +302,46 @@
             <p class="rank-note">RANKING 🥇 5학년 중 1위 · 🏫 전교 0위</p>
           </article>
 
+          <article class="panel skill-panel">
+            <div class="panel-head">
+              <div>
+                <p>Class Skill Registry</p>
+                <h2>우리 반이 AI에게 가르친 것</h2>
+              </div>
+            </div>
+            <details class="classroom-skill-panel" id="classroomSkillPanel">
+              <summary>우리 반이 AI에게 가르친 것</summary>
+              <p class="classroom-skill-intro">Gemini의 판단을 바꾸지 않고, 우리 반이 만든 Teachable Machine 기술을 참고용으로 누적합니다.</p>
+              <div class="class-profile-panel" id="classProfilePanel">
+                <p id="classProfileStatus" class="class-profile-status" role="status" aria-live="polite">반을 연결하면 우리 반 Skill만 참고용으로 사용합니다.</p>
+                <form id="classProfileForm" class="class-profile-form">
+                  <label>학교 ID<input id="classProfileSchoolId" required maxlength="80" placeholder="예: aiways-elementary" autocomplete="organization" /></label>
+                  <label>학교 이름<input id="classProfileSchoolName" required maxlength="80" placeholder="예: AI Ways 초등학교" autocomplete="organization" /></label>
+                  <label>학년<input id="classProfileGrade" required maxlength="12" placeholder="예: 3" inputmode="numeric" /></label>
+                  <label>반<input id="classProfileClassName" required maxlength="24" placeholder="예: 3-2" /></label>
+                  <label>연결 방식<select id="classProfileMode"><option value="personal">개인 기기</option><option value="class_device">공용 기기</option></select></label>
+                  <button type="submit">우리 반 연결</button>
+                </form>
+                <div id="classProfileActions" class="class-profile-actions" hidden>
+                  <button type="button" id="classProfileChangeButton">다른 반으로 연결</button>
+                  <button type="button" id="classProfileClearButton">반 연결 해제</button>
+                </div>
+              </div>
+              <p id="classroomSkillCount" class="classroom-skill-count" aria-live="polite">우리 반이 AI에게 가르친 기술 0개</p>
+              <button type="button" id="classroomSeedSkillButton">AI Ways Seed 분리수거 Skill 연결</button>
+              <form id="classroomSkillForm" class="classroom-skill-form">
+                <label>기술 이름<input id="classroomSkillName" required maxlength="60" placeholder="예: 우리 반 페트병 구분" /></label>
+                <label>무엇을 가르쳤는지<textarea id="classroomSkillDescription" required maxlength="240" placeholder="예: 찌그러진 페트병과 일반 플라스틱을 구분했어요."></textarea></label>
+                <label>Teachable Machine model URL<input id="classroomSkillUrl" type="url" required placeholder="https://teachablemachine.withgoogle.com/models/..." /></label>
+                <label>공개 범위<select id="classroomSkillVisibility"><option value="class">우리 반</option><option value="school">우리 학교</option><option value="public">공개</option></select></label>
+                <button type="submit">기술 미리보기</button>
+              </form>
+              <div id="classroomSkillPreview" hidden></div>
+              <p id="classroomSkillStatus" role="status" aria-live="polite"></p>
+              <ul id="classroomSkillList" class="classroom-skill-list"><li class="empty-state">아직 우리 반이 가르쳐준 기술이 없어요. 첫 번째 기술을 만들어볼까요? 🎓</li></ul>
+            </details>
+          </article>
+
           <article class="panel upload-panel">
             <div class="panel-head">
               <div>

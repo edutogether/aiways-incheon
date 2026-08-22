@@ -1537,6 +1537,15 @@ a.source-link:hover {
     display: flex !important;
     flex-direction: column !important;
   }
+  /* 이 태블릿 뷰의 2x2 grid-template-rows: repeat(2, ...)는 정확히 4개
+     패널(school/landfill/class/upload)만 있다고 가정하고 실측으로 튜닝된
+     레이아웃이다. skill-panel(우리 반이 AI에게 가르친 것)을 5번째 항목으로
+     그냥 끼워 넣으면 quadrant가 찌그러진다 - 태블릿 폭 재측정은 나중에
+     한꺼번에 처리하기로 했으므로, 그때까지는 이 폭에서만 숨겨서 기존 4분할
+     레이아웃을 보존한다. PC 폭(스코프 밖)에서는 정상적으로 보인다. */
+  .dashboard-grid > .skill-panel {
+    display: none !important;
+  }
   /* school-panel/class-panel은 PC용 "좁은 라벨열+넓은 내용열" grid-template이
      64rem 이상 블록에만 있어서, 이 폭엔 그 템플릿 없이 옛 "아주 좁은 화면"
      규칙의 grid-template-columns만 남아 패널헤드가 폭 12px짜리 첫 칸에

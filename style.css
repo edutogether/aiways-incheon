@@ -223,7 +223,7 @@
 @layer responsive {
   @media (min-width: 42rem) {
     .dashboard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .landfill-panel { grid-column: span 2; }
+    .landfill-panel, .skill-panel { grid-column: span 2; }
     .project-cards, .subject-grid, .hah-grid, .flow-grid, .gallery-grid, .resource-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .kpi-row, .class-kpis, .landfill-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .school-visuals { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
@@ -239,6 +239,7 @@
     .school-panel { grid-column: span 5; }
     .landfill-panel { grid-column: span 7; }
     .class-panel, .upload-panel { grid-column: span 6; }
+    .skill-panel { grid-column: span 12; }
     .project-scene, .curriculum-scene, .flow-scene, .gallery-scene, .sorting-scene { grid-template-columns: minmax(0, .78fr) minmax(0, 1.22fr); align-items: start; }
     .project-cards, .hah-grid, .flow-grid, .gallery-grid, .resource-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .project-scene > .project-cards, .curriculum-scene > .curriculum-layout, .flow-scene > .flow-grid, .gallery-scene > .gallery-stage, .sorting-scene > .sorting-layout { align-self: center; }

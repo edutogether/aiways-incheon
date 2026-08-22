@@ -109,6 +109,7 @@ function createSaveSortingRecordHandler(dependencies = {}) {
   const logger = dependencies.logger || (() => {});
   const serverTimestamp = dependencies.serverTimestamp || (() => now());
   const store = dependencies.store;
+  const db = dependencies.db;
   return async (req, res) => {
     if (!applyCors(req, res)) return res.status(403).json({ ok: false, code: "invalid_origin" });
     if (req.method === "OPTIONS") return res.status(204).send("");
@@ -123,6 +124,15 @@ function createSaveSortingRecordHandler(dependencies = {}) {
     const createdAt = now();
     const expireAt = new Date(createdAt.getTime() + 90 * DAY_MS);
     const record = { ...checked.value, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), expireAt };
+    // 실명가입(4단계)으로 이 actor에 검증된 studentProfile이 있으면, 클라이언트가
+    // 뭐라고 보냈든 그 값을 무시하고 서버가 기억하는 값으로 덮어쓴다 - 그래야
+    // 학생이 임시 입력폼을 조작해서 다른 반으로 기록되는 걸 막을 수 있다.
+    // 아직 가입 전이면(=studentProfile 없으면) 기존처럼 클라이언트 값을 그대로 쓴다.
+    if (db) {
+      const actorSnap = await db.collection("actors").doc(actorId).get();
+      const profile = actorSnap.exists ? actorSnap.data()?.studentProfile : null;
+      if (profile) record.classContext = { schoolId: profile.schoolId, grade: profile.grade, classNum: profile.classNum };
+    }
     delete record.idempotencyKey;
     const result = await store.createOrGet(actorId, checked.value.idempotencyKey, record, { createdAt: createdAt.toISOString(), expireAt: expireAt.toISOString() });
     logger({ recordId: result.recordId, status: result.status, provider: record.provider, schemaVersion: SCHEMA_VERSION, duplicate: result.duplicate === true });

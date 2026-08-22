@@ -3,7 +3,7 @@
 (() => {
   const REGION = "asia-northeast3";
   const EMULATOR_PROJECT = "demo-aiways-incheon";
-  const ALLOWED = new Set(["redeemEdu2gPass", "getEdu2gSession", "listEdu2gTrustedDevices", "revokeEdu2gTrustedDevice", "analyzeSortingImage", "analyzeSortingText", "analyzeSortingSafetyObserver", "saveSortingRecord", "listSortingRecords", "resolveSortingRecord", "getSchoolDashboard"]);
+  const ALLOWED = new Set(["redeemEdu2gPass", "getEdu2gSession", "listEdu2gTrustedDevices", "revokeEdu2gTrustedDevice", "analyzeSortingImage", "analyzeSortingText", "analyzeSortingSafetyObserver", "saveSortingRecord", "listSortingRecords", "resolveSortingRecord", "getSchoolDashboard", "checkStudentProfile", "registerStudentProfile"]);
   const LOCAL = new Set(["localhost", "127.0.0.1"]);
 
   function usingEmulator() {
@@ -73,6 +73,9 @@
     saveSortingRecord: (payload) => request("saveSortingRecord", payload),
     listSortingRecords: ({ pageSize = 20, cursor = "", statusFilter = "all" } = {}) => request("listSortingRecords", { pageSize, ...(cursor ? { cursor } : {}), statusFilter }),
     resolveSortingRecord: (payload) => request("resolveSortingRecord", payload),
-    getSchoolDashboard: ({ schoolId, grade = "", classNum = "" } = {}) => request("getSchoolDashboard", { schoolId, ...(grade ? { grade } : {}), ...(classNum ? { classNum } : {}) })
+    getSchoolDashboard: ({ schoolId, grade = "", classNum = "" } = {}) => request("getSchoolDashboard", { schoolId, ...(grade ? { grade } : {}), ...(classNum ? { classNum } : {}) }),
+    checkStudentProfile: () => request("checkStudentProfile", {}),
+    previewStudentProfile: ({ schoolId, grade, classNum, studentNumber, name }) => request("registerStudentProfile", { schoolId, grade, classNum, studentNumber, name, confirm: false }),
+    registerStudentProfile: ({ schoolId, grade, classNum, studentNumber, name }) => request("registerStudentProfile", { schoolId, grade, classNum, studentNumber, name, confirm: true })
   };
 })();

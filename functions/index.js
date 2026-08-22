@@ -10,6 +10,7 @@ const { createSaveSortingRecordHandler } = require("./lib/sortingRecord");
 const { createListSortingRecordsHandler, createResolveSortingRecordHandler } = require("./lib/sortingRecordQuery");
 const { createSortingRecordAggregator } = require("./lib/schoolDashboardAggregate");
 const { createGetSchoolDashboardHandler } = require("./lib/schoolDashboard");
+const { createCheckStudentProfileHandler, createRegisterStudentProfileHandler } = require("./lib/studentProfile");
 const { getApps, initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
@@ -51,7 +52,7 @@ const recordStore = {
   }
 };
 exports.saveSortingRecord = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createSaveSortingRecordHandler({
-  serverTimestamp: () => FieldValue.serverTimestamp(), store: recordStore, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck
+  serverTimestamp: () => FieldValue.serverTimestamp(), store: recordStore, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, db
 }));
 const queryStore = {
   async list(actorId, size, cursor, filter) { let q=db.collection("actors").doc(actorId).collection("records").orderBy("createdAt","desc").limit(size+1); if(filter!=="all") q=q.where("status","==",filter); if(cursor) q=q.startAfter(await db.collection("actors").doc(actorId).collection("records").doc(cursor).get()); const snap=await q.get(); const docs=snap.docs.slice(0,size); return {records:docs.map(d=>({id:d.id,data:d.data()})),nextCursor:snap.docs.length>size?docs.at(-1).id:null}; },
@@ -71,6 +72,12 @@ exports.onSortingRecordWritten = onDocumentWritten({ region: "asia-northeast3", 
 });
 exports.getSchoolDashboard = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createGetSchoolDashboardHandler({
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck
+}));
+exports.checkStudentProfile = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckStudentProfileHandler({
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck
+}));
+exports.registerStudentProfile = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createRegisterStudentProfileHandler({
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, serverTimestamp: () => FieldValue.serverTimestamp()
 }));
 const edu2gHandlers = createEdu2gHandlers({
   registry: createEdu2gPassRegistry({ getSecret: () => edu2gPassRegistrySecret.value() }),

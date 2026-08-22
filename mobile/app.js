@@ -83,6 +83,78 @@
     sync();
   }
 
+  // -----------------------------------------------------------------
+  // 정식 가입 (최초 1회, 기기 영구고정) — 이중 확인창까지 포함한 흐름
+  // -----------------------------------------------------------------
+  function showSignupLocked(profile) {
+    const card = $("signupCard");
+    if (!card) return;
+    card.innerHTML = `
+      <div class="flex items-center gap-1.5 text-xs font-bold text-blue-800">
+        <span>🎓</span><span>가입 완료</span>
+      </div>
+      <p class="text-xs font-semibold text-blue-700">${profile.schoolId} ${profile.grade}학년 ${profile.classNum}반 ${profile.studentNumber}번 ${profile.name}</p>
+      <p class="text-[10px] text-blue-500 leading-snug">이 기기에 영구히 저장됐어요. 반이 바뀌었다면 선생님께 말씀해 주세요.</p>
+    `;
+    $("interimClassCard")?.classList.add("hidden");
+  }
+
+  function initSignupForm() {
+    const card = $("signupCard");
+    const submitBtn = $("signupSubmitButton");
+    const status = $("signupStatus");
+    if (!card || !submitBtn || !status) return;
+    const client = window.AIWaysEdu2gClient;
+
+    client?.checkStudentProfile?.().then(response => {
+      if (response.ok && response.data?.hasProfile) showSignupLocked(response.data.profile);
+    }).catch(() => {});
+
+    submitBtn.addEventListener("click", async () => {
+      const schoolId = cleanForSignup($("signupSchoolInput")?.value);
+      const grade = cleanForSignup($("signupGradeInput")?.value);
+      const classNum = cleanForSignup($("signupClassInput")?.value);
+      const studentNumber = cleanForSignup($("signupNumberInput")?.value);
+      const name = cleanForSignup($("signupNameInput")?.value);
+      if (!schoolId || !grade || !classNum || !studentNumber || !name) {
+        status.textContent = "학교/학년/반/번호/이름을 모두 입력해 주세요.";
+        return;
+      }
+      if (!client?.previewStudentProfile || !client?.registerStudentProfile) {
+        status.textContent = "지금은 가입을 처리할 수 없어요. 잠시 후 다시 시도해 주세요.";
+        return;
+      }
+      submitBtn.disabled = true;
+      status.textContent = "확인 중입니다...";
+      const preview = await client.previewStudentProfile({ schoolId, grade, classNum, studentNumber, name });
+      submitBtn.disabled = false;
+      if (!preview.ok) {
+        status.textContent = preview.data?.code === "already_registered" ? "이미 가입된 기기예요." : "입력 내용을 다시 확인해 주세요.";
+        if (preview.data?.profile) showSignupLocked(preview.data.profile);
+        return;
+      }
+      openCustomModal(
+        "가입 정보 확인",
+        `정말 "${schoolId} ${grade}학년 ${classNum}반 ${studentNumber}번 ${name}" 학생이 맞나요? 가입하면 이 기기에 영구히 저장되고 다시 바꿀 수 없어요.`,
+        "🎓",
+        "bg-blue-600 hover:bg-blue-700",
+        async () => {
+          status.textContent = "가입하는 중입니다...";
+          const result = await client.registerStudentProfile({ schoolId, grade, classNum, studentNumber, name });
+          if (result.ok) { showSignupLocked(result.data.profile); showVisualAlert(`🎉 "${name}" 학생으로 가입 완료!`, "emerald"); }
+          else {
+            status.textContent = result.data?.code === "already_registered" ? "이미 가입된 기기예요." : "가입에 실패했어요. 다시 시도해 주세요.";
+            if (result.data?.profile) showSignupLocked(result.data.profile);
+          }
+        }
+      );
+    });
+  }
+
+  function cleanForSignup(value) {
+    return (value || "").toString().trim();
+  }
+
   function createRecordIdempotencyKey() {
     if (window.crypto?.randomUUID) return window.crypto.randomUUID();
     const bytes = window.crypto?.getRandomValues ? window.crypto.getRandomValues(new Uint32Array(4)) : [Date.now(), Math.random() * 1e9, Math.random() * 1e9, Math.random() * 1e9];
@@ -709,6 +781,7 @@
     initPhotoCapture();
     restoreLocal();
     initClassContextForm();
+    initSignupForm();
     renderQuizRankLadder();
     startQuiz();
     syncTabHeights();

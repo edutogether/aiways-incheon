@@ -1038,15 +1038,77 @@
   // 3단계: PC 대시보드 실제 데이터 연결 (Firestore 집계 -> getSchoolDashboard)
   // -----------------------------------------------------------------
   const DASHBOARD_SCHOOL_ID_KEY = "aiways_pc_dashboard_school_v1";
-  // 학교별 PC 키오스크는 한 번 URL에 ?school=학교이름 을 붙여 열면 그 값이
-  // localStorage에 저장돼 다음부터는 URL 없이 열어도 같은 학교로 유지된다.
-  // (실명가입/기기고정이 들어오기 전까지의 임시 방식 - mobile/app.js의
-  // classContext.schoolId와 반드시 같은 문자열(학교 이름 그대로)이어야 같은
-  // 학교로 집계된다.)
+  const DASHBOARD_SCHOOL_NAME_KEY = "aiways_pc_dashboard_school_name_v1";
+  // 학교별 PC/태블릿 키오스크는 한 번 학교를 설정하면(검색해서 고르거나,
+  // URL에 ?school=나이스학교코드 를 붙여 열면) 그 값이 이 브라우저의
+  // localStorage에 저장돼 다음부터는 계속 같은 학교로 유지된다 - 다른
+  // 기기(태블릿 등)는 그 기기에서 따로 한 번 더 설정해야 한다. schoolId는
+  // 학교 "이름"이 아니라 나이스(NEIS) 표준학교코드다(mobile 쪽 가입과
+  // 동일한 식별자라야 같은 학교로 집계된다) - ?school= URL 트릭은 코드를
+  // 직접 아는 사람만 쓰는 상급자용 지름길이고, 보통은 화면의 학교 검색
+  // 입력(dashboardSchoolSetup)으로 설정한다.
   function resolveDashboardSchoolId() {
     const fromUrl = cleanText(new URLSearchParams(window.location.search).get("school") || "");
     if (fromUrl) { try { localStorage.setItem(DASHBOARD_SCHOOL_ID_KEY, fromUrl); } catch {} return fromUrl; }
     try { return cleanText(localStorage.getItem(DASHBOARD_SCHOOL_ID_KEY) || ""); } catch { return ""; }
+  }
+
+  // 학교가 아직 설정 안 된 PC/태블릿에서 화면에 바로 검색-선택 UI를
+  // 띄운다 - URL 트릭을 모르는 다른 교사가 그냥 열었을 때 계속 빈 화면만
+  // 보는 문제(교사 지적 사항)를 해결하기 위함. 선택하면 그 자리에서
+  // 대시보드를 다시 불러온다(새로고침 불필요).
+  function initDashboardSchoolSetup() {
+    const panel = $("#dashboardSchoolSetup");
+    const input = $("#dashboardSchoolInput");
+    const results = $("#dashboardSchoolResults");
+    const status = $("#dashboardSchoolStatus");
+    if (!panel || !input || !results || !status) return;
+    if (resolveDashboardSchoolId()) return; // already set -- nothing to do
+    panel.hidden = false;
+    const client = window.AIWaysEdu2gClient;
+    let debounceTimer = 0;
+    function hideResults() { results.style.display = "none"; results.replaceChildren(); }
+    function selectSchool(school) {
+      try {
+        localStorage.setItem(DASHBOARD_SCHOOL_ID_KEY, school.schoolCode);
+        localStorage.setItem(DASHBOARD_SCHOOL_NAME_KEY, school.schoolName);
+      } catch {}
+      status.textContent = `"${school.schoolName}"(으)로 설정했어요. 이 화면을 계속 그 학교로 보여줄게요.`;
+      hideResults();
+      input.value = school.schoolName;
+      input.disabled = true;
+      loadSchoolDashboardFromApi();
+      window.setTimeout(() => { panel.hidden = true; }, 1500);
+    }
+    input.addEventListener("input", () => {
+      clearTimeout(debounceTimer);
+      const query = input.value.trim();
+      if (query.length < 2) { hideResults(); return; }
+      debounceTimer = window.setTimeout(async () => {
+        const response = await client?.searchSchool?.({ query });
+        const schools = response?.ok ? (response.data?.schools || []) : [];
+        results.replaceChildren();
+        if (!schools.length) {
+          const empty = document.createElement("li");
+          empty.className = "empty-state";
+          empty.textContent = "검색 결과가 없어요.";
+          results.append(empty);
+        } else {
+          schools.slice(0, 15).forEach(school => {
+            const item = document.createElement("li");
+            const button = document.createElement("button");
+            button.type = "button";
+            button.style.cssText = "width:100%;text-align:left;border:0;background:none;padding:.5rem;cursor:pointer;color:inherit";
+            button.textContent = `${school.schoolName} (${school.region} · ${school.schoolLevel})`;
+            button.addEventListener("click", () => selectSchool(school));
+            item.append(button);
+            results.append(item);
+          });
+        }
+        results.style.display = "block";
+      }, 300);
+    });
+    input.addEventListener("blur", () => window.setTimeout(hideResults, 150));
   }
 
   function digitsOnly(value) {
@@ -4132,6 +4194,7 @@
     initSelectors();
     initUpload();
     initClassroomSkills();
+    initDashboardSchoolSetup();
     initRefreshControls();
     initRankingModal();
     initLandfillSourceLink();

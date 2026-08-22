@@ -59,31 +59,92 @@
     } catch { return null; }
   }
 
+  // 학교 검색 위젯: 자유 텍스트 입력 대신 나이스(NEIS) 학교기본정보 API로
+  // 실제 검색해서 목록에서 고르게 한다 - 오타로 같은 학교 학생이 다른
+  // 집계 단위로 쪼개지는 걸 막기 위함(교사 지적 사항). 입력창엔 학교
+  // "이름"이 보이지만, 실제로 서버에 보내는 schoolId는 그 학교의 나이스
+  // 표준학교코드다. 검색 결과에서 고르기 전까지는 코드가 비어있어서
+  // (getSelection()이 null 반환) 자유 텍스트만 쳐놓고 제출하는 걸 막는다.
+  function initSchoolSearch({ inputId, hiddenId, resultsId }) {
+    const input = $(inputId), hidden = $(hiddenId), results = $(resultsId);
+    if (!input || !hidden || !results) return null;
+    const client = window.AIWaysEdu2gClient;
+    let debounceTimer = 0;
+    let selectedLabel = "";
+    function hideResults() { results.classList.add("hidden"); results.replaceChildren(); }
+    function renderSchools(schools) {
+      results.replaceChildren();
+      if (!schools.length) {
+        const empty = document.createElement("div");
+        empty.className = "px-3 py-2 text-slate-400";
+        empty.textContent = "검색 결과가 없어요.";
+        results.append(empty);
+      } else {
+        schools.slice(0, 15).forEach(school => {
+          const item = document.createElement("button");
+          item.type = "button";
+          item.className = "block w-full text-left px-3 py-2 hover:bg-blue-50 border-b border-slate-100 last:border-0";
+          item.textContent = `${school.schoolName} (${school.region} · ${school.schoolLevel})`;
+          item.addEventListener("click", () => {
+            input.value = school.schoolName;
+            selectedLabel = school.schoolName;
+            hidden.value = school.schoolCode;
+            hideResults();
+          });
+          results.append(item);
+        });
+      }
+      results.classList.remove("hidden");
+    }
+    input.addEventListener("input", () => {
+      if (input.value.trim() !== selectedLabel) hidden.value = "";
+      clearTimeout(debounceTimer);
+      const query = input.value.trim();
+      if (query.length < 2) { hideResults(); return; }
+      debounceTimer = setTimeout(async () => {
+        const response = await client?.searchSchool?.({ query });
+        renderSchools(response?.ok ? (response.data?.schools || []) : []);
+      }, 300);
+    });
+    input.addEventListener("blur", () => setTimeout(hideResults, 150));
+    return {
+      setValue(schoolId, schoolName) {
+        hidden.value = schoolId || "";
+        input.value = schoolName || "";
+        selectedLabel = schoolName || "";
+      },
+      getSelection() {
+        return hidden.value ? { schoolId: hidden.value, schoolName: input.value.trim() } : null;
+      }
+    };
+  }
+
   function initClassContextForm() {
-    const schoolInput = $("classSchoolInput");
     const gradeInput = $("classGradeInput");
     const numInput = $("classNumInput");
     const status = $("classContextStatus");
-    if (!schoolInput || !gradeInput || !numInput || !status) return;
+    const search = initSchoolSearch({ inputId: "classSchoolInput", hiddenId: "classSchoolCode", resultsId: "classSchoolResults" });
+    if (!search || !gradeInput || !numInput || !status) return;
     const saved = loadClassContext();
     if (saved) {
-      schoolInput.value = saved.schoolId;
+      search.setValue(saved.schoolId, saved.schoolName);
       gradeInput.value = saved.grade;
       numInput.value = saved.classNum;
     }
     function sync() {
-      const schoolId = schoolInput.value.trim();
+      const selection = search.getSelection();
       const grade = gradeInput.value.trim();
       const classNum = numInput.value.trim();
-      if (schoolId && grade && classNum) {
-        try { localStorage.setItem(CLASS_KEY, JSON.stringify({ schoolId, grade, classNum })); } catch {}
+      if (selection && grade && classNum) {
+        try { localStorage.setItem(CLASS_KEY, JSON.stringify({ schoolId: selection.schoolId, schoolName: selection.schoolName, grade, classNum })); } catch {}
         status.textContent = "저장됨 · 이제부터 이 반 기록으로 저장돼요.";
       } else {
         try { localStorage.removeItem(CLASS_KEY); } catch {}
-        status.textContent = "학교/학년/반을 모두 입력해야 우리 반 기록에 반영돼요.";
+        status.textContent = "학교를 검색해서 목록에서 고르고, 학년/반을 입력해야 우리 반 기록에 반영돼요.";
       }
     }
-    [schoolInput, gradeInput, numInput].forEach(input => input.addEventListener("change", sync));
+    [$("classSchoolInput"), gradeInput, numInput].forEach(input => input.addEventListener("change", sync));
+    $("classSchoolResults").addEventListener("click", () => setTimeout(sync, 0));
     sync();
   }
 
@@ -123,7 +184,7 @@
       <div class="flex items-center gap-1.5 text-xs font-bold text-blue-800">
         <span>🎓</span><span>가입 완료</span>
       </div>
-      <p class="text-xs font-semibold text-blue-700">${profile.schoolId} ${profile.grade}학년 ${profile.classNum}반 ${profile.studentNumber}번 ${profile.name}</p>
+      <p class="text-xs font-semibold text-blue-700">${profile.schoolName || profile.schoolId} ${profile.grade}학년 ${profile.classNum}반 ${profile.studentNumber}번 ${profile.name}</p>
       <button id="classChangeToggleButton" type="button" class="text-[10px] font-bold text-blue-600 underline">반이 바뀌었어요</button>
       <div id="classChangeForm" class="hidden space-y-2 pt-1">
         <div class="grid grid-cols-2 gap-2">
@@ -180,7 +241,7 @@
       }
       item.className = `flex items-center justify-between rounded-xl px-3 py-2 text-xs ${school.isMine ? "bg-indigo-600 text-white font-bold" : "bg-white text-slate-600 font-semibold"}`;
       const left = document.createElement("span");
-      left.textContent = `${school.rank}위 · ${school.schoolId}`;
+      left.textContent = `${school.rank}위 · ${school.schoolName || school.schoolId}`;
       const right = document.createElement("span");
       right.textContent = `${school.score}회`;
       item.append(left, right);
@@ -216,7 +277,7 @@
       const p = preview.data.preview;
       openCustomModal(
         "반 변경 확인",
-        `정말 "${p.schoolId} ${p.grade}학년 ${p.classNum}반"으로 바꾸시겠어요? 반 변경은 하루에 한 번만 할 수 있어요.`,
+        `정말 "${p.schoolName || p.schoolId} ${p.grade}학년 ${p.classNum}반"으로 바꾸시겠어요? 반 변경은 하루에 한 번만 할 수 있어요.`,
         "🔄",
         "bg-blue-600 hover:bg-blue-700",
         async () => {
@@ -241,23 +302,26 @@
       else initSignupBanner();
     }).catch(() => initSignupBanner());
 
+    const schoolSearch = initSchoolSearch({ inputId: "signupSchoolInput", hiddenId: "signupSchoolCode", resultsId: "signupSchoolResults" });
+
     submitBtn.addEventListener("click", async () => {
-      const schoolId = cleanForSignup($("signupSchoolInput")?.value);
+      const schoolSelection = schoolSearch?.getSelection();
       const grade = cleanForSignup($("signupGradeInput")?.value);
       const classNum = cleanForSignup($("signupClassInput")?.value);
       const studentNumber = cleanForSignup($("signupNumberInput")?.value);
       const name = cleanForSignup($("signupNameInput")?.value);
-      if (!schoolId || !grade || !classNum || !studentNumber || !name) {
-        status.textContent = "학교/학년/반/번호/이름을 모두 입력해 주세요.";
+      if (!schoolSelection || !grade || !classNum || !studentNumber || !name) {
+        status.textContent = "학교를 검색해서 목록에서 고르고, 학년/반/번호/이름을 모두 입력해 주세요.";
         return;
       }
+      const { schoolId, schoolName } = schoolSelection;
       if (!client?.previewStudentProfile || !client?.registerStudentProfile) {
         status.textContent = "지금은 가입을 처리할 수 없어요. 잠시 후 다시 시도해 주세요.";
         return;
       }
       submitBtn.disabled = true;
       status.textContent = "확인 중입니다...";
-      const preview = await client.previewStudentProfile({ schoolId, grade, classNum, studentNumber, name });
+      const preview = await client.previewStudentProfile({ schoolId, schoolName, grade, classNum, studentNumber, name });
       submitBtn.disabled = false;
       if (!preview.ok) {
         status.textContent = preview.data?.code === "already_registered" ? "이미 가입된 기기예요." : "입력 내용을 다시 확인해 주세요.";
@@ -266,12 +330,12 @@
       }
       openCustomModal(
         "가입 정보 확인",
-        `정말 "${schoolId} ${grade}학년 ${classNum}반 ${studentNumber}번 ${name}" 학생이 맞나요? 가입하면 이 기기에 영구히 저장되고 다시 바꿀 수 없어요.`,
+        `정말 "${schoolName} ${grade}학년 ${classNum}반 ${studentNumber}번 ${name}" 학생이 맞나요? 가입하면 이 기기에 영구히 저장되고 다시 바꿀 수 없어요.`,
         "🎓",
         "bg-blue-600 hover:bg-blue-700",
         async () => {
           status.textContent = "가입하는 중입니다...";
-          const result = await client.registerStudentProfile({ schoolId, grade, classNum, studentNumber, name });
+          const result = await client.registerStudentProfile({ schoolId, schoolName, grade, classNum, studentNumber, name });
           if (result.ok) { showSignupLocked(result.data.profile); showVisualAlert(`🎉 "${name}" 학생으로 가입 완료!`, "emerald"); }
           else {
             status.textContent = result.data?.code === "already_registered" ? "이미 가입된 기기예요." : "가입에 실패했어요. 다시 시도해 주세요.";

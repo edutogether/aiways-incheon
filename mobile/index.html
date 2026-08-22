@@ -221,7 +221,11 @@
                 </div>
                 <p class="text-[10px] text-blue-600 leading-snug">한 번만 가입하면 이 기기에 영구히 저장돼요(다시 못 바꿔요). 가입하면 우리반 순위·통계에 내 기록이 정확히 반영됩니다. 안 해도 판단/퀴즈는 그대로 쓸 수 있어요.</p>
                 <div class="grid grid-cols-3 gap-2">
-                    <input type="text" id="signupSchoolInput" placeholder="학교명" class="col-span-3 sm:col-span-1 bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                    <div class="col-span-3 sm:col-span-1 relative">
+                        <input type="text" id="signupSchoolInput" placeholder="학교 이름 검색" autocomplete="off" class="w-full bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                        <input type="hidden" id="signupSchoolCode" />
+                        <div id="signupSchoolResults" class="hidden absolute left-0 right-0 mt-1 bg-white border border-blue-200 rounded-xl shadow-lg z-20 max-h-40 overflow-y-auto text-xs"></div>
+                    </div>
                     <input type="text" inputmode="numeric" id="signupGradeInput" placeholder="학년" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
                     <input type="text" inputmode="numeric" id="signupClassInput" placeholder="반" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 </div>
@@ -241,7 +245,11 @@
                 </div>
                 <p class="text-[10px] text-slate-500 leading-snug">우리 반 기록으로 집계되려면 학교/학년/반을 적어 주세요. 정식 가입 기능이 열리면 이 입력은 자동으로 대체됩니다.</p>
                 <div class="grid grid-cols-3 gap-2">
-                    <input type="text" id="classSchoolInput" placeholder="학교명" class="col-span-3 sm:col-span-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                    <div class="col-span-3 sm:col-span-1 relative">
+                        <input type="text" id="classSchoolInput" placeholder="학교 이름 검색" autocomplete="off" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                        <input type="hidden" id="classSchoolCode" />
+                        <div id="classSchoolResults" class="hidden absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-20 max-h-40 overflow-y-auto text-xs"></div>
+                    </div>
                     <input type="text" inputmode="numeric" id="classGradeInput" placeholder="학년" class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
                     <input type="text" id="classNumInput" placeholder="반" class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 </div>

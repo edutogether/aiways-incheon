@@ -208,7 +208,11 @@
 @layer states {
   body.modal-open { overscroll-behavior: contain; }
   .is-loading, .quick-result.is-scanning { position: relative; opacity: .78; }
-  .is-loading::after, .quick-result.is-scanning::after { content: ""; inline-size: 1.25rem; block-size: 1.25rem; border: 2px solid var(--line-strong); border-block-start-color: var(--accent-primary); border-radius: 50%; animation: spin var(--duration) linear infinite; }
+  /* .data-refresh-btn은 이미 자기만의 링(.data-refresh-ring, styles/cb3a.css)이
+     있는데 이 범용 스피너도 같은 .is-loading 클래스를 보고 따로 하나 더
+     그려서, 새로고침 버튼에서 원이 2개가 겹쳐 도는 것처럼 보였다 - 그
+     충돌만 제외한다. */
+  .is-loading:not(.data-refresh-btn)::after, .quick-result.is-scanning::after { content: ""; inline-size: 1.25rem; block-size: 1.25rem; border: 2px solid var(--line-strong); border-block-start-color: var(--accent-primary); border-radius: 50%; animation: spin var(--duration) linear infinite; }
   button:disabled { cursor: not-allowed; opacity: .48; }
   .scan-overlay { display: none; }
   .quick-result.is-live-gemini .judgement-gemini-live { border: 1px solid var(--info); background: color-mix(in srgb, var(--info) 14%, var(--surface-2)); }

@@ -1053,18 +1053,38 @@
     try { return cleanText(localStorage.getItem(DASHBOARD_SCHOOL_ID_KEY) || ""); } catch { return ""; }
   }
 
-  // 학교가 아직 설정 안 된 PC/태블릿에서 화면에 바로 검색-선택 UI를
-  // 띄운다 - URL 트릭을 모르는 다른 교사가 그냥 열었을 때 계속 빈 화면만
-  // 보는 문제(교사 지적 사항)를 해결하기 위함. 선택하면 그 자리에서
-  // 대시보드를 다시 불러온다(새로고침 불필요).
+  // 학교가 아직 설정 안 된 PC/태블릿에서 모달로 검색-선택 UI를 띄운다 -
+  // URL 트릭을 모르는 다른 교사가 그냥 열었을 때 계속 빈 화면만 보는
+  // 문제(교사 지적 사항)를 해결하기 위함. dashboard-grid의 실측 튜닝된
+  // 4패널 quadrant를 화면에 인라인으로 끼워넣으면 레이아웃이 밀리므로
+  // (사용자 지적), 기존 #aiModal과 같은 <dialog> 오버레이 방식을 쓴다.
+  // 선택하면 모달을 닫고 그 자리에서 대시보드를 다시 불러온다.
+  function openDashboardSchoolModal() {
+    const modal = $("#dashboardSchoolModal");
+    if (!modal) return;
+    document.body.classList.add("modal-open");
+    if (typeof modal.showModal === "function") modal.showModal();
+    else modal.setAttribute("open", "");
+    $("#dashboardSchoolInput")?.focus();
+  }
+  function closeDashboardSchoolModal() {
+    const modal = $("#dashboardSchoolModal");
+    if (!modal) return;
+    document.body.classList.remove("modal-open");
+    if (typeof modal.close === "function" && modal.open) modal.close();
+    else modal.removeAttribute("open");
+  }
   function initDashboardSchoolSetup() {
-    const panel = $("#dashboardSchoolSetup");
+    const modal = $("#dashboardSchoolModal");
     const input = $("#dashboardSchoolInput");
     const results = $("#dashboardSchoolResults");
     const status = $("#dashboardSchoolStatus");
-    if (!panel || !input || !results || !status) return;
+    if (!modal || !input || !results || !status) return;
+    $$("[data-close-school-modal]").forEach(button => button.addEventListener("click", closeDashboardSchoolModal));
+    modal.addEventListener("click", event => { if (event.target === modal) closeDashboardSchoolModal(); });
+    modal.addEventListener("cancel", event => { event.preventDefault(); closeDashboardSchoolModal(); });
     if (resolveDashboardSchoolId()) return; // already set -- nothing to do
-    panel.hidden = false;
+    openDashboardSchoolModal();
     const client = window.AIWaysEdu2gClient;
     let debounceTimer = 0;
     function hideResults() { results.style.display = "none"; results.replaceChildren(); }
@@ -1078,7 +1098,7 @@
       input.value = school.schoolName;
       input.disabled = true;
       loadSchoolDashboardFromApi();
-      window.setTimeout(() => { panel.hidden = true; }, 1500);
+      window.setTimeout(closeDashboardSchoolModal, 900);
     }
     input.addEventListener("input", () => {
       clearTimeout(debounceTimer);

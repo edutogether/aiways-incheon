@@ -120,23 +120,6 @@
           <span class="orb-sm" style="width:120px;height:120px;top:34%;left:56%;background:#ad8cff;"></span>
           <span class="orb-sm" style="width:110px;height:110px;bottom:24%;left:26%;background:#64a9ff;"></span>
         </div>
-        <div id="dashboardSchoolSetup" class="panel skill-panel" hidden>
-          <div class="panel-head">
-            <div>
-              <p>Dashboard Setup</p>
-              <h2>이 화면이 표시할 학교를 검색해 주세요</h2>
-            </div>
-          </div>
-          <p class="classroom-skill-intro">한 번만 설정하면 이 기기(브라우저)에 계속 저장돼요. 다른 PC/태블릿에서는 그 기기에서 따로 한 번 더 설정해야 해요.</p>
-          <div class="class-profile-panel">
-            <div style="position:relative">
-              <input type="text" id="dashboardSchoolInput" autocomplete="off" placeholder="학교 이름 검색 (예: 인천초등학교)" />
-              <div id="dashboardSchoolResults" class="classroom-skill-list" style="display:none;position:absolute;left:0;right:0;z-index:20;margin-block-start:.4rem;max-block-size:12rem;overflow-y:auto;background:var(--surface-2);border:1px solid var(--line-subtle);border-radius:.65rem"></div>
-            </div>
-            <p id="dashboardSchoolStatus" class="class-profile-status" role="status" aria-live="polite"></p>
-          </div>
-        </div>
-
         <div class="hero-copy">
           <p class="eyebrow">학생의 버리는 순간을 읽는 자원순환 분석 엔진</p>
           <h1>
@@ -671,6 +654,22 @@
         </div>
         <button class="modal-cancel-action" type="button" data-close-analysis>취소하고 닫기</button>
         <p class="save-state" id="saveState" aria-live="polite"></p>
+      </div>
+    </dialog>
+
+    <dialog class="ai-modal" id="dashboardSchoolModal">
+      <form method="dialog">
+        <button class="close-btn" type="button" value="close" aria-label="닫기" data-close-school-modal>×</button>
+      </form>
+      <div class="modal-body">
+        <p class="eyebrow">Dashboard Setup</p>
+        <h2>이 화면이 표시할 학교를 검색해 주세요</h2>
+        <p id="dashboardSchoolIntro">한 번만 설정하면 이 기기(브라우저)에 계속 저장돼요. 다른 PC/태블릿에서는 그 기기에서 따로 한 번 더 설정해야 해요.</p>
+        <div style="position:relative">
+          <input type="text" id="dashboardSchoolInput" autocomplete="off" placeholder="학교 이름 검색 (예: 인천초등학교)" />
+          <div id="dashboardSchoolResults" class="classroom-skill-list" style="display:none;position:absolute;left:0;right:0;z-index:20;margin-block-start:.4rem;max-block-size:12rem;overflow-y:auto;background:var(--surface-2);border:1px solid var(--line-subtle);border-radius:.65rem"></div>
+        </div>
+        <p id="dashboardSchoolStatus" class="save-state" role="status" aria-live="polite"></p>
       </div>
     </dialog>
   </body>

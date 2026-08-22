@@ -462,159 +462,6 @@
     box: "tape-box"
   };
 
-  function buildExpandedSortingQuizData(seedQuestions) {
-    const quizItems = [
-      ["🥛", "우유갑", "종이팩류", "내용물을 비우고 헹군 뒤 펼쳐 말린"],
-      ["🧃", "멸균팩", "종이팩류", "빨대를 분리하고 헹군 뒤 말린"],
-      ["📄", "깨끗한 종이", "종이류", "물기와 테이프를 제거한"],
-      ["📘", "코팅 공책", "판단 보류", "코팅 여부를 확인한"],
-      ["📦", "택배상자", "종이류", "송장과 테이프를 제거한"],
-      ["🥤", "플라스틱컵", "플라스틱류", "남은 음료를 비우고 헹군"],
-      ["🧴", "페트병", "플라스틱류", "라벨을 제거하고 찌그러뜨린"],
-      ["🧴", "샴푸통", "플라스틱류", "내용물을 비우고 헹군"],
-      ["🛍️", "깨끗한 비닐봉투", "비닐류", "이물질을 털어낸"],
-      ["🍿", "과자봉지", "비닐류", "부스러기와 기름기를 확인한"],
-      ["🍜", "컵라면 용기", "일반쓰레기 검토", "국물 자국과 기름때를 확인한"],
-      ["🥫", "알루미늄 캔", "캔류", "내용물을 비우고 헹군"],
-      ["🍾", "유리병", "유리류", "뚜껑을 분리하고 깨지지 않게 정리한"],
-      ["🔋", "폐건전지", "전용 수거함", "전용 수거함 위치를 확인한"],
-      ["🧾", "영수증", "일반쓰레기", "감열지 여부를 확인한"],
-      ["🧻", "사용한 휴지", "일반쓰레기", "오염 상태를 확인한"],
-      ["☕", "코팅 종이컵", "판단 보류", "오염과 코팅 상태를 확인한"],
-      ["🥢", "나무젓가락", "일반쓰레기 검토", "음식물 오염 여부를 확인한"],
-      ["🍕", "피자박스", "일반쓰레기 검토", "기름 묻은 부분을 분리한"],
-      ["🧸", "고장난 장난감", "판단 보류", "복합 재질 여부를 확인한"],
-      ["📏", "부러진 자", "판단 보류", "재질과 파손 상태를 확인한"],
-      ["🧲", "자석 홍보물", "판단 보류", "자석과 종이를 분리 가능한지 확인한"],
-      ["🧷", "클립이 붙은 종이", "종이류", "금속 클립을 분리한"],
-      ["🧽", "수세미", "일반쓰레기", "여러 재질이 섞였는지 확인한"],
-      ["🧼", "세제 리필 파우치", "판단 보류", "재질 표시와 오염 상태를 확인한"],
-      ["🥡", "검은색 플라스틱 용기", "판단 보류", "선별 가능 여부를 확인한"],
-      ["🍱", "배달 용기", "판단 보류", "음식물 오염을 확인한"],
-      ["🪥", "칫솔", "일반쓰레기 검토", "복합 재질 여부를 확인한"],
-      ["🖊️", "볼펜", "일반쓰레기 검토", "분리 가능한 부품을 확인한"],
-      ["📚", "스프링 노트", "종이류", "스프링과 종이를 분리한"],
-      ["🧪", "깨진 유리", "별도 배출", "안전하게 감싼 뒤 학교 기준을 확인한"],
-      ["🧂", "양념 묻은 비닐", "일반쓰레기 검토", "오염 정도를 확인한"],
-      ["🥚", "달걀 껍데기", "일반쓰레기", "지역 음식물 기준을 확인한"],
-      ["🍗", "닭뼈", "일반쓰레기", "음식물쓰레기 예외 기준을 확인한"],
-      ["🐚", "조개껍데기", "일반쓰레기", "음식물쓰레기 예외 기준을 확인한"],
-      ["🧊", "스티로폼", "스티로폼류", "테이프와 이물질을 제거한"],
-      ["🧴", "펌프형 용기", "판단 보류", "스프링과 몸체를 분리 가능한지 확인한"],
-      ["📎", "복합 재질 물건", "판단 보류", "재질이 섞인 부분을 확인한"],
-      ["🧃", "빨대", "판단 보류", "작은 플라스틱 선별 기준을 확인한"],
-      ["🟨", "이름 모를 물건", "판단 보류", "아무 데나 버리지 않고 기록한"]
-    ];
-    const trueTemplates = [
-      item => `${item.name}은 ${item.action} 뒤 ${item.category} 기준으로 검토하는 것이 좋다.`,
-      item => `${item.name}은 배출 전 오염 상태와 학교 수거 기준을 함께 확인해야 한다.`,
-      item => `${item.name}처럼 헷갈리는 물건은 AI 제안 후 학생이 다시 확인하는 과정이 필요하다.`,
-      item => `${item.name}은 분리 가능한 부품을 떼어내면 자원순환 품질을 높일 수 있다.`,
-      item => `${item.name}을 판단 보류함에 남기는 것도 아무 데나 버리지 않는 실천이다.`,
-      item => `${item.name}은 같은 이름이어도 오염 상태에 따라 최종 판단이 달라질 수 있다.`,
-      item => `${item.name} 배출 기준은 우리 학교 수거함 안내와 지역 기준을 같이 살펴야 한다.`,
-      item => `${item.name}을 기록하면 우리 반 자원순환 데이터가 더 정확해진다.`
-    ];
-    const falseTemplates = [
-      item => `${item.name}은 오염 상태와 상관없이 무조건 ${item.category}로 버리면 된다.`,
-      item => `${item.name}은 AI가 한 번 제안하면 학생 확인 없이 바로 최종 판단해도 된다.`,
-      item => `${item.name}은 학교 기준을 보지 않아도 전국 어디서나 항상 같은 수거함에 넣는다.`,
-      item => `${item.name}은 음식물이나 액체가 묻어도 재활용 품질에 영향을 주지 않는다.`,
-      item => `${item.name}은 작거나 가벼우면 아무 일반 수거함에 섞어도 괜찮다.`,
-      item => `${item.name}은 분리 가능한 부품이 있어도 그대로 버리는 것이 항상 더 좋다.`,
-      item => `${item.name}을 헷갈릴 때 보류함에 기록하는 것은 자원순환 실천이 아니다.`,
-      item => `${item.name}은 친구 의견이나 학교 안내보다 색깔만 보고 분류하면 충분하다.`
-    ];
-    const trueQuestions = seedQuestions.filter(item => item.answer);
-    const falseQuestions = seedQuestions.filter(item => !item.answer);
-
-    quizItems.forEach(([emoji, name, category, action]) => {
-      const item = { emoji, name, category, action };
-      trueTemplates.forEach(template => {
-        trueQuestions.push({
-          emoji,
-          question: template(item),
-          answer: true,
-          explanation: "맞는 판단입니다. 오염 상태, 재질, 학교 기준을 함께 확인하는 습관이 중요합니다."
-        });
-      });
-      falseTemplates.forEach(template => {
-        falseQuestions.push({
-          emoji,
-          question: template(item),
-          answer: false,
-          explanation: "아쉬워요. 분리배출은 물건 이름만이 아니라 오염 상태와 학교 기준까지 함께 봐야 합니다."
-        });
-      });
-    });
-
-    const balanced = [];
-    for (let index = 0; index < 250; index += 1) {
-      balanced.push(trueQuestions[index % trueQuestions.length]);
-      balanced.push(falseQuestions[index % falseQuestions.length]);
-    }
-    return balanced;
-  }
-
-  const sortingQuizData = buildExpandedSortingQuizData([
-    ["🧾", "영수증은 깨끗해 보여도 감열지라 일반쓰레기로 배출하는 것이 맞다.", true],
-    ["🥛", "우유갑은 일반 종이와 같은 수거함에 섞어도 항상 괜찮다.", false],
-    ["📦", "택배상자는 테이프와 송장을 최대한 제거하고 종이류로 배출한다.", true],
-    ["🥤", "플라스틱컵은 남은 음료를 비우고 헹군 뒤 배출해야 한다.", true],
-    ["🍜", "국물 자국이 심한 컵라면 용기는 재활용보다 일반쓰레기 검토가 필요하다.", true],
-    ["🍿", "과자봉지는 부스러기와 기름기가 많아도 무조건 비닐류다.", false],
-    ["🥫", "캔 안에 이물질이 들어 있으면 먼저 비우는 것이 좋다.", true],
-    ["🔋", "폐건전지는 일반쓰레기 봉투에 넣어도 안전하다.", false],
-    ["🪥", "칫솔처럼 여러 재질이 결합된 생활용품은 일반쓰레기 검토가 필요하다.", true],
-    ["🖊️", "볼펜은 플라스틱처럼 보여도 재질 분리가 어려워 일반쓰레기로 보는 경우가 많다.", true],
-    ["🧼", "지우개 조각은 종이류와 함께 버리면 좋다.", false],
-    ["🍌", "바나나 껍질은 지역 기준에 따라 음식물쓰레기로 배출할 수 있다.", true],
-    ["🥚", "달걀 껍데기는 음식물쓰레기로 항상 배출한다.", false],
-    ["🧃", "빨대가 붙은 음료팩은 빨대를 분리하고 팩을 헹구는 것이 좋다.", true],
-    ["☕", "종이컵 안쪽 코팅과 오염 상태가 애매하면 학교 기준을 다시 확인한다.", true],
-    ["🧴", "페트병은 내용물을 비우고 라벨을 제거한 뒤 찌그러뜨려 배출하면 좋다.", true],
-    ["🧴", "페트병 뚜껑은 닫아도 되는지 학교 기준에 따라 확인할 필요가 있다.", true],
-    ["🍱", "음식물이 묻은 배달 용기는 씻기 어렵다면 재활용함을 오염시킬 수 있다.", true],
-    ["🧻", "물티슈는 종이류로 재활용하는 것이 원칙이다.", false],
-    ["📄", "코팅된 전단지는 일반 종이와 다르게 판단이 필요할 수 있다.", true],
-    ["🧲", "자석이 붙은 홍보물은 종이류로만 보면 안 된다.", true],
-    ["🧃", "종이팩은 펼쳐 말린 뒤 배출하면 재활용 품질이 좋아진다.", true],
-    ["🥢", "나무젓가락은 깨끗하면 종이류로 배출한다.", false],
-    ["🍕", "기름이 밴 피자박스는 오염된 부분을 일반쓰레기로 검토한다.", true],
-    ["🧊", "스티로폼은 이물질과 테이프를 제거하고 깨끗할 때 분리배출한다.", true],
-    ["🧷", "클립과 종이는 가능하면 분리해서 배출한다.", true],
-    ["🧽", "수세미는 플라스틱류로 재활용하는 것이 일반적이다.", false],
-    ["🧴", "샴푸통은 내용물을 비우고 헹군 뒤 배출한다.", true],
-    ["🛍️", "비닐봉투는 음식물 오염이 심하면 비닐류 배출이 어려울 수 있다.", true],
-    ["🧃", "빨대는 작고 재질이 달라 별도 판단이 필요할 수 있다.", true],
-    ["🪙", "알루미늄 캔과 철 캔은 같은 캔류 흐름에서 관리될 수 있다.", true],
-    ["📚", "스프링 노트는 종이와 스프링을 분리하면 더 좋다.", true],
-    ["🧴", "펌프형 용기는 금속 스프링이 있어 재질 분리가 필요하다.", true],
-    ["🧂", "양념이 묻은 비닐은 깨끗한 비닐과 섞지 않는 것이 좋다.", true],
-    ["🥤", "플라스틱 빨대는 작아서 선별이 어려울 수 있다.", true],
-    ["📦", "택배 완충재는 재질에 따라 비닐류 또는 일반쓰레기로 나뉠 수 있다.", true],
-    ["🧻", "휴지는 사용 후 오염되므로 종이류로 재활용하지 않는다.", true],
-    ["🥫", "통조림 캔은 내용물을 비우고 헹구면 재활용에 도움이 된다.", true],
-    ["🧴", "화장품 용기는 내용물을 비우고 재질 표시를 확인한다.", true],
-    ["🧃", "멸균팩과 일반 종이팩은 수거 체계가 다를 수 있어 학교 기준을 확인한다.", true],
-    ["🧸", "고장난 장난감은 플라스틱류로 무조건 배출한다.", false],
-    ["📎", "복합 재질 물건은 판단 보류함에 기록해 기준을 정할 수 있다.", true],
-    ["🍗", "닭뼈는 음식물쓰레기가 아니라 일반쓰레기로 보는 지역이 많다.", true],
-    ["🐚", "조개껍데기는 음식물쓰레기로 배출하면 사료화에 좋다.", false],
-    ["🥤", "테이크아웃 컵의 뚜껑과 컵은 재질이 다를 수 있어 분리 확인이 필요하다.", true],
-    ["🧪", "깨진 유리는 안전하게 감싸 별도 배출 기준을 확인한다.", true],
-    ["🧼", "세제 리필 파우치는 내용물을 비우고 재질 표시를 확인한다.", true],
-    ["🥡", "검은색 플라스틱 용기는 선별이 어려울 수 있어 지역 기준을 확인한다.", true],
-    ["🟨", "모르는 물건을 아무 데나 버리지 않고 보류하는 것도 좋은 선택이다.", true],
-    ["🌱", "AI가 제안한 분류는 학생이 오염 상태와 학교 기준으로 다시 확인해야 한다.", true]
-  ].map(([emoji, question, answer]) => ({
-    emoji,
-    question,
-    answer,
-    explanation: answer ? "맞는 기준입니다. 실제 배출 전 오염 상태와 학교 기준을 한 번 더 확인해요." : "헷갈리기 쉬운 기준입니다. 재질과 오염 상태를 다시 살펴봐요."
-  })));
-
-  let mobileNetModelPromise = null;
   let teachableMachineModelPromise = null;
   let currentDraft = null;
   let pendingDecision = null;
@@ -645,10 +492,6 @@
   let sortingJudgementTimer = 0;
   let currentSortingJudgement = null;
   let sortingDecisionHistory = [];
-  let quizSet = [];
-  let quizIndex = 0;
-  let quizScore = 0;
-  let quizLocked = false;
 
   const DEMO_SORTING_LOGS = [
     { label: "우유갑", emoji: "🥛", category: "종이팩류", carbon: 25, time: "09:12", synced: true },
@@ -1191,6 +1034,26 @@
     };
   }
 
+  // -----------------------------------------------------------------
+  // 3단계: PC 대시보드 실제 데이터 연결 (Firestore 집계 -> getSchoolDashboard)
+  // -----------------------------------------------------------------
+  const DASHBOARD_SCHOOL_ID_KEY = "aiways_pc_dashboard_school_v1";
+  // 학교별 PC 키오스크는 한 번 URL에 ?school=학교이름 을 붙여 열면 그 값이
+  // localStorage에 저장돼 다음부터는 URL 없이 열어도 같은 학교로 유지된다.
+  // (실명가입/기기고정이 들어오기 전까지의 임시 방식 - mobile/app.js의
+  // classContext.schoolId와 반드시 같은 문자열(학교 이름 그대로)이어야 같은
+  // 학교로 집계된다.)
+  function resolveDashboardSchoolId() {
+    const fromUrl = cleanText(new URLSearchParams(window.location.search).get("school") || "");
+    if (fromUrl) { try { localStorage.setItem(DASHBOARD_SCHOOL_ID_KEY, fromUrl); } catch {} return fromUrl; }
+    try { return cleanText(localStorage.getItem(DASHBOARD_SCHOOL_ID_KEY) || ""); } catch { return ""; }
+  }
+
+  function digitsOnly(value) {
+    const match = String(value || "").match(/\d+/);
+    return match ? match[0] : "";
+  }
+
   function parseTsv(text) {
     const lines = String(text || "").replace(/^\uFEFF/, "").split(/\r?\n/).filter(Boolean);
     const headers = (lines.shift() || "").split("\t").map(header => header.trim());
@@ -1592,6 +1455,95 @@
       rankNote.setAttribute("tabindex", "0");
       rankNote.setAttribute("aria-label", "우리 학급 자원순환 랭킹 상세 보기");
     }
+  }
+
+  // getSchoolDashboard 응답(실제 Firestore 집계)으로 학교/반 패널을 그린다.
+  // 매립지 패널은 원래도 실제 제출과 무관한 참고용 더미 데이터라 그대로 둔다.
+  function renderSchoolPanelFromDashboardApi(data) {
+    setDashboardNumber("[data-school-classes]", data.classCount);
+    setDashboardNumber("[data-school-observed]", data.school.observedTotal);
+    setDashboardNumber("[data-school-hold]", data.school.heldTotal);
+
+    const selectedGradeDigits = digitsOnly(selectedGrade());
+    const bars = $("[data-grade-bars]");
+    if (bars) {
+      const maxObserved = Math.max(...data.gradeBars.map(item => item.observedToday), 1);
+      bars.innerHTML = data.gradeBars.map(item => {
+        const pct = Math.max(8, Math.round((item.observedToday / maxObserved) * 100));
+        return `<div class="${item.grade === selectedGradeDigits ? "is-selected" : ""}"><span>${item.grade}학년</span><i style="--value:${pct}%"></i><b>${item.observedToday}</b></div>`;
+      }).join("");
+    }
+
+    const observedForRate = Math.max(1, data.school.observedTotal);
+    const successPct = Math.round((data.school.completedTotal / observedForRate) * 1000) / 10;
+    const holdPct = Math.round((data.school.heldTotal / observedForRate) * 1000) / 10;
+    const animate = dashboardAnimationScope === "school" || dashboardAnimationScope === "all";
+    const donuts = $$(".school-panel .donut");
+    updateDonut(donuts[0], successPct, { label: "분리 성공률", animate, duration: 720 });
+    updateDonut(donuts[1], holdPct, { label: "판단 보류 비율", animate, duration: 720, delay: animate ? 90 : 0 });
+  }
+
+  function renderClassPanelFromDashboardApi(selectedClass) {
+    if (!selectedClass) return;
+    setDashboardNumber("[data-today-observed]", selectedClass.observedToday);
+    setDashboardNumber("[data-ai-classified]", selectedClass.heldTotal);
+    setDashboardNumber("[data-human-confirmed]", selectedClass.convertedTotal);
+
+    const confusion = $(".confusion");
+    if (confusion) {
+      const heading = $("h3", confusion)?.outerHTML || "<h3>헷갈린 물건 TOP 5</h3>";
+      const items = selectedClass.topItems.map(entry => ({ label: sortingDbV2[entry.itemId]?.label || entry.itemId, value: entry.count }));
+      const max = Math.max(...items.map(item => item.value), 1);
+      confusion.innerHTML = heading + (items.length
+        ? items.map(item => {
+          const pct = Math.max(12, Math.round((item.value / max) * 100));
+          return `<div><span><em aria-hidden="true">${itemEmoji(item.label)}</em>${escapeHtml(item.label)}</span><i style="--value:${pct}%"></i><b>${item.value}</b></div>`;
+        }).join("")
+        : `<p class="confusion-empty">아직 기록이 없어요.</p>`);
+    }
+
+    const rankNote = $(".rank-note");
+    if (rankNote) {
+      const hasActivity = selectedClass.observedToday > 0 || selectedClass.completedTotal > 0 || selectedClass.heldTotal > 0;
+      rankNote.textContent = hasActivity
+        ? `RANKING 🥇 ${selectedClass.grade}학년 중 ${selectedClass.rankInGrade}위 · 🏫 전교 ${selectedClass.rankInSchool}위`
+        : "아직 이 반의 기록이 없어요.";
+      rankNote.setAttribute("role", "button");
+      rankNote.setAttribute("tabindex", "0");
+      rankNote.setAttribute("aria-label", "우리 학급 자원순환 랭킹 상세 보기");
+    }
+  }
+
+  let dashboardApiSchoolNotice = false;
+  async function loadSchoolDashboardFromApi() {
+    const client = window.AIWaysEdu2gClient;
+    const schoolId = resolveDashboardSchoolId();
+    if (!schoolId) {
+      // 아직 이 PC에 학교가 설정되지 않음 - 콘솔에 한 번만 안내하고 조용히 대기.
+      // (URL에 ?school=학교이름 을 붙여 한 번 열면 저장됨)
+      if (!dashboardApiSchoolNotice) { dashboardApiSchoolNotice = true; console.info("[aiways] 대시보드에 표시할 학교가 설정되지 않았습니다. ?school=학교이름 으로 접속해 주세요."); }
+      return null;
+    }
+    if (!client?.getSchoolDashboard) return null;
+    const grade = digitsOnly(selectedGrade());
+    const classNum = digitsOnly(selectedClassName());
+    try {
+      const response = await client.getSchoolDashboard({ schoolId, grade, classNum });
+      if (!response.ok || !response.data) return null;
+      renderSchoolPanelFromDashboardApi(response.data);
+      renderClassPanelFromDashboardApi(response.data.selectedClass);
+      consumeDashboardIntroRender();
+      return response.data;
+    } catch { return null; }
+  }
+
+  let schoolDashboardLiveRefreshTimer = 0;
+  function startSchoolDashboardLiveRefresh() {
+    if (schoolDashboardLiveRefreshTimer) return;
+    schoolDashboardLiveRefreshTimer = window.setInterval(() => {
+      if (document.hidden) return;
+      loadSchoolDashboardFromApi();
+    }, 20000);
   }
 
   function landfillDaysForChart(days) {
@@ -2182,64 +2134,9 @@
     resetInternalScrollState(stage);
   }
 
-  function resetHoldEmojiPreviewToCycle() {
-    const preview = $("#manualHoldEmojiPreview");
-    if (!preview) return;
-    preview.textContent = HOLD_EMOJI_CYCLE[0];
-    preview.classList.remove("is-matched");
-    preview.classList.add("is-cycling");
-  }
-
-  function resetThreeSecondAppUiState() {
-    cancelThreeSecondJudgement();
-    const sortingSection = $("#sorting");
-    if (!sortingSection) return;
-
-    $$("[data-tab]", sortingSection).forEach(tab => {
-      tab.classList.toggle("is-active", tab.dataset.tab === "classify");
-    });
-    $$("[data-panel]", sortingSection).forEach(panel => {
-      panel.classList.toggle("is-active", panel.dataset.panel === "classify");
-    });
-
-    selectedSortingKey = "";
-    $$("[data-quick-item]", sortingSection).forEach(button => button.classList.remove("is-active"));
-    const searchInput = $("#searchInput", sortingSection);
-    if (searchInput) searchInput.value = "";
-    const result = $("[data-sorting-result]", sortingSection);
-    result?.classList.remove("is-scanning", "is-result");
-    result?.classList.add("is-empty");
-    const category = $("[data-quick-category]", sortingSection);
-    if (category) category.innerHTML = "<b>H-A-H</b> AI 1차 제안 준비";
-    const guidance = $("[data-quick-guidance]", sortingSection);
-    if (guidance) guidance.textContent = "지금 버리려는 물건을 선택하거나 검색해 보세요. AI가 먼저 분류 후보를 제안하고, 여러분이 다시 확인해 실천 기록으로 남깁니다.";
-    const tip = $("[data-quick-tip]", sortingSection);
-    if (tip) {
-      tip.hidden = false;
-      tip.innerHTML = "<strong>실천 흐름</strong><span>사진 또는 검색 → AI 후보 → 학생 확인 → 실천 기록 또는 판단 보류</span>";
-    }
-    $(".quick-action-row", sortingSection)?.setAttribute("hidden", "");
-    $("#practiceLogButton", sortingSection)?.removeAttribute("disabled");
-    const holdButton = $("#holdLogButton", sortingSection);
-    if (holdButton) holdButton.textContent = "판단 보류";
-    if (result) renderJudgementResult(getJudgementResult("hold", { source: "initial" }), result);
-
-    quizSet = [];
-    quizIndex = 0;
-    quizScore = 0;
-    quizLocked = false;
-    showQuizQuestion();
-
-    const holdInput = $("#manualHoldInput", sortingSection);
-    if (holdInput) holdInput.value = "";
-    resetHoldEmojiPreviewToCycle();
-    resetInternalScrollState(sortingSection);
-  }
-
   function resetTransientUiState(section) {
     if (!section) return;
     if (section.id === "gallery") resetGalleryUiState();
-    if (section.id === "sorting") resetThreeSecondAppUiState();
     resetInternalScrollState(section);
   }
 
@@ -2247,7 +2144,6 @@
     if (!section) return;
     closeAllOpenOverlays();
     if (section.id === "gallery") resetGalleryUiState();
-    if (section.id === "sorting") resetThreeSecondAppUiState();
     resetInternalScrollState(section);
   }
 
@@ -2282,83 +2178,17 @@
     consumeDashboardIntroRender();
   }
 
-  function loadRemoteRecords(options = {}) {
-    return new Promise(resolve => {
-      // applyDashboard() unconditionally tears down and rebuilds the chart
-      // SVG and the confusion/hold lists, so calling it after every poll -
-      // including the ones every 20s that come back with exactly the same
-      // rows - repainted the dashboard for no reason. That read as the
-      // screen flickering on its own. Only re-render when the fetched set
-      // actually differs from what's already on screen.
-      const applyIfChanged = next => {
-        const changed = JSON.stringify(next) !== JSON.stringify(remoteRecords);
-        remoteRecords = next;
-        if (changed) applyDashboard(allStoredRecords());
-      };
-
-      if (!DATA_CONFIG.appsScriptUrl) {
-        if (options.skipApplyWhenUnavailable) { remoteRecords = []; } else { applyIfChanged([]); }
-        resolve([]);
-        return;
-      }
-
-      const callbackName = "aiwaysCleanCallback_" + Date.now().toString(36);
-      const script = document.createElement("script");
-      let settled = false;
-
-      window[callbackName] = data => {
-        if (settled) return;
-        settled = true;
-        const records = Array.isArray(data) ? data : data.rows || data.records || data.data || [];
-        const normalized = normalizeRecords(records);
-        applyIfChanged(normalized);
-        cleanup();
-        resolve(normalized);
-      };
-
-      function cleanup() {
-        delete window[callbackName];
-        script.remove();
-      }
-
-      script.onerror = () => {
-        if (settled) return;
-        settled = true;
-        applyIfChanged([]);
-        cleanup();
-        resolve([]);
-      };
-
-      script.src = DATA_CONFIG.appsScriptUrl + "?action=list&callback=" + encodeURIComponent(callbackName);
-      document.body.appendChild(script);
-
-      window.setTimeout(() => {
-        if (settled) return;
-        settled = true;
-        applyIfChanged([]);
-        cleanup();
-        resolve([]);
-      }, 6500);
-    });
-  }
-
-  let dashboardLiveRefreshTimer = 0;
-
-  function startDashboardLiveRefresh() {
-    if (!DATA_CONFIG.appsScriptUrl || dashboardLiveRefreshTimer) return;
-    dashboardLiveRefreshTimer = window.setInterval(() => {
-      if (document.hidden) return;
-      loadRemoteRecords({ skipApplyWhenUnavailable: true });
-    }, 20000);
-  }
-
+  // 예전엔 여기서 구글시트(Code.gs) JSONP를 폴링해 school-panel/class-panel을
+  // 채웠다. 3단계부터는 그 자리를 loadSchoolDashboardFromApi()(Firestore 집계
+  // 읽기, 위쪽에 정의)가 대신한다 - 매립지 패널만 여전히 seed 기반 참고용
+  // 데이터라 applyDashboard()가 그대로 담당한다.
   async function loadDashboardRows(options = {}) {
     await loadSeedData();
     dashboardDataReady = true;
     if (options.animateIntro) playDashboardIntroForCurrentData();
     else applyDashboard(allStoredRecords());
-    await loadRemoteRecords({ skipApplyWhenUnavailable: options.animateIntro });
-    startDashboardLiveRefresh();
+    await loadSchoolDashboardFromApi();
+    startSchoolDashboardLiveRefresh();
     return allStoredRecords();
   }
 
@@ -2954,21 +2784,6 @@
       .at(-1)?.title || "기록 시작 전";
   }
 
-  function recordForSortingItem(item, holdFlag = false, labelOverride = "") {
-    const label = cleanText(labelOverride || item?.label || item?.title || "판단 기록");
-    const category = holdFlag ? "기준 확인 필요" : cleanText(item?.category || "학생 확인");
-    return {
-      input_type: "search",
-      ai_engine: "main-3second-helper",
-      ai_raw_label: label,
-      ai_confidence: "",
-      mapped_item: label,
-      suggested_category: category,
-      final_decision: holdFlag ? "판단 보류" : category,
-      hold_flag: Boolean(holdFlag)
-    };
-  }
-
   function recordSortingPracticeLocally(item, saved = true) {
     const time = new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
     sortingStats.totalCount += 1;
@@ -3168,465 +2983,6 @@
     `).join("");
   }
 
-  const FIRESTORE_EMULATOR_PROJECT_ID = "demo-aiways-incheon";
-  const FIRESTORE_EMULATOR_ACTOR_ID = "emulator-test-actor";
-  const FIRESTORE_EMULATOR_SAVE_URL = `http://127.0.0.1:5001/${FIRESTORE_EMULATOR_PROJECT_ID}/asia-northeast3/saveSortingRecord`;
-  const FIRESTORE_EMULATOR_LIST_URL = `http://127.0.0.1:5001/${FIRESTORE_EMULATOR_PROJECT_ID}/asia-northeast3/listSortingRecords`;
-  const FIRESTORE_EMULATOR_RESOLVE_URL = `http://127.0.0.1:5001/${FIRESTORE_EMULATOR_PROJECT_ID}/asia-northeast3/resolveSortingRecord`;
-  let pendingFirestoreRecordSave = null;
-  let localSortingSyncActive = false;
-  let localSortingSyncBlocked = false;
-  async function appCheckHeaders() { return window.AIWaysAppCheck?.getAIWaysAppCheckHeaders?.() || null; }
-
-  function isFirestoreEmulatorStorageMode(locationLike = window.location) {
-    const hostname = cleanText(locationLike?.hostname).toLowerCase();
-    const storage = new URLSearchParams(locationLike?.search || "").get("storage");
-    return (hostname === "localhost" || hostname === "127.0.0.1") && storage === "firestore-emulator";
-  }
-
-  function createFirestoreIdempotencyKey() {
-    if (window.crypto?.randomUUID) return window.crypto.randomUUID();
-    const bytes = window.crypto?.getRandomValues ? window.crypto.getRandomValues(new Uint32Array(4)) : [Date.now(), Math.random() * 0xffffffff, Math.random() * 0xffffffff, Math.random() * 0xffffffff];
-    return Array.from(bytes, value => Number(value >>> 0).toString(36)).join("-");
-  }
-
-  async function loadFirestoreEmulatorHolds() {
-    const client = window.AIWaysEdu2gClient;
-    if (!client?.listSortingRecords || client.visualReviewRequested?.()) return false;
-    try {
-      const response = await client.listSortingRecords({ pageSize: 20, statusFilter: "all" });
-      if (!response.ok || !Array.isArray(response.data?.records)) return false;
-      const remote = response.data.records.map(record => ({ id: `firestore-${record.recordId}`, remoteRecordId: record.recordId, name: cleanText(record.analysis?.objectCandidates?.[0]?.label) || "판단 기록", reason: cleanText(record.hold?.reasons?.[0]) || "사용자 최종 판단 기록", status: record.status === "held" ? "보류" : record.resolvedAt ? "재확인 완료" : "배출 완료", candidate: cleanText(record.provider) === "future_gemini" ? "AI 사진 분석 참고 후보" : "사용자 확인 기록", judgement: { checklist: Array.isArray(record.checklist) ? record.checklist : [], userDecision: record.userDecision || {} }, time: cleanText(record.updatedAt || record.createdAt).replace("T", " ").slice(0, 16), synced: true }));
-      sortingHoldItems = [...remote, ...sortingHoldItems.filter(item => !item.remoteRecordId)];
-      renderSortingHolds();
-      return true;
-    } catch { return false; }
-  }
-
-  async function resolveFirestoreEmulatorHold(item) {
-    const client = window.AIWaysEdu2gClient;
-    if (!client?.resolveSortingRecord || client.visualReviewRequested?.() || !item?.remoteRecordId) return false;
-    const checklist = Array.isArray(item.judgement?.checklist) ? item.judgement.checklist : [];
-    if (!checklist.length || checklist.some(check => !check.checked)) return false;
-    const userDecision = item.judgement?.userDecision;
-    if (!userDecision?.userConfirmed) return false;
-    const response = await client.resolveSortingRecord({ recordId: item.remoteRecordId, idempotencyKey: item.__resolveKey || (item.__resolveKey = createFirestoreIdempotencyKey()), resolutionType: "confirmed_after_review", userDecision: { userConfirmed: true }, checklist });
-    return response.ok === true;
-  }
-
-  function recordPayloadFromDecision(decision, status, idempotencyKey) {
-    const objectCandidates = (Array.isArray(decision?.objectCandidates) ? decision.objectCandidates : []).slice(0, 3).map(candidate => ({
-      label: cleanText(candidate?.label).slice(0, 200), itemId: cleanText(candidate?.itemId).slice(0, 40), objectType: cleanText(candidate?.objectType).slice(0, 40), confidenceBand: sortingVisionConfidence(candidate?.confidenceBand || candidate?.confidence)
-    }));
-    const materialCandidates = (Array.isArray(decision?.materialCandidates) ? decision.materialCandidates : []).slice(0, 3).map(candidate => ({
-      label: cleanText(candidate?.label).slice(0, 200), confidenceBand: sortingVisionConfidence(candidate?.confidenceBand || candidate?.confidence)
-    }));
-    const visibleCautions = (Array.isArray(decision?.visibleCautions) ? decision.visibleCautions : []).slice(0, 5).map(value => cleanText(value).slice(0, 200)).filter(Boolean);
-    const checklist = (Array.isArray(decision?.checklist) ? decision.checklist : []).filter(item => item?.required !== false).slice(0, 20).map(item => ({ id: cleanText(item?.id).slice(0, 80), label: cleanText(item?.label).slice(0, 200), checked: item?.checked === true }));
-    const action = status === "held" ? "held" : "recorded";
-    return {
-      schemaVersion: "sorting-record-v1", status, provider: cleanText(decision?.provider || decision?.source || "local_rule").slice(0, 80),
-      ...(cleanText(decision?.model).slice(0, 80) ? { model: cleanText(decision.model).slice(0, 80) } : {}),
-      analysis: { objectCandidates, materialCandidates, visibleCautions }, checklist,
-      userDecision: { selectedItemId: cleanText(decision?.selectedItemId).slice(0, 40), ...(cleanText(decision?.selectedCorrectionType).slice(0, 80) ? { selectedCorrectionType: cleanText(decision.selectedCorrectionType).slice(0, 80) } : {}), action, userConfirmed: true },
-      hold: status === "held" ? { recommended: true, reasons: (Array.isArray(decision?.hold?.reasons) ? decision.hold.reasons : []).slice(0, 5).map(value => cleanText(value).slice(0, 200)).filter(Boolean) } : null,
-      appVersion: "clean-2026-08", sourceSchemaVersion: cleanText(decision?.schemaVersion).slice(0, 80), idempotencyKey
-    };
-  }
-
-  async function persistSortingRecordRemote(decision, status, clientRecordId = "") {
-    const client = window.AIWaysEdu2gClient;
-    if (!decision || !client?.saveSortingRecord || client.visualReviewRequested?.()) return { attempted: false, saved: false, status: 0, code: "auth_invalid" };
-    const existing = clientRecordId || decision.__firestoreIdempotencyKey || createFirestoreIdempotencyKey();
-    decision.__firestoreIdempotencyKey = existing;
-    if (pendingFirestoreRecordSave?.key === existing) return pendingFirestoreRecordSave.promise;
-    const promise = client.saveSortingRecord(recordPayloadFromDecision(decision, status, existing))
-      .then(response => ({ attempted: true, saved: response.ok === true, status: response.status || 0, code: response.code || "invalid_response", duplicate: response.data?.duplicate === true, serverRecordId: cleanText(response.data?.recordId) }))
-      .catch(() => ({ attempted: true, saved: false, status: 0, code: "network_error" }));
-    pendingFirestoreRecordSave = { key: existing, promise };
-    try { return await promise; } finally { if (pendingFirestoreRecordSave?.key === existing) pendingFirestoreRecordSave = null; }
-  }
-
-  function localDecisionRecord(decision, status, record) {
-    const clientRecordId = decision?.__localRecordId || createFirestoreIdempotencyKey();
-    if (decision) decision.__localRecordId = clientRecordId;
-    return { clientRecordId, decision: status === "held" ? "held" : "completed", status, category: cleanText(record?.category || decision?.item?.category || "학생 확인").slice(0, 200), displayLabel: cleanText(record?.mapped_item || record?.ai_raw_label || decision?.item?.label || "판단 기록").slice(0, 200), source: cleanText(decision?.provider || decision?.source || "local_rule").slice(0, 80), analysisMode: cleanText(decision?.selectedItemId || decision?.key || "local-item").slice(0, 40), syncStatus: "pending" };
-  }
-
-  function decisionFromLocalRecord(record) {
-    const itemId = cleanText(record.analysisMode || "local-item").slice(0, 40) || "local-item";
-    const label = cleanText(record.displayLabel || "판단 기록").slice(0, 200) || "판단 기록";
-    const category = cleanText(record.category || "학생 확인").slice(0, 200) || "학생 확인";
-    const held = record.status === "held";
-    return { provider: cleanText(record.source || "local_rule"), selectedItemId: itemId, objectCandidates: [{ label, itemId, objectType: itemId, confidenceBand: "unknown" }], materialCandidates: [{ label: category, confidenceBand: "unknown" }], visibleCautions: [], checklist: [], hold: held ? { recommended: true, reasons: [] } : null };
-  }
-
-  async function syncOneLocalSortingRecord(localRecord, decision = null) {
-    const status = localRecord.status === "resolved" ? "completed" : localRecord.status;
-    const remote = await persistSortingRecordRemote(decision || decisionFromLocalRecord(localRecord), status, localRecord.clientRecordId);
-    if (!remote.saved) {
-      const error = new Error(remote.code || "sync-failed");
-      error.status = remote.status || 0;
-      if (remote.status === 403) localSortingSyncBlocked = true;
-      throw error;
-    }
-    return { serverRecordId: remote.serverRecordId || localRecord.serverRecordId || "" };
-  }
-
-  async function syncPendingLocalSortingRecords() {
-    if (!localSortingStore || localSortingSyncActive || localSortingSyncBlocked || !navigator.onLine) return [];
-    localSortingSyncActive = true;
-    try { return await localSortingStore.syncPendingSortingRecords(record => syncOneLocalSortingRecord(record)); }
-    catch { return []; }
-    finally { localSortingSyncActive = false; }
-  }
-
-  async function appendSortingDecisionRecord(record, decision, status) {
-    if (!localSortingStore) return { attempted: false, saved: false, localSaved: false, code: "local_storage_unavailable" };
-    let local;
-    try { local = await localSortingStore.saveLocalSortingRecord(localDecisionRecord(decision, status, record)); }
-    catch { return { attempted: false, saved: false, localSaved: false, code: "local_storage_failed" }; }
-    const nextRecords = localRecords();
-    if (!nextRecords.some(item => item.clientRecordId === local.clientRecordId)) {
-      nextRecords.push({ ...record, clientRecordId: local.clientRecordId, timestamp: new Date().toISOString(), local_time: new Date().toLocaleString("ko-KR") });
-      writeJson(STORAGE_RECORDS, nextRecords);
-      applyDashboard(allStoredRecords());
-    }
-    let remote = { attempted: false, saved: false, status: 0, code: "network_error" };
-    try {
-      const result = await syncOneLocalSortingRecord(local, decision);
-      await localSortingStore.updateLocalSortingRecord(local.clientRecordId, { syncStatus: "synced", serverRecordId: result.serverRecordId, syncedAt: new Date().toISOString() });
-      remote = { attempted: true, saved: true, serverRecordId: result.serverRecordId };
-    } catch (error) {
-      await localSortingStore.updateLocalSortingRecord(local.clientRecordId, { syncStatus: "failed", lastSyncErrorCode: error?.status === 403 ? "app-check-permission-denied" : "sync-failed" });
-      if (error?.status === 403) localSortingSyncBlocked = true;
-    }
-    if (!remote.saved) syncPendingLocalSortingRecords();
-    return { ...remote, localSaved: true, clientRecordId: local.clientRecordId };
-  }
-
-  async function logSortingPractice(item, decision = null) {
-    const remote = await appendSortingDecisionRecord(recordForSortingItem(item, false), decision, "completed");
-    if (remote.localSaved) recordSortingPracticeLocally(item, remote.saved);
-    if (remote.saved) loadFirestoreEmulatorHolds();
-    const guidance = $("[data-quick-guidance]");
-    if (guidance) guidance.textContent = remote.saved
-      ? `${item.label} 기록을 보호된 클라우드 기록에 저장했어요.`
-      : remote.localSaved ? "기기에 저장됨 · 네트워크 연결 후 자동으로 전송됩니다." : "기기 저장을 완료하지 못했습니다. 다시 시도해 주세요.";
-    return remote;
-  }
-
-  async function addSortingHold(name, reason = "기준 확인 필요", decision = null) {
-    const cleaned = cleanText(name) || "판단 보류 물건";
-    const remote = await appendSortingDecisionRecord(recordForSortingItem({ label: cleaned, category: "기준 확인 필요" }, true, cleaned), decision, "held");
-    if (remote.localSaved) {
-      addSortingHoldLocally(cleaned, reason, remote.saved, decision, remote.clientRecordId, remote.serverRecordId);
-      if (decision) saveSortingDecisionV2(decision, "held");
-      loadFirestoreEmulatorHolds();
-    }
-    return remote;
-  }
-
-  async function recoverLocalSortingRecords() {
-    if (!localSortingStore) return [];
-    const records = await localSortingStore.listLocalSortingRecords();
-    records.filter(record => record.status === "held").forEach(record => {
-      if (!sortingHoldItems.some(item => item.localRecordId === record.clientRecordId)) addSortingHoldLocally(record.displayLabel, "기기에 저장된 판단 보류", record.syncStatus === "synced", null, record.clientRecordId, record.serverRecordId || "");
-    });
-    renderSortingHolds();
-    return records;
-  }
-
-  async function resolveLocalSortingHold(item) {
-    if (!item?.localRecordId || !localSortingStore) return false;
-    const resolved = await localSortingStore.resolveLocalHeldRecord(item.localRecordId);
-    item.status = "재확인 완료";
-    item.synced = false;
-    renderSortingHolds();
-    if (item.remoteRecordId) {
-      try {
-        const remote = await resolveFirestoreEmulatorHold(item);
-        if (remote) await localSortingStore.updateLocalSortingRecord(resolved.clientRecordId, { syncStatus: "synced", syncedAt: new Date().toISOString() });
-      } catch { /* local resolution remains durable */ }
-    } else syncPendingLocalSortingRecords();
-    return true;
-  }
-
-  function pickQuizSet() {
-    const shuffle = items => [...items].sort(() => Math.random() - 0.5);
-    const truePool = shuffle(sortingQuizData.filter(item => item.answer === true));
-    const falsePool = shuffle(sortingQuizData.filter(item => item.answer === false));
-    return shuffle([...truePool.slice(0, 5), ...falsePool.slice(0, 5)]);
-  }
-
-  function quizRank(correctCount) {
-    if (correctCount >= 10) return { title: "AI Ways 자원순환 마스터", message: "완벽해요. 오늘의 분리배출 챔피언입니다 🏆", emoji: "🏆" };
-    if (correctCount >= 9) return { title: "자원순환 환경운동가", message: "와우! 기준도 좋고 실천 감각도 뛰어나요 🌍", emoji: "🌍" };
-    if (correctCount >= 7) return { title: "분리배출 실천가", message: "잘하고 있어요! 학교에서도 믿고 맡길 수 있는 수준이에요 ♻️", emoji: "♻️" };
-    if (correctCount >= 5) return { title: "자원순환 탐험가", message: "기준을 꽤 잘 알고 있어요. 이제 실천력을 더 키워봐요 🔎", emoji: "🔎" };
-    if (correctCount >= 3) return { title: "분리배출 연습생", message: "조금씩 감이 오고 있어요. 한 번 더 하면 더 잘할 수 있어요 🍀", emoji: "🍀" };
-    return { title: "분리배출 새싹", message: "처음은 누구나 헷갈릴 수 있어요. 다시 도전해봐요 🌱", emoji: "🌱" };
-  }
-
-  function quizRankTableHtml(correctCount) {
-    const ranges = [
-      ["0~2개", "분리배출 새싹", "🌱"],
-      ["3~4개", "분리배출 연습생", "🍀"],
-      ["5~6개", "자원순환 탐험가", "🔎"],
-      ["7~8개", "분리배출 실천가", "♻️"],
-      ["9개", "자원순환 환경운동가", "🌍"],
-      ["10개", "AI Ways 자원순환 마스터", "🏆"]
-    ];
-    return `<div class="quiz-rank-table">${ranges.map(([range, title, emoji]) => `
-      <span class="${title === quizRank(correctCount).title ? "is-current" : ""}"><b>${emoji}</b><em>${range}</em><strong>${title}</strong></span>
-    `).join("")}</div>`;
-  }
-
-  function quizMessage(score) {
-    return quizRank(Math.round(score / 10)).message;
-  }
-
-  function showQuizQuestion() {
-    const item = quizSet[quizIndex];
-    const progress = quizSet.length ? ((quizIndex + 1) / quizSet.length) * 100 : 0;
-    setText("#quizProgress", quizSet.length ? `문제 ${quizIndex + 1} / ${quizSet.length}` : "대기 중");
-    setText("#quizScore", `${quizScore}점`);
-    setText("#quizEmoji", item?.emoji || "🎮");
-    setText("#quizQuestion", item?.question || "퀴즈 탭을 열면 10문제가 바로 시작됩니다.");
-    setText("#quizResult", "");
-    $(".quiz-card")?.classList.remove("is-correct", "is-wrong", "is-finished");
-    $$("[data-quiz-choice]").forEach(button => {
-      button.classList.remove("is-picked", "is-answer");
-      button.disabled = false;
-    });
-    const bar = $("#quizBar");
-    if (bar) bar.style.width = `${progress}%`;
-    quizLocked = false;
-  }
-
-  function finishQuiz() {
-    const correctCount = Math.round(quizScore / 10);
-    const wrongCount = Math.max(0, quizSet.length - correctCount);
-    const rank = quizRank(correctCount);
-    setText("#quizProgress", "퀴즈 완료");
-    setText("#quizScore", `${quizScore}점`);
-    setText("#quizEmoji", "");
-    const question = $("#quizQuestion");
-    if (question) question.textContent = "";
-    const result = $("#quizResult");
-    if (result) {
-      result.innerHTML = `
-        <section class="quiz-report-panel" aria-label="퀴즈 결과 리포트">
-          <span class="quiz-report-label">퀴즈 결과 리포트</span>
-          <div class="quiz-report-rank">
-            <b>${escapeHtml(rank.emoji)}</b>
-            <span>
-              <strong>${escapeHtml(rank.title)}</strong>
-              <em>${escapeHtml(rank.message)}</em>
-            </span>
-          </div>
-          <div class="quiz-report-score" aria-label="퀴즈 점수 요약">
-            <span class="quiz-total-score"><em>총점</em><b>${quizScore}점</b></span>
-            <span><em>정답</em><b>${correctCount}/${quizSet.length}</b></span>
-            <span><em>오답</em><b>${wrongCount}</b></span>
-          </div>
-          <p class="quiz-finish-count">10문제 중 ${correctCount}문제를 맞혔습니다.</p>
-        </section>
-        ${quizRankTableHtml(correctCount)}
-        <button type="button" class="quiz-retry-btn" data-quiz-retry>💪 다시 도전하기</button>
-      `;
-    }
-    const bar = $("#quizBar");
-    if (bar) bar.style.width = "100%";
-    $(".quiz-card")?.classList.add("is-finished");
-    $$("[data-quiz-choice]").forEach(button => {
-      button.disabled = true;
-      button.classList.remove("is-picked", "is-answer");
-    });
-    quizLocked = true;
-  }
-
-  function startSortingQuiz() {
-    quizSet = pickQuizSet();
-    quizIndex = 0;
-    quizScore = 0;
-    quizLocked = false;
-    showQuizQuestion();
-  }
-
-  function answerSortingQuiz(answer) {
-    if (quizLocked || !quizSet.length) return;
-    quizLocked = true;
-    const item = quizSet[quizIndex];
-    const correct = item.answer === answer;
-    const correctLabel = item.answer ? "O" : "X";
-    if (correct) quizScore += 10;
-    setText("#quizScore", `${quizScore}점`);
-    const result = $("#quizResult");
-    if (result) {
-      result.innerHTML = `
-        <strong class="${correct ? "is-good" : "is-bad"}">${correct ? "정답이에요!" : "아쉬워요!"}</strong>
-        <span>정답은 ${correctLabel}입니다. ${escapeHtml(item.explanation)}</span>
-      `;
-    }
-    const card = $(".quiz-card");
-    card?.classList.toggle("is-correct", correct);
-    card?.classList.toggle("is-wrong", !correct);
-    $$("[data-quiz-choice]").forEach(button => {
-      const buttonAnswer = button.dataset.quizChoice === "true";
-      button.disabled = true;
-      button.classList.toggle("is-picked", buttonAnswer === answer);
-      button.classList.toggle("is-answer", buttonAnswer === item.answer);
-    });
-    window.setTimeout(() => {
-      quizIndex += 1;
-      if (quizIndex >= quizSet.length) finishQuiz();
-      else showQuizQuestion();
-    }, 900);
-  }
-
-  function updateHoldEmojiPreview(forceMatch = false) {
-    const preview = $("#manualHoldEmojiPreview");
-    const input = $("#manualHoldInput");
-    if (!preview || !input) return;
-    const value = cleanText(input.value);
-    if (value) {
-      preview.textContent = holdEmojiFor(value);
-      preview.classList.toggle("is-matched", forceMatch);
-      preview.classList.remove("is-cycling");
-      return;
-    }
-    preview.classList.remove("is-matched");
-    preview.classList.add("is-cycling");
-  }
-
-  function initHoldEmojiPreview() {
-    const preview = $("#manualHoldEmojiPreview");
-    const input = $("#manualHoldInput");
-    if (!preview || !input) return;
-    input.value = "";
-    let index = 0;
-
-    const cycle = () => {
-      if (cleanText(input.value)) return;
-      preview.textContent = HOLD_EMOJI_CYCLE[index % HOLD_EMOJI_CYCLE.length];
-      preview.classList.remove("is-matched");
-      preview.classList.add("is-cycling");
-      index += 1;
-    };
-
-    cycle();
-    if (!holdEmojiCycleTimer) holdEmojiCycleTimer = window.setInterval(cycle, 500);
-    input.addEventListener("input", () => {
-      window.clearTimeout(holdEmojiSettleTimer);
-      if (!cleanText(input.value)) {
-        cycle();
-        return;
-      }
-      updateHoldEmojiPreview(false);
-      holdEmojiSettleTimer = window.setTimeout(() => updateHoldEmojiPreview(true), 360);
-    });
-    input.addEventListener("blur", () => updateHoldEmojiPreview(true));
-  }
-
-  function isolateWheelInside(selector) {
-    const node = $(selector);
-    if (!node || node.dataset.wheelIsolated === "true") return;
-    node.dataset.wheelIsolated = "true";
-    node.addEventListener("wheel", event => {
-      const canScroll = node.scrollHeight > node.clientHeight + 1;
-      if (!canScroll) return;
-      const previousTop = node.scrollTop;
-      node.scrollTop += event.deltaY;
-      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) node.scrollLeft += event.deltaX;
-      if (node.scrollTop === previousTop && Math.abs(event.deltaY) < 1) return;
-      event.preventDefault();
-      event.stopPropagation();
-    }, { passive: false });
-  }
-
-  function initNestedScrollIsolation() {
-    isolateWheelInside("#sortingTimeline");
-    isolateWheelInside("#holdList");
-  }
-
-  function initSortingDataApp() {
-    loadSortingStorage();
-    renderSortingStats();
-    renderSortingHolds();
-    loadFirestoreEmulatorHolds();
-    recoverLocalSortingRecords().then(() => syncPendingLocalSortingRecords());
-    window.addEventListener("online", () => syncPendingLocalSortingRecords());
-    initHoldEmojiPreview();
-    initNestedScrollIsolation();
-
-    $("#manualHoldButton")?.addEventListener("click", () => {
-      const input = $("#manualHoldInput");
-      const value = cleanText(input?.value);
-      if (!value) return;
-      addSortingHold(value);
-      input.value = "";
-      updateHoldEmojiPreview(false);
-    });
-
-    $("#manualHoldInput")?.addEventListener("keydown", event => {
-      if (event.key !== "Enter") return;
-      event.preventDefault();
-      $("#manualHoldButton")?.click();
-    });
-
-    $("#holdList")?.addEventListener("click", async event => {
-      const checkButton = event.target.closest("[data-hold-check]");
-      if (checkButton) {
-        const [id, indexText] = checkButton.dataset.holdCheck.split(":");
-        const check = sortingHoldItems.find(entry => entry.id === id)?.judgement?.checklist?.[Number(indexText)];
-        if (check) { check.checked = !check.checked; renderSortingHolds(); }
-        return;
-      }
-      const button = event.target.closest("[data-resolve-hold]");
-      if (!button) return;
-      const id = button.dataset.resolveHold;
-      const item = sortingHoldItems.find(entry => entry.id === id);
-      if (item?.localRecordId) {
-        if (button.dataset.pending === "true") return;
-        button.dataset.pending = "true";
-        button.disabled = true;
-        try {
-          await resolveLocalSortingHold(item);
-        } finally { button.disabled = false; button.dataset.pending = "false"; }
-        return;
-      }
-      sortingHoldItems = sortingHoldItems.filter(item => item.id !== id);
-      saveSortingHolds();
-      renderSortingHolds();
-    });
-
-    $("#exportSortingCsvButton")?.addEventListener("click", async () => {
-      const status = $("#sortingCsvStatus");
-      const records = localSortingStore ? await localSortingStore.listLocalSortingRecords() : [];
-      if (!records.length) { if (status) status.textContent = "내보낼 기기 저장 기록이 없습니다."; return; }
-      window.AIWaysSortingLocalStore?.downloadSortingRecordsCsv(records);
-      if (status) status.textContent = "기기 저장 기록을 CSV로 내보냈습니다.";
-    });
-
-    $("#quizStartButton")?.addEventListener("click", startSortingQuiz);
-    $(".quiz-card")?.addEventListener("click", event => {
-      if (!event.target.closest("[data-quiz-retry]")) return;
-      startSortingQuiz();
-    });
-    $$("[data-quiz-choice]").forEach(button => {
-      button.addEventListener("click", () => answerSortingQuiz(button.dataset.quizChoice === "true"));
-    });
-  }
-
-  function cancelThreeSecondJudgement() {
-    sortingJudgementRequest += 1;
-    if (sortingJudgementTimer) {
-      window.clearTimeout(sortingJudgementTimer);
-      sortingJudgementTimer = 0;
-    }
-  }
-
   function judgementKeyFor(input) {
     const rawKey = String(typeof input === "string" ? input : input?.key || "").trim().toLowerCase();
     if (sortingDbV2[rawKey]) return rawKey;
@@ -3636,8 +2992,8 @@
   }
 
   // Stage 5 keeps image analysis advisory-only: remote hints never decide a disposal outcome.
-  const SORTING_INPUT_SOURCES = Object.freeze({ quick: "quick_select", search: "search_rule", photo: "mobilenet_hint", correction: "user_correction", future: "future_gemini" });
-  const SORTING_VISION_SOURCES = Object.freeze({ MOBILENET: "mobilenet_hint", TEACHABLE_MACHINE: "tm_hint", FUTURE_GEMINI: "future_gemini" });
+  const SORTING_INPUT_SOURCES = Object.freeze({ quick: "quick_select", search: "search_rule", photo: "photo_hint", correction: "user_correction", future: "future_gemini" });
+  const SORTING_VISION_SOURCES = Object.freeze({ TEACHABLE_MACHINE: "tm_hint", FUTURE_GEMINI: "future_gemini" });
   const SORTING_VISION_SCHEMA_VERSION = "sorting-vision-v1";
   const SORTING_VISION_PRODUCTION_ENDPOINT = "https://asia-northeast3-ai-ways-incheon.cloudfunctions.net/analyzeSortingImage";
   const SORTING_VISION_STATES = Object.freeze({ IDLE: "idle", PREPARING: "preparing", ANALYZING: "analyzing", SUCCESS: "success", UNCERTAIN: "uncertain", UNAVAILABLE: "unavailable", INVALID_RESPONSE: "invalid_response", ERROR: "error" });
@@ -3816,7 +3172,6 @@
   }
 
   const sortingVisionProviders = Object.freeze({
-    mobilenet: { source: SORTING_VISION_SOURCES.MOBILENET, enabled: true },
     teachableMachine: { source: SORTING_VISION_SOURCES.TEACHABLE_MACHINE, enabled: true },
     futureGemini: {
       source: SORTING_VISION_SOURCES.FUTURE_GEMINI,
@@ -3874,7 +3229,7 @@
       quick: SORTING_INPUT_SOURCES.quick,
       search: SORTING_INPUT_SOURCES.search,
       correction: SORTING_INPUT_SOURCES.correction,
-      photo: options.candidateSource || "mobilenet_hint",
+      photo: options.candidateSource || "photo_hint",
       initial: "quick_select",
       future_gemini: "future_gemini"
     }[inputSource] || inputSource;
@@ -3958,7 +3313,7 @@
     const needsHold = safeResult.hold.recommended || !completed;
     const liveGemini = safeResult.liveGemini === true;
     safeResult.canRecord = completed && !safeResult.hold.recommended;
-    const objectChips = safeResult.objectCandidates.map(candidate => `<span class="judgement-chip object"><b>${escapeHtml(candidate.label)}</b><em>${escapeHtml(candidate.source === "mobilenet_hint" ? "사진 기반 참고 후보" : candidate.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : candidate.source === "future_gemini" ? "AI 사진 분석 참고 후보" : candidate.source === "user" ? "사용자 선택" : "검색 후보")}</em></span>`).join("");
+    const objectChips = safeResult.objectCandidates.map(candidate => `<span class="judgement-chip object"><b>${escapeHtml(candidate.label)}</b><em>${escapeHtml(candidate.source === "photo_hint" ? "사진 기반 참고 후보" : candidate.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : candidate.source === "future_gemini" ? "AI 사진 분석 참고 후보" : candidate.source === "user" ? "사용자 선택" : "검색 후보")}</em></span>`).join("");
     const materialChips = safeResult.materialCandidates.map(candidate => `<span class="judgement-chip material">${escapeHtml(candidate.label)}</span>`).join("");
     const correctionButtons = [["pet-bottle", "병"], ["plastic-cup", "컵"], ["tape-box", "박스"], ["snack-wrapper", "봉지"], ["paper-cup", "종이"], ["can", "캔"], ["glass-bottle", "유리"], ["hold", "기타"]].map(([type, label]) => `<button type="button" data-judgement-correction="${type}" class="${safeResult.selectedCorrectionType === type ? "is-active" : ""}">${label}</button>`).join("");
     const checklistHtml = safeResult.checklist.map(check => `<button type="button" class="judgement-check ${check.status === "done" ? "is-done" : ""}" data-judgement-check="${check.id}" aria-pressed="${check.status === "done"}"><span aria-hidden="true">${check.status === "done" ? "✓" : ""}</span>${escapeHtml(check.label)}</button>`).join("");
@@ -3997,139 +3352,6 @@
       sortingJudgementTimer = 0;
       renderJudgementResult(result, container);
     }, options.delay ?? 1080);
-  }
-
-  function initQuickButtons() {
-    const buttons = $$("[data-quick-item]");
-    const result = $("[data-sorting-result]");
-    if (!result) return;
-    const modeButtons = $$("button[data-sorting-mode]");
-    const modeStatus = $("[data-sorting-mode-status]");
-    const modeCopy = {
-      photo: "사진을 찍거나 올려서 참고 후보를 확인할 수 있어요.",
-      search: "물건 이름을 검색해 규칙 기반 판단 지원을 받아보세요.",
-      quick: "자주 헷갈리는 물건을 빠르게 선택해 확인할 수 있어요."
-    };
-
-    function setSortingMode(mode) {
-      modeButtons.forEach(button => {
-        const active = button.dataset.sortingMode === mode;
-        button.classList.toggle("is-active", active);
-        button.setAttribute("aria-pressed", String(active));
-      });
-      result?.closest(".sorting-app")?.setAttribute("data-sorting-mode", mode);
-      if (modeStatus) modeStatus.textContent = modeCopy[mode] || modeCopy.photo;
-    }
-
-    modeButtons.forEach(button => button.addEventListener("click", () => setSortingMode(button.dataset.sortingMode)));
-    setSortingMode("photo");
-
-    function itemFromSearch(value) {
-      return findJudgementKeys(value);
-    }
-
-    function renderEmptySortingResult() {
-      cancelThreeSecondJudgement();
-      selectedSortingKey = "";
-      buttons.forEach(target => target.classList.remove("is-active"));
-      renderJudgementResult(getJudgementResult("hold", { source: "initial" }), result);
-    }
-
-    function applySearchValue() {
-      const value = cleanText($("#searchInput")?.value);
-      if (!value) return;
-      const candidateKeys = itemFromSearch(value);
-      const primaryKey = candidateKeys[0] || "hold";
-      runThreeSecondJudgement({ key: primaryKey, query: value }, { container: result, source: "search", key: primaryKey, candidateKeys });
-    }
-
-    buttons.forEach(button => {
-      button.classList.remove("is-active");
-      button.addEventListener("click", () => {
-        buttons.forEach(target => target.classList.toggle("is-active", target === button));
-        runThreeSecondJudgement(button.dataset.quickItem, { container: result, source: "quick" });
-      });
-    });
-
-    $("#searchButton")?.addEventListener("click", applySearchValue);
-    $("#searchInput")?.addEventListener("keydown", event => {
-      if (event.key !== "Enter") return;
-      event.preventDefault();
-      applySearchValue();
-    });
-
-    $("#tmApplyButton")?.addEventListener("click", async () => {
-      const state = $("#tmModelState");
-      const value = cleanText($("#tmModelInput")?.value);
-      if (!value) {
-        if (state) state.textContent = "모델 링크를 입력하면 적용할 수 있습니다.";
-        return;
-      }
-      if (state) state.textContent = "모델을 불러오는 중입니다...";
-      try {
-        teachableMachineModelPromise = await loadTeachableMachineModel(value);
-        if (state) state.textContent = teachableMachineModelPromise ? "우리 학교 학습 모델 참고 후보 기능이 적용되었습니다. 최종 판단에는 사용하지 않습니다." : "모델 런타임을 사용할 수 없어 기본 판단 지원을 유지합니다.";
-      } catch {
-        teachableMachineModelPromise = null;
-        if (state) state.textContent = "모델을 불러오지 못했습니다. 링크를 다시 확인해 주세요.";
-      }
-    });
-
-    $("#tmModelInput")?.addEventListener("keydown", event => {
-      if (event.key !== "Enter") return;
-      event.preventDefault();
-      $("#tmApplyButton")?.click();
-    });
-
-    result?.addEventListener("click", async event => {
-      const correction = event.target.closest("[data-judgement-correction]");
-      if (correction) {
-        runThreeSecondJudgement(correction.dataset.judgementCorrection, { container: result, source: "correction", selectedCorrectionType: correction.dataset.judgementCorrection });
-        return;
-      }
-      const check = event.target.closest("[data-judgement-check]");
-      if (check && currentSortingJudgement) {
-        const target = currentSortingJudgement.checklist.find(item => item.id === check.dataset.judgementCheck);
-        if (target) {
-          target.checked = !target.checked;
-          target.status = target.checked ? "done" : "unknown";
-        }
-        renderJudgementResult(currentSortingJudgement, result);
-        return;
-      }
-      const action = event.target.closest("[data-judgement-action]");
-      const nextItem = event.target.closest("[data-next-sorting-item]");
-      if (nextItem) { resetThreeSecondAppUiState(); $("[data-upload=\"camera\"]")?.focus(); return; }
-      if (!action || !currentSortingJudgement) return;
-      if (action.disabled || action.dataset.pending === "true") return;
-      action.dataset.pending = "true";
-      const status = result.querySelector("[data-judgement-action-status]");
-      const setActionStatus = message => { if (status) status.textContent = message; };
-      const decision = currentSortingJudgement;
-      const legacyItem = { label: decision.item.label, emoji: decision.item.emoji, category: decision.item.category, carbonSaved: decision.item.carbonSaved };
-      try {
-        if (action.dataset.judgementAction === "record") {
-          setActionStatus("기기에 저장하는 중입니다.");
-          const remote = await logSortingPractice(legacyItem, decision);
-          if (remote.localSaved) {
-            saveSortingDecisionV2(decision, "recorded");
-            setActionStatus(remote.saved ? (remote.duplicate ? "기기에 저장됨 · 기존 클라우드 기록을 사용합니다." : "기기에 저장됨 · 클라우드 기록에 전송했습니다.") : "기기에 저장됨 · 네트워크 연결 후 자동으로 전송됩니다.");
-          } else setActionStatus("기기 저장을 완료하지 못했습니다. 다시 시도해 주세요.");
-        } else if (action.dataset.judgementAction === "decide") {
-          saveSortingDecisionV2(decision, "user_confirmed");
-          renderJudgementResult({ ...decision, hold: { ...decision.hold, recommended: false } }, result);
-        } else {
-          const reason = decision.hold.reasons[0] || "확인 항목 또는 지역 기준 확인 필요";
-          setActionStatus("기기에 보류 기록을 저장하는 중입니다.");
-          const remote = await addSortingHold(decision.item.label, reason, decision);
-          setActionStatus(remote.localSaved ? (remote.saved ? "기기에 저장됨 · 보류 기록을 전송했습니다." : "기기에 저장됨 · 네트워크 연결 후 자동으로 전송됩니다.") : "기기 저장을 완료하지 못했습니다. 다시 시도해 주세요.");
-        }
-      } finally {
-        action.dataset.pending = "false";
-      }
-    });
-
-    renderEmptySortingResult();
   }
 
   function chooseDraftFromLabel(label, confidence) {
@@ -4241,20 +3463,6 @@
       }
     }
     try {
-      if (!mobileNetModelPromise) {
-        mobileNetModelPromise = window.AIWaysAiRuntime?.loadMobileNet().then(runtime => runtime.load());
-      }
-      if (mobileNetModelPromise) {
-        const model = await mobileNetModelPromise;
-        const top = (await model.classify(image))?.[0];
-        if (top) hints.push(createSortingVisionHint({ label: top.className, itemId: judgementKeyFromVisualLabel(top.className) }, SORTING_VISION_SOURCES.MOBILENET, {
-          provider: "mobilenet", rawConfidence: top.probability, confidenceBand: sortingVisionConfidenceBand(top.probability), requestId: requestMetadata.requestId
-        }));
-      }
-    } catch {
-      mobileNetModelPromise = null;
-    }
-    try {
       const imagePayload = await prepareSortingVisionImage(image);
       const [recognitionResult, observerResult] = await Promise.allSettled([sortingVisionProviders.futureGemini.analyze({ requestMetadata, imagePayload }), requestSortingSafetyObserver({ requestMetadata, imagePayload })]);
       const remote = recognitionResult.status === "fulfilled" ? recognitionResult.value : { ok:false, code:"analysis_failed" };
@@ -4271,13 +3479,19 @@
       analysisCode = "analysis_failed";
     }
     const mergedHints = mergeSortingVisionHints(hints);
-    const topHint = mergedHints[0];
-    const mapped = topHint ? chooseDraftFromLabel(topHint.label, topHint.rawConfidence) : { item: "기타 / 판단 보류", category: "기준 확인 필요", guidance: "사진만으로 재질과 오염 상태를 확정할 수 없습니다.", ruleBased: true };
+    // Advisory hints (Teachable Machine) must never decide the final judgement -
+    // only a live Gemini candidate can. If Gemini didn't return one, there is no
+    // topHint at all (no silent fallback to an advisory model).
+    const topHint = mergedHints.find(hint => hint.source === SORTING_VISION_SOURCES.FUTURE_GEMINI) || null;
+    const mapped = topHint ? chooseDraftFromLabel(topHint.label, topHint.rawConfidence) : { item: "판단 실패", category: "다시 시도해 주세요", guidance: "AI 분석에 실패했습니다. 사진을 다시 찍거나 올려서 다시 시도해 주세요.", ruleBased: true };
     return {
       ...mapped,
       hints: mergedHints,
       judgementKey: topHint?.itemId || "hold",
       confidence: topHint?.rawConfidence ?? null,
+      source: topHint?.source || null,
+      provider: topHint?.provider || null,
+      confidenceBand: topHint?.confidenceBand || null,
       liveGemini,
       analysisCode,
       safety,
@@ -4359,7 +3573,7 @@
 
   function formatConfidence(draftRecord) {
     const confidence = Number(draftRecord.ai_confidence);
-    if (draftRecord.ai_engine === "mobilenet" && Number.isFinite(confidence) && confidence > 0) {
+    if (draftRecord.ai_engine === "future_gemini" && Number.isFinite(confidence) && confidence > 0) {
       return Math.round(confidence * 100) + "%";
     }
     return draftRecord.input_type === "search" ? "규칙 기반 제안" : "참고 제안";
@@ -4394,7 +3608,7 @@
     if (session !== modalSession) return;
     currentDraft = {
       input_type: "image",
-      ai_engine: draft.hints?.[0]?.source || (draft.ruleBased ? "fallback-rule" : "mobilenet_hint"),
+      ai_engine: draft.source || "fallback-rule",
       ai_raw_label: draft.item,
       ai_confidence: draft.ruleBased ? "" : Number(draft.confidence || 0).toFixed(4),
       mapped_item: draft.item,
@@ -4406,11 +3620,11 @@
     showDraftModal(currentDraft, draft.guidance);
     runThreeSecondJudgement({ key: draft.judgementKey }, {
       source: "photo",
-      candidateSource: draft.hints?.[0]?.source || "mobilenet_hint",
-      provider: draft.hints?.[0]?.provider || "fallback_rule",
+      candidateSource: draft.source || "photo_hint",
+      provider: draft.provider || "fallback_rule",
       schemaVersion: draft.requestMetadata?.schemaVersion,
       requestId: draft.requestMetadata?.requestId,
-      confidenceBand: draft.hints?.[0]?.confidenceBand,
+      confidenceBand: draft.confidenceBand,
       candidateKeys: draft.hints?.map(hint => hint.itemId).filter(Boolean),
       confidence: draft.confidence,
       imageHints: draft.hints.map(hint => `${hint.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : hint.source === "future_gemini" ? "AI 사진 분석 참고 후보" : "사진 기반 참고 후보"}: ${hint.label}`),
@@ -4442,7 +3656,7 @@
     image.src = previewUrl;
     currentDraft = {
       input_type: "image",
-      ai_engine: "mobilenet_hint",
+      ai_engine: "pending",
       ai_raw_label: "pending",
       ai_confidence: 0,
       mapped_item: "분석 중",
@@ -4698,10 +3912,12 @@
     $("#gradeSelect")?.addEventListener("change", () => {
       beginDashboardRepaint("school", 980);
       applyDashboard(allStoredRecords());
+      loadSchoolDashboardFromApi();
     });
     $("#classSelect")?.addEventListener("change", () => {
       beginDashboardRepaint("class", 980);
       applyDashboard(allStoredRecords());
+      loadSchoolDashboardFromApi();
     });
   }
 
@@ -4890,10 +4106,20 @@
   }
 
   function boot() {
+    // 폰 폭(deviceTier.js와 같은 기준, 767px)에서는 화면 자체를 mobile/ 앱
+    // iframe으로 대체하므로, 이 PC용 대시보드 초기화(구글시트 JSONP 폴링 등)를
+    // 뒤에서 돌릴 이유가 없다 - 안 보이는데도 계속 실행되며 콘솔에 에러만
+    // 남기고 있었다.
+    if (window.innerWidth <= 767) return;
     initNavigation();
-    initQuickButtons();
     initTabs();
-    initSortingDataApp();
+    // "3초 판단" 퀴즈/보류함 로컬 상태는 사진 판단 흐름(#confirmDecision)이
+    // 계속 읽고 쓰므로 로딩/초기 렌더는 유지한다 - 그 흐름을 여는 옛 UI 자체
+    // (검색창, 빠른선택 그리드, 자체 퀴즈 탭 등)만 화면에서 사라져
+    // initQuickButtons()/initSortingDataApp()의 나머지 부분은 제거했다.
+    loadSortingStorage();
+    renderSortingStats();
+    renderSortingHolds();
     initGallery();
     initSelectors();
     initUpload();

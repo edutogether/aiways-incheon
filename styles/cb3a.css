@@ -1457,3 +1457,232 @@ a.source-link:hover {
    좁은 clamp 범위(.9~.98rem)에 머물러 있었다. 다른 씬 설명문과 어울리는
    폭으로 한 단계 키운다. */
 .gallery-description { font-size: clamp(1.02rem, .62rem + .45vw, 1.12rem) !important; }
+
+/* ---------- 3단 기기 라우팅 (2026-08-21) ----------
+   폰 폭: index.html 자체 콘텐츠를 전부 숨기고, deviceTier.js가 src를 채운
+   #phoneShellFrame(mobile/ 앱 iframe)만 풀스크린으로 보여준다.
+   패드 폭: 대시보드 씬의 4개 패널만 남기고 나머지(헤더/히어로/다른 씬)는
+   전부 숨긴다 - PC와 같은 다크 유리 카드를 그대로 재사용(이 규칙이 파일
+   뒤쪽 unlayered라서, 앞쪽 @layer의 밝은 테마 축소판 규칙을 이긴다).
+   PC 폭: 기존 그대로. */
+.phone-shell-frame { display: none; }
+
+@media (max-width: 47.99rem) {
+  .site-header, .mobile-quick-nav, .snap-root { display: none !important; }
+  /* edu2gBetaUi.js가 만드는 <dialog>는 네이티브 top-layer라 iframe의
+     z-index로는 절대 못 가린다 - 폰 폭에서는 이 다이얼로그 자체를 숨긴다
+     (이 별도 베타게이트 시스템 자체는 건드리지 않음, 화면에서만 뺌). */
+  .edu2g-beta-dialog { display: none !important; }
+  .phone-shell-frame {
+    display: block;
+    position: fixed;
+    inset: 0;
+    inline-size: 100vw;
+    block-size: 100vh;
+    border: 0;
+    z-index: 9999;
+  }
+}
+
+/* 태블릿 대시보드 전용 뷰: 48~64rem 구간은 폭만으로(브라우저 창을 늘렸다
+   줄였다 해도 즉시 전환), 64~87.4rem 구간은 "실제 터치스크린"일 때만
+   적용한다 - iPad Air/Pro 가로모드(1180~1366px)는 64rem을 넘지만 여전히
+   패드이므로 커버해야 하는데, 그 폭은 노트북/PC 창 폭과 겹쳐서 폭만으로는
+   구분이 안 된다. (hover:none) and (pointer:coarse)로 실제 터치 기기만
+   가려낸다 - 마우스로 그 폭까지 줄인 PC 창은 그대로 PC 화면을 유지한다. */
+@media (min-width: 48rem) and (max-width: 63.99rem),
+       (min-width: 64rem) and (max-width: 87.4rem) and (hover: none) and (pointer: coarse) {
+  .site-header, .mobile-quick-nav, .phone-shell-frame { display: none !important; }
+  /* 이 <dialog>는 네이티브 top-layer라 z-index로 못 가린다(폰 폭 규칙과 동일 이유). */
+  .edu2g-beta-dialog { display: none !important; }
+  body { background: #050a1c; color: #f6fbff; padding-block-end: 0 !important; }
+  .snap-root { display: block; }
+  .scene { display: none !important; }
+  .dashboard-scene {
+    display: block !important;
+    min-block-size: 100svh;
+    padding: 1rem;
+    background: radial-gradient(circle at 72% 16%, rgb(86 141 255 / 38%), transparent 42vw), radial-gradient(circle at 14% 78%, rgb(80 255 207 / 28%), transparent 38vw), radial-gradient(circle at 50% 96%, rgb(173 140 255 / 22%), transparent 40vw), linear-gradient(135deg, #050a1c 0%, #0c1b38 44%, #070f24 100%);
+  }
+  /* 오브(.scene-orbs)는 살려둔다 - 이게 빠지니 하루종일 만든 다크 유리
+     분위기가 하나도 없이 텅 빈 검은 배경 위에 흰 박스만 뜬 꼴이 됐었다. */
+  .dashboard-scene > *:not(.dashboard-grid):not(.scene-orbs) { display: none !important; }
+  .dashboard-grid {
+    display: grid !important;
+    position: relative;
+    z-index: 1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    block-size: calc(100svh - 2rem);
+  }
+  .dashboard-grid > .panel {
+    display: grid !important;
+    align-content: start;
+    gap: .9rem;
+    min-block-size: 0;
+    padding: 1.1rem;
+    overflow-y: auto;
+    border-style: none !important;
+    background: rgb(10 22 42 / 42%) !important;
+    backdrop-filter: blur(24px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+    box-shadow: 0 28px 72px rgb(0 0 0 / 32%), inset 0 0 0 1px rgb(255 255 255 / 14%) !important;
+  }
+  /* landfill-panel/upload-panel은 PC에서 grid가 아니라 flex-column이다
+     (1440px 실측: getComputedStyle().display). 위의 일괄 grid 규칙 다음에
+     이 예외를 둬서 두 패널만 PC와 같은 flex로 되돌린다. */
+  .dashboard-grid > .landfill-panel,
+  .dashboard-grid > .upload-panel {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  /* school-panel/class-panel은 PC용 "좁은 라벨열+넓은 내용열" grid-template이
+     64rem 이상 블록에만 있어서, 이 폭엔 그 템플릿 없이 옛 "아주 좁은 화면"
+     규칙의 grid-template-columns만 남아 패널헤드가 폭 12px짜리 첫 칸에
+     끼여 글자가 세로로 한 자씩 쪼개지는 버그가 났다(실측: getBoundingClientRect
+     width 12px, height 204px). 태블릿에서는 아예 한 칸짜리 세로 스택으로
+     고정해 이 종류의 버그 자체를 차단한다. */
+  .school-panel,
+  .class-panel {
+    grid-template-columns: 1fr !important;
+    grid-template-areas: none !important;
+  }
+  .school-panel .panel-head,
+  .school-panel .select-line,
+  .school-panel .kpi-row,
+  .school-panel .school-visuals,
+  .class-panel .panel-head,
+  .class-panel .select-line,
+  .class-panel .class-kpis,
+  .class-panel .confusion,
+  .class-panel .rank-note {
+    grid-column: 1 / -1 !important;
+  }
+  /* 아래는 전부 1440px PC 화면에서 getComputedStyle로 실측한 값을 그대로
+     옮긴 것이다(추측 금지 - "아주 좁은 화면" 구간용 옛 규칙이 이 태블릿
+     폭에도 걸쳐 패널 안쪽 콘텐츠를 block/none으로 축소해 놓았던 걸
+     되돌리는 작업). */
+  .dashboard-grid > .panel .panel-head p,
+  .dashboard-grid > .panel .select-line,
+  .class-panel .rank-note,
+  .upload-panel .portal-teaser,
+  .upload-panel .portal-arrow,
+  .upload-panel > small {
+    display: block !important;
+  }
+  .school-panel .school-visuals,
+  .landfill-panel .chart-wrap,
+  .class-panel .confusion,
+  .dashboard-grid > .panel .kpi-row,
+  .dashboard-grid > .panel .class-kpis,
+  .dashboard-grid > .panel .landfill-metrics,
+  .dashboard-grid > .panel .kpi-row > div,
+  .dashboard-grid > .panel .class-kpis > div,
+  .dashboard-grid > .panel .landfill-metrics > div,
+  .upload-panel .experience-portal,
+  .upload-panel .portal-frame {
+    display: grid !important;
+    margin: revert !important;
+  }
+  /* 아래부터는 63.99rem 이하 규칙이 손도 안 댄 부분이 아니라, PC 전용
+     장식 스타일(테두리·그라데이션·아이콘 크기)이 64rem 이상 블록에만
+     있어서 이 태블릿 폭엔 아예 안 걸려 있던 것 - PC 원본 선언을 그대로
+     옮긴다(라인 227-251, 740-742 실측 대조). */
+  .landfill-panel .landfill-actions {
+    display: flex !important;
+    gap: 8px;
+    align-items: center;
+  }
+  /* PC는 총량 대비 반입량이 도넛 두 개로 이미 표현되니 막대 두 줄짜리
+     progress-stack을 중복으로 보고 뺀다(라인 671, PC 전용 블록이라 이
+     폭엔 안 걸려 있었음) - 768px처럼 가장 좁은 태블릿 폭에서 매립지
+     패널이 세로로 넘치는 걸 여기서 줄인다. */
+  .landfill-panel .progress-stack { display: none !important; }
+  .upload-panel .portal-powered {
+    display: flex !important;
+    justify-self: center;
+    align-items: center;
+    gap: .5rem;
+    font-size: clamp(.98rem, .8vw, 1.22rem);
+    font-weight: 850;
+    letter-spacing: .02em;
+    background: linear-gradient(90deg, #64eaff, #5ef7cd);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .upload-panel .portal-gemini-star {
+    inline-size: 1.25em;
+    block-size: 1.25em;
+    flex: 0 0 auto;
+    filter: drop-shadow(0 0 6px rgb(66 133 244 / 35%));
+  }
+  .upload-panel .portal-frame {
+    place-items: center;
+    min-block-size: 7.2rem;
+    align-content: center;
+    row-gap: .3rem;
+    padding: .7rem 1.1rem 1.15rem;
+    border: 2px dashed rgb(131 224 255 / 36%) !important;
+    border-radius: 1.15rem;
+    background: rgb(100 234 255 / 4%) !important;
+    animation: finale-hint-float 3.4s ease-in-out infinite;
+  }
+  .upload-panel .portal-teaser {
+    margin: 0;
+    text-align: center;
+    color: #f6fbff;
+    font-size: clamp(.98rem, .85vw, 1.28rem);
+    font-weight: 850;
+    line-height: 1.55;
+    letter-spacing: -.01em;
+  }
+  .upload-panel .portal-teaser strong { color: #5ef7cd; }
+  .upload-panel .portal-arrow {
+    inline-size: 1.7rem;
+    block-size: 1.55rem;
+    margin-block-start: .05rem;
+    background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 44'><defs><linearGradient id='p' x1='0' x2='0' y1='0' y2='1'><stop offset='0' stop-color='%2364eaff'/><stop offset='1' stop-color='%235ef7cd'/></linearGradient></defs><path d='M7 5l17 13L41 5' fill='none' stroke='url(%23p)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round' opacity='.38'/><path d='M7 21l17 13L41 21' fill='none' stroke='url(%23p)' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/contain no-repeat;
+    filter: drop-shadow(0 0 9px rgb(94 247 205 / 5));
+    animation: finale-arrow-bob 1.7s cubic-bezier(.45, 0, .25, 1) infinite;
+  }
+  .upload-panel .experience-portal { grid-template-rows: auto 1fr !important; gap: .4rem; margin-block-end: .55rem; }
+  .upload-panel .upload-highlights {
+    display: grid !important;
+    gap: .28rem;
+    margin: 0;
+    padding: .55rem .8rem;
+    border: 1px solid rgb(100 220 235 / 18%);
+    border-radius: 1rem;
+    background: rgb(4 24 42 / 55%);
+  }
+  .upload-panel .upload-highlights li { display: flex !important; gap: .5rem; align-items: flex-start; color: #c9dbe6; font-size: .76rem; line-height: 1.35; }
+  .upload-panel .upload-highlights li::before { content: "✓"; flex: 0 0 auto; color: #65ead6; font-weight: 900; }
+  .upload-panel > small { color: #bcd3e0; font-size: clamp(.85rem, .72vw, 1.05rem); line-height: 1.5; margin-block-start: .3rem; }
+  /* PC는 upload-panel에서 카메라/QR 촬영 버튼 대신 "체험 포탈" 안내를
+     보여준다(실측: .upload-card-actions/.gemini-credit/.qr-invite는 PC에서
+     전부 display:none). 태블릿도 PC와 동일하게 맞춘다. */
+  .upload-panel > p,
+  .upload-panel .upload-card-actions,
+  .upload-panel .gemini-credit,
+  .upload-panel .qr-invite {
+    display: none !important;
+  }
+  /* 옛 밝은 테마가 박아둔 어두운 글자색(#202124, #0b57d0 등)이 다크 배경
+     위에서 그대로 남아있으면 안 보이거나 붕 떠 보인다 - PC 실측 색상으로
+     되돌린다(큰 숫자는 흰색, panel-head 부제만 민트 - 1440px 확인). */
+  .dashboard-grid > .panel .panel-head h2 { color: #f6fbff !important; }
+  .dashboard-grid > .panel .panel-head p { color: #5ef7cd !important; }
+  .school-panel .kpi-row strong,
+  .landfill-panel .landfill-metrics strong,
+  .class-panel .class-kpis strong {
+    color: #f6fbff !important;
+  }
+  .dashboard-grid > .panel .kpi-row span,
+  .dashboard-grid > .panel .class-kpis span,
+  .dashboard-grid > .panel .landfill-metrics span {
+    color: rgb(158 179 199) !important;
+  }
+  .upload-panel::after { content: none !important; }
+}

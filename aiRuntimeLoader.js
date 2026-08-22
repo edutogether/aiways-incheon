@@ -5,7 +5,6 @@
 (() => {
   const SOURCES = Object.freeze({
     tf: "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js",
-    mobilenet: "https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js",
     teachableMachine: "https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"
   });
   const pending = new Map();
@@ -41,13 +40,6 @@
     return promise;
   }
 
-  async function loadMobileNet() {
-    await loadScript("tf");
-    await loadScript("mobilenet");
-    if (!window.mobilenet?.load) throw new Error("MobileNet runtime is unavailable");
-    return window.mobilenet;
-  }
-
   async function loadTeachableMachine() {
     await loadScript("tf");
     await loadScript("teachableMachine");
@@ -55,5 +47,5 @@
     return window.tmImage;
   }
 
-  window.AIWaysAiRuntime = Object.freeze({ loadMobileNet, loadTeachableMachine });
+  window.AIWaysAiRuntime = Object.freeze({ loadTeachableMachine });
 })();

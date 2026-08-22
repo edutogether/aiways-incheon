@@ -10,12 +10,13 @@
     />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com https://www.recaptcha.net https://cdn.jsdelivr.net https://script.google.com https://script.googleusercontent.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://www.google.com https://www.gstatic.com https://script.google.com https://asia-northeast3-ai-ways-incheon.cloudfunctions.net https://cdn.jsdelivr.net; frame-src https://www.google.com https://ai-ways-incheon.firebaseapp.com; object-src 'none'; base-uri 'self';"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com https://www.recaptcha.net https://cdn.jsdelivr.net https://script.google.com https://script.googleusercontent.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://www.google.com https://www.gstatic.com https://script.google.com https://asia-northeast3-ai-ways-incheon.cloudfunctions.net https://cdn.jsdelivr.net; frame-src 'self' https://www.google.com https://ai-ways-incheon.firebaseapp.com; object-src 'none'; base-uri 'self';"
     />
     <link rel="icon" type="image/png" href="./assets/brand/aiways-logo.png" />
     <link rel="stylesheet" href="./style.css" />
     <link rel="stylesheet" href="./edu2gBeta.css" />
     <link rel="stylesheet" href="./styles/cb3a.css" />
+    <script defer src="./deviceTier.js"></script>
     <script defer src="./firebaseAppCheck.js"></script>
     <script defer src="./firebaseBetaAuth.js"></script>
     <script defer src="./edu2gBetaClient.js"></script>
@@ -89,6 +90,19 @@
       <a href="#ranking">랭킹</a>
       <a href="#landfill">매립지 확인</a>
     </nav>
+
+    <!-- 3단 기기 라우팅: 폰 폭에서는 이 페이지 대신 진짜 모바일 앱(mobile/)을
+         iframe으로 통째로 띄운다. 코드를 합치지 않고 그대로 재사용하는 이유는
+         mobile/이 완전히 독립된 앱(자체 app.js 등)이라, 억지로 합치면 두 앱의
+         스크립트가 충돌할 위험이 있기 때문. src는 deviceTier.js가 폰 폭일
+         때만 채워 넣는다(항상 로드해두면 PC/패드 방문자도 모바일 앱을 매번
+         공짜로 부팅시키는 낭비가 생김). -->
+    <iframe
+      id="phoneShellFrame"
+      class="phone-shell-frame"
+      title="AI Ways Incheon 모바일 3초판단 앱"
+      hidden
+    ></iframe>
 
     <main class="snap-root">
       <section class="scene dashboard-scene" id="dashboard" data-nav="대시보드">

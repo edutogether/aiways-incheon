@@ -196,6 +196,22 @@
 
         <!-- 3. 실천 통계 탭 -->
         <div id="tab-stats" class="tab-content hidden space-y-5">
+            <!-- 임시 학교/반 입력: 정식 회원가입 전까지 우리 학급 기록에 붙일 값을
+                 학생이 직접 적어 저장한다. 실명가입+기기고정이 들어오면 이 폼은
+                 그 화면으로 대체될 예정이라 "임시"라고 명시해 둔다. -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-slate-700">
+                    <span>🏫</span><span>내 학교/반 (임시 입력)</span>
+                </div>
+                <p class="text-[10px] text-slate-500 leading-snug">우리 반 기록으로 집계되려면 학교/학년/반을 적어 주세요. 정식 가입 기능이 열리면 이 입력은 자동으로 대체됩니다.</p>
+                <div class="grid grid-cols-3 gap-2">
+                    <input type="text" id="classSchoolInput" placeholder="학교명" class="col-span-3 sm:col-span-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                    <input type="text" inputmode="numeric" id="classGradeInput" placeholder="학년" class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                    <input type="text" id="classNumInput" placeholder="반" class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                </div>
+                <p id="classContextStatus" class="text-[10px] font-semibold text-slate-400"></p>
+            </div>
+
             <div class="bg-teal-50 border border-teal-100 rounded-2xl p-4 flex items-center gap-3">
                 <span class="text-3xl">🌳</span>
                 <div>

@@ -45,9 +45,21 @@ function normalizeChecklist(value) {
   const label = cleanText(value.label);
   return id && label && typeof value.checked === "boolean" ? { id, label, checked: value.checked } : null;
 }
+// Interim, student-typed school/grade/class (step 4 will replace this with a
+// real one-time signup + permanent device lock). Kept optional so records
+// saved before this field existed, and any caller that never sets it, still
+// validate exactly as before.
+function normalizeClassContext(value) {
+  if (value === null || value === undefined) return null;
+  if (typeof value !== "object" || Array.isArray(value) || hasForbiddenKey(value)) return undefined;
+  const schoolId = cleanText(value.schoolId, 80);
+  const grade = cleanText(String(value.grade ?? ""), 10);
+  const classNum = cleanText(String(value.classNum ?? ""), 10);
+  return schoolId && grade && classNum ? { schoolId, grade, classNum } : undefined;
+}
 function validateRecordRequest(body) {
   if (!body || typeof body !== "object" || Array.isArray(body) || hasForbiddenKey(body)) return reject("invalid_request");
-  const allowed = new Set(["schemaVersion", "status", "provider", "model", "appVersion", "sourceSchemaVersion", "analysis", "checklist", "userDecision", "hold", "idempotencyKey"]);
+  const allowed = new Set(["schemaVersion", "status", "provider", "model", "appVersion", "sourceSchemaVersion", "analysis", "checklist", "userDecision", "hold", "idempotencyKey", "classContext"]);
   if (Object.keys(body).some((key) => !allowed.has(key))) return reject("unknown_field");
   if (body.schemaVersion !== SCHEMA_VERSION || !["completed", "held"].includes(body.status)) return reject("invalid_schema");
   const provider = cleanText(body.provider, 80);
@@ -80,6 +92,8 @@ function validateRecordRequest(body) {
   } : null;
   if (body.status === "completed" && (action !== "recorded" || !checklist.every((item) => item.checked) || normalizedHold?.recommended)) return reject("invalid_completed_state");
   if (body.status === "held" && (action !== "held" || !normalizedHold?.recommended)) return reject("invalid_held_state");
+  const classContext = normalizeClassContext(body.classContext);
+  if (classContext === undefined) return reject("invalid_class_context");
   return { valid: true, value: {
     schemaVersion: SCHEMA_VERSION, status: body.status, provider,
     ...(cleanText(body.model, 80) ? { model: cleanText(body.model, 80) } : {}),
@@ -87,7 +101,7 @@ function validateRecordRequest(body) {
     ...(cleanText(body.sourceSchemaVersion, 80) ? { sourceSchemaVersion: cleanText(body.sourceSchemaVersion, 80) } : {}),
     analysis: { objectCandidates, materialCandidates, visibleCautions }, checklist,
     userDecision: { selectedItemId, ...(selectedCorrectionType ? { selectedCorrectionType } : {}), action, userConfirmed: true },
-    hold: normalizedHold, idempotencyKey
+    hold: normalizedHold, ...(classContext ? { classContext } : {}), idempotencyKey
   } };
 }
 function createSaveSortingRecordHandler(dependencies = {}) {

@@ -40,6 +40,6 @@ test("advisory AI runtime remains lazy, deduplicated and safely bounded", () => 
   assert.match(loader, /const pending = new Map\(\)/);
   assert.match(loader, /if \(pending\.has\(name\)\) return pending\.get\(name\)/);
   assert.match(loader, /runtime timed out/);
-  assert.match(loader, /async function loadMobileNet\(\)[\s\S]*loadScript\("tf"\)[\s\S]*loadScript\("mobilenet"\)/);
+  assert.doesNotMatch(loader, /loadMobileNet/);
   assert.match(loader, /async function loadTeachableMachine\(\)[\s\S]*loadScript\("tf"\)[\s\S]*loadScript\("teachableMachine"\)/);
 });

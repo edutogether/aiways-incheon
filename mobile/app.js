@@ -3,10 +3,12 @@
   const DATA = window.AIWaysMobileData;
   const STATS_KEY = "aiways_mobile_stats_v1";
   const HOLD_KEY = "aiways_mobile_hold_v1";
+  const CLASS_KEY = "aiways_mobile_class_v1";
 
   let practiceStats = { totalCount: 0, carbonReduction: 0, logs: [] };
   let holdBoxList = [];
   let activeResultItem = null;
+  let activeResultContext = {};
   let currentQuizSet = [];
   let currentQuizIndex = 0;
   let userQuizScore = 0;
@@ -37,6 +39,76 @@
   function syncTabHeights() {
     const active = document.querySelector(".tab-content:not(.hidden)");
     if (active) growSharedTabHeight(active);
+  }
+
+  // -----------------------------------------------------------------
+  // Interim class context (school/grade/class) + real backend recording
+  // -----------------------------------------------------------------
+  // Step 4 (one-time real-name signup + permanent device lock) will replace
+  // this free-text form. Until then, this is the only way a record can be
+  // tied to a class, so it stays optional: without it, saveSortingRecord
+  // still succeeds, the record just has no classContext.
+  function loadClassContext() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(CLASS_KEY) || "null");
+      return saved?.schoolId && saved?.grade && saved?.classNum ? saved : null;
+    } catch { return null; }
+  }
+
+  function initClassContextForm() {
+    const schoolInput = $("classSchoolInput");
+    const gradeInput = $("classGradeInput");
+    const numInput = $("classNumInput");
+    const status = $("classContextStatus");
+    if (!schoolInput || !gradeInput || !numInput || !status) return;
+    const saved = loadClassContext();
+    if (saved) {
+      schoolInput.value = saved.schoolId;
+      gradeInput.value = saved.grade;
+      numInput.value = saved.classNum;
+    }
+    function sync() {
+      const schoolId = schoolInput.value.trim();
+      const grade = gradeInput.value.trim();
+      const classNum = numInput.value.trim();
+      if (schoolId && grade && classNum) {
+        try { localStorage.setItem(CLASS_KEY, JSON.stringify({ schoolId, grade, classNum })); } catch {}
+        status.textContent = "저장됨 · 이제부터 이 반 기록으로 저장돼요.";
+      } else {
+        try { localStorage.removeItem(CLASS_KEY); } catch {}
+        status.textContent = "학교/학년/반을 모두 입력해야 우리 반 기록에 반영돼요.";
+      }
+    }
+    [schoolInput, gradeInput, numInput].forEach(input => input.addEventListener("change", sync));
+    sync();
+  }
+
+  function createRecordIdempotencyKey() {
+    if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+    const bytes = window.crypto?.getRandomValues ? window.crypto.getRandomValues(new Uint32Array(4)) : [Date.now(), Math.random() * 1e9, Math.random() * 1e9, Math.random() * 1e9];
+    return Array.from(bytes, value => Number(value >>> 0).toString(36)).join("-");
+  }
+
+  // Fire-and-forget: this is the actual network call HANDOFF.md flagged as
+  // missing ("mobile/에 fetch가 단 한 줄도 없다"). It never blocks the UI --
+  // the student's confirmation is already reflected locally before this
+  // resolves, matching the "사진찍는 것도 귀찮은데" no-friction requirement.
+  async function submitSortingRecord({ status, selectedItemId, provider, objectCandidates = [], holdReasons = [] }) {
+    const client = window.AIWaysEdu2gClient;
+    if (!client?.saveSortingRecord || !selectedItemId) return;
+    const classContext = loadClassContext();
+    const payload = {
+      schemaVersion: "sorting-record-v1",
+      status,
+      provider: provider.slice(0, 80),
+      analysis: { objectCandidates, materialCandidates: [], visibleCautions: [] },
+      checklist: [],
+      userDecision: { selectedItemId: selectedItemId.slice(0, 40), action: status === "held" ? "held" : "recorded", userConfirmed: true },
+      hold: status === "held" ? { recommended: true, reasons: holdReasons.slice(0, 5) } : null,
+      ...(classContext ? { classContext } : {}),
+      idempotencyKey: createRecordIdempotencyKey()
+    };
+    try { await client.saveSortingRecord(payload); } catch { /* best-effort; local UI already reflects the action */ }
   }
 
   function switchTab(tabId) {
@@ -163,6 +235,7 @@
     const db = DATA.sortingDbV2;
     const item = db[itemId] || db.hold;
     activeResultItem = item;
+    activeResultContext = opts;
 
     // AI photo results that land on "hold" still carry Gemini's best-effort
     // read of the object and its likely material -- surface that instead of
@@ -380,6 +453,13 @@
       showVisualAlert("🛑 판단 유예 항목입니다. 보류함에 기록해 주세요.", "amber");
       return;
     }
+    const isAiResult = activeResultContext.isAiResult === true;
+    submitSortingRecord({
+      status: "completed",
+      selectedItemId: item.id,
+      provider: isAiResult ? "future_gemini" : "manual_select",
+      objectCandidates: isAiResult ? [{ label: activeResultContext.aiLabel || item.label, itemId: item.id, objectType: item.objectType || item.id, confidenceBand: "unknown" }] : []
+    });
     practiceStats.totalCount += 1;
     practiceStats.carbonReduction += item.carbonSaved || 0;
     const timestamp = new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
@@ -435,6 +515,7 @@
     const today = new Date();
     holdBoxList.unshift({ id: crypto.randomUUID(), name, date: `${today.getMonth() + 1}월 ${today.getDate()}일` });
     try { localStorage.setItem(HOLD_KEY, JSON.stringify(holdBoxList)); } catch {}
+    submitSortingRecord({ status: "held", selectedItemId: name, provider: "manual_hold", holdReasons: ["학생 직접 등록"] });
     updateHoldUI();
     showVisualAlert(`❓ "${name}"이(가) 회의 안건 목록에 등록되었습니다.`, "amber");
   }
@@ -627,6 +708,7 @@
     initSearchEmojiIcon();
     initPhotoCapture();
     restoreLocal();
+    initClassContextForm();
     renderQuizRankLadder();
     startQuiz();
     syncTabHeights();

@@ -17,7 +17,7 @@ const requiredData = ["data-nav", "data-upload", "data-tab", "data-panel"];
 test("frontend DOM keeps the app event contract", () => {
   requiredIds.forEach((id) => assert.match(html, new RegExp(`id=["']${id}["']`), id));
   requiredData.forEach((attribute) => assert.match(html + app, new RegExp(attribute), attribute));
-  ["#aiModal", "[data-judgement-action]"].forEach((selector) => assert.match(app, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), selector));
+  ["#aiModal"].forEach((selector) => assert.match(app, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), selector));
 });
 
 test("frontend preserves learner-facing decision boundaries", () => {

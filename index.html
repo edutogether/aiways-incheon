@@ -657,17 +657,18 @@
       </div>
     </dialog>
 
-    <dialog class="ai-modal" id="dashboardSchoolModal">
-      <form method="dialog">
-        <button class="close-btn" type="button" value="close" aria-label="닫기" data-close-school-modal>×</button>
-      </form>
+    <dialog class="ai-modal school-setup-modal" id="dashboardSchoolModal">
+      <button class="close-btn" type="button" aria-label="닫기" data-close-school-modal>×</button>
       <div class="modal-body">
-        <p class="eyebrow">Dashboard Setup</p>
-        <h2>이 화면이 표시할 학교를 검색해 주세요</h2>
-        <p id="dashboardSchoolIntro">한 번만 설정하면 이 기기(브라우저)에 계속 저장돼요. 다른 PC/태블릿에서는 그 기기에서 따로 한 번 더 설정해야 해요.</p>
-        <div style="position:relative">
-          <input type="text" id="dashboardSchoolInput" autocomplete="off" placeholder="학교 이름 검색 (예: 인천초등학교)" />
-          <div id="dashboardSchoolResults" class="classroom-skill-list" style="display:none;position:absolute;left:0;right:0;z-index:20;margin-block-start:.4rem;max-block-size:12rem;overflow-y:auto;background:var(--surface-2);border:1px solid var(--line-subtle);border-radius:.65rem"></div>
+        <p class="eyebrow">School Setup</p>
+        <h2>여러분은 어느 학교인가요?</h2>
+        <p class="school-setup-warning">⚠️ 한 번 설정하면 이 기기(브라우저)에서는 다시 바꿀 수 없어요. 신중하게 선택해 주세요. 다른 PC/태블릿은 그 기기에서 따로 설정해야 해요.</p>
+        <div class="school-search-row">
+          <input type="text" id="dashboardSchoolInput" autocomplete="off" placeholder="학교 이름 검색 (예: 인천동방초등학교)" />
+          <button type="button" id="dashboardSchoolSearchBtn" aria-label="검색">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4.35-4.35" /></svg>
+          </button>
+          <div id="dashboardSchoolResults" class="classroom-skill-list"></div>
         </div>
         <p id="dashboardSchoolStatus" class="save-state" role="status" aria-live="polite"></p>
       </div>

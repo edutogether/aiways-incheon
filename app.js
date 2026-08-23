@@ -1079,6 +1079,7 @@
     const input = $("#dashboardSchoolInput");
     const results = $("#dashboardSchoolResults");
     const status = $("#dashboardSchoolStatus");
+    const searchBtn = $("#dashboardSchoolSearchBtn");
     if (!modal || !input || !results || !status) return;
     $$("[data-close-school-modal]").forEach(button => button.addEventListener("click", closeDashboardSchoolModal));
     modal.addEventListener("click", event => { if (event.target === modal) closeDashboardSchoolModal(); });
@@ -1087,48 +1088,48 @@
     openDashboardSchoolModal();
     const client = window.AIWaysEdu2gClient;
     let debounceTimer = 0;
-    function hideResults() { results.style.display = "none"; results.replaceChildren(); }
+    let searchToken = 0;
     function selectSchool(school) {
       try {
         localStorage.setItem(DASHBOARD_SCHOOL_ID_KEY, school.schoolCode);
         localStorage.setItem(DASHBOARD_SCHOOL_NAME_KEY, school.schoolName);
       } catch {}
       status.textContent = `"${school.schoolName}"(으)로 설정했어요. 이 화면을 계속 그 학교로 보여줄게요.`;
-      hideResults();
+      results.replaceChildren();
       input.value = school.schoolName;
       input.disabled = true;
       loadSchoolDashboardFromApi();
       window.setTimeout(closeDashboardSchoolModal, 900);
     }
+    async function runSearch(rawQuery) {
+      const query = rawQuery.trim();
+      results.replaceChildren();
+      if (!query) { status.textContent = ""; return; }
+      if (query.length < 2) { status.textContent = "학교 이름을 두 글자 이상 입력해 주세요."; return; }
+      status.textContent = "검색하는 중이에요...";
+      const token = ++searchToken;
+      const response = await client?.searchSchool?.({ query });
+      if (token !== searchToken) return; // a newer search already superseded this one
+      if (!response?.ok) { status.textContent = "검색에 실패했어요. 잠시 후 다시 시도해 주세요."; return; }
+      const schools = response.data?.schools || [];
+      if (!schools.length) { status.textContent = "검색 결과가 없어요. 학교 이름을 다시 확인해 주세요."; return; }
+      status.textContent = `${schools.length}개 학교를 찾았어요. 목록에서 골라 주세요.`;
+      schools.slice(0, 15).forEach(school => {
+        const item = document.createElement("li");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.style.cssText = "width:100%;text-align:left;border:0;background:none;padding:.5rem;cursor:pointer;color:inherit";
+        button.textContent = `${school.schoolName} (${school.region} · ${school.schoolLevel})`;
+        button.addEventListener("click", () => selectSchool(school));
+        item.append(button);
+        results.append(item);
+      });
+    }
     input.addEventListener("input", () => {
       clearTimeout(debounceTimer);
-      const query = input.value.trim();
-      if (query.length < 2) { hideResults(); return; }
-      debounceTimer = window.setTimeout(async () => {
-        const response = await client?.searchSchool?.({ query });
-        const schools = response?.ok ? (response.data?.schools || []) : [];
-        results.replaceChildren();
-        if (!schools.length) {
-          const empty = document.createElement("li");
-          empty.className = "empty-state";
-          empty.textContent = "검색 결과가 없어요.";
-          results.append(empty);
-        } else {
-          schools.slice(0, 15).forEach(school => {
-            const item = document.createElement("li");
-            const button = document.createElement("button");
-            button.type = "button";
-            button.style.cssText = "width:100%;text-align:left;border:0;background:none;padding:.5rem;cursor:pointer;color:inherit";
-            button.textContent = `${school.schoolName} (${school.region} · ${school.schoolLevel})`;
-            button.addEventListener("click", () => selectSchool(school));
-            item.append(button);
-            results.append(item);
-          });
-        }
-        results.style.display = "block";
-      }, 300);
+      debounceTimer = window.setTimeout(() => runSearch(input.value), 300);
     });
-    input.addEventListener("blur", () => window.setTimeout(hideResults, 150));
+    searchBtn?.addEventListener("click", () => { clearTimeout(debounceTimer); runSearch(input.value); });
   }
 
   function digitsOnly(value) {

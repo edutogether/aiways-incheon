@@ -14,7 +14,7 @@ const allowLimit = { check: async () => ({ allowed: true, outcome: "allowed" }) 
 const allowAccess = { resolve: async () => ({ ok: true, actorId: "actor_test" }) };
 const validAppCheck = async () => ({ status: "valid" });
 function neisRow(overrides = {}) {
-  return { SD_SCHUL_CODE: "7321071", SCHUL_NM: "남인천초등학교", SCHUL_KND_SC_NM: "초등학교", LCTN_SC_NM: "인천광역시", ...overrides };
+  return { SD_SCHUL_CODE: "7321071", SCHUL_NM: "남인천초등학교", SCHUL_KND_SC_NM: "초등학교", LCTN_SC_NM: "인천광역시", ORG_RDNMA: "인천광역시 미추홀구 인하로 426", ...overrides };
 }
 function handlerFor(rows = [neisRow()], fetchImpl) {
   return createSearchSchoolHandler({
@@ -27,7 +27,7 @@ function handlerFor(rows = [neisRow()], fetchImpl) {
 test("returns cleaned school list from NEIS response", async () => {
   const result = await invoke(handlerFor(), { query: "인천초" });
   assert.equal(result.statusCode, 200);
-  assert.deepEqual(result.payload.schools, [{ schoolCode: "7321071", schoolName: "남인천초등학교", schoolLevel: "초등학교", region: "인천광역시" }]);
+  assert.deepEqual(result.payload.schools, [{ schoolCode: "7321071", schoolName: "남인천초등학교", schoolLevel: "초등학교", region: "인천광역시", address: "인천광역시 미추홀구 인하로 426" }]);
 });
 test("rejects short or missing query without calling NEIS", async () => {
   let called = false;
@@ -58,6 +58,17 @@ test("drops rows missing a school code or name", async () => {
   const handler = handlerFor([neisRow({ SD_SCHUL_CODE: "" }), neisRow({ SCHUL_NM: "" }), neisRow()]);
   const result = await invoke(handler, { query: "인천초" });
   assert.equal(result.payload.schools.length, 1);
+});
+test("returns a distinct address per school so same-name-prefix results can be told apart", async () => {
+  const handler = handlerFor([
+    neisRow({ SD_SCHUL_CODE: "7341090", SCHUL_NM: "인천동방중학교", SCHUL_KND_SC_NM: "중학교", ORG_RDNMA: "인천광역시 남동구 논현역로 41" }),
+    neisRow({ SD_SCHUL_CODE: "7341025", SCHUL_NM: "인천동방초등학교", SCHUL_KND_SC_NM: "초등학교", ORG_RDNMA: "인천광역시 남동구 논현역로 31" })
+  ]);
+  const result = await invoke(handler, { query: "동방" });
+  assert.equal(result.payload.schools.length, 2);
+  const addresses = result.payload.schools.map((school) => school.address);
+  assert.deepEqual(addresses, ["인천광역시 남동구 논현역로 41", "인천광역시 남동구 논현역로 31"]);
+  assert.ok(addresses.every(Boolean));
 });
 test("rejects when getApiKey has no value configured", async () => {
   const handler = createSearchSchoolHandler({ appCheck: validAppCheck, access: allowAccess, actorRateLimiter: allowLimit, rateLimiter: allowLimit, getApiKey: () => "" });

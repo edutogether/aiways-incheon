@@ -1706,21 +1706,21 @@ a.source-link:hover {
 #dashboardSchoolModal {
   --ssm-ink: #12181f; --ssm-muted: #5b6572; --ssm-line: #e7eaee; --ssm-bg: #ffffff;
   --ssm-accent: #2b6cf6; --ssm-accent-soft: #eaf1ff;
-  inline-size: min(100% - 2rem, 33rem) !important; overflow: visible !important; position: relative;
+  inline-size: min(100% - 2rem, 35rem) !important; overflow: visible !important; position: relative;
   background: var(--ssm-bg) !important; color: var(--ssm-ink); border: none !important;
   box-shadow: 0 30px 70px rgb(10 20 35 / 30%), 0 2px 8px rgb(10 20 35 / 10%) !important;
 }
 #dashboardSchoolModal::backdrop { background: rgb(6 12 22 / 66%); }
-#dashboardSchoolModal .modal-body { overflow: visible; padding: 2rem 1.75rem 1.75rem; }
+#dashboardSchoolModal .modal-body { overflow: visible; padding: 1.4rem 1.75rem 1.3rem; }
 #dashboardSchoolModal .close-btn {
   position: absolute; inset-block-start: 1.1rem; inset-inline-end: 1.1rem; z-index: 2;
   background: none; border: none; color: var(--ssm-ink); font-size: 1.3rem; opacity: .55;
 }
 #dashboardSchoolModal .close-btn:hover { opacity: 1; }
 #dashboardSchoolModal .eyebrow { display: inline-flex; padding: .3rem .75rem; border-radius: 999px; border: 1px solid var(--ssm-accent); background: var(--ssm-accent-soft); color: var(--ssm-accent); font-size: .72rem; font-weight: 800; letter-spacing: .03em; }
-#dashboardSchoolModal h2 { color: var(--ssm-ink); margin-block: 1.1rem .9rem; font-size: 1.55rem; font-weight: 800; white-space: nowrap; }
-.school-setup-warning { margin: 0 0 1.4rem; color: var(--ssm-muted); font-size: .88rem; line-height: 1.65; }
-.school-search-row { position: relative; }
+#dashboardSchoolModal h2 { color: var(--ssm-ink); margin-block: .6rem .6rem; font-size: 1.75rem; font-weight: 800; white-space: nowrap; }
+.school-setup-warning { margin: 0 0 1rem; color: var(--ssm-muted); font-size: .88rem; line-height: 1.6; }
+.school-search-row { position: relative; max-inline-size: 24rem; margin-inline: auto; }
 .school-search-row input {
   inline-size: 100%; padding: .7rem 2.2rem .7rem .1rem; font-size: 1rem;
   background: transparent; color: var(--ssm-ink); border: none; border-block-end: 1.5px solid var(--ssm-line); border-radius: 0;

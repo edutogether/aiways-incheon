@@ -80,11 +80,19 @@
         empty.textContent = "검색 결과가 없어요.";
         results.append(empty);
       } else {
+        // 같은 이름의 학교가 여러 지역에 있을 수 있어 급별만으론 못 구분할
+        // 때가 있다 - 도로명주소를 같이 보여줘야 정확히 구분해서 고를 수 있다.
         schools.slice(0, 15).forEach(school => {
           const item = document.createElement("button");
           item.type = "button";
           item.className = "block w-full text-left px-3 py-2 hover:bg-blue-50 border-b border-slate-100 last:border-0";
-          item.textContent = `${school.schoolName} (${school.region} · ${school.schoolLevel})`;
+          const title = document.createElement("span");
+          title.className = "block font-semibold";
+          title.textContent = `${school.schoolName} (${school.schoolLevel})`;
+          const address = document.createElement("span");
+          address.className = "block text-[11px] text-slate-400 mt-0.5";
+          address.textContent = school.address || school.region;
+          item.append(title, address);
           item.addEventListener("click", () => {
             input.value = school.schoolName;
             selectedLabel = school.schoolName;

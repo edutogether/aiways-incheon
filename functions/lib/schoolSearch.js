@@ -35,7 +35,11 @@ function toSchool(row) {
     schoolCode: cleanText(row.SD_SCHUL_CODE, 20),
     schoolName: cleanText(row.SCHUL_NM, 80),
     schoolLevel: cleanText(row.SCHUL_KND_SC_NM, 20),
-    region: cleanText(row.LCTN_SC_NM, 20)
+    region: cleanText(row.LCTN_SC_NM, 20),
+    // 같은 이름의 학교가 여러 지역에 있을 수 있어(예: 인천동방초등학교 vs
+    // 인천동방중학교), region만으로는 못 구분한다 - 실제 도로명주소까지
+    // 보여줘야 목록에서 정확히 구분해서 고를 수 있다.
+    address: cleanText(row.ORG_RDNMA, 120)
   };
 }
 

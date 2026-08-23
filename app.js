@@ -1114,12 +1114,21 @@
       const schools = response.data?.schools || [];
       if (!schools.length) { status.textContent = "검색 결과가 없어요. 학교 이름을 다시 확인해 주세요."; return; }
       status.textContent = `${schools.length}개 학교를 찾았어요. 목록에서 골라 주세요.`;
+      // 같은 이름의 학교가 여러 지역에 있을 수 있어(예: 인천동방초등학교 vs
+      // 인천동방중학교), 급별만으론 못 구분할 때가 있다 - 실제 도로명주소를
+      // 같이 보여줘야 정확히 구분해서 고를 수 있다.
       schools.slice(0, 15).forEach(school => {
         const item = document.createElement("li");
         const button = document.createElement("button");
         button.type = "button";
-        button.style.cssText = "width:100%;text-align:left;border:0;background:none;padding:.5rem;cursor:pointer;color:inherit";
-        button.textContent = `${school.schoolName} (${school.region} · ${school.schoolLevel})`;
+        button.style.cssText = "display:block;width:100%;text-align:left;border:0;background:none;padding:.6rem .5rem;cursor:pointer;color:inherit";
+        const title = document.createElement("strong");
+        title.style.cssText = "display:block;font-weight:700;font-size:.92rem";
+        title.textContent = `${school.schoolName} (${school.schoolLevel})`;
+        const address = document.createElement("small");
+        address.style.cssText = "display:block;margin-block-start:.15rem;color:var(--ssm-muted,#5b6572);font-size:.78rem";
+        address.textContent = school.address || school.region;
+        button.append(title, address);
         button.addEventListener("click", () => selectSchool(school));
         item.append(button);
         results.append(item);

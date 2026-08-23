@@ -1686,3 +1686,53 @@ a.source-link:hover {
   }
   .upload-panel::after { content: none !important; }
 }
+
+/* 학교 설정 모달 - 사용자가 직접 제시한 참고 이미지대로, 이 앱의 나머지
+   화면과 다르게 밝은 카드 스타일로 의도적으로 만든다(전체 다크 테마의
+   예외 - 사용자가 이 모달만 콕 집어 이 디자인을 요청함). 공용 다크
+   토큰을 이어받지 않고 이 모달 전용 밝은 팔레트를 직접 정의한다.
+   이 파일(cb3a.css)은 @layer 밖의 일반 규칙이라, style.css의
+   @layer components 안에 있던 .ai-modal 배경(#071326, layer 규칙)보다
+   항상 이긴다 - CSS 스펙상 레이어 밖 규칙이 레이어 안 규칙을 명시도와
+   무관하게 항상 이기기 때문에, 처음엔 style.css의 @layer 안에 이
+   오버라이드를 넣었다가 안 먹혀서(다크 배경 그대로 남음) 여기로
+   옮겼다. 크기/닫기버튼 위치도 #aiModal과 다르게 써야 해서(가로로만
+   쓸데없이 길다, X는 우상단이 보편적) .ai-modal 공통 크기를 여기서만
+   좁게 덮어쓴다. 검색 결과 목록은 position:absolute로 입력창 바로
+   아래 떠야 하는데, .modal-body의 overflow:auto뿐 아니라 <dialog>
+   자체의 브라우저 기본 overflow:auto까지 이중으로 잘라내서 아래쪽이
+   잘려 보였다 - 이 모달은 내용이 짧고 고정이라 스크롤이 필요 없으므로
+   둘 다 풀어준다. */
+#dashboardSchoolModal {
+  --ssm-ink: #12181f; --ssm-muted: #5b6572; --ssm-line: #e7eaee; --ssm-bg: #ffffff;
+  --ssm-accent: #2b6cf6; --ssm-accent-soft: #eaf1ff;
+  inline-size: min(100% - 2rem, 33rem) !important; overflow: visible !important; position: relative;
+  background: var(--ssm-bg) !important; color: var(--ssm-ink); border: none !important;
+  box-shadow: 0 30px 70px rgb(10 20 35 / 30%), 0 2px 8px rgb(10 20 35 / 10%) !important;
+}
+#dashboardSchoolModal::backdrop { background: rgb(6 12 22 / 66%); }
+#dashboardSchoolModal .modal-body { overflow: visible; padding: 2rem 1.75rem 1.75rem; }
+#dashboardSchoolModal .close-btn {
+  position: absolute; inset-block-start: 1.1rem; inset-inline-end: 1.1rem; z-index: 2;
+  background: none; border: none; color: var(--ssm-ink); font-size: 1.3rem; opacity: .55;
+}
+#dashboardSchoolModal .close-btn:hover { opacity: 1; }
+#dashboardSchoolModal .eyebrow { display: inline-flex; padding: .3rem .75rem; border-radius: 999px; border: 1px solid var(--ssm-accent); background: var(--ssm-accent-soft); color: var(--ssm-accent); font-size: .72rem; font-weight: 800; letter-spacing: .03em; }
+.school-setup-tagline { margin-block: .8rem 0; color: var(--ssm-muted); font-size: .82rem; font-weight: 700; letter-spacing: .01em; }
+#dashboardSchoolModal h2 { color: var(--ssm-ink); margin-block: .35rem .9rem; word-break: keep-all; }
+.school-setup-warning { margin: 0 0 1.4rem; color: var(--ssm-muted); font-size: .88rem; line-height: 1.65; }
+.school-search-row { position: relative; }
+.school-search-row input {
+  inline-size: 100%; padding: .7rem 2.2rem .7rem .1rem; font-size: 1rem;
+  background: transparent; color: var(--ssm-ink); border: none; border-block-end: 1.5px solid var(--ssm-line); border-radius: 0;
+}
+.school-search-row input::placeholder { color: color-mix(in srgb, var(--ssm-muted) 70%, transparent); }
+.school-search-row input:focus { outline: none; border-block-end-color: var(--ssm-accent); }
+#dashboardSchoolSearchBtn { position: absolute; inset-block-start: .35rem; inset-inline-end: 0; inline-size: 1.6rem; block-size: 1.6rem; padding: 0; display: grid; place-items: center; background: none; border: none; color: var(--ssm-accent); }
+#dashboardSchoolSearchBtn svg { inline-size: 1.15rem; block-size: 1.15rem; fill: none; stroke: currentColor; stroke-width: 2; }
+#dashboardSchoolResults:not(:empty) { display: block; position: absolute; left: 0; right: 0; z-index: 20; margin-block-start: .5rem; max-block-size: 14rem; overflow-y: auto; background: var(--ssm-bg); color: var(--ssm-ink); border: 1px solid var(--ssm-line); border-radius: .65rem; box-shadow: 0 16px 40px rgb(10 20 35 / 16%); }
+#dashboardSchoolResults:empty { display: none; }
+#dashboardSchoolResults li { border-color: var(--ssm-line) !important; padding: 0 !important; }
+#dashboardSchoolResults li:hover { background: var(--ssm-accent-soft); }
+#dashboardSchoolResults li + li { border-block-start: 1px solid var(--ssm-line); border-radius: 0 !important; }
+#dashboardSchoolStatus { color: var(--ssm-muted); }

@@ -188,26 +188,6 @@
   .ai-modal { inline-size: min(100% - 2rem, 43rem); padding: 0; color: var(--ink); border-color: var(--line-strong); box-shadow: var(--shadow-high); }
   .ai-modal::backdrop { background: rgb(2 10 18 / 76%); }
   .modal-body { padding: 1rem; overflow: auto; }
-
-  /* 학교 설정 모달 - #aiModal(사진 판단용)과 크기/닫기버튼 위치가 다르게
-     쓰여야 해서(사용자 피드백: 가로로만 쓸데없이 길다, X는 우상단이
-     보편적) .ai-modal 공통 크기를 여기서만 좁게 덮어쓴다. 검색 결과
-     목록은 position:absolute로 입력창 바로 아래 떠야 하는데,
-     .modal-body의 overflow:auto뿐 아니라 <dialog> 자체의 브라우저 기본
-     overflow:auto까지 이중으로 잘라내서 목록 아래쪽이 잘려 보였다 -
-     이 모달은 내용이 짧고 고정이라 스크롤이 애초에 필요 없으므로 둘 다
-     풀어준다. */
-  #dashboardSchoolModal { inline-size: min(100% - 2rem, 30rem); overflow: visible; position: relative; }
-  #dashboardSchoolModal .modal-body { overflow: visible; padding: 1.75rem 1.5rem 1.5rem; }
-  #dashboardSchoolModal .close-btn { position: absolute; inset-block-start: 1rem; inset-inline-end: 1rem; z-index: 2; }
-  #dashboardSchoolModal h2 { font-size: var(--type-card); margin-block: .3rem .7rem; }
-  .school-setup-warning { padding: .65rem .8rem; border-radius: var(--radius-small); background: color-mix(in srgb, var(--caution) 14%, var(--surface-2)); border: 1px solid color-mix(in srgb, var(--caution) 30%, var(--line-subtle)); color: var(--ink); font-size: .85rem; line-height: 1.5; }
-  .school-search-row { position: relative; margin-block-start: 1.1rem; }
-  .school-search-row input { inline-size: 100%; padding: .95rem 3rem .95rem 1rem; font-size: 1rem; }
-  #dashboardSchoolSearchBtn { position: absolute; inset-block-start: 50%; inset-inline-end: .4rem; translate: 0 -50%; inline-size: 2.35rem; block-size: 2.35rem; padding: 0; display: grid; place-items: center; border-radius: 50%; background: var(--brand); border-color: var(--brand); color: var(--canvas-bg); }
-  #dashboardSchoolSearchBtn svg { inline-size: 1.1rem; block-size: 1.1rem; fill: none; stroke: currentColor; stroke-width: 2; }
-  #dashboardSchoolResults:not(:empty) { display: block; position: absolute; left: 0; right: 0; z-index: 20; margin-block-start: .4rem; max-block-size: 14rem; overflow-y: auto; background: var(--surface-2); border: 1px solid var(--line-subtle); border-radius: .65rem; box-shadow: var(--shadow-high); }
-  #dashboardSchoolResults:empty { display: none; }
   .modal-preview { background: var(--elevated-bg); border: 1px solid var(--line-subtle); border-radius: var(--radius-small); }
   .modal-preview img { inline-size: 100%; aspect-ratio: 16 / 9; object-fit: contain; }
   .close-btn { inline-size: var(--control-height); padding: 0; border-radius: 50%; color: var(--ink); background: var(--surface-2); font-size: 1.4rem; }

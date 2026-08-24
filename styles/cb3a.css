@@ -1726,8 +1726,7 @@ a.source-link:hover {
 .school-setup-icon { display: grid; place-items: center; inline-size: 3.6rem; block-size: 3.6rem; margin: 0 auto .9rem; border-radius: 50%; background: var(--ssm-accent-soft); color: var(--ssm-accent); }
 .school-setup-icon svg { inline-size: 1.7rem; block-size: 1.7rem; }
 #dashboardSchoolModal h2 { color: var(--ssm-ink); margin-block: 0 1.4rem; font-size: 1.5rem; line-height: 1.32; font-weight: 800; }
-.school-setup-warning { margin: -.6rem 0 1.2rem; color: var(--ssm-muted); font-size: .86rem; line-height: 1.55; }
-.school-search-row { position: relative; inline-size: 100%; max-inline-size: 18.5rem; margin-inline: auto; }
+.school-search-row { position: relative; inline-size: 100%; max-inline-size: 18.5rem; margin: 1.3rem auto 0; }
 .school-search-row input {
   inline-size: 100%; padding: .75rem 1rem .75rem 2.5rem; font-size: .92rem; text-align: start;
   background: #f4f6f9; color: var(--ssm-ink); border: 1.5px solid transparent; border-radius: 999px;
@@ -1755,7 +1754,7 @@ a.source-link:hover {
    (SCHOOL_CLASS_CONFIG), 반 번호만 숫자 버튼 그리드로 직접 고르게 한다.
    특정 선생님 반을 기본값으로 미리 선택해두지 않는다(교사 지적: 1반
    선생님도 2반 선생님도 각자 다르게 직접 설정해야 함). */
-.class-picker-selects { display: flex; justify-content: center; gap: .6rem; margin-block-start: .6rem; }
+.class-picker-selects { display: flex; justify-content: center; gap: .6rem; margin-block-start: 1.3rem; }
 .class-picker-selects select { min-inline-size: 7rem; padding: .65rem .9rem; border-radius: .7rem; border: 1.5px solid var(--ssm-line); background: var(--ssm-bg); color: var(--ssm-ink); font-weight: 700; font-size: .92rem; text-align: center; cursor: pointer; }
 .class-picker-selects select:focus { outline: none; border-color: var(--ssm-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ssm-accent) 14%, transparent); }
 .class-picker-confirm { display: block; inline-size: 100%; max-inline-size: 18.5rem; margin: 1.1rem auto 0; padding: .8rem; border-radius: 999px; border: none; background: var(--ssm-accent); color: #fff; font-weight: 800; font-size: .95rem; cursor: pointer; }
@@ -1763,9 +1762,9 @@ a.source-link:hover {
 /* 반 선택 단계에서 학교 검색 단계로 돌아가는 뒤로가기 - 닫기(X)와
    같은 우상단 클러스터에 나란히 둔다(사용자 지적: 뒤로가기가 우상단에
    있어야 함). 학교 검색 단계에서는 갈 곳이 없으니 숨긴다. */
-.modal-back-btn { position: absolute; inset-block-start: 1.1rem; inset-inline-end: 2.9rem; z-index: 2; display: grid; place-items: center; inline-size: 1.6rem; block-size: 1.6rem; padding: 0; background: none; border: none; color: var(--ssm-muted); opacity: .7; cursor: pointer; }
-.modal-back-btn svg { inline-size: 1.1rem; block-size: 1.1rem; }
-.modal-back-btn:hover { opacity: 1; color: var(--ssm-ink); }
+.modal-back-btn { position: absolute; inset-block-start: 1.1rem; inset-inline-start: 1.1rem; z-index: 2; display: grid; place-items: center; inline-size: 2rem; block-size: 2rem; padding: 0; border-radius: 50%; background: none; border: none; color: var(--ssm-muted); opacity: .7; cursor: pointer; }
+.modal-back-btn svg { inline-size: 1.3rem; block-size: 1.3rem; }
+.modal-back-btn:hover { opacity: 1; color: var(--ssm-ink); background: var(--ssm-accent-soft); }
 .modal-back-btn[hidden] { display: none; }
 
 /* 헤더 톱니바퀴 설정 메뉴 - main-nav의 형제로 다시 빼서(그 안에 있으면
@@ -1788,6 +1787,6 @@ a.source-link:hover {
 
 /* 서비스 준비중 등, 조용히 지나치면 안 되는 안내를 눈에 띄는 팝업
    이벤트로 보여준다(문단 텍스트로만 두지 말라는 요청). */
-.dashboard-toast-host { position: fixed; inset-block-start: 1.5rem; inset-inline-start: 50%; translate: -50% 0; z-index: 200; display: grid; gap: .5rem; pointer-events: none; }
+.dashboard-toast-host { position: fixed; inset-block-start: 50%; inset-inline-start: 50%; translate: -50% -50%; z-index: 200; display: grid; gap: .5rem; pointer-events: none; }
 .dashboard-toast { pointer-events: auto; padding: .8rem 1.2rem; border-radius: .8rem; background: #1a2436; color: #f2fdff; border: 1px solid rgb(100 234 255 / 30%); box-shadow: 0 16px 40px rgb(0 0 0 / 35%); font-size: .88rem; font-weight: 700; animation: toastPop .25s ease both; }
 @keyframes toastPop { from { opacity: 0; translate: 0 -.6rem; } to { opacity: 1; translate: 0 0; } }

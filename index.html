@@ -86,7 +86,7 @@
         <div class="dashboard-settings-menu" id="dashboardSettingsMenu" hidden>
           <button type="button" data-settings-action="sample">👀 샘플 데이터 보기</button>
           <button type="button" data-settings-action="reconfigure">🏫 학년반 다시 설정하기</button>
-          <button type="button" data-settings-action="reset">🔄 전부 초기화</button>
+          <button type="button" data-settings-action="reset">🔄 모두 초기화하기</button>
         </div>
       </div>
       <div class="mobile-shell-bar" aria-label="모바일 작업 바로가기">
@@ -678,7 +678,7 @@
 
     <dialog class="ai-modal school-setup-modal" id="dashboardSchoolModal">
       <button type="button" id="dashboardClassBackBtn" class="modal-back-btn" aria-label="뒤로" hidden>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7" /></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H4M4 12l6-6M4 12l6 6" /></svg>
       </button>
       <button class="close-btn" type="button" aria-label="닫기" data-close-school-modal>×</button>
       <div class="modal-body">
@@ -702,12 +702,12 @@
         <div id="dashboardSchoolStepClass" hidden>
           <div class="school-setup-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="4.5" y="4.5" width="15" height="15" rx="3" />
-              <path d="M8.2 9.5h7.6M8.2 13.5h4.6" />
+              <path d="M12 3l9 4.8v1.2H3V7.8L12 3Z" />
+              <path d="M5 9v10M19 9v10M9.5 19v-5h5v5" />
+              <path d="M3 19h18" />
             </svg>
           </div>
-          <h2>몇 반이세요?</h2>
-          <p class="school-setup-warning" id="dashboardClassStepIntro"></p>
+          <h2>학년 반을 입력해주세요.</h2>
           <div class="class-picker-selects">
             <select id="dashboardGradeSelect" aria-label="학년"></select>
             <select id="dashboardClassNumSelect" aria-label="반"></select>

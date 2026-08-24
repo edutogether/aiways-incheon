@@ -1125,7 +1125,7 @@
   // body 직속 토스트 host가 그 뒤에 가려 안 보였다(사용자 지적: "안
   // 해줌" - 실제로는 뜨고 있었지만 모달에 가려 안 보인 것). 모달이
   // 열려 있으면 모달 안의 host를, 아니면 body 직속 host를 쓴다.
-  function showDashboardToast(message, duration = 3200) {
+  function showDashboardToast(message, duration = 2200) {
     const modal = $("#dashboardSchoolModal");
     const host = (modal?.open && $("#dashboardToastHostModal")) || $("#dashboardToastHost");
     if (!host) return;
@@ -1186,7 +1186,6 @@
     if (!config) return;
     const stepSearch = $("#dashboardSchoolStepSearch");
     const stepClass = $("#dashboardSchoolStepClass");
-    const classIntro = $("#dashboardClassStepIntro");
     const gradeSelect = $("#dashboardGradeSelect");
     const classNumSelect = $("#dashboardClassNumSelect");
     const confirmBtn = $("#dashboardClassConfirmBtn");
@@ -1195,7 +1194,6 @@
     stepClass.hidden = false;
     const backBtn = $("#dashboardClassBackBtn");
     if (backBtn) backBtn.hidden = false;
-    classIntro.textContent = `${school.schoolName}은(는) 몇 학년 몇 반이세요?`;
     gradeSelect.replaceChildren();
     for (let g = 1; g <= 6; g += 1) {
       const option = document.createElement("option");
@@ -1361,7 +1359,7 @@
     });
     $("[data-settings-action='reset']")?.addEventListener("click", () => {
       closeMenu();
-      if (!window.confirm("정말 전부 초기화할까요? 이 기기에 설정된 학교, 학년, 반이 모두 사라지고 처음 학교 검색 화면으로 돌아가요.")) return;
+      if (!window.confirm("정말 모두 초기화할까요? 이 기기에 설정된 학교, 학년, 반이 모두 사라지고 처음 학교 검색 화면으로 돌아가요.")) return;
       try {
         localStorage.removeItem(DASHBOARD_SCHOOL_ID_KEY);
         localStorage.removeItem(DASHBOARD_SCHOOL_NAME_KEY);
@@ -4256,14 +4254,22 @@
       if (seenClasses.has(label)) option.remove();
       else seenClasses.add(label);
     });
+    // 실제 학교가 설정된 상태에서는 school-panel/class-panel을
+    // loadSchoolDashboardFromApi()가 전담한다(위 주석 참고 - 3단계부터
+    // 구글시트 폴링 대신 Firestore 집계로 넘어감). 그런데도 학년/반을
+    // 바꿀 때마다 여기서 applyDashboard(로컬/시드 데이터)를 무조건 같이
+    // 불러버려서, 그 더미 숫자가 잠깐 그려졌다가 API 응답이 도착하면
+    // 진짜 데이터로 다시 바뀌는 깜빡임이 매번 생겼다(사용자 지적: "학년
+    // 반 고를때마다 계속 생김"). 학교가 아직 없거나 "샘플 데이터
+    // 보기" 중일 때만 applyDashboard로 로컬 데이터를 보여준다.
     $("#gradeSelect")?.addEventListener("change", () => {
       beginDashboardRepaint("school", 980);
-      applyDashboard(allStoredRecords());
+      if (!resolveDashboardSchoolId() || isSamplePreview()) applyDashboard(allStoredRecords());
       loadSchoolDashboardFromApi();
     });
     $("#classSelect")?.addEventListener("change", () => {
       beginDashboardRepaint("class", 980);
-      applyDashboard(allStoredRecords());
+      if (!resolveDashboardSchoolId() || isSamplePreview()) applyDashboard(allStoredRecords());
       loadSchoolDashboardFromApi();
     });
   }

@@ -193,12 +193,13 @@ body { color:#202124; background:#f8fafd; }
 
 /* ---------- 4. PC / 전시용 대형 화면 (1024px~) — 이 앱의 주 무대 ---------- */
 @media (min-width:64rem) {
-/* The last nav item should line up with the right edge of the scene content
-     below it. Since 2026-08-24 the last item is the settings gear button
-     (padding:0, no internal inline padding of its own - unlike the <a> nav
-     links, which each carry --nav-link-pad and used to need that padding
-     subtracted here), so the header now stops exactly at the scene inset. */
-  .site-header { box-shadow:none; padding-inline-end: var(--scene-inline-space); }
+/* The last real nav *link*'s text should line up with the right edge of the
+     scene content below it, so the header stops short of the scene inset by
+     exactly the link's own inline padding. (The settings gear that visually
+     sits further right is nudged out with transform, not real layout space,
+     so it doesn't count as "the last item" for this alignment.) Verified at
+     both widths: 180-20=160 at 2560px, 77.76-12=65.6 at 1440px. */
+  .site-header { box-shadow:none; padding-inline-end:calc(var(--scene-inline-space) - var(--nav-link-pad)); }
   .main-nav a { border-radius:.7rem; }
   /* Lights flip in .17s - fast enough to read as a switch ("탁"), not a fade.
      app.js keeps the destination dark for the whole ride and calls the light
@@ -1758,14 +1759,19 @@ a.source-link:hover {
 .class-picker-grid button { padding: .8rem .5rem; border-radius: .65rem; border: 1.5px solid var(--ssm-line); background: var(--ssm-bg); color: var(--ssm-ink); font-weight: 700; cursor: pointer; }
 .class-picker-grid button:hover { border-color: var(--ssm-accent); background: var(--ssm-accent-soft); }
 
-/* 헤더 톱니바퀴 설정 메뉴 - main-nav 맨 끝(자료실 바로 뒤)에 붙여서
-   같은 줄의 마지막 항목이 되게 하고, .main-nav 자체는 이제 대시보드
-   본문(.scene)과 같은 좌우 여백 공식을 쓰는 .site-header 안에 있으므로
-   이 톱니바퀴의 오른쪽 끝이 곧 본문 우측 끝과 정렬된다. */
-.dashboard-settings { position: relative; flex: 0 0 auto; margin-inline-start: .5rem; padding-inline-start: .5rem; border-inline-start: 1px solid var(--line-subtle); }
-.dashboard-settings-toggle { display: grid; place-items: center; inline-size: 2.3rem; block-size: 2.3rem; padding: 0; border-radius: 50%; border: 1px solid rgb(255 255 255 / 16%); background: rgb(255 255 255 / 6%); color: #cfe4ea; cursor: pointer; }
-.dashboard-settings-toggle:hover { background: rgb(255 255 255 / 12%); color: #f2fdff; }
-.dashboard-settings-toggle svg { inline-size: 1.15rem; block-size: 1.15rem; }
+/* 헤더 톱니바퀴 설정 메뉴 - main-nav의 형제로 다시 빼서(그 안에 있으면
+   4구역 미만 폭에서 main-nav 자체가 드롭다운으로 position이 바뀌어
+   버튼 위치가 같이 틀어짐), .site-header(position:sticky)를 기준으로
+   position:absolute로 띄운다. 자료실은 이제 이 톱니와 무관하게 다시
+   nav의 실제 마지막 항목이 되어 본문(.scene) 우측 끝과 정렬된다.
+   톱니는 헤더의 우측 여백(최대 4rem=64px, --scene-inline-space의 clamp
+   상한) 안에서 최대한 오른쪽 - 뷰포트 진짜 끝에 거의 붙는 자리 - 에
+   놓았다. 100px만큼 더 밀면 헤더 폭(뷰포트 100%) 밖으로 나가 화면에
+   안 보이게 되므로, 물리적으로 가능한 가장 오른쪽 지점으로 잡았다. */
+.dashboard-settings { position: absolute; inset-block-start: 50%; inset-inline-end: 0; translate: 0 -50%; }
+.dashboard-settings-toggle { display: grid; place-items: center; inline-size: 2.3rem; block-size: 2.3rem; padding: 0; border: none; background: none; color: #cfe4ea; cursor: pointer; }
+.dashboard-settings-toggle:hover { color: #f2fdff; }
+.dashboard-settings-toggle svg { inline-size: 1.3rem; block-size: 1.3rem; }
 .dashboard-settings-menu { position: absolute; inset-block-start: calc(100% + .5rem); inset-inline-end: 0; z-index: 60; min-inline-size: 13rem; padding: .5rem; border-radius: .8rem; background: #0c1a2c; border: 1px solid rgb(100 234 255 / 22%); box-shadow: 0 20px 50px rgb(0 0 0 / 40%); display: grid; gap: .2rem; }
 .dashboard-settings-menu[hidden] { display: none; }
 .dashboard-settings-menu button { display: block; width: 100%; text-align: left; padding: .6rem .7rem; border-radius: .5rem; border: none; background: none; color: #eaf3f8; font-size: .85rem; cursor: pointer; }

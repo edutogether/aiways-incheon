@@ -1044,6 +1044,48 @@
   // 참여하는 4개 학교로 한정한다 - 그 외 학교를 고르면 저장 대신
   // "서비스 준비중" 안내만 보여준다.
   const DASHBOARD_LAUNCHED_SCHOOLS = new Set(["7341025", "7321030", "7361073", "7361064"]);
+  // 4개 파일럿 학교 각각 실제 담당 선생님이 확인해 준 학년/반 기본값과
+  // 그 학년의 총 반 수 - 학교마다 반 구성이 다 달라서(3반짜리 학교도,
+  // 9반짜리 학교도 있음) #classSelect를 하드코딩된 고정 목록 대신 이
+  // 설정에 맞춰 매번 다시 만든다.
+  const SCHOOL_CLASS_CONFIG = {
+    "7321030": { grade: "1", classNum: "3", totalClasses: 3 },  // 인천서흥초등학교 · 박상현
+    "7361073": { grade: "3", classNum: "4", totalClasses: 9 },  // 인천청라초등학교 · 진가연
+    "7341025": { grade: "5", classNum: "1", totalClasses: 4 },  // 인천동방초등학교 · 강서희
+    "7361064": { grade: "6", classNum: "3", totalClasses: 7 }   // 인천마전초등학교 · 이혜련
+  };
+  function applySchoolClassConfig(schoolId) {
+    const config = SCHOOL_CLASS_CONFIG[schoolId];
+    if (!config) return;
+    const classSelect = $("#classSelect");
+    if (classSelect) {
+      classSelect.replaceChildren();
+      for (let classNum = 1; classNum <= config.totalClasses; classNum += 1) {
+        const option = document.createElement("option");
+        option.textContent = `${config.grade}학년 ${classNum}반`;
+        if (String(classNum) === config.classNum) option.selected = true;
+        classSelect.append(option);
+      }
+      classSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    // #gradeSelect(학교 전체 학년별 통계용)와 #classSelect(우리반)는 서로
+    // 독립된 두 <select>라 그냥 두면 안 맞을 수 있다 - getSchoolDashboard가
+    // 이 둘을 각각 읽어(grade는 gradeSelect, classNum은 classSelect) 같은
+    // 반을 가리킨다고 가정하고 조합하므로, 학교 설정 시 gradeSelect도 같은
+    // 학년으로 맞춰준다(하드코딩된 3~6학년 목록에 없는 학년이면 새로 추가).
+    const gradeSelect = $("#gradeSelect");
+    if (gradeSelect) {
+      const targetLabel = `${config.grade}학년`;
+      let option = [...gradeSelect.options].find(item => item.textContent === targetLabel);
+      if (!option) {
+        option = document.createElement("option");
+        option.textContent = targetLabel;
+        gradeSelect.append(option);
+      }
+      gradeSelect.value = targetLabel;
+      gradeSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }
   // 학교별 PC/태블릿 키오스크는 한 번 학교를 설정하면(검색해서 고르거나,
   // URL에 ?school=나이스학교코드 를 붙여 열면) 그 값이 이 브라우저의
   // localStorage에 저장돼 다음부터는 계속 같은 학교로 유지된다 - 다른
@@ -1112,6 +1154,7 @@
       input.value = school.schoolName;
       input.disabled = true;
       updateSampleBadge();
+      applySchoolClassConfig(school.schoolCode);
       loadSchoolDashboardFromApi();
       window.setTimeout(closeDashboardSchoolModal, 900);
     }
@@ -1632,7 +1675,13 @@
     }
     if (!client?.getSchoolDashboard) return null;
     const grade = digitsOnly(selectedGrade());
-    const classNum = digitsOnly(selectedClassName());
+    // digitsOnly(selectedClassName())는 "5학년 1반" 전체 문자열에서 첫
+    // 숫자(5)를 집어서, 반 번호가 아니라 학년 숫자를 classNum으로 잘못
+    // 보내고 있었다(학년과 반 번호가 다른 4개 파일럿 학교 전부 이 버그에
+    // 걸림 - 예: 인천동방초 5학년 1반이면 classNum이 "1"이 아니라 "5"가
+    // 되어 우리반 패널이 계속 빈 데이터를 보여줬을 것). classParts로 반
+    // 부분만 정확히 뽑는다.
+    const classNum = digitsOnly(classParts(selectedClassName()).className);
     try {
       const response = await client.getSchoolDashboard({ schoolId, grade, classNum });
       if (!response.ok || !response.data) return null;
@@ -2293,6 +2342,7 @@
     dashboardDataReady = true;
     if (options.animateIntro) playDashboardIntroForCurrentData();
     else applyDashboard(allStoredRecords());
+    applySchoolClassConfig(resolveDashboardSchoolId());
     await loadSchoolDashboardFromApi();
     startSchoolDashboardLiveRefresh();
     return allStoredRecords();

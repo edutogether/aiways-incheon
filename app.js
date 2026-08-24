@@ -923,7 +923,14 @@
       // screen, so it hides here - not on the animation frame right after
       // boot() merely starts the data fetch, which used to fire before the
       // fetch had even resolved and left nothing for the fade to reveal.
-      window.__aiwaysHideBootSplash?.();
+      // 이미 실제 학교가 설정된 채로 부팅할 때(options.deferSplashHide)는
+      // 여기서 걷지 않는다 - loadDashboardRows가 그 학교의 진짜
+      // 데이터(loadSchoolDashboardFromApi)까지 받아온 뒤에 직접 걷어서,
+      // 이 시드/더미 숫자가 화면에 잠깐 보였다가 진짜 학교 데이터로
+      // 바뀌는 깜빡임을 막는다(사용자 지적: "더미데이터가 언뜻언뜻 보여
+      // 방 분리가 안 된 것 같다" - 실제로는 다른 학교 데이터가 섞인 게
+      // 아니라, 이 화면이 걷히는 타이밍이 너무 일렀던 것).
+      if (!options.deferSplashHide) window.__aiwaysHideBootSplash?.();
     });
   }
 
@@ -1112,9 +1119,15 @@
   }
 
   // 조용히 지나치기 쉬운 안내(예: "서비스 준비중")를 눈에 띄는 팝업으로
-  // 띄운다 - 문단 텍스트만으로는 놓치기 쉽다는 지적.
+  // 띄운다 - 문단 텍스트만으로는 놓치기 쉽다는 지적. 열려 있는
+  // <dialog>는 브라우저가 항상 "top layer"에 그려서 z-index와 무관하게
+  // 다른 모든 일반 DOM보다 위에 뜨므로, 모달이 열려 있는 동안은
+  // body 직속 토스트 host가 그 뒤에 가려 안 보였다(사용자 지적: "안
+  // 해줌" - 실제로는 뜨고 있었지만 모달에 가려 안 보인 것). 모달이
+  // 열려 있으면 모달 안의 host를, 아니면 body 직속 host를 쓴다.
   function showDashboardToast(message, duration = 3200) {
-    const host = $("#dashboardToastHost");
+    const modal = $("#dashboardSchoolModal");
+    const host = (modal?.open && $("#dashboardToastHostModal")) || $("#dashboardToastHost");
     if (!host) return;
     const toast = document.createElement("div");
     toast.className = "dashboard-toast";
@@ -1145,6 +1158,8 @@
     if (!modal) return;
     $("#dashboardSchoolStepSearch").hidden = false;
     $("#dashboardSchoolStepClass").hidden = true;
+    const backBtn = $("#dashboardClassBackBtn");
+    if (backBtn) backBtn.hidden = true;
     const input = $("#dashboardSchoolInput");
     if (input) { input.disabled = false; input.value = ""; }
     $("#dashboardSchoolStatus").textContent = "";
@@ -1161,6 +1176,76 @@
     if (typeof modal.close === "function" && modal.open) modal.close();
     else modal.removeAttribute("open");
   }
+  // 반 선택 단계: 학년/반을 각각 드롭다운으로 고르게 한다(전에는 반만
+  // 버튼 그리드였는데, 학교마다 참여 학년도 다를 수 있어 학년도 같이
+  // 고르는 게 더 일반적인 구조). 실제로 그 학교가 서비스 중인
+  // 학년/반 조합(SCHOOL_CLASS_CONFIG)과 다르면 저장하지 않고 학교
+  // 선택 때와 같은 토스트로 "아직 준비중"을 안내한다.
+  function showClassStep(school) {
+    const config = SCHOOL_CLASS_CONFIG[school.schoolCode];
+    if (!config) return;
+    const stepSearch = $("#dashboardSchoolStepSearch");
+    const stepClass = $("#dashboardSchoolStepClass");
+    const classIntro = $("#dashboardClassStepIntro");
+    const gradeSelect = $("#dashboardGradeSelect");
+    const classNumSelect = $("#dashboardClassNumSelect");
+    const confirmBtn = $("#dashboardClassConfirmBtn");
+    if (!stepSearch || !stepClass || !gradeSelect || !classNumSelect || !confirmBtn) return;
+    stepSearch.hidden = true;
+    stepClass.hidden = false;
+    const backBtn = $("#dashboardClassBackBtn");
+    if (backBtn) backBtn.hidden = false;
+    classIntro.textContent = `${school.schoolName}은(는) 몇 학년 몇 반이세요?`;
+    gradeSelect.replaceChildren();
+    for (let g = 1; g <= 6; g += 1) {
+      const option = document.createElement("option");
+      option.value = String(g);
+      option.textContent = `${g}학년`;
+      gradeSelect.append(option);
+    }
+    gradeSelect.value = config.grade;
+    classNumSelect.replaceChildren();
+    for (let n = 1; n <= 15; n += 1) {
+      const option = document.createElement("option");
+      option.value = String(n);
+      option.textContent = `${n}반`;
+      classNumSelect.append(option);
+    }
+    classNumSelect.value = "1";
+    confirmBtn.onclick = () => {
+      const grade = gradeSelect.value;
+      const classNum = classNumSelect.value;
+      if (grade !== config.grade || Number(classNum) > config.totalClasses) {
+        showDashboardToast(`${school.schoolName} ${grade}학년 ${classNum}반은 아직 서비스 준비중이에요. 곧 만나요!`);
+        return;
+      }
+      try {
+        localStorage.setItem(DASHBOARD_SCHOOL_ID_KEY, school.schoolCode);
+        localStorage.setItem(DASHBOARD_SCHOOL_NAME_KEY, school.schoolName);
+        localStorage.setItem(DASHBOARD_CLASS_NUM_KEY, classNum);
+        sessionStorage.removeItem(DASHBOARD_SAMPLE_PREVIEW_KEY);
+      } catch {}
+      updateSampleBadge();
+      applySchoolClassConfig(school.schoolCode, classNum);
+      loadSchoolDashboardFromApi();
+      closeDashboardSchoolModal();
+    };
+  }
+  // 톱니바퀴 메뉴의 "학년반 다시 설정하기" - 이미 설정된 학교는 그대로
+  // 두고 반 선택 단계로 바로 연다(학교부터 다시 고르는 "초기화"와는
+  // 달라야 한다는 지적 - 지금까지는 사실상 같았음).
+  function openDashboardClassStepForCurrentSchool() {
+    const schoolId = resolveDashboardSchoolId();
+    let schoolName = "";
+    try { schoolName = cleanText(localStorage.getItem(DASHBOARD_SCHOOL_NAME_KEY) || ""); } catch {}
+    if (!schoolId || !SCHOOL_CLASS_CONFIG[schoolId]) { openDashboardSchoolModal(); return; }
+    const modal = $("#dashboardSchoolModal");
+    if (!modal) return;
+    document.body.classList.add("modal-open");
+    if (typeof modal.showModal === "function") modal.showModal();
+    else modal.setAttribute("open", "");
+    showClassStep({ schoolCode: schoolId, schoolName: schoolName || schoolId });
+  }
   function initDashboardSchoolSetup() {
     const modal = $("#dashboardSchoolModal");
     const input = $("#dashboardSchoolInput");
@@ -1169,12 +1254,17 @@
     const searchBtn = $("#dashboardSchoolSearchBtn");
     const stepSearch = $("#dashboardSchoolStepSearch");
     const stepClass = $("#dashboardSchoolStepClass");
-    const classIntro = $("#dashboardClassStepIntro");
-    const classGrid = $("#dashboardClassGrid");
+    const backBtn = $("#dashboardClassBackBtn");
     if (!modal || !input || !results || !status || !stepSearch || !stepClass) return;
     $$("[data-close-school-modal]").forEach(button => button.addEventListener("click", closeDashboardSchoolModal));
     modal.addEventListener("click", event => { if (event.target === modal) closeDashboardSchoolModal(); });
     modal.addEventListener("cancel", event => { event.preventDefault(); closeDashboardSchoolModal(); });
+    backBtn?.addEventListener("click", () => {
+      stepClass.hidden = true;
+      stepSearch.hidden = false;
+      backBtn.hidden = true;
+      input.focus();
+    });
     $("#sampleDataBadge")?.addEventListener("click", () => {
       if (isSamplePreview() && resolveDashboardSchoolId()) {
         try { sessionStorage.removeItem(DASHBOARD_SAMPLE_PREVIEW_KEY); } catch {}
@@ -1185,37 +1275,16 @@
       openDashboardSchoolModal();
     });
     updateSampleBadge();
-    if (resolveDashboardSchoolId()) return; // already set -- nothing to do
+    // 검색/자동 오픈 로직은 학교 미설정 상태에서만 필요하지만, 그와
+    // 별개로 닫기·뒤로가기 버튼은 항상 동작해야 한다(톱니 메뉴의
+    // "학년반 다시 설정하기"는 학교가 이미 설정된 상태에서도 반 선택
+    // 단계를 직접 여니까, 그 안의 뒤로가기가 죽어있으면 안 된다) - 위
+    // 리스너들은 그래서 이 검사보다 앞에 둔다.
+    if (resolveDashboardSchoolId()) return;
     openDashboardSchoolModal();
     const client = window.AIWaysEdu2gClient;
     let debounceTimer = 0;
     let searchToken = 0;
-    function showClassStep(school) {
-      const config = SCHOOL_CLASS_CONFIG[school.schoolCode];
-      if (!config) return;
-      stepSearch.hidden = true;
-      stepClass.hidden = false;
-      classIntro.textContent = `${school.schoolName} · ${config.grade}학년 몇 반이세요?`;
-      classGrid.replaceChildren();
-      for (let n = 1; n <= config.totalClasses; n += 1) {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.textContent = `${n}반`;
-        button.addEventListener("click", () => {
-          try {
-            localStorage.setItem(DASHBOARD_SCHOOL_ID_KEY, school.schoolCode);
-            localStorage.setItem(DASHBOARD_SCHOOL_NAME_KEY, school.schoolName);
-            localStorage.setItem(DASHBOARD_CLASS_NUM_KEY, String(n));
-            sessionStorage.removeItem(DASHBOARD_SAMPLE_PREVIEW_KEY);
-          } catch {}
-          updateSampleBadge();
-          applySchoolClassConfig(school.schoolCode, String(n));
-          loadSchoolDashboardFromApi();
-          closeDashboardSchoolModal();
-        });
-        classGrid.append(button);
-      }
-    }
     function selectSchool(school) {
       if (!DASHBOARD_LAUNCHED_SCHOOLS.has(school.schoolCode)) {
         showDashboardToast(`"${school.schoolName}"은(는) 아직 서비스 준비중이에요. 곧 만나요!`);
@@ -1280,19 +1349,19 @@
     document.addEventListener("click", event => {
       if (!menu.hidden && event.target !== toggle && !menu.contains(event.target)) closeMenu();
     });
-    $("[data-settings-action='reconfigure']")?.addEventListener("click", () => {
-      closeMenu();
-      openDashboardSchoolModal();
-    });
     $("[data-settings-action='sample']")?.addEventListener("click", () => {
       closeMenu();
       try { sessionStorage.setItem(DASHBOARD_SAMPLE_PREVIEW_KEY, "1"); } catch {}
       updateSampleBadge();
       showDashboardToast("샘플 데이터를 보여드릴게요. 실제 데이터로 돌아가려면 배지를 눌러 주세요.");
     });
+    $("[data-settings-action='reconfigure']")?.addEventListener("click", () => {
+      closeMenu();
+      openDashboardClassStepForCurrentSchool();
+    });
     $("[data-settings-action='reset']")?.addEventListener("click", () => {
       closeMenu();
-      if (!window.confirm("정말 초기화할까요? 이 기기에 저장된 학교/반 설정이 모두 지워져요.")) return;
+      if (!window.confirm("정말 전부 초기화할까요? 이 기기에 설정된 학교, 학년, 반이 모두 사라지고 처음 학교 검색 화면으로 돌아가요.")) return;
       try {
         localStorage.removeItem(DASHBOARD_SCHOOL_ID_KEY);
         localStorage.removeItem(DASHBOARD_SCHOOL_NAME_KEY);
@@ -2448,10 +2517,16 @@
   async function loadDashboardRows(options = {}) {
     await loadSeedData();
     dashboardDataReady = true;
-    if (options.animateIntro) playDashboardIntroForCurrentData();
-    else applyDashboard(allStoredRecords());
     applySchoolClassConfig(resolveDashboardSchoolId(), resolveDashboardClassNum());
+    // 이미 실제 학교가 설정된 채로 부팅하는 경우, 부트 스플래시를 이
+    // 학교의 진짜 데이터가 도착할 때까지 걷지 않는다(deferSplashHide) -
+    // 그래야 시드/더미 숫자가 화면에 잠깐 노출됐다가 진짜 데이터로
+    // 바뀌는 깜빡임이 없다.
+    const hasRealSchool = !!resolveDashboardSchoolId() && !isSamplePreview();
+    if (options.animateIntro) playDashboardIntroForCurrentData({ deferSplashHide: hasRealSchool });
+    else applyDashboard(allStoredRecords());
     await loadSchoolDashboardFromApi();
+    if (hasRealSchool) window.__aiwaysHideBootSplash?.();
     startSchoolDashboardLiveRefresh();
     return allStoredRecords();
   }

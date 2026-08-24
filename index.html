@@ -84,9 +84,9 @@
           </svg>
         </button>
         <div class="dashboard-settings-menu" id="dashboardSettingsMenu" hidden>
-          <button type="button" data-settings-action="reconfigure">🏫 학교/반 다시 설정하기</button>
           <button type="button" data-settings-action="sample">👀 샘플 데이터 보기</button>
-          <button type="button" data-settings-action="reset">🗑️ 초기화</button>
+          <button type="button" data-settings-action="reconfigure">🏫 학년반 다시 설정하기</button>
+          <button type="button" data-settings-action="reset">🔄 전부 초기화</button>
         </div>
       </div>
       <div class="mobile-shell-bar" aria-label="모바일 작업 바로가기">
@@ -677,6 +677,9 @@
     </dialog>
 
     <dialog class="ai-modal school-setup-modal" id="dashboardSchoolModal">
+      <button type="button" id="dashboardClassBackBtn" class="modal-back-btn" aria-label="뒤로" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7" /></svg>
+      </button>
       <button class="close-btn" type="button" aria-label="닫기" data-close-school-modal>×</button>
       <div class="modal-body">
         <div id="dashboardSchoolStepSearch">
@@ -705,9 +708,14 @@
           </div>
           <h2>몇 반이세요?</h2>
           <p class="school-setup-warning" id="dashboardClassStepIntro"></p>
-          <div id="dashboardClassGrid" class="class-picker-grid"></div>
+          <div class="class-picker-selects">
+            <select id="dashboardGradeSelect" aria-label="학년"></select>
+            <select id="dashboardClassNumSelect" aria-label="반"></select>
+          </div>
+          <button type="button" id="dashboardClassConfirmBtn" class="class-picker-confirm">확인</button>
         </div>
       </div>
+      <div id="dashboardToastHostModal" class="dashboard-toast-host" aria-live="assertive"></div>
     </dialog>
 
     <!-- 학교를 아직 설정 안 했거나(또는 "샘플 보기"를 눌렀을 때) 잠깐

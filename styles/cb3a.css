@@ -1755,9 +1755,18 @@ a.source-link:hover {
    (SCHOOL_CLASS_CONFIG), 반 번호만 숫자 버튼 그리드로 직접 고르게 한다.
    특정 선생님 반을 기본값으로 미리 선택해두지 않는다(교사 지적: 1반
    선생님도 2반 선생님도 각자 다르게 직접 설정해야 함). */
-.class-picker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(3.4rem, 1fr)); gap: .6rem; margin-block-start: 1rem; }
-.class-picker-grid button { padding: .8rem .5rem; border-radius: .65rem; border: 1.5px solid var(--ssm-line); background: var(--ssm-bg); color: var(--ssm-ink); font-weight: 700; cursor: pointer; }
-.class-picker-grid button:hover { border-color: var(--ssm-accent); background: var(--ssm-accent-soft); }
+.class-picker-selects { display: flex; justify-content: center; gap: .6rem; margin-block-start: .6rem; }
+.class-picker-selects select { min-inline-size: 7rem; padding: .65rem .9rem; border-radius: .7rem; border: 1.5px solid var(--ssm-line); background: var(--ssm-bg); color: var(--ssm-ink); font-weight: 700; font-size: .92rem; text-align: center; cursor: pointer; }
+.class-picker-selects select:focus { outline: none; border-color: var(--ssm-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ssm-accent) 14%, transparent); }
+.class-picker-confirm { display: block; inline-size: 100%; max-inline-size: 18.5rem; margin: 1.1rem auto 0; padding: .8rem; border-radius: 999px; border: none; background: var(--ssm-accent); color: #fff; font-weight: 800; font-size: .95rem; cursor: pointer; }
+.class-picker-confirm:hover { background: color-mix(in srgb, var(--ssm-accent) 88%, black); }
+/* 반 선택 단계에서 학교 검색 단계로 돌아가는 뒤로가기 - 닫기(X)와
+   같은 우상단 클러스터에 나란히 둔다(사용자 지적: 뒤로가기가 우상단에
+   있어야 함). 학교 검색 단계에서는 갈 곳이 없으니 숨긴다. */
+.modal-back-btn { position: absolute; inset-block-start: 1.1rem; inset-inline-end: 2.9rem; z-index: 2; display: grid; place-items: center; inline-size: 1.6rem; block-size: 1.6rem; padding: 0; background: none; border: none; color: var(--ssm-muted); opacity: .7; cursor: pointer; }
+.modal-back-btn svg { inline-size: 1.1rem; block-size: 1.1rem; }
+.modal-back-btn:hover { opacity: 1; color: var(--ssm-ink); }
+.modal-back-btn[hidden] { display: none; }
 
 /* 헤더 톱니바퀴 설정 메뉴 - main-nav의 형제로 다시 빼서(그 안에 있으면
    4구역 미만 폭에서 main-nav 자체가 드롭다운으로 position이 바뀌어
@@ -1768,7 +1777,7 @@ a.source-link:hover {
    상한) 안에서 최대한 오른쪽 - 뷰포트 진짜 끝에 거의 붙는 자리 - 에
    놓았다. 100px만큼 더 밀면 헤더 폭(뷰포트 100%) 밖으로 나가 화면에
    안 보이게 되므로, 물리적으로 가능한 가장 오른쪽 지점으로 잡았다. */
-.dashboard-settings { position: absolute; inset-block-start: 50%; inset-inline-end: 0; translate: 0 -50%; }
+.dashboard-settings { position: absolute; inset-block-start: 50%; inset-inline-end: 30px; translate: 0 calc(-50% - 2px); }
 .dashboard-settings-toggle { display: grid; place-items: center; inline-size: 2.3rem; block-size: 2.3rem; padding: 0; border: none; background: none; color: #cfe4ea; cursor: pointer; }
 .dashboard-settings-toggle:hover { color: #f2fdff; }
 .dashboard-settings-toggle svg { inline-size: 1.3rem; block-size: 1.3rem; }

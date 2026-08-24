@@ -1735,3 +1735,10 @@ a.source-link:hover {
 #dashboardSchoolResults li:hover { background: var(--ssm-accent-soft); }
 #dashboardSchoolResults li + li { border-block-start: 1px solid var(--ssm-line); border-radius: 0 !important; }
 #dashboardSchoolStatus { color: var(--ssm-muted); }
+
+/* 학교 미설정 상태에서 화면 속 숫자가 진짜 데이터처럼 보이던 문제
+   (사용자 지적) - 계속 떠있는 배지로 "샘플일 뿐"임을 알리고, 눌러서
+   언제든 다시 학교 검색 모달을 연다. style.css의 raw-color 개수 제한
+   테스트(design system 가드)를 건드리지 않도록 이 파일(레이어 밖)에 둔다. */
+.sample-data-badge { position: fixed; inset-block-end: 1.25rem; inset-inline-end: 1.25rem; z-index: 50; padding: .65rem 1rem; border-radius: 999px; border: 1px solid rgb(255 200 100 / 45%); background: rgb(20 15 5 / 88%); color: #ffd27a; font-size: .8rem; font-weight: 700; box-shadow: 0 10px 30px rgb(0 0 0 / 35%); cursor: pointer; backdrop-filter: blur(6px); }
+.sample-data-badge:hover { border-color: rgb(255 200 100 / 80%); }

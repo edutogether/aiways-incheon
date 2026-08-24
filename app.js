@@ -1039,6 +1039,11 @@
   // -----------------------------------------------------------------
   const DASHBOARD_SCHOOL_ID_KEY = "aiways_pc_dashboard_school_v1";
   const DASHBOARD_SCHOOL_NAME_KEY = "aiways_pc_dashboard_school_name_v1";
+  // 검색은 전국 학교 전부 되지만(교사가 나중에 필요한 학교를 미리
+  // 찾아볼 수 있게), 실제로 데이터가 쌓이는 "방"은 이번 파일럿에
+  // 참여하는 4개 학교로 한정한다 - 그 외 학교를 고르면 저장 대신
+  // "서비스 준비중" 안내만 보여준다.
+  const DASHBOARD_LAUNCHED_SCHOOLS = new Set(["7341025", "7321030", "7361073", "7361064"]);
   // 학교별 PC/태블릿 키오스크는 한 번 학교를 설정하면(검색해서 고르거나,
   // URL에 ?school=나이스학교코드 를 붙여 열면) 그 값이 이 브라우저의
   // localStorage에 저장돼 다음부터는 계속 같은 학교로 유지된다 - 다른
@@ -1084,12 +1089,20 @@
     $$("[data-close-school-modal]").forEach(button => button.addEventListener("click", closeDashboardSchoolModal));
     modal.addEventListener("click", event => { if (event.target === modal) closeDashboardSchoolModal(); });
     modal.addEventListener("cancel", event => { event.preventDefault(); closeDashboardSchoolModal(); });
+    const sampleBadge = $("#sampleDataBadge");
+    function updateSampleBadge() { if (sampleBadge) sampleBadge.hidden = !!resolveDashboardSchoolId(); }
+    sampleBadge?.addEventListener("click", openDashboardSchoolModal);
+    updateSampleBadge();
     if (resolveDashboardSchoolId()) return; // already set -- nothing to do
     openDashboardSchoolModal();
     const client = window.AIWaysEdu2gClient;
     let debounceTimer = 0;
     let searchToken = 0;
     function selectSchool(school) {
+      if (!DASHBOARD_LAUNCHED_SCHOOLS.has(school.schoolCode)) {
+        status.textContent = `"${school.schoolName}"은(는) 아직 서비스 준비중이에요. 곧 만나요!`;
+        return;
+      }
       try {
         localStorage.setItem(DASHBOARD_SCHOOL_ID_KEY, school.schoolCode);
         localStorage.setItem(DASHBOARD_SCHOOL_NAME_KEY, school.schoolName);
@@ -1098,6 +1111,7 @@
       results.replaceChildren();
       input.value = school.schoolName;
       input.disabled = true;
+      updateSampleBadge();
       loadSchoolDashboardFromApi();
       window.setTimeout(closeDashboardSchoolModal, 900);
     }

@@ -104,6 +104,12 @@
       hidden
     ></iframe>
 
+    <!-- 학교를 아직 설정 안 한 PC에서 화면 속 숫자가 진짜 학교 데이터처럼
+         보여서 헷갈리던 문제(사용자 지적) - 학교 미설정 상태인 동안 계속
+         떠있는 배지로 "이거 예시일 뿐"이라는 걸 명확히 하고, 눌러서 언제든
+         다시 학교 검색 모달을 열 수 있게 한다. -->
+    <button type="button" id="sampleDataBadge" class="sample-data-badge" hidden>📊 샘플 데이터 보는 중 · 학교 설정하기</button>
+
     <main class="snap-root">
       <section class="scene dashboard-scene" id="dashboard" data-nav="대시보드">
         <div class="scene-orbs" aria-hidden="true">

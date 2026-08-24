@@ -193,11 +193,12 @@ body { color:#202124; background:#f8fafd; }
 
 /* ---------- 4. PC / 전시용 대형 화면 (1024px~) — 이 앱의 주 무대 ---------- */
 @media (min-width:64rem) {
-/* The last nav item's *text* should line up with the right edge of the scene
-     content below it, so the header stops short of the scene inset by exactly
-     the link's own inline padding. Verified at both widths: 180-20=160 at
-     2560px, 77.76-12=65.6 at 1440px. */
-  .site-header { box-shadow:none; padding-inline-end:calc(var(--scene-inline-space) - var(--nav-link-pad)); }
+/* The last nav item should line up with the right edge of the scene content
+     below it. Since 2026-08-24 the last item is the settings gear button
+     (padding:0, no internal inline padding of its own - unlike the <a> nav
+     links, which each carry --nav-link-pad and used to need that padding
+     subtracted here), so the header now stops exactly at the scene inset. */
+  .site-header { box-shadow:none; padding-inline-end: var(--scene-inline-space); }
   .main-nav a { border-radius:.7rem; }
   /* Lights flip in .17s - fast enough to read as a switch ("탁"), not a fade.
      app.js keeps the destination dark for the whole ride and calls the light
@@ -1706,35 +1707,41 @@ a.source-link:hover {
 #dashboardSchoolModal {
   --ssm-ink: #12181f; --ssm-muted: #5b6572; --ssm-line: #e7eaee; --ssm-bg: #ffffff;
   --ssm-accent: #2b6cf6; --ssm-accent-soft: #eaf1ff;
-  inline-size: min(100% - 2rem, 35rem) !important; overflow: visible !important; position: relative;
+  inline-size: min(100% - 2rem, 27rem) !important; overflow: visible !important; position: relative;
   background: var(--ssm-bg) !important; color: var(--ssm-ink); border: none !important;
+  border-radius: 1.4rem !important;
   box-shadow: 0 30px 70px rgb(10 20 35 / 30%), 0 2px 8px rgb(10 20 35 / 10%) !important;
 }
 #dashboardSchoolModal::backdrop { background: rgb(6 12 22 / 66%); }
-#dashboardSchoolModal .modal-body { overflow: visible; padding: 1.4rem 1.75rem 1.3rem; min-block-size: 19rem; }
+#dashboardSchoolModal .modal-body { overflow: visible; padding: 2.3rem 2rem 2rem; min-block-size: 20rem; text-align: center; }
 #dashboardSchoolModal .close-btn {
   position: absolute; inset-block-start: 1.1rem; inset-inline-end: 1.1rem; z-index: 2;
-  background: none; border: none; color: var(--ssm-ink); font-size: 1.3rem; opacity: .55;
+  background: none; border: none; color: var(--ssm-muted); font-size: 1.3rem; opacity: .7;
 }
-#dashboardSchoolModal .close-btn:hover { opacity: 1; }
-#dashboardSchoolModal .eyebrow { display: inline-flex; padding: .3rem .75rem; border-radius: 999px; border: 1px solid var(--ssm-accent); background: var(--ssm-accent-soft); color: var(--ssm-accent); font-size: .72rem; font-weight: 800; letter-spacing: .03em; }
-#dashboardSchoolModal h2 { color: var(--ssm-ink); margin-block: .3rem .4rem; font-size: 1.75rem; font-weight: 800; white-space: nowrap; }
-.school-setup-warning { margin: 0 0 1.1rem; color: var(--ssm-muted); font-size: .88rem; line-height: 1.6; }
-.school-search-row { position: relative; }
+#dashboardSchoolModal .close-btn:hover { opacity: 1; color: var(--ssm-ink); }
+/* 위 두 <p>였던 "Find Your School" 영어 배지 + 안내문 대신, 실제 그린
+   아이콘 하나로 이 단계가 뭘 하는 곳인지 보여준다 - 이모지나 흔한
+   "eyebrow" 라벨 대신 이 화면 전용 SVG. */
+.school-setup-icon { display: grid; place-items: center; inline-size: 3.6rem; block-size: 3.6rem; margin: 0 auto .9rem; border-radius: 50%; background: var(--ssm-accent-soft); color: var(--ssm-accent); }
+.school-setup-icon svg { inline-size: 1.7rem; block-size: 1.7rem; }
+#dashboardSchoolModal h2 { color: var(--ssm-ink); margin-block: 0 1.4rem; font-size: 1.5rem; line-height: 1.32; font-weight: 800; }
+.school-setup-warning { margin: -.6rem 0 1.2rem; color: var(--ssm-muted); font-size: .86rem; line-height: 1.55; }
+.school-search-row { position: relative; inline-size: 100%; max-inline-size: 18.5rem; margin-inline: auto; }
 .school-search-row input {
-  inline-size: 100%; padding: .7rem 2.2rem .7rem .1rem; font-size: 1rem;
-  background: transparent; color: var(--ssm-ink); border: none; border-block-end: 1.5px solid var(--ssm-line); border-radius: 0;
+  inline-size: 100%; padding: .75rem 1rem .75rem 2.5rem; font-size: .92rem; text-align: start;
+  background: #f4f6f9; color: var(--ssm-ink); border: 1.5px solid transparent; border-radius: 999px;
+  transition: border-color .15s ease, background .15s ease;
 }
 .school-search-row input::placeholder { color: color-mix(in srgb, var(--ssm-muted) 70%, transparent); }
-.school-search-row input:focus { outline: none; border-block-end-color: var(--ssm-accent); }
-#dashboardSchoolSearchBtn { position: absolute; inset-block-start: .35rem; inset-inline-end: 0; inline-size: 1.6rem; block-size: 1.6rem; padding: 0; display: grid; place-items: center; background: none; border: none; color: var(--ssm-accent); }
-#dashboardSchoolSearchBtn svg { inline-size: 1.15rem; block-size: 1.15rem; fill: none; stroke: currentColor; stroke-width: 2; }
-#dashboardSchoolResults:not(:empty) { display: block; position: absolute; left: 0; right: 0; z-index: 20; margin-block-start: .5rem; max-block-size: 14rem; overflow-y: auto; background: var(--ssm-bg); color: var(--ssm-ink); border: 1px solid var(--ssm-line); border-radius: .65rem; box-shadow: 0 16px 40px rgb(10 20 35 / 16%); }
+.school-search-row input:focus { outline: none; background: var(--ssm-bg); border-color: var(--ssm-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ssm-accent) 14%, transparent); }
+#dashboardSchoolSearchBtn { position: absolute; inset-block-start: 50%; inset-inline-start: .9rem; translate: 0 -50%; inline-size: 1.05rem; block-size: 1.05rem; padding: 0; display: grid; place-items: center; background: none; border: none; color: var(--ssm-muted); }
+#dashboardSchoolSearchBtn svg { inline-size: 100%; block-size: 100%; fill: none; stroke: currentColor; stroke-width: 2; }
+#dashboardSchoolResults:not(:empty) { display: block; position: absolute; left: -1.5rem; right: -1.5rem; z-index: 20; margin-block-start: .5rem; max-block-size: 14rem; overflow-y: auto; background: var(--ssm-bg); color: var(--ssm-ink); border: 1px solid var(--ssm-line); border-radius: .8rem; box-shadow: 0 16px 40px rgb(10 20 35 / 16%); text-align: start; }
 #dashboardSchoolResults:empty { display: none; }
 #dashboardSchoolResults li { border-color: var(--ssm-line) !important; padding: 0 !important; }
 #dashboardSchoolResults li:hover { background: var(--ssm-accent-soft); }
 #dashboardSchoolResults li + li { border-block-start: 1px solid var(--ssm-line); border-radius: 0 !important; }
-#dashboardSchoolStatus { color: var(--ssm-muted); }
+#dashboardSchoolStatus { margin-block-start: 1rem; color: var(--ssm-muted); font-size: .82rem; }
 
 /* 학교 미설정 상태에서 화면 속 숫자가 진짜 데이터처럼 보이던 문제
    (사용자 지적) - 계속 떠있는 배지로 "샘플일 뿐"임을 알리고, 눌러서
@@ -1751,10 +1758,14 @@ a.source-link:hover {
 .class-picker-grid button { padding: .8rem .5rem; border-radius: .65rem; border: 1.5px solid var(--ssm-line); background: var(--ssm-bg); color: var(--ssm-ink); font-weight: 700; cursor: pointer; }
 .class-picker-grid button:hover { border-color: var(--ssm-accent); background: var(--ssm-accent-soft); }
 
-/* 헤더 우상단 톱니바퀴 설정 메뉴 */
-.dashboard-settings { position: relative; }
-.dashboard-settings-toggle { display: grid; place-items: center; inline-size: 2.4rem; block-size: 2.4rem; padding: 0; border-radius: 50%; border: 1px solid rgb(255 255 255 / 16%); background: rgb(255 255 255 / 6%); color: #f2fdff; font-size: 1.05rem; cursor: pointer; }
-.dashboard-settings-toggle:hover { background: rgb(255 255 255 / 12%); }
+/* 헤더 톱니바퀴 설정 메뉴 - main-nav 맨 끝(자료실 바로 뒤)에 붙여서
+   같은 줄의 마지막 항목이 되게 하고, .main-nav 자체는 이제 대시보드
+   본문(.scene)과 같은 좌우 여백 공식을 쓰는 .site-header 안에 있으므로
+   이 톱니바퀴의 오른쪽 끝이 곧 본문 우측 끝과 정렬된다. */
+.dashboard-settings { position: relative; flex: 0 0 auto; margin-inline-start: .5rem; padding-inline-start: .5rem; border-inline-start: 1px solid var(--line-subtle); }
+.dashboard-settings-toggle { display: grid; place-items: center; inline-size: 2.3rem; block-size: 2.3rem; padding: 0; border-radius: 50%; border: 1px solid rgb(255 255 255 / 16%); background: rgb(255 255 255 / 6%); color: #cfe4ea; cursor: pointer; }
+.dashboard-settings-toggle:hover { background: rgb(255 255 255 / 12%); color: #f2fdff; }
+.dashboard-settings-toggle svg { inline-size: 1.15rem; block-size: 1.15rem; }
 .dashboard-settings-menu { position: absolute; inset-block-start: calc(100% + .5rem); inset-inline-end: 0; z-index: 60; min-inline-size: 13rem; padding: .5rem; border-radius: .8rem; background: #0c1a2c; border: 1px solid rgb(100 234 255 / 22%); box-shadow: 0 20px 50px rgb(0 0 0 / 40%); display: grid; gap: .2rem; }
 .dashboard-settings-menu[hidden] { display: none; }
 .dashboard-settings-menu button { display: block; width: 100%; text-align: left; padding: .6rem .7rem; border-radius: .5rem; border: none; background: none; color: #eaf3f8; font-size: .85rem; cursor: pointer; }

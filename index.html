@@ -75,15 +75,20 @@
         <a href="#flow">차시흐름</a>
         <a href="#gallery">갤러리</a>
         <a href="#resources">자료실</a>
-      </nav>
-      <div class="dashboard-settings" id="dashboardSettings">
-        <button type="button" id="dashboardSettingsToggle" class="dashboard-settings-toggle" aria-label="대시보드 설정" aria-haspopup="true" aria-expanded="false">⚙️</button>
-        <div class="dashboard-settings-menu" id="dashboardSettingsMenu" hidden>
-          <button type="button" data-settings-action="reconfigure">🏫 학교/반 다시 설정하기</button>
-          <button type="button" data-settings-action="sample">👀 샘플 데이터 보기</button>
-          <button type="button" data-settings-action="reset">🗑️ 초기화</button>
+        <div class="dashboard-settings" id="dashboardSettings">
+          <button type="button" id="dashboardSettingsToggle" class="dashboard-settings-toggle" aria-label="대시보드 설정" aria-haspopup="true" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3.2" />
+              <path d="M19.4 13.2a7.7 7.7 0 0 0 0-2.4l2.02-1.57a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.38.96a7.6 7.6 0 0 0-2.08-1.2L14.2 2.3a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.5a7.6 7.6 0 0 0-2.08 1.2l-2.38-.96a.5.5 0 0 0-.6.22L1.92 8.58a.5.5 0 0 0 .12.64L4.06 10.8a7.7 7.7 0 0 0 0 2.4l-2.02 1.57a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.38-.96c.62.51 1.32.92 2.08 1.2l.36 2.5a.5.5 0 0 0 .5.42h3.84a.5.5 0 0 0 .5-.42l.36-2.5a7.6 7.6 0 0 0 2.08-1.2l2.38.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64Z" />
+            </svg>
+          </button>
+          <div class="dashboard-settings-menu" id="dashboardSettingsMenu" hidden>
+            <button type="button" data-settings-action="reconfigure">🏫 학교/반 다시 설정하기</button>
+            <button type="button" data-settings-action="sample">👀 샘플 데이터 보기</button>
+            <button type="button" data-settings-action="reset">🗑️ 초기화</button>
+          </div>
         </div>
-      </div>
+      </nav>
       <div class="mobile-shell-bar" aria-label="모바일 작업 바로가기">
         <div class="mobile-shell-context" aria-live="polite">
           <span>현재 화면</span>
@@ -675,20 +680,29 @@
       <button class="close-btn" type="button" aria-label="닫기" data-close-school-modal>×</button>
       <div class="modal-body">
         <div id="dashboardSchoolStepSearch">
-          <p class="eyebrow">Find Your School</p>
-          <h2>여러분의 학교는 어디인가요?</h2>
-          <p class="school-setup-warning">한 번 설정하면 이 기기에서는 다시 바꿀 수 없어요. 신중하게 선택해 주세요.</p>
+          <div class="school-setup-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 21s7-6.4 7-11.6A7 7 0 0 0 5 9.4C5 14.6 12 21 12 21Z" />
+              <circle cx="12" cy="9.4" r="2.5" />
+            </svg>
+          </div>
+          <h2>여러분의 학교는<br />어디인가요?</h2>
           <div class="school-search-row">
-            <input type="text" id="dashboardSchoolInput" autocomplete="off" placeholder="학교 이름을 검색해 주세요 (예: 같이초)" />
             <button type="button" id="dashboardSchoolSearchBtn" aria-label="검색">
               <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4.35-4.35" /></svg>
             </button>
+            <input type="text" id="dashboardSchoolInput" autocomplete="off" placeholder="학교 이름 검색 (예: 같이초)" />
             <div id="dashboardSchoolResults" class="classroom-skill-list"></div>
           </div>
           <p id="dashboardSchoolStatus" class="save-state" role="status" aria-live="polite"></p>
         </div>
         <div id="dashboardSchoolStepClass" hidden>
-          <p class="eyebrow">Find Your Class</p>
+          <div class="school-setup-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4.5" y="4.5" width="15" height="15" rx="3" />
+              <path d="M8.2 9.5h7.6M8.2 13.5h4.6" />
+            </svg>
+          </div>
           <h2>몇 반이세요?</h2>
           <p class="school-setup-warning" id="dashboardClassStepIntro"></p>
           <div id="dashboardClassGrid" class="class-picker-grid"></div>

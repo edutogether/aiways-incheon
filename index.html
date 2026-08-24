@@ -8,6 +8,15 @@
       name="description"
       content="AI와 데이터로 실천하는 학교 자원순환 UX 개선 프로젝트"
     />
+    <!-- 카카오톡 등 메신저 링크 미리보기는 이 og: 태그를 읽는다 - 이게
+         없으면 "여기를 눌러 링크를 확인하세요" 같은 기본 문구만 뜬다
+         (사용자 지적). description은 위 name="description"과 같은 문구로
+         맞춘다. -->
+    <meta property="og:title" content="AI Ways Incheon" />
+    <meta property="og:description" content="AI와 데이터로 실천하는 자원순환 UX 개선 프로젝트" />
+    <meta property="og:image" content="https://edutogether.github.io/aiways-incheon/assets/brand/aiways-logo.png" />
+    <meta property="og:url" content="https://edutogether.github.io/aiways-incheon/" />
+    <meta property="og:type" content="website" />
     <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com https://www.recaptcha.net https://cdn.jsdelivr.net https://script.google.com https://script.googleusercontent.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://www.google.com https://www.gstatic.com https://script.google.com https://asia-northeast3-ai-ways-incheon.cloudfunctions.net https://cdn.jsdelivr.net; frame-src 'self' https://www.google.com https://ai-ways-incheon.firebaseapp.com; object-src 'none'; base-uri 'self';"
@@ -76,19 +85,6 @@
         <a href="#gallery">갤러리</a>
         <a href="#resources">자료실</a>
       </nav>
-      <div class="dashboard-settings" id="dashboardSettings">
-        <button type="button" id="dashboardSettingsToggle" class="dashboard-settings-toggle" aria-label="대시보드 설정" aria-haspopup="true" aria-expanded="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="3.2" />
-            <path d="M19.4 13.2a7.7 7.7 0 0 0 0-2.4l2.02-1.57a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.38.96a7.6 7.6 0 0 0-2.08-1.2L14.2 2.3a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.5a7.6 7.6 0 0 0-2.08 1.2l-2.38-.96a.5.5 0 0 0-.6.22L1.92 8.58a.5.5 0 0 0 .12.64L4.06 10.8a7.7 7.7 0 0 0 0 2.4l-2.02 1.57a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.38-.96c.62.51 1.32.92 2.08 1.2l.36 2.5a.5.5 0 0 0 .5.42h3.84a.5.5 0 0 0 .5-.42l.36-2.5a7.6 7.6 0 0 0 2.08-1.2l2.38.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64Z" />
-          </svg>
-        </button>
-        <div class="dashboard-settings-menu" id="dashboardSettingsMenu" hidden>
-          <button type="button" data-settings-action="sample">👀 샘플 데이터 보기</button>
-          <button type="button" data-settings-action="reconfigure">🏫 학년반 다시 설정하기</button>
-          <button type="button" data-settings-action="reset">🔄 모두 초기화하기</button>
-        </div>
-      </div>
       <div class="mobile-shell-bar" aria-label="모바일 작업 바로가기">
         <div class="mobile-shell-context" aria-live="polite">
           <span>현재 화면</span>
@@ -98,6 +94,26 @@
       </div>
       <p class="mobile-shell-state" data-mobile-shell-state role="status" hidden></p>
     </header>
+    <!-- 헤더 밖의 독립된 형제 요소 - 태블릿 대시보드 전용 뷰가
+         .site-header를 통째로 display:none으로 가리는데, 부모가
+         display:none이면 자식은 어떤 CSS로도 다시 못 보이게 하는 게
+         CSS 규칙이라(예외 없음) 헤더 안에 있으면 패드에서 톱니바퀴
+         자체가 사라진다(사용자 지적). #sampleDataBadge와 같은 방식으로
+         position:fixed를 써서 헤더 안에 있을 때와 화면상 같은 자리를
+         유지하면서도, 헤더의 display:none과 무관하게 항상 보이게 한다. -->
+    <div class="dashboard-settings" id="dashboardSettings">
+      <button type="button" id="dashboardSettingsToggle" class="dashboard-settings-toggle" aria-label="대시보드 설정" aria-haspopup="true" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3.2" />
+          <path d="M19.4 13.2a7.7 7.7 0 0 0 0-2.4l2.02-1.57a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.38.96a7.6 7.6 0 0 0-2.08-1.2L14.2 2.3a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.5a7.6 7.6 0 0 0-2.08 1.2l-2.38-.96a.5.5 0 0 0-.6.22L1.92 8.58a.5.5 0 0 0 .12.64L4.06 10.8a7.7 7.7 0 0 0 0 2.4l-2.02 1.57a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.38-.96c.62.51 1.32.92 2.08 1.2l.36 2.5a.5.5 0 0 0 .5.42h3.84a.5.5 0 0 0 .5-.42l.36-2.5a7.6 7.6 0 0 0 2.08-1.2l2.38.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64Z" />
+        </svg>
+      </button>
+      <div class="dashboard-settings-menu" id="dashboardSettingsMenu" hidden>
+        <button type="button" data-settings-action="sample">👀 샘플 데이터 보기</button>
+        <button type="button" data-settings-action="reconfigure">🏫 학년반 다시 설정하기</button>
+        <button type="button" data-settings-action="reset">🔄 모두 초기화하기</button>
+      </div>
+    </div>
     <nav class="mobile-quick-nav" aria-label="모바일 주요 진입">
       <a href="#dashboard">대시보드</a>
       <a href="#ranking">랭킹</a>

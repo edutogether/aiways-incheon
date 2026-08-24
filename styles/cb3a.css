@@ -1671,6 +1671,15 @@ a.source-link:hover {
   .upload-panel .qr-invite {
     display: none !important;
   }
+  /* PC는 "화면을 끝까지 스크롤했다가 대시보드로 돌아오면" 큐알이
+     열리는데(body.is-rewound, min-width:64rem 전용 블록), 이 패드
+     대시보드 전용 뷰는 위에서 다른 모든 섹션(.scene)을 꺼버려서 스크롤
+     할 대상 자체가 없다 - 그 제스처가 성립하지 않는데 학생더러 하라고
+     할 수 없다(사용자 지적). 조건 없이 큐알을 바로 보여준다. 바로 위
+     규칙(.upload-panel .qr-invite)보다 뒤에 있어야 이긴다(둘 다
+     명시도가 같아서 나중에 나온 규칙이 이김). */
+  .dashboard-scene .qr-invite { display: flex !important; }
+  .dashboard-scene .portal-teaser, .dashboard-scene .portal-arrow { display: none !important; }
   /* 옛 밝은 테마가 박아둔 어두운 글자색(#202124, #0b57d0 등)이 다크 배경
      위에서 그대로 남아있으면 안 보이거나 붕 떠 보인다 - PC 실측 색상으로
      되돌린다(큰 숫자는 흰색, panel-head 부제만 민트 - 1440px 확인). */
@@ -1776,7 +1785,12 @@ a.source-link:hover {
    상한) 안에서 최대한 오른쪽 - 뷰포트 진짜 끝에 거의 붙는 자리 - 에
    놓았다. 100px만큼 더 밀면 헤더 폭(뷰포트 100%) 밖으로 나가 화면에
    안 보이게 되므로, 물리적으로 가능한 가장 오른쪽 지점으로 잡았다. */
-.dashboard-settings { position: absolute; inset-block-start: 50%; inset-inline-end: 30px; translate: 0 calc(-50% - 2px); }
+/* position:fixed로 뷰포트 기준 배치 - .site-header 밖으로 옮긴 뒤에도
+   (요소 자체는 더 이상 헤더의 자식이 아니라) 화면상 정확히 같은
+   자리(헤더 높이의 절반, 사용자 지적대로 위로 2px/왼쪽으로 30px 보정)에
+   고정된다. --header-size가 브레이크포인트마다 바뀌므로 그 변수를
+   그대로 참조해 PC 쪽 위치가 조금도 달라지지 않게 한다. */
+.dashboard-settings { position: fixed; z-index: 25; inset-block-start: calc(var(--header-size) / 2 - 2px); inset-inline-end: 30px; translate: 0 -50%; }
 .dashboard-settings-toggle { display: grid; place-items: center; inline-size: 2.3rem; block-size: 2.3rem; padding: 0; border: none; background: none; color: #cfe4ea; cursor: pointer; }
 .dashboard-settings-toggle:hover { color: #f2fdff; }
 .dashboard-settings-toggle svg { inline-size: 1.3rem; block-size: 1.3rem; }

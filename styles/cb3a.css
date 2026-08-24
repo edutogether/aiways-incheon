@@ -1711,7 +1711,7 @@ a.source-link:hover {
   box-shadow: 0 30px 70px rgb(10 20 35 / 30%), 0 2px 8px rgb(10 20 35 / 10%) !important;
 }
 #dashboardSchoolModal::backdrop { background: rgb(6 12 22 / 66%); }
-#dashboardSchoolModal .modal-body { overflow: visible; padding: 1.4rem 1.75rem 1.3rem; }
+#dashboardSchoolModal .modal-body { overflow: visible; padding: 1.4rem 1.75rem 1.3rem; min-block-size: 19rem; }
 #dashboardSchoolModal .close-btn {
   position: absolute; inset-block-start: 1.1rem; inset-inline-end: 1.1rem; z-index: 2;
   background: none; border: none; color: var(--ssm-ink); font-size: 1.3rem; opacity: .55;
@@ -1742,3 +1742,26 @@ a.source-link:hover {
    테스트(design system 가드)를 건드리지 않도록 이 파일(레이어 밖)에 둔다. */
 .sample-data-badge { position: fixed; inset-block-start: 50%; inset-inline-start: 50%; translate: -50% -50%; z-index: 50; padding: .65rem 1rem; border-radius: 999px; border: 1px solid rgb(255 200 100 / 45%); background: rgb(20 15 5 / 88%); color: #ffd27a; font-size: .8rem; font-weight: 700; box-shadow: 0 10px 30px rgb(0 0 0 / 35%); cursor: pointer; backdrop-filter: blur(6px); }
 .sample-data-badge:hover { border-color: rgb(255 200 100 / 80%); }
+
+/* 반 선택 2단계 화면 (학교 고른 뒤) - 학년은 학교별로 이미 정해져 있고
+   (SCHOOL_CLASS_CONFIG), 반 번호만 숫자 버튼 그리드로 직접 고르게 한다.
+   특정 선생님 반을 기본값으로 미리 선택해두지 않는다(교사 지적: 1반
+   선생님도 2반 선생님도 각자 다르게 직접 설정해야 함). */
+.class-picker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(3.4rem, 1fr)); gap: .6rem; margin-block-start: 1rem; }
+.class-picker-grid button { padding: .8rem .5rem; border-radius: .65rem; border: 1.5px solid var(--ssm-line); background: var(--ssm-bg); color: var(--ssm-ink); font-weight: 700; cursor: pointer; }
+.class-picker-grid button:hover { border-color: var(--ssm-accent); background: var(--ssm-accent-soft); }
+
+/* 헤더 우상단 톱니바퀴 설정 메뉴 */
+.dashboard-settings { position: relative; }
+.dashboard-settings-toggle { display: grid; place-items: center; inline-size: 2.4rem; block-size: 2.4rem; padding: 0; border-radius: 50%; border: 1px solid rgb(255 255 255 / 16%); background: rgb(255 255 255 / 6%); color: #f2fdff; font-size: 1.05rem; cursor: pointer; }
+.dashboard-settings-toggle:hover { background: rgb(255 255 255 / 12%); }
+.dashboard-settings-menu { position: absolute; inset-block-start: calc(100% + .5rem); inset-inline-end: 0; z-index: 60; min-inline-size: 13rem; padding: .5rem; border-radius: .8rem; background: #0c1a2c; border: 1px solid rgb(100 234 255 / 22%); box-shadow: 0 20px 50px rgb(0 0 0 / 40%); display: grid; gap: .2rem; }
+.dashboard-settings-menu[hidden] { display: none; }
+.dashboard-settings-menu button { display: block; width: 100%; text-align: left; padding: .6rem .7rem; border-radius: .5rem; border: none; background: none; color: #eaf3f8; font-size: .85rem; cursor: pointer; }
+.dashboard-settings-menu button:hover { background: rgb(100 234 255 / 12%); }
+
+/* 서비스 준비중 등, 조용히 지나치면 안 되는 안내를 눈에 띄는 팝업
+   이벤트로 보여준다(문단 텍스트로만 두지 말라는 요청). */
+.dashboard-toast-host { position: fixed; inset-block-start: 1.5rem; inset-inline-start: 50%; translate: -50% 0; z-index: 200; display: grid; gap: .5rem; pointer-events: none; }
+.dashboard-toast { pointer-events: auto; padding: .8rem 1.2rem; border-radius: .8rem; background: #1a2436; color: #f2fdff; border: 1px solid rgb(100 234 255 / 30%); box-shadow: 0 16px 40px rgb(0 0 0 / 35%); font-size: .88rem; font-weight: 700; animation: toastPop .25s ease both; }
+@keyframes toastPop { from { opacity: 0; translate: 0 -.6rem; } to { opacity: 1; translate: 0 0; } }

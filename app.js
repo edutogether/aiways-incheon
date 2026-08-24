@@ -1039,31 +1039,36 @@
   // -----------------------------------------------------------------
   const DASHBOARD_SCHOOL_ID_KEY = "aiways_pc_dashboard_school_v1";
   const DASHBOARD_SCHOOL_NAME_KEY = "aiways_pc_dashboard_school_name_v1";
+  const DASHBOARD_CLASS_NUM_KEY = "aiways_pc_dashboard_classnum_v1";
+  const DASHBOARD_SAMPLE_PREVIEW_KEY = "aiways_pc_sample_preview_v1";
   // 검색은 전국 학교 전부 되지만(교사가 나중에 필요한 학교를 미리
   // 찾아볼 수 있게), 실제로 데이터가 쌓이는 "방"은 이번 파일럿에
   // 참여하는 4개 학교로 한정한다 - 그 외 학교를 고르면 저장 대신
-  // "서비스 준비중" 안내만 보여준다.
+  // "서비스 준비중" 팝업을 띄운다.
   const DASHBOARD_LAUNCHED_SCHOOLS = new Set(["7341025", "7321030", "7361073", "7361064"]);
-  // 4개 파일럿 학교 각각 실제 담당 선생님이 확인해 준 학년/반 기본값과
-  // 그 학년의 총 반 수 - 학교마다 반 구성이 다 달라서(3반짜리 학교도,
-  // 9반짜리 학교도 있음) #classSelect를 하드코딩된 고정 목록 대신 이
-  // 설정에 맞춰 매번 다시 만든다.
+  // 4개 파일럿 학교 각각의 학년/총 반 수(교사가 확인해 줌) - 학교마다
+  // 반 구성이 다 달라서(3반짜리 학교도, 9반짜리 학교도 있음)
+  // #classSelect를 하드코딩된 고정 목록 대신 이 설정에 맞춰 매번 다시
+  // 만든다. classNum(몇 반)은 여기 없다 - "1반 선생님도, 2반 선생님도
+  // 각자 쓸 건데 특정 선생님 반을 기본값으로 미리 깔아두면 안 된다"는
+  // 지적에 따라, 반 번호는 학교를 고른 다음 별도 단계에서 매번 직접
+  // 고르게 한다.
   const SCHOOL_CLASS_CONFIG = {
-    "7321030": { grade: "1", classNum: "3", totalClasses: 3 },  // 인천서흥초등학교 · 박상현
-    "7361073": { grade: "3", classNum: "4", totalClasses: 9 },  // 인천청라초등학교 · 진가연
-    "7341025": { grade: "5", classNum: "1", totalClasses: 4 },  // 인천동방초등학교 · 강서희
-    "7361064": { grade: "6", classNum: "3", totalClasses: 7 }   // 인천마전초등학교 · 이혜련
+    "7321030": { grade: "1", totalClasses: 3 },  // 인천서흥초등학교
+    "7361073": { grade: "3", totalClasses: 9 },  // 인천청라초등학교
+    "7341025": { grade: "5", totalClasses: 4 },  // 인천동방초등학교
+    "7361064": { grade: "6", totalClasses: 7 }   // 인천마전초등학교
   };
-  function applySchoolClassConfig(schoolId) {
+  function applySchoolClassConfig(schoolId, classNum) {
     const config = SCHOOL_CLASS_CONFIG[schoolId];
-    if (!config) return;
+    if (!config || !classNum) return;
     const classSelect = $("#classSelect");
     if (classSelect) {
       classSelect.replaceChildren();
-      for (let classNum = 1; classNum <= config.totalClasses; classNum += 1) {
+      for (let n = 1; n <= config.totalClasses; n += 1) {
         const option = document.createElement("option");
-        option.textContent = `${config.grade}학년 ${classNum}반`;
-        if (String(classNum) === config.classNum) option.selected = true;
+        option.textContent = `${config.grade}학년 ${n}반`;
+        if (String(n) === String(classNum)) option.selected = true;
         classSelect.append(option);
       }
       classSelect.dispatchEvent(new Event("change", { bubbles: true }));
@@ -1099,6 +1104,35 @@
     if (fromUrl) { try { localStorage.setItem(DASHBOARD_SCHOOL_ID_KEY, fromUrl); } catch {} return fromUrl; }
     try { return cleanText(localStorage.getItem(DASHBOARD_SCHOOL_ID_KEY) || ""); } catch { return ""; }
   }
+  function resolveDashboardClassNum() {
+    try { return cleanText(localStorage.getItem(DASHBOARD_CLASS_NUM_KEY) || ""); } catch { return ""; }
+  }
+  function isSamplePreview() {
+    try { return sessionStorage.getItem(DASHBOARD_SAMPLE_PREVIEW_KEY) === "1"; } catch { return false; }
+  }
+
+  // 조용히 지나치기 쉬운 안내(예: "서비스 준비중")를 눈에 띄는 팝업으로
+  // 띄운다 - 문단 텍스트만으로는 놓치기 쉽다는 지적.
+  function showDashboardToast(message, duration = 3200) {
+    const host = $("#dashboardToastHost");
+    if (!host) return;
+    const toast = document.createElement("div");
+    toast.className = "dashboard-toast";
+    toast.textContent = message;
+    host.append(toast);
+    window.setTimeout(() => toast.remove(), duration);
+  }
+
+  function updateSampleBadge() {
+    const badge = $("#sampleDataBadge");
+    if (!badge) return;
+    const hasSchool = !!resolveDashboardSchoolId();
+    const previewing = isSamplePreview();
+    badge.hidden = hasSchool && !previewing;
+    badge.textContent = previewing && hasSchool
+      ? "👀 샘플 미리보기 중 · 실제 데이터로 돌아가기"
+      : "📊 샘플 데이터 보는 중 · 학교 설정하기";
+  }
 
   // 학교가 아직 설정 안 된 PC/태블릿에서 모달로 검색-선택 UI를 띄운다 -
   // URL 트릭을 모르는 다른 교사가 그냥 열었을 때 계속 빈 화면만 보는
@@ -1109,10 +1143,16 @@
   function openDashboardSchoolModal() {
     const modal = $("#dashboardSchoolModal");
     if (!modal) return;
+    $("#dashboardSchoolStepSearch").hidden = false;
+    $("#dashboardSchoolStepClass").hidden = true;
+    const input = $("#dashboardSchoolInput");
+    if (input) { input.disabled = false; input.value = ""; }
+    $("#dashboardSchoolStatus").textContent = "";
+    $("#dashboardSchoolResults").replaceChildren();
     document.body.classList.add("modal-open");
     if (typeof modal.showModal === "function") modal.showModal();
     else modal.setAttribute("open", "");
-    $("#dashboardSchoolInput")?.focus();
+    input?.focus();
   }
   function closeDashboardSchoolModal() {
     const modal = $("#dashboardSchoolModal");
@@ -1127,36 +1167,61 @@
     const results = $("#dashboardSchoolResults");
     const status = $("#dashboardSchoolStatus");
     const searchBtn = $("#dashboardSchoolSearchBtn");
-    if (!modal || !input || !results || !status) return;
+    const stepSearch = $("#dashboardSchoolStepSearch");
+    const stepClass = $("#dashboardSchoolStepClass");
+    const classIntro = $("#dashboardClassStepIntro");
+    const classGrid = $("#dashboardClassGrid");
+    if (!modal || !input || !results || !status || !stepSearch || !stepClass) return;
     $$("[data-close-school-modal]").forEach(button => button.addEventListener("click", closeDashboardSchoolModal));
     modal.addEventListener("click", event => { if (event.target === modal) closeDashboardSchoolModal(); });
     modal.addEventListener("cancel", event => { event.preventDefault(); closeDashboardSchoolModal(); });
-    const sampleBadge = $("#sampleDataBadge");
-    function updateSampleBadge() { if (sampleBadge) sampleBadge.hidden = !!resolveDashboardSchoolId(); }
-    sampleBadge?.addEventListener("click", openDashboardSchoolModal);
+    $("#sampleDataBadge")?.addEventListener("click", () => {
+      if (isSamplePreview() && resolveDashboardSchoolId()) {
+        try { sessionStorage.removeItem(DASHBOARD_SAMPLE_PREVIEW_KEY); } catch {}
+        updateSampleBadge();
+        loadSchoolDashboardFromApi();
+        return;
+      }
+      openDashboardSchoolModal();
+    });
     updateSampleBadge();
     if (resolveDashboardSchoolId()) return; // already set -- nothing to do
     openDashboardSchoolModal();
     const client = window.AIWaysEdu2gClient;
     let debounceTimer = 0;
     let searchToken = 0;
+    function showClassStep(school) {
+      const config = SCHOOL_CLASS_CONFIG[school.schoolCode];
+      if (!config) return;
+      stepSearch.hidden = true;
+      stepClass.hidden = false;
+      classIntro.textContent = `${school.schoolName} · ${config.grade}학년 몇 반이세요?`;
+      classGrid.replaceChildren();
+      for (let n = 1; n <= config.totalClasses; n += 1) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = `${n}반`;
+        button.addEventListener("click", () => {
+          try {
+            localStorage.setItem(DASHBOARD_SCHOOL_ID_KEY, school.schoolCode);
+            localStorage.setItem(DASHBOARD_SCHOOL_NAME_KEY, school.schoolName);
+            localStorage.setItem(DASHBOARD_CLASS_NUM_KEY, String(n));
+            sessionStorage.removeItem(DASHBOARD_SAMPLE_PREVIEW_KEY);
+          } catch {}
+          updateSampleBadge();
+          applySchoolClassConfig(school.schoolCode, String(n));
+          loadSchoolDashboardFromApi();
+          closeDashboardSchoolModal();
+        });
+        classGrid.append(button);
+      }
+    }
     function selectSchool(school) {
       if (!DASHBOARD_LAUNCHED_SCHOOLS.has(school.schoolCode)) {
-        status.textContent = `"${school.schoolName}"은(는) 아직 서비스 준비중이에요. 곧 만나요!`;
+        showDashboardToast(`"${school.schoolName}"은(는) 아직 서비스 준비중이에요. 곧 만나요!`);
         return;
       }
-      try {
-        localStorage.setItem(DASHBOARD_SCHOOL_ID_KEY, school.schoolCode);
-        localStorage.setItem(DASHBOARD_SCHOOL_NAME_KEY, school.schoolName);
-      } catch {}
-      status.textContent = `"${school.schoolName}"(으)로 설정했어요. 이 화면을 계속 그 학교로 보여줄게요.`;
-      results.replaceChildren();
-      input.value = school.schoolName;
-      input.disabled = true;
-      updateSampleBadge();
-      applySchoolClassConfig(school.schoolCode);
-      loadSchoolDashboardFromApi();
-      window.setTimeout(closeDashboardSchoolModal, 900);
+      showClassStep(school);
     }
     async function runSearch(rawQuery) {
       const query = rawQuery.trim();
@@ -1196,6 +1261,46 @@
       debounceTimer = window.setTimeout(() => runSearch(input.value), 300);
     });
     searchBtn?.addEventListener("click", () => { clearTimeout(debounceTimer); runSearch(input.value); });
+  }
+
+  // 헤더 우상단 톱니바퀴 설정 메뉴: 학교/반 다시 설정, 샘플 데이터 보기,
+  // 초기화. "샘플 데이터 보기"는 실제 학교가 설정돼 있어도 언제든 눌러서
+  // 볼 수 있게 세션 동안만 유지되는 미리보기 상태로 전환한다(저장된
+  // 설정 자체는 안 지움).
+  function initDashboardSettingsMenu() {
+    const toggle = $("#dashboardSettingsToggle");
+    const menu = $("#dashboardSettingsMenu");
+    if (!toggle || !menu) return;
+    function closeMenu() { menu.hidden = true; toggle.setAttribute("aria-expanded", "false"); }
+    function openMenu() { menu.hidden = false; toggle.setAttribute("aria-expanded", "true"); }
+    toggle.addEventListener("click", event => {
+      event.stopPropagation();
+      menu.hidden ? openMenu() : closeMenu();
+    });
+    document.addEventListener("click", event => {
+      if (!menu.hidden && event.target !== toggle && !menu.contains(event.target)) closeMenu();
+    });
+    $("[data-settings-action='reconfigure']")?.addEventListener("click", () => {
+      closeMenu();
+      openDashboardSchoolModal();
+    });
+    $("[data-settings-action='sample']")?.addEventListener("click", () => {
+      closeMenu();
+      try { sessionStorage.setItem(DASHBOARD_SAMPLE_PREVIEW_KEY, "1"); } catch {}
+      updateSampleBadge();
+      showDashboardToast("샘플 데이터를 보여드릴게요. 실제 데이터로 돌아가려면 배지를 눌러 주세요.");
+    });
+    $("[data-settings-action='reset']")?.addEventListener("click", () => {
+      closeMenu();
+      if (!window.confirm("정말 초기화할까요? 이 기기에 저장된 학교/반 설정이 모두 지워져요.")) return;
+      try {
+        localStorage.removeItem(DASHBOARD_SCHOOL_ID_KEY);
+        localStorage.removeItem(DASHBOARD_SCHOOL_NAME_KEY);
+        localStorage.removeItem(DASHBOARD_CLASS_NUM_KEY);
+        sessionStorage.removeItem(DASHBOARD_SAMPLE_PREVIEW_KEY);
+      } catch {}
+      window.location.reload();
+    });
   }
 
   function digitsOnly(value) {
@@ -1665,6 +1770,9 @@
 
   let dashboardApiSchoolNotice = false;
   async function loadSchoolDashboardFromApi() {
+    // "샘플 데이터 보기"로 미리보기 중이면 실제 학교가 설정돼 있어도
+    // API 호출 없이 화면의 기본(더미) 데이터를 그대로 보여준다.
+    if (isSamplePreview()) return null;
     const client = window.AIWaysEdu2gClient;
     const schoolId = resolveDashboardSchoolId();
     if (!schoolId) {
@@ -2342,7 +2450,7 @@
     dashboardDataReady = true;
     if (options.animateIntro) playDashboardIntroForCurrentData();
     else applyDashboard(allStoredRecords());
-    applySchoolClassConfig(resolveDashboardSchoolId());
+    applySchoolClassConfig(resolveDashboardSchoolId(), resolveDashboardClassNum());
     await loadSchoolDashboardFromApi();
     startSchoolDashboardLiveRefresh();
     return allStoredRecords();
@@ -4289,6 +4397,7 @@
     initUpload();
     initClassroomSkills();
     initDashboardSchoolSetup();
+    initDashboardSettingsMenu();
     initRefreshControls();
     initRankingModal();
     initLandfillSourceLink();

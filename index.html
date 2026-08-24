@@ -76,6 +76,14 @@
         <a href="#gallery">갤러리</a>
         <a href="#resources">자료실</a>
       </nav>
+      <div class="dashboard-settings" id="dashboardSettings">
+        <button type="button" id="dashboardSettingsToggle" class="dashboard-settings-toggle" aria-label="대시보드 설정" aria-haspopup="true" aria-expanded="false">⚙️</button>
+        <div class="dashboard-settings-menu" id="dashboardSettingsMenu" hidden>
+          <button type="button" data-settings-action="reconfigure">🏫 학교/반 다시 설정하기</button>
+          <button type="button" data-settings-action="sample">👀 샘플 데이터 보기</button>
+          <button type="button" data-settings-action="reset">🗑️ 초기화</button>
+        </div>
+      </div>
       <div class="mobile-shell-bar" aria-label="모바일 작업 바로가기">
         <div class="mobile-shell-context" aria-live="polite">
           <span>현재 화면</span>
@@ -666,18 +674,31 @@
     <dialog class="ai-modal school-setup-modal" id="dashboardSchoolModal">
       <button class="close-btn" type="button" aria-label="닫기" data-close-school-modal>×</button>
       <div class="modal-body">
-        <p class="eyebrow">Find Your School</p>
-        <h2>여러분의 학교는 어디인가요?</h2>
-        <p class="school-setup-warning">한 번 설정하면 이 기기에서는 다시 바꿀 수 없어요. 신중하게 선택해 주세요.</p>
-        <div class="school-search-row">
-          <input type="text" id="dashboardSchoolInput" autocomplete="off" placeholder="학교 이름을 검색해 주세요 (예: 같이초)" />
-          <button type="button" id="dashboardSchoolSearchBtn" aria-label="검색">
-            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4.35-4.35" /></svg>
-          </button>
-          <div id="dashboardSchoolResults" class="classroom-skill-list"></div>
+        <div id="dashboardSchoolStepSearch">
+          <p class="eyebrow">Find Your School</p>
+          <h2>여러분의 학교는 어디인가요?</h2>
+          <p class="school-setup-warning">한 번 설정하면 이 기기에서는 다시 바꿀 수 없어요. 신중하게 선택해 주세요.</p>
+          <div class="school-search-row">
+            <input type="text" id="dashboardSchoolInput" autocomplete="off" placeholder="학교 이름을 검색해 주세요 (예: 같이초)" />
+            <button type="button" id="dashboardSchoolSearchBtn" aria-label="검색">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4.35-4.35" /></svg>
+            </button>
+            <div id="dashboardSchoolResults" class="classroom-skill-list"></div>
+          </div>
+          <p id="dashboardSchoolStatus" class="save-state" role="status" aria-live="polite"></p>
         </div>
-        <p id="dashboardSchoolStatus" class="save-state" role="status" aria-live="polite"></p>
+        <div id="dashboardSchoolStepClass" hidden>
+          <p class="eyebrow">Find Your Class</p>
+          <h2>몇 반이세요?</h2>
+          <p class="school-setup-warning" id="dashboardClassStepIntro"></p>
+          <div id="dashboardClassGrid" class="class-picker-grid"></div>
+        </div>
       </div>
     </dialog>
+
+    <!-- 학교를 아직 설정 안 했거나(또는 "샘플 보기"를 눌렀을 때) 잠깐
+         뜨는 안내 팝업 - "서비스 준비중이에요" 같은 걸 조용히 문단 텍스트로
+         바꾸는 대신 눈에 띄는 이벤트로 튀어나오게 해달라는 요청. -->
+    <div id="dashboardToastHost" class="dashboard-toast-host" aria-live="assertive"></div>
   </body>
 </html>

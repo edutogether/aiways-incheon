@@ -99,7 +99,10 @@ const student = { schoolId: "7321071", schoolName: "테스트초등학교", grad
     const saved = await call(save, token, spoofedPayload);
     assert.equal(saved.status, 201);
     const savedDoc = await db.collection("actors").doc(ACTOR_ID).collection("records").doc(saved.body.recordId).get();
-    assert.deepEqual(savedDoc.data().classContext, { schoolId: student.schoolId, schoolName: student.schoolName, grade: student.grade, classNum: student.classNum });
+    // studentNumber/studentName도 서버가 프로필에서 채워넣는다(개인별
+    // 랭킹 6단계) - "name"이 아니라 "studentName"인 이유는 FORBIDDEN_KEY의
+    // \bname\b 때문(위와 같은 이유로 schoolName도 그냥 "name"을 못 씀).
+    assert.deepEqual(savedDoc.data().classContext, { schoolId: student.schoolId, schoolName: student.schoolName, grade: student.grade, classNum: student.classNum, studentNumber: student.studentNumber, studentName: student.name });
 
     const after = await call(check, token, {});
     assert.equal(after.status, 200);

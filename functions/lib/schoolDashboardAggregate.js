@@ -48,6 +48,15 @@ function createSortingRecordAggregator({ db, serverTimestamp, now = () => new Da
     // (반마다 중복 저장할 필요 없음).
     const schoolName = typeof classContext.schoolName === "string" && classContext.schoolName.trim() ? classContext.schoolName.trim() : "";
 
+    // 개인별 랭킹(6단계): 학생이 실명 검증 없이 자율로 적은 번호/이름을
+    // 그대로 쓴다(교사가 부모 동의 하에 결정) - studentNumber가 있는
+    // 기록만(가입 전 임시 입력 단계는 번호가 없을 수 있음) 반 문서 밑
+    // students 서브컬렉션에 완료 횟수를 집계한다. 반 집계와 같은
+    // 트랜잭션 안에서 처리해 둘이 서로 어긋나지 않게 한다.
+    const studentNumber = typeof classContext.studentNumber === "string" ? classContext.studentNumber.trim() : "";
+    const studentName = typeof classContext.studentName === "string" ? classContext.studentName.trim() : "";
+    const studentRef = studentNumber ? classRef.collection("students").doc(studentNumber) : null;
+
     await db.runTransaction(async (transaction) => {
       const snap = await transaction.get(classRef);
       const data = snap.exists ? snap.data() : {};
@@ -57,6 +66,7 @@ function createSortingRecordAggregator({ db, serverTimestamp, now = () => new Da
       let heldTotal = Number(data.heldTotal) || 0;
       let convertedTotal = Number(data.convertedTotal) || 0;
       let observedTodayNext = observedToday;
+      const studentSnap = studentRef ? await transaction.get(studentRef) : null;
 
       if (isNew) {
         observedTodayNext += 1;
@@ -76,6 +86,13 @@ function createSortingRecordAggregator({ db, serverTimestamp, now = () => new Da
         updatedAt: serverTimestamp()
       }, { merge: true });
       if (schoolName) transaction.set(schoolRef, { schoolName, updatedAt: serverTimestamp() }, { merge: true });
+      if (studentRef && isCompleted) {
+        const studentData = studentSnap?.exists ? studentSnap.data() : {};
+        const studentCompletedTotal = (Number(studentData.completedTotal) || 0) + 1;
+        transaction.set(studentRef, {
+          studentNumber, ...(studentName ? { studentName } : {}), completedTotal: studentCompletedTotal, updatedAt: serverTimestamp()
+        }, { merge: true });
+      }
     });
   };
 }

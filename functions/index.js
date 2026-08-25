@@ -32,15 +32,21 @@ const actorRateLimiter = createActorRateLimiter({ db, serverTimestamp: () => Fie
 const deviceAccess = createEdu2gDeviceAccess({ auth: getAuth(), db, serverTimestamp: () => FieldValue.serverTimestamp() });
 const analysisRequests = createAnalysisIdempotency({ db, serverTimestamp: () => FieldValue.serverTimestamp(), model: "gemini-3.5-flash-lite" });
 const logAppCheck = (metadata) => logger.write({ severity: metadata?.status === "invalid" || metadata?.status === "unavailable" ? "WARNING" : "INFO", ...metadata });
+// 실명 검증이 없어 학생이 자율로 이름/번호를 적게 두기로 한 만큼("우주제일킹왕짱스타"도
+// 허용), 문제가 생겼을 때 "누구인지 특정"은 못 해도 "그 계정을 더 이상 못 쓰게"는
+// 할 수 있어야 한다 - protectActorRequest에서 모든 엔드포인트 공통으로 걸리는
+// 차단 목록. blockedActors/{actorId} 문서가 있으면(내용 무관, 존재 자체가 신호)
+// 그 actor의 모든 요청을 403으로 거절한다.
+const blockedActors = { async isBlocked(actorId) { const snap = await db.collection("blockedActors").doc(actorId).get(); return snap.exists; } };
 exports.analyzeSortingImage = onRequest({
   region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 30, minInstances: 0, maxInstances: 2, concurrency: 1,
   secrets: [geminiApiKey], cors: false
-}, createAnalyzeSortingHandler({ getApiKey: () => geminiApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, analysisRequests, logAppCheck }));
+}, createAnalyzeSortingHandler({ getApiKey: () => geminiApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, analysisRequests, logAppCheck, blockedActors }));
 exports.analyzeSortingText = onRequest({
   region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 20, minInstances: 0, maxInstances: 2, concurrency: 2,
   secrets: [geminiApiKey], cors: false
-}, createAnalyzeSortingTextHandler({ getApiKey: () => geminiApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, analysisRequests, logAppCheck }));
-exports.analyzeSortingSafetyObserver = onRequest({ region:"asia-northeast3", memory:"256MiB", timeoutSeconds:30, minInstances:0, maxInstances:2, concurrency:1, secrets:[geminiApiKey], cors:false }, createSortingSafetyObserverHandler({getApiKey:()=>geminiApiKey.value(),access:deviceAccess,rateLimiter,actorRateLimiter,analysisRequests,logAppCheck}));
+}, createAnalyzeSortingTextHandler({ getApiKey: () => geminiApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, analysisRequests, logAppCheck, blockedActors }));
+exports.analyzeSortingSafetyObserver = onRequest({ region:"asia-northeast3", memory:"256MiB", timeoutSeconds:30, minInstances:0, maxInstances:2, concurrency:1, secrets:[geminiApiKey], cors:false }, createSortingSafetyObserverHandler({getApiKey:()=>geminiApiKey.value(),access:deviceAccess,rateLimiter,actorRateLimiter,analysisRequests,logAppCheck,blockedActors}));
 const recordStore = {
   async createOrGet(actorId, idempotencyKey, record, response) {
     const actor = db.collection("actors").doc(actorId);
@@ -56,14 +62,14 @@ const recordStore = {
   }
 };
 exports.saveSortingRecord = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createSaveSortingRecordHandler({
-  serverTimestamp: () => FieldValue.serverTimestamp(), store: recordStore, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, db
+  serverTimestamp: () => FieldValue.serverTimestamp(), store: recordStore, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, db
 }));
 const queryStore = {
   async list(actorId, size, cursor, filter) { let q=db.collection("actors").doc(actorId).collection("records").orderBy("createdAt","desc").limit(size+1); if(filter!=="all") q=q.where("status","==",filter); if(cursor) q=q.startAfter(await db.collection("actors").doc(actorId).collection("records").doc(cursor).get()); const snap=await q.get(); const docs=snap.docs.slice(0,size); return {records:docs.map(d=>({id:d.id,data:d.data()})),nextCursor:snap.docs.length>size?docs.at(-1).id:null}; },
   async resolve(actorId,b,serverTime) { const record=db.collection("actors").doc(actorId).collection("records").doc(b.recordId); const key=db.collection("actors").doc(actorId).collection("_resolutions").doc(b.idempotencyKey); return db.runTransaction(async tx=>{const prior=await tx.get(key); if(prior.exists)return {...prior.data(),duplicate:true}; const snap=await tx.get(record); if(!snap.exists)return {code:"not_found"}; if(snap.data().status!=="held")return {code:"conflict"}; const result={recordId:b.recordId,status:"completed",resolutionType:b.resolutionType,duplicate:false}; tx.update(record,{status:"completed",updatedAt:serverTime,resolvedAt:serverTime,resolutionType:b.resolutionType,userDecision:b.userDecision,checklist:b.checklist}); tx.create(key,result); return result;}); }
 };
-exports.listSortingRecords=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createListSortingRecordsHandler({store:queryStore,access:deviceAccess,rateLimiter,actorRateLimiter,logAppCheck}));
-exports.resolveSortingRecord=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createResolveSortingRecordHandler({store:queryStore,access:deviceAccess,serverTimestamp:()=>FieldValue.serverTimestamp(),rateLimiter,actorRateLimiter,logAppCheck}));
+exports.listSortingRecords=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createListSortingRecordsHandler({store:queryStore,access:deviceAccess,rateLimiter,actorRateLimiter,logAppCheck,blockedActors}));
+exports.resolveSortingRecord=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createResolveSortingRecordHandler({store:queryStore,access:deviceAccess,serverTimestamp:()=>FieldValue.serverTimestamp(),rateLimiter,actorRateLimiter,logAppCheck,blockedActors}));
 // Keeps schools/{schoolId}/classes/{grade_classNum} aggregate docs in sync
 // with every sorting record create (saveSortingRecord) and held->completed
 // transition (resolveSortingRecord) -- the PC dashboard reads only these
@@ -75,30 +81,30 @@ exports.onSortingRecordWritten = onDocumentWritten({ region: "asia-northeast3", 
   await aggregateSortingRecordWrite(before, after);
 });
 exports.getSchoolDashboard = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createGetSchoolDashboardHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 exports.checkStudentProfile = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckStudentProfileHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 exports.registerStudentProfile = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createRegisterStudentProfileHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, serverTimestamp: () => FieldValue.serverTimestamp()
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
 }));
 exports.checkCampusLocation = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckCampusLocationHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, serverTimestamp: () => FieldValue.serverTimestamp()
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
 }));
 exports.changeStudentClass = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createChangeStudentClassHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, serverTimestamp: () => FieldValue.serverTimestamp()
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
 }));
 exports.getNationalRanking = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createGetNationalRankingHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 exports.searchSchool = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, secrets: [neisApiKey], cors: false }, createSearchSchoolHandler({
-  getApiKey: () => neisApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck
+  getApiKey: () => neisApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 const edu2gHandlers = createEdu2gHandlers({
   registry: createEdu2gPassRegistry({ getSecret: () => edu2gPassRegistrySecret.value() }),
   access: deviceAccess,
-  store: createFirestoreDeviceStore({ db, serverTimestamp: () => FieldValue.serverTimestamp() }), rateLimiter, actorRateLimiter, logAppCheck
+  store: createFirestoreDeviceStore({ db, serverTimestamp: () => FieldValue.serverTimestamp() }), rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 });
 const edu2gOptions = { region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false };
 exports.redeemEdu2gPass = onRequest({ ...edu2gOptions, secrets: [edu2gPassRegistrySecret] }, edu2gHandlers.redeem);

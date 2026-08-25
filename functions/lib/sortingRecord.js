@@ -137,7 +137,13 @@ function createSaveSortingRecordHandler(dependencies = {}) {
     if (db) {
       const actorSnap = await db.collection("actors").doc(actorId).get();
       const profile = actorSnap.exists ? actorSnap.data()?.studentProfile : null;
-      if (profile) record.classContext = { schoolId: profile.schoolId, ...(profile.schoolName ? { schoolName: profile.schoolName } : {}), grade: profile.grade, classNum: profile.classNum };
+      // studentNumber/studentName도 같이 넘겨야 반별 개인 랭킹(6단계)을
+      // 집계할 수 있다 - 필드명은 "studentName"으로, 그냥 "name"을 쓰면
+      // FORBIDDEN_KEY(\bname\b)에 걸려 기록 자체가 거부된다(이 세션에
+      // schoolName에서 이미 한 번 겪은 문제와 동일한 이유). 실명 검증
+      // 없이 학생이 스스로 적은 값 그대로다(교사가 부모 동의 하에 자율
+      // 입력을 허용하기로 결정 - 실명이 아니어도 됨).
+      if (profile) record.classContext = { schoolId: profile.schoolId, ...(profile.schoolName ? { schoolName: profile.schoolName } : {}), grade: profile.grade, classNum: profile.classNum, ...(profile.studentNumber ? { studentNumber: profile.studentNumber } : {}), ...(profile.name ? { studentName: profile.name } : {}) };
     }
     // GPS 교내판정(5단계): campusCheckId가 있으면 그 일회용 판정 결과를 소비해서
     // record.onCampus에 반영한다 - 좌표 자체는 이 함수도, 그 이전 어떤 단계도

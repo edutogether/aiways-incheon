@@ -485,6 +485,9 @@
   let seedRecords = [];
   let remoteRecords = [];
   let latestRanking = [];
+  // 개인별 랭킹(6단계) - 실명 검증 없이 학생이 자율로 적은 번호/이름을
+  // 그대로 보여준다(교사가 부모 동의 하에 결정, 마스킹 없음).
+  let latestTopStudents = [];
   let sortingStats = { totalCount: 0, carbonReduction: 0, logs: [] };
   let sortingHoldItems = [];
   let selectedSortingKey = "";
@@ -1806,6 +1809,7 @@
 
   function renderClassPanelFromDashboardApi(selectedClass) {
     if (!selectedClass) return;
+    latestTopStudents = Array.isArray(selectedClass.topStudents) ? selectedClass.topStudents : [];
     setDashboardNumber("[data-today-observed]", selectedClass.observedToday);
     setDashboardNumber("[data-ai-classified]", selectedClass.heldTotal);
     setDashboardNumber("[data-human-confirmed]", selectedClass.convertedTotal);
@@ -1870,10 +1874,13 @@
   let schoolDashboardLiveRefreshTimer = 0;
   function startSchoolDashboardLiveRefresh() {
     if (schoolDashboardLiveRefreshTimer) return;
+    // 이 파일럿 규모(학교 4곳)에서는 20초든 5초든 Firestore/Functions
+    // 비용 차이가 무시할 수준이라, 체감(박람회에서 찍자마자 화면 앞으로
+    // 달려와 확인하는 상황)을 기준으로 5초로 줄였다.
     schoolDashboardLiveRefreshTimer = window.setInterval(() => {
       if (document.hidden) return;
       loadSchoolDashboardFromApi();
-    }, 20000);
+    }, 5000);
   }
 
   function landfillDaysForChart(days) {
@@ -2327,6 +2334,10 @@
           <div class="ranking-race-head"><span>학급 레이스</span></div>
           <div class="ranking-race-list"></div>
         </div>
+        <div class="ranking-student-wrap ranking-race-wrap">
+          <div class="ranking-race-head"><span>우리반 실천왕</span></div>
+          <div class="ranking-student-list ranking-race-list"></div>
+        </div>
       </section>
     `;
     document.body.appendChild(modal);
@@ -2407,9 +2418,28 @@
     }).join("");
   }
 
+  function renderTopStudentsModalRows(modal) {
+    const list = $(".ranking-student-list", modal);
+    const wrap = $(".ranking-student-wrap", modal);
+    if (!list || !wrap) return;
+    wrap.hidden = latestTopStudents.length === 0;
+    list.innerHTML = latestTopStudents.map((item, index) => `
+      <article class="race-row">
+        <span class="race-rank">${index + 1}</span>
+        <div class="race-body">
+          <div class="race-title">
+            <strong>${escapeHtml(item.studentNumber)}번 ${escapeHtml(item.studentName || "이름 없음")}</strong>
+            <b>${item.completedTotal.toLocaleString("ko-KR")}회</b>
+          </div>
+        </div>
+      </article>
+    `).join("");
+  }
+
   function openRankingModal() {
     const modal = ensureRankingModal();
     renderRankingModalRows(modal);
+    renderTopStudentsModalRows(modal);
     modal.hidden = false;
     document.body.classList.add("ranking-modal-open");
     requestAnimationFrame(() => modal.classList.add("is-open"));

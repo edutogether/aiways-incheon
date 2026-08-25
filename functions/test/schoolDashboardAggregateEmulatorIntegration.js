@@ -14,10 +14,14 @@ const { createGlobalRateLimiter, createActorRateLimiter } = require("../lib/glob
 const { createSaveSortingRecordHandler } = require("../lib/sortingRecord");
 const { createResolveSortingRecordHandler } = require("../lib/sortingRecordQuery");
 const { createGetSchoolDashboardHandler } = require("../lib/schoolDashboard");
+const { createRegisterStudentProfileHandler } = require("../lib/studentProfile");
 
 const projectId = process.env.GCLOUD_PROJECT || "demo-aiways-incheon";
 const authEmulator = new URL(`http://${process.env.FIREBASE_AUTH_EMULATOR_HOST || "127.0.0.1:9099"}`);
-const SCHOOL_ID = "dashboard_test_school";
+// registerStudentProfile은 schoolId가 나이스 표준학교코드(숫자만)여야
+// 통과시킨다(4단계 마이그레이션 이후 규칙) - 이 테스트가 registerStudentProfile을
+// 처음 쓰기 전까지는 문자열 아무거나로도 괜찮았다.
+const SCHOOL_ID = "9999999";
 
 function signup() {
   return new Promise((resolve, reject) => {
@@ -35,13 +39,13 @@ function call(handler, token, body) {
   return handler({ method: "POST", headers: { origin: "http://localhost:5173", "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) }, body }, res).then(() => out);
 }
 
-function recordPayload(key, { status = "completed", selectedItemId = "pet-bottle", grade = "5", classNum = "1", campusCheckId = "", schoolName = "" } = {}) {
+function recordPayload(key, { status = "completed", selectedItemId = "pet-bottle", grade = "5", classNum = "1", campusCheckId = "", schoolName = "", studentNumber = "", studentName = "" } = {}) {
   return {
     schemaVersion: "sorting-record-v1", status, provider: status === "held" ? "manual_hold" : "manual_select",
     analysis: { objectCandidates: [], materialCandidates: [], visibleCautions: [] }, checklist: [],
     userDecision: { selectedItemId, action: status === "held" ? "held" : "recorded", userConfirmed: true },
     hold: status === "held" ? { recommended: true, reasons: ["check"] } : null,
-    classContext: { schoolId: SCHOOL_ID, ...(schoolName ? { schoolName } : {}), grade, classNum }, idempotencyKey: key,
+    classContext: { schoolId: SCHOOL_ID, ...(schoolName ? { schoolName } : {}), grade, classNum, ...(studentNumber ? { studentNumber } : {}), ...(studentName ? { studentName } : {}) }, idempotencyKey: key,
     ...(campusCheckId ? { campusCheckId } : {})
   };
 }
@@ -61,6 +65,8 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
   const auth = getAuth(app);
   const db = getFirestore(app);
   let uid = "";
+  let studentUid = "";
+  const secondActorId = "dashboard_test_actor_student";
   try {
     const signed = await signup();
     const token = signed.idToken;
@@ -107,6 +113,7 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
     const save = createSaveSortingRecordHandler({ access, rateLimiter, actorRateLimiter, appCheck, store, db, serverTimestamp: () => FieldValue.serverTimestamp() });
     const resolve = createResolveSortingRecordHandler({ store, access, appCheck, serverTimestamp: () => FieldValue.serverTimestamp(), rateLimiter, actorRateLimiter, logAppCheck: () => {} });
     const dashboard = createGetSchoolDashboardHandler({ db, access, appCheck, rateLimiter, actorRateLimiter, logAppCheck: () => {} });
+    const register = createRegisterStudentProfileHandler({ db, access, appCheck, rateLimiter, actorRateLimiter, logAppCheck: () => {}, serverTimestamp: () => FieldValue.serverTimestamp() });
 
     // This suite is about aggregation math, not GPS (that's campusLocationEmulatorIntegration.js's
     // job) -- seed already-verified on-campus checks directly rather than going through
@@ -165,6 +172,10 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
     assert.equal(classView.body.selectedClass.topItems[0].count, 2);
     assert.equal(classView.body.selectedClass.rankInGrade, 1);
     assert.equal(classView.body.selectedClass.gradeSize, 2);
+    // 위 r1/r2/r3/held는 전부 studentProfile 없는 actor가 보낸 것(가입 전
+    // 임시 입력 단계)이라 개인 랭킹에 안 잡혀야 정상이다 - 실제로 가입한
+    // 학생이 하나도 없는 반이라 topStudents가 비어있는 것까지 같이 확인한다.
+    assert.deepEqual(classView.body.selectedClass.topStudents, []);
 
     const badSelector = await call(dashboard, token, { schoolId: SCHOOL_ID, grade: "5" });
     assert.equal(badSelector.status, 400);
@@ -179,18 +190,66 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
     const sameSchoolAgain = await call(dashboard, token, { schoolId: SCHOOL_ID });
     assert.equal(sameSchoolAgain.status, 200);
 
+    // 개인별 랭킹(6단계) - 완전히 별도의 두 번째 actor로 격리해서 확인한다.
+    // 같은 actor를 재사용하면 registerStudentProfile이 그 이후 모든
+    // saveSortingRecord 호출의 classContext.grade/classNum을 프로필 값으로
+    // 강제로 덮어써버려서(의도된 동작 - 학생이 임시 입력을 조작 못 하게),
+    // 위에서 r3를 5학년 2반에 넣으려던 것까지 전부 5학년 1반으로 밀려나
+    // 기존 검증이 깨진다.
+    const signedStudent = await signup();
+    const studentToken = signedStudent.idToken;
+    studentUid = (await auth.verifyIdToken(studentToken)).uid;
+    await db.collection("actors").doc(secondActorId).set({ status: "active", plan: "closed_beta" });
+    await db.collection("actors").doc(secondActorId).collection("trustedDevices").doc(studentUid).set({ uid: studentUid, status: "active", managementId: "123e4567-e89b-42d3-a456-426614174601" });
+    await db.collection("edu2gDeviceBindings").doc(studentUid).set({ actorId: secondActorId, status: "active" });
+    const registered = await call(register, studentToken, { schoolId: SCHOOL_ID, schoolName: "실측초등학교", grade: "5", classNum: "1", studentNumber: "7", name: "우주제일킹왕짱스타", confirm: true });
+    assert.equal(registered.status, 201);
+
+    async function seedOnCampusCheckFor(actorIdArg) {
+      const ref = db.collection("actors").doc(actorIdArg).collection("campusChecks").doc();
+      await ref.set({ onCampus: true, consumed: false, createdAt: FieldValue.serverTimestamp(), expiresAt: new Date(Date.now() + 120000) });
+      return ref.id;
+    }
+    // classContext는 registerStudentProfile로 저장된 프로필에서 서버가
+    // 자동으로 채워넣으므로(정식 가입 이후엔 클라이언트가 studentNumber를
+    // 직접 보내도 무시됨) payload에는 안 실어도 된다.
+    const studentRecord = await call(save, studentToken, recordPayload("123e4567-e89b-42d3-a456-426614174601", { selectedItemId: "pet-bottle", campusCheckId: await seedOnCampusCheckFor(secondActorId) }));
+    assert.equal(studentRecord.status, 201);
+
+    const studentRef = classRef.collection("students").doc("7");
+    const studentDoc = await pollUntil(async () => {
+      const snap = await studentRef.get();
+      const data = snap.data();
+      return data && data.completedTotal === 1 ? data : null;
+    });
+    assert.equal(studentDoc.studentName, "우주제일킹왕짱스타");
+
+    const classViewWithStudent = await call(dashboard, token, { schoolId: SCHOOL_ID, grade: "5", classNum: "1" });
+    assert.equal(classViewWithStudent.status, 200);
+    assert.equal(classViewWithStudent.body.selectedClass.topStudents[0].studentNumber, "7");
+    assert.equal(classViewWithStudent.body.selectedClass.topStudents[0].studentName, "우주제일킹왕짱스타");
+    assert.equal(classViewWithStudent.body.selectedClass.topStudents[0].completedTotal, 1);
+
     process.stdout.write(JSON.stringify({ schoolDashboardAggregateEmulatorIntegration: "passed" }) + "\n");
   } finally {
     const batch = db.batch();
     if (uid) batch.delete(db.collection("edu2gDeviceBindings").doc(uid));
+    if (studentUid) batch.delete(db.collection("edu2gDeviceBindings").doc(studentUid));
     const actorRoot = db.collection("actors").doc("dashboard_test_actor");
-    for (const name of ["records", "_idempotency", "_resolutions", "trustedDevices", "campusChecks"]) {
-      const snap = await actorRoot.collection(name).get();
-      snap.docs.forEach((d) => batch.delete(d.ref));
+    const secondActorRoot = db.collection("actors").doc(secondActorId);
+    for (const root of [actorRoot, secondActorRoot]) {
+      for (const name of ["records", "_idempotency", "_resolutions", "trustedDevices", "campusChecks"]) {
+        const snap = await root.collection(name).get();
+        snap.docs.forEach((d) => batch.delete(d.ref));
+      }
+      batch.delete(root);
     }
-    batch.delete(actorRoot);
     const classesSnap = await db.collection("schools").doc(SCHOOL_ID).collection("classes").get();
-    classesSnap.docs.forEach((d) => batch.delete(d.ref));
+    for (const classDoc of classesSnap.docs) {
+      const studentsSnap = await classDoc.ref.collection("students").get();
+      studentsSnap.docs.forEach((d) => batch.delete(d.ref));
+      batch.delete(classDoc.ref);
+    }
     batch.delete(db.collection("schools").doc(SCHOOL_ID));
     await batch.commit();
   }

@@ -143,7 +143,7 @@ function createAnalyzeSortingHandler(dependencies = {}) {
     if (!applyCors(req, res)) return res.status(403).json(errorResponse("invalid_request"));
     if (req.method === "OPTIONS") return res.status(204).send("");
     if (req.method !== "POST") return res.status(405).json(errorResponse("method_not_allowed"));
-    const protectedActor=await protectActorRequest({req,functionName:"analyzeSortingImage",access:dependencies.access,appCheck:dependencies.appCheck,globalRateLimiter:dependencies.rateLimiter,actorRateLimiter:dependencies.actorRateLimiter,logAppCheck:dependencies.logAppCheck}); if(!protectedActor.ok){if(protectedActor.retryAfterSeconds)res.set("Retry-After",String(protectedActor.retryAfterSeconds));return res.status(protectedActor.httpStatus).json(errorResponse(protectedActor.code));}
+    const protectedActor=await protectActorRequest({req,functionName:"analyzeSortingImage",access:dependencies.access,appCheck:dependencies.appCheck,globalRateLimiter:dependencies.rateLimiter,actorRateLimiter:dependencies.actorRateLimiter,logAppCheck:dependencies.logAppCheck,blockedActors:dependencies.blockedActors}); if(!protectedActor.ok){if(protectedActor.retryAfterSeconds)res.set("Retry-After",String(protectedActor.retryAfterSeconds));return res.status(protectedActor.httpStatus).json(errorResponse(protectedActor.code));}
     const requestCheck = validateRequest(req.body);
     if (!requestCheck.valid) return res.status(["payload_too_large", "image_too_large", "image_dimensions_too_large"].includes(requestCheck.code) ? 413 : 400).json(errorResponse(requestCheck.code, requestCheck.requestId));
     const claim = await analysisRequests.claimAnalysisRequest(protectedActor.actorId, req.body.idempotencyKey);

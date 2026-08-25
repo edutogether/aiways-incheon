@@ -224,7 +224,16 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
     });
     assert.equal(studentDoc.studentName, "우주제일킹왕짱스타");
 
-    const classViewWithStudent = await call(dashboard, token, { schoolId: SCHOOL_ID, grade: "5", classNum: "1" });
+    // topStudents는 실제로 그 반에 가입한 studentToken(secondActorId)이
+    // 요청할 때만 보여야 한다 - dashboard_test_actor(token)는 studentProfile이
+    // 아예 없는 액터라, 같은 학교/반을 조회해도 topStudents는 비어 있어야
+    // 정상이다(실제로 발견됐던 취약점: 검증된 소속 없이도 다른 반 학생의
+    // 실명·번호를 볼 수 있었음).
+    const classViewNoProfile = await call(dashboard, token, { schoolId: SCHOOL_ID, grade: "5", classNum: "1" });
+    assert.equal(classViewNoProfile.status, 200);
+    assert.deepEqual(classViewNoProfile.body.selectedClass.topStudents, [], "actor without a matching studentProfile must not see other students' names/numbers");
+
+    const classViewWithStudent = await call(dashboard, studentToken, { schoolId: SCHOOL_ID, grade: "5", classNum: "1" });
     assert.equal(classViewWithStudent.status, 200);
     assert.equal(classViewWithStudent.body.selectedClass.topStudents[0].studentNumber, "7");
     assert.equal(classViewWithStudent.body.selectedClass.topStudents[0].studentName, "우주제일킹왕짱스타");

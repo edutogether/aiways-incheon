@@ -10,7 +10,12 @@ const RATE_LIMITS = Object.freeze({
   saveSortingRecord: { perMinute: 60 },
   listSortingRecords: { perMinute: 120 },
   resolveSortingRecord: { perMinute: 60 },
-  getSchoolDashboard: { perMinute: 120 },
+  // 대시보드가 5초마다 자동으로 다시 불러오는 폴링 방식이라(app.js) 기기
+  // 한 대가 분당 12번을 쓴다 - 예전 120/min은 동시에 10대만 켜져 있어도
+  // (파일럿 4개 학교 x PC/패드 여러 대) 전역 상한에 걸려 그 순간 모든
+  // 사용자가 같이 막히는 구조였다(실측: 2000/일 액터 상한은 약 2시간
+  // 47분 만에 소진). 이 파일럿 규모(4개 학교) 기준으로 여유 있게 올림.
+  getSchoolDashboard: { perMinute: 600 },
   checkStudentProfile: { perMinute: 30 }, registerStudentProfile: { perMinute: 10 },
   checkCampusLocation: { perMinute: 60 },
   changeStudentClass: { perMinute: 10 },
@@ -74,7 +79,12 @@ const ACTOR_RATE_LIMITS = Object.freeze({
   analyzeSortingImage: { perMinute: 4, perDay: 50 }, analyzeSortingText: { perMinute: 6, perDay: 80 },
   saveSortingRecord: { perMinute: 12, perDay: 200 },
   listSortingRecords: { perMinute: 60, perDay: 500 }, resolveSortingRecord: { perMinute: 20, perDay: 100 },
-  getSchoolDashboard: { perMinute: 30, perDay: 2000 },
+  // 24시간 내내 켜있는 키오스크 기기가 5초마다 폴링하면 하루 최대
+  // 86400/5=17280번 호출한다 - 2000이면 약 2시간 47분 만에 소진돼서
+  // 그 뒤로는 이 기기 하나만 대시보드가 조용히 멈춘다(429가 화면에
+  // 아무 표시도 안 남기고 그냥 무시됐었음, 아래 app.js에서 별도 수정).
+  // 여유 있게 20000으로 올림.
+  getSchoolDashboard: { perMinute: 30, perDay: 20000 },
   checkStudentProfile: { perMinute: 10, perDay: 200 }, registerStudentProfile: { perMinute: 5, perDay: 20 },
   checkCampusLocation: { perMinute: 15, perDay: 300 },
   changeStudentClass: { perMinute: 15, perDay: 20 },

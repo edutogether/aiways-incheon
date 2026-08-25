@@ -9,7 +9,7 @@ function createSortingSafetyObserverHandler(d={}){
   const analysisRequests=d.analysisRequests||{claimAnalysisRequest:async()=>({state:"unavailable"}),completeAnalysisRequest:async()=>false,failAnalysisRequest:async()=>false};
   return async(req,res)=>{
   if(req.method!=="POST")return res.status(405).json(errorResponse("method_not_allowed"));
-  const protectedActor=await protectActorRequest({req,functionName:"analyzeSortingSafetyObserver",access:d.access,appCheck:d.appCheck,globalRateLimiter:d.rateLimiter,actorRateLimiter:d.actorRateLimiter,logAppCheck:d.logAppCheck});
+  const protectedActor=await protectActorRequest({req,functionName:"analyzeSortingSafetyObserver",access:d.access,appCheck:d.appCheck,globalRateLimiter:d.rateLimiter,actorRateLimiter:d.actorRateLimiter,logAppCheck:d.logAppCheck,blockedActors:d.blockedActors});
   if(!protectedActor.ok)return res.status(protectedActor.httpStatus).json(errorResponse(protectedActor.code));
   const check=validateRequest(req.body);
   if(!check.valid)return res.status(400).json(errorResponse(check.code,check.requestId));

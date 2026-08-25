@@ -1863,12 +1863,39 @@
     const classNum = digitsOnly(classParts(selectedClassName()).className);
     try {
       const response = await client.getSchoolDashboard({ schoolId, grade, classNum });
-      if (!response.ok || !response.data) return null;
+      if (!response.ok || !response.data) {
+        // 예전엔 실패(429 요청 한도 초과 등)를 그냥 조용히 삼켜서, 화면이
+        // 멈춰도 교사/학생이 원인을 알 방법이 전혀 없었다(사용자 지적) -
+        // 매 폴링(5초)마다 토스트를 띄우면 그것대로 방해가 되니, 연속
+        // 실패가 일정 횟수 쌓였을 때 한 번만 눈에 띄게 알린다.
+        noteDashboardApiFailure(response);
+        return null;
+      }
+      dashboardApiFailureStreak = 0;
       renderSchoolPanelFromDashboardApi(response.data);
       renderClassPanelFromDashboardApi(response.data.selectedClass);
       consumeDashboardIntroRender();
       return response.data;
-    } catch { return null; }
+    } catch (error) {
+      noteDashboardApiFailure({ status: 0, code: error?.name || "network_error" });
+      return null;
+    }
+  }
+
+  let dashboardApiFailureStreak = 0;
+  let dashboardApiFailureToastShown = false;
+  function noteDashboardApiFailure(response) {
+    dashboardApiFailureStreak += 1;
+    console.warn("[aiways] 대시보드 갱신 실패", response?.status, response?.code);
+    // 5초 폴링 기준 3연속 실패면 최소 15초는 화면이 멈춰있었다는 뜻 -
+    // 그 시점에 딱 한 번만 토스트를 띄운다(재접속/새로고침 전까지 반복 안 함).
+    if (dashboardApiFailureStreak >= 3 && !dashboardApiFailureToastShown) {
+      dashboardApiFailureToastShown = true;
+      const isRateLimited = response?.status === 429 || response?.code === "rate_limit_exceeded";
+      showDashboardToast(isRateLimited
+        ? "실시간 갱신이 잠시 지연되고 있어요. 화면은 곧 다시 정상적으로 업데이트돼요."
+        : "대시보드 갱신에 문제가 생겼어요. 화면을 새로고침 해주세요.");
+    }
   }
 
   let schoolDashboardLiveRefreshTimer = 0;

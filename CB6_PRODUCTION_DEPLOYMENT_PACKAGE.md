@@ -9,7 +9,7 @@
 - Firebase 프로젝트: `ai-ways-incheon` (프로젝트 번호 `367235994253`)
 - Functions 리전: `asia-northeast3`
 - 런타임: Node.js `22`
-- Functions: `analyzeSortingImage`, `saveSortingRecord`, `listSortingRecords`, `resolveSortingRecord`, `redeemEdu2gPass`, `getEdu2gSession`, `listEdu2gTrustedDevices`, `revokeEdu2gTrustedDevice`
+- Functions: 이 목록은 2026-08 초 기준이라 낡았다 — 2026-08-19~25 백엔드 재설계로 함수가 8개에서 18개로 늘었다(`analyzeSortingText`, `onSortingRecordWritten`, `getSchoolDashboard`, `checkStudentProfile`, `registerStudentProfile`, `checkCampusLocation`, `changeStudentClass`, `getNationalRanking`, `searchSchool` 신규 추가, 2026-08-26 확인). 실제 배포 대상 함수 목록은 항상 `functions/index.js`의 `exports.*`를 기준으로 삼을 것 — 아래 배포 명령의 `--only functions:...` 목록도 그 기준으로 갱신 필요.
 - Firestore Rules: `firestore.rules` — 클라이언트 직접 접근 전면 거부, Functions Admin SDK만 사용
 - Firestore 복합 인덱스: `records` 컬렉션 범위의 `status ASC`, `createdAt DESC`
 - 정적 웹 출처: `https://edutogether.github.io`
@@ -36,7 +36,7 @@
    ```
 
 3. `records(status ASC, createdAt DESC)` 인덱스가 `READY`인 것을 확인한다. 인덱스 빌드 중에는 상태 필터 조회를 포함한 클로즈드 베타 시작을 하지 않는다.
-4. 명시한 함수만 배포한다.
+4. 명시한 함수만 배포한다. **아래 목록은 2026-08 초 기준으로 낡았다(위 "배포 대상" 절 참고) — 실행 전 `functions/index.js`의 `exports.*` 전체와 대조해 갱신할 것.**
 
    ```powershell
    firebase deploy --project ai-ways-incheon --only functions:analyzeSortingImage,functions:saveSortingRecord,functions:listSortingRecords,functions:resolveSortingRecord,functions:redeemEdu2gPass,functions:getEdu2gSession,functions:listEdu2gTrustedDevices,functions:revokeEdu2gTrustedDevice

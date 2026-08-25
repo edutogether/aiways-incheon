@@ -4,10 +4,14 @@
 
 **`HANDOFF.md`와 이 파일의 역할 차이**: `HANDOFF.md`는 세션 간 인수인계용 상세 작업일지(진행 중인 이슈, 다음에 할 일, 미해결 버그의 시행착오 기록)라 오래되면 낡은 항목이 남아있을 수 있다(마지막 갱신 2026-08-19). `CLAUDE.md`(이 파일)는 저장소 전역 규칙·정착된 결정·구조 요약이며 새 세션이 항상 먼저 읽는 곳이다. 최신 상태 파악은 이 파일을 우선하고, 특정 기능의 구현 배경/시행착오가 궁금하면 `HANDOFF.md`를 참고할 것.
 
+## LOCKED — 재논의·임의 수정 금지
+- 개인랭킹("우리반 실천왕")의 자율입력 이름 노출은 실명검증 없이 허용하기로 이미 확정된 제품결정 — 재논의 금지.
+- 🔴 `registerStudentProfile` 학생소속증명 우회 문제(아래 크로스체크 섹션 참고)는 대표 결정 전까지 임의 설계·수정 금지.
+
 ## 현재 상태 요약 (2026-08-25 기준)
 
 **2026-08-19~25, 백엔드 전면 재설계 완료.** 8/19 사용자가 라이브 상태를 직접 캐물으며 코드를 확인한 결과 "실제로 작동하는 시스템이 아니었음"을 발견(모바일 앱에 네트워크 호출이 0줄, Code.gs/Firestore 이중 백엔드, 화면에 뜨는 최종 판단을 Gemini가 아니라 MobileNet이 정하고 있던 버그 등 — 상세 경위는 `HANDOFF.md` -1절). 그 자리에서 확정한 새 방향을 8단계로 순서대로 구현 완료했다:
-- Code.gs/Google Sheets 완전 폐기, Firestore 단일 백엔드로 전환. MobileNet 완전 제거(Gemini 단독 판정).
+- Firestore 단일 백엔드로 전환 — `mobile/`(진짜 3초판단 앱)과 대시보드 조회는 완료. MobileNet 완전 제거(Gemini 단독 판정). **단, PC `index.html`의 레거시 "AI 판단" 모달(`#aiModal`)은 아직 `appendRecord()`로 Code.gs/Google Sheets에 직접 기록을 쓰고 있어 "완전 폐기"는 아직 아니다(2026-08-26 문서 점검에서 발견, 상세는 `README.md`/`google-apps-script/README.md` 참고).**
 - 최초 1회 실명 가입 + 기기 영구 고정(이중 확인창), 학교 식별자를 자유텍스트에서 NEIS 학교코드로 전환.
 - GPS로 교내/교외만 판정(좌표 자체는 저장 안 하고 통과여부만 저장) — 교내 기록만 학급/학교 경쟁에 반영, 교외 기록은 개인 업적에만 반영.
 - 반 변경 서버 쿨다운, 안전관찰자 조건부 호출(메인 판별이 애매할 때만), 개수 제한 대신 이상 패턴 감지.
@@ -21,23 +25,10 @@
 - `aiways-incheon-closed-beta` 워크트리를 제거하고, 이 폴더(`aiways-incheon`)를 `main`으로 전환 — 지금 이 폴더가 곧 예전 closed-beta다.
 - `feature/owner-visual-recovery`는 삭제하지 않고 `archive/owner-visual-recovery-20260814`로 이름만 옮겨 보관(커밋 보존, 활성 브랜치 목록에서만 제외).
 - `aiways-pc-design-worktree`(브랜치 `feature/pc-frontend-design`, 이미 main에 전부 병합 확인됨)와 `D:\Projects\_review-packages`/`_review-tools`/`_handoff`(git 추적 안 되는 순수 스크래치 파일, 총 5.3GB+)를 삭제.
-- D 참조본(`_visual-recovery/aiways-candidate-d`)은 아래 섹션대로 그대로 보존.
-
-## D (PC Visual Master) 참조본 — 언제든 복원 가능
-
-"D"는 이 앱의 PC(≥64rem) 비주얼을 맞춰나가는 기준점(2026-07-27 커밋)이다.
-
-- **영구 보존**: git 태그 `pc-visual-master-d` (커밋 `0bb2443`). 이 태그가 있는 한 워크트리를 통째로 지워도 언제든 복원 가능.
-- **현재 라이브 워크트리**: `D:/Projects/_visual-recovery/aiways-candidate-d` (포트 8231에서 서빙 중일 때 사용). 이건 그냥 편의용 체크아웃이니, 지워도 아래 명령으로 즉시 재생성 가능:
-  ```
-  git worktree add D:/Projects/_visual-recovery/aiways-candidate-d pc-visual-master-d
-  ```
-- **비교 방법론**: 화면을 눈으로만 비교하지 말고, 두 앱을 동시에 띄운 뒤 `getComputedStyle()`로 같은 CSS 클래스 조합의 실제 계산값(폰트크기·패딩·마진·gap·색상 등)을 element-by-element로 diff. 소스 CSS를 grep으로 훑는 것만으로는 patch-on-patch 구조 때문에 실제 이기는 규칙을 못 찾음 — 반드시 라이브 브라우저에서 확인.
-- **여백/폰트크기는 D도 유동형(fluid)**: 대부분 `clamp()`로 뷰포트 너비에 비례해서 변한다. 한 뷰포트(예: 1728px)에서만 재고 고정값으로 박으면 다른 폭에서 어긋난다 — 최소 두 지점(예: 1440px + 2560px 또는 실제 배포 해상도 두 곳)에서 실측해서 `clamp()` 공식을 다시 유도해야 한다.
 
 ## Git worktree 정리 이력 (2026-08-11)
 
-과거 세션들이 D 후보 탐색 과정에서 만든 worktree가 20개까지 늘어나 있었다. 전부 확인한 결과 메인 클론(`D:/Project/ssamkang/aiways-incheon`)과 이 저장소, D 참조본을 제외한 나머지 18개는:
+과거 세션들이 비교용으로 만든 worktree가 20개까지 늘어나 있었다. 전부 확인한 결과 메인 클론과 이 저장소를 제외한 나머지는:
 - detached-HEAD 스냅샷들은 전부 `main`/영구 태그에 이미 보존되어 있었고,
 - 브랜치 기반 worktree들은 전부 origin에 이미 푸시 완료 상태였다.
 

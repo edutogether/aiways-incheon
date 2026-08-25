@@ -1,5 +1,7 @@
 # PC 비주얼 D 대조 감사 — 2026-08-12
 
+> **역사 기록, 실행 불가**: D 참조본은 2026-08-25 폐기되어 워크트리와 영구 태그(`pc-visual-master-d`) 모두 삭제됐다 — 아래 `git worktree add` 명령은 더 이상 실행되지 않는다. 경로도 당시 표기(`D:/Project/...`, s 없음)로 이후 최상위 폴더가 `D:\Projects`로 이동했다. 참고용으로만 남김.
+
 브랜치 `feature/pc-frontend-design` (워크트리 `D:/Project/ssamkang/aiways-pc-design-worktree`)에서
 PC(≥64rem) 화면을 기준점 D(태그 `pc-visual-master-d`, 커밋 `0bb2443`)와 실측 대조한 기록이다.
 

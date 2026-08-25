@@ -1734,8 +1734,8 @@ a.source-link:hover {
    "eyebrow" 라벨 대신 이 화면 전용 SVG. */
 .school-setup-icon { display: grid; place-items: center; inline-size: 3.6rem; block-size: 3.6rem; margin: 0 auto .9rem; border-radius: 50%; background: var(--ssm-accent-soft); color: var(--ssm-accent); }
 .school-setup-icon svg { inline-size: 1.7rem; block-size: 1.7rem; }
-#dashboardSchoolModal h2 { color: var(--ssm-ink); margin-block: 0 1.4rem; font-size: 1.5rem; line-height: 1.32; font-weight: 800; }
-.school-search-row { position: relative; inline-size: 100%; max-inline-size: 18.5rem; margin: 1.3rem auto 0; }
+#dashboardSchoolModal h2 { color: var(--ssm-ink); margin-block: 10px 1.4rem; font-size: 1.5rem; line-height: 1.32; font-weight: 800; }
+.school-search-row { position: relative; inline-size: 100%; max-inline-size: 18.5rem; margin: calc(1.3rem + 20px) auto 0; }
 .school-search-row input {
   inline-size: 100%; padding: .75rem 1rem .75rem 2.5rem; font-size: .92rem; text-align: start;
   background: #f4f6f9; color: var(--ssm-ink); border: 1.5px solid transparent; border-radius: 999px;

@@ -15,11 +15,18 @@ const RATE_LIMITS = Object.freeze({
   // (파일럿 4개 학교 x PC/패드 여러 대) 전역 상한에 걸려 그 순간 모든
   // 사용자가 같이 막히는 구조였다(실측: 2000/일 액터 상한은 약 2시간
   // 47분 만에 소진). 이 파일럿 규모(4개 학교) 기준으로 여유 있게 올림.
-  getSchoolDashboard: { perMinute: 600 },
+  // perDay는 2026-08-26 정밀감사에서 빠진 게 발견됨 - 분당 상한만 있으면
+  // 하루 종일 최대치로 돌리는 트래픽을 못 막는다. 5초 폴링 x 넉넉히
+  // 20대(4학교 x PC/패드 5대) 기준 하루 약 34.5만 회(17,280 x 20)가
+  // 정상 사용 상한선이라, 그 위에 여유를 둔 50만으로 잡는다.
+  getSchoolDashboard: { perMinute: 600, perDay: 500000 },
   checkStudentProfile: { perMinute: 30 }, registerStudentProfile: { perMinute: 10 },
   checkCampusLocation: { perMinute: 60 },
   changeStudentClass: { perMinute: 10 },
-  getNationalRanking: { perMinute: 60 },
+  // 전국 랭킹(collectionGroup 전수스캔)을 폐지하고 학교+학년 범위로 축소한
+  // 뒤 이름도 그에 맞게 바꿈(2026-08-26) - 쿼리 자체가 훨씬 가벼워졌지만
+  // perDay가 아예 없던 문제는 그대로 남아있어 같이 추가.
+  getClassRanking: { perMinute: 60, perDay: 5000 },
   searchSchool: { perMinute: 60 }
   ,redeemEdu2gPass: { perMinute: 5 }, getEdu2gSession: { perMinute: 60 }, listEdu2gTrustedDevices: { perMinute: 60 }, revokeEdu2gTrustedDevice: { perMinute: 20 }
 });
@@ -88,7 +95,7 @@ const ACTOR_RATE_LIMITS = Object.freeze({
   checkStudentProfile: { perMinute: 10, perDay: 200 }, registerStudentProfile: { perMinute: 5, perDay: 20 },
   checkCampusLocation: { perMinute: 15, perDay: 300 },
   changeStudentClass: { perMinute: 15, perDay: 20 },
-  getNationalRanking: { perMinute: 30, perDay: 2000 },
+  getClassRanking: { perMinute: 30, perDay: 2000 },
   searchSchool: { perMinute: 20, perDay: 500 },
   redeemEdu2gPass: { perMinute: 5 }
 });

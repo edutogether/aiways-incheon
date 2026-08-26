@@ -9,7 +9,7 @@
 - Firebase 프로젝트: `ai-ways-incheon` (프로젝트 번호 `367235994253`)
 - Functions 리전: `asia-northeast3`
 - 런타임: Node.js `22`
-- Functions (2026-08-26 `functions/index.js`의 `exports.*` 전수 대조, 18개): `analyzeSortingImage`, `analyzeSortingText`, `analyzeSortingSafetyObserver`, `saveSortingRecord`, `listSortingRecords`, `resolveSortingRecord`, `onSortingRecordWritten`(Firestore 트리거), `getSchoolDashboard`, `checkStudentProfile`, `registerStudentProfile`, `checkCampusLocation`, `changeStudentClass`, `getNationalRanking`, `searchSchool`, `redeemEdu2gPass`, `getEdu2gSession`, `listEdu2gTrustedDevices`, `revokeEdu2gTrustedDevice`
+- Functions (2026-08-26 `functions/index.js`의 `exports.*` 전수 대조, 18개): `analyzeSortingImage`, `analyzeSortingText`, `analyzeSortingSafetyObserver`, `saveSortingRecord`, `listSortingRecords`, `resolveSortingRecord`, `onSortingRecordWritten`(Firestore 트리거), `getSchoolDashboard`, `checkStudentProfile`, `registerStudentProfile`, `checkCampusLocation`, `changeStudentClass`, `getClassRanking`, `searchSchool`, `redeemEdu2gPass`, `getEdu2gSession`, `listEdu2gTrustedDevices`, `revokeEdu2gTrustedDevice`
 - Firestore Rules: `firestore.rules` — 클라이언트 직접 접근 전면 거부, Functions Admin SDK만 사용
 - Firestore 복합 인덱스: `records` 컬렉션 범위의 `status ASC`, `createdAt DESC`
 - 정적 웹 출처: `https://edutogether.github.io`
@@ -39,7 +39,7 @@
 4. 명시한 함수만 배포한다 (2026-08-26 `functions/index.js` 기준 18개 전체).
 
    ```powershell
-   firebase deploy --project ai-ways-incheon --only functions:analyzeSortingImage,functions:analyzeSortingText,functions:analyzeSortingSafetyObserver,functions:saveSortingRecord,functions:listSortingRecords,functions:resolveSortingRecord,functions:onSortingRecordWritten,functions:getSchoolDashboard,functions:checkStudentProfile,functions:registerStudentProfile,functions:checkCampusLocation,functions:changeStudentClass,functions:getNationalRanking,functions:searchSchool,functions:redeemEdu2gPass,functions:getEdu2gSession,functions:listEdu2gTrustedDevices,functions:revokeEdu2gTrustedDevice
+   firebase deploy --project ai-ways-incheon --only functions:analyzeSortingImage,functions:analyzeSortingText,functions:analyzeSortingSafetyObserver,functions:saveSortingRecord,functions:listSortingRecords,functions:resolveSortingRecord,functions:onSortingRecordWritten,functions:getSchoolDashboard,functions:checkStudentProfile,functions:registerStudentProfile,functions:checkCampusLocation,functions:changeStudentClass,functions:getClassRanking,functions:searchSchool,functions:redeemEdu2gPass,functions:getEdu2gSession,functions:listEdu2gTrustedDevices,functions:revokeEdu2gTrustedDevice
    ```
 
 5. 기존 승인 절차로 정적 GitHub Pages를 게시한다. Firebase Hosting 배포는 이 계약의 대상이 아니다.

@@ -12,7 +12,7 @@ const { createSortingRecordAggregator } = require("./lib/schoolDashboardAggregat
 const { createGetSchoolDashboardHandler } = require("./lib/schoolDashboard");
 const { createCheckStudentProfileHandler, createRegisterStudentProfileHandler, createChangeStudentClassHandler } = require("./lib/studentProfile");
 const { createCheckCampusLocationHandler } = require("./lib/campusLocation");
-const { createGetNationalRankingHandler } = require("./lib/nationalRanking");
+const { createGetClassRankingHandler } = require("./lib/classRanking");
 const { createSearchSchoolHandler } = require("./lib/schoolSearch");
 const { getApps, initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
@@ -78,7 +78,17 @@ const aggregateSortingRecordWrite = createSortingRecordAggregator({ db, serverTi
 exports.onSortingRecordWritten = onDocumentWritten({ region: "asia-northeast3", document: "actors/{actorId}/records/{recordId}" }, async (event) => {
   const before = event.data?.before?.exists ? event.data.before.data() : null;
   const after = event.data?.after?.exists ? event.data.after.data() : null;
-  await aggregateSortingRecordWrite(before, after);
+  try {
+    await aggregateSortingRecordWrite(before, after);
+  } catch (error) {
+    // A failure here used to vanish silently: the student's record still
+    // saves fine (this trigger runs after the fact), but the class/school
+    // aggregate that saveSortingRecordCompleted and the dashboard both fed
+    // on would quietly stop matching reality with no signal anywhere. Log
+    // it at ERROR severity so it surfaces in Cloud Logging/alerts instead.
+    logger.error({ message: "sorting_record_aggregation_failed", actorId: event.params?.actorId, recordId: event.params?.recordId, error: String(error && error.message ? error.message : error) });
+    throw error;
+  }
 });
 exports.getSchoolDashboard = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createGetSchoolDashboardHandler({
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
@@ -95,7 +105,7 @@ exports.checkCampusLocation = onRequest({ region: "asia-northeast3", memory: "25
 exports.changeStudentClass = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createChangeStudentClassHandler({
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
 }));
-exports.getNationalRanking = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createGetNationalRankingHandler({
+exports.getClassRanking = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createGetClassRankingHandler({
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 exports.searchSchool = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, secrets: [neisApiKey], cors: false }, createSearchSchoolHandler({

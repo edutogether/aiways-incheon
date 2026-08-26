@@ -56,7 +56,7 @@ const recordStore = {
       if (existing.exists) return { ...existing.data(), duplicate: true };
       const recordRef = actor.collection("records").doc();
       transaction.create(recordRef, record);
-      transaction.create(idempotency, { recordId: recordRef.id, status: record.status, createdAt: response.createdAt, expireAt: response.expireAt });
+      transaction.create(idempotency, { recordId: recordRef.id, status: record.status, createdAt: response.createdAt });
       return { recordId: recordRef.id, status: record.status, ...response, duplicate: false };
     });
   }

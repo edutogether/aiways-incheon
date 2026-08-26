@@ -1,7 +1,6 @@
 "use strict";
 
 const SCHEMA_VERSION = "sorting-record-v1";
-const DAY_MS = 24 * 60 * 60 * 1000;
 const MAX_BODY_BYTES = 24 * 1024;
 // \bname\b (word-boundary), not a bare "name" substring match -- otherwise
 // legitimate keys like classContext.schoolName would false-positive as PII
@@ -10,6 +9,7 @@ const FORBIDDEN_KEY = /(?:image|base64|data:image|url|authorization|api[_-]?key|
 const ALLOWED_ORIGIN = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
 const { observeAppCheck } = require("./appCheckProtection");
 const { protectActorRequest } = require("./protectedActor");
+const { cleanSchoolId, cleanPathSegment } = require("./firestorePathSafety");
 
 function reject(code) { return { valid: false, code }; }
 function cleanText(value, max = 200) {
@@ -55,10 +55,10 @@ function normalizeChecklist(value) {
 function normalizeClassContext(value) {
   if (value === null || value === undefined) return null;
   if (typeof value !== "object" || Array.isArray(value) || hasForbiddenKey(value)) return undefined;
-  const schoolId = cleanText(value.schoolId, 80);
+  const schoolId = cleanSchoolId(value.schoolId);
   const schoolName = cleanText(value.schoolName, 80);
-  const grade = cleanText(String(value.grade ?? ""), 10);
-  const classNum = cleanText(String(value.classNum ?? ""), 10);
+  const grade = cleanPathSegment(String(value.grade ?? ""));
+  const classNum = cleanPathSegment(String(value.classNum ?? ""));
   return schoolId && grade && classNum ? { schoolId, ...(schoolName ? { schoolName } : {}), grade, classNum } : undefined;
 }
 function validateRecordRequest(body) {
@@ -128,8 +128,10 @@ function createSaveSortingRecordHandler(dependencies = {}) {
     if (!checked.valid) { logger({ validationCode: checked.code }); return res.status(400).json({ ok: false, code: checked.code }); }
     const actorId = protectedActor.actorId;
     const createdAt = now();
-    const expireAt = new Date(createdAt.getTime() + 90 * DAY_MS);
-    const record = { ...checked.value, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), expireAt };
+    // 2026-08-26: 90일 후 자동삭제 정책 폐지 - 이 앱은 누적 실적/반별
+    // 랭킹이 핵심 기능이라 기록을 계속 쌓아야 한다(대표 결정). expireAt을
+    // 아예 더 이상 만들지 않는다.
+    const record = { ...checked.value, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
     // 실명가입(4단계)으로 이 actor에 검증된 studentProfile이 있으면, 클라이언트가
     // 뭐라고 보냈든 그 값을 무시하고 서버가 기억하는 값으로 덮어쓴다 - 그래야
     // 학생이 임시 입력폼을 조작해서 다른 반으로 기록되는 걸 막을 수 있다.
@@ -150,6 +152,7 @@ function createSaveSortingRecordHandler(dependencies = {}) {
     // 저장/기록하지 않는다(checkCampusLocation에서 이미 boolean만 남기고 버림).
     // 아이디가 없거나, 없거나, 만료/중복사용이면 안전하게 교외(false)로 취급한다.
     if (db && record.campusCheckId) {
+      const recordSchoolId = record.classContext?.schoolId || "";
       const checkRef = db.collection("actors").doc(actorId).collection("campusChecks").doc(record.campusCheckId);
       record.onCampus = await db.runTransaction(async (transaction) => {
         const snap = await transaction.get(checkRef);
@@ -158,14 +161,20 @@ function createSaveSortingRecordHandler(dependencies = {}) {
         const expiresAt = data.expiresAt?.toDate ? data.expiresAt.toDate() : new Date(data.expiresAt);
         if (data.consumed === true || !(expiresAt instanceof Date) || Number.isNaN(expiresAt.getTime()) || expiresAt.getTime() < now().getTime()) return false;
         transaction.update(checkRef, { consumed: true });
+        // The check was performed for a specific school (campusLocation.js
+        // stores it at creation time); a record whose classContext claims a
+        // different school cannot borrow that school's on-campus result --
+        // otherwise an actor could stand on their own campus, mint a passing
+        // check, then submit a record tagged with someone else's schoolId.
+        if (!recordSchoolId || data.schoolId !== recordSchoolId) return false;
         return data.onCampus === true;
       });
     }
     delete record.idempotencyKey;
     delete record.campusCheckId;
-    const result = await store.createOrGet(actorId, checked.value.idempotencyKey, record, { createdAt: createdAt.toISOString(), expireAt: expireAt.toISOString() });
+    const result = await store.createOrGet(actorId, checked.value.idempotencyKey, record, { createdAt: createdAt.toISOString() });
     logger({ recordId: result.recordId, status: result.status, provider: record.provider, schemaVersion: SCHEMA_VERSION, duplicate: result.duplicate === true });
-    return res.status(result.duplicate ? 200 : 201).json({ recordId: result.recordId, status: result.status, createdAt: result.createdAt, expireAt: result.expireAt, schemaVersion: SCHEMA_VERSION, duplicate: result.duplicate === true });
+    return res.status(result.duplicate ? 200 : 201).json({ recordId: result.recordId, status: result.status, createdAt: result.createdAt, schemaVersion: SCHEMA_VERSION, duplicate: result.duplicate === true });
   };
 }
-module.exports = { DAY_MS, SCHEMA_VERSION, validateRecordRequest, createSaveSortingRecordHandler };
+module.exports = { SCHEMA_VERSION, validateRecordRequest, createSaveSortingRecordHandler };

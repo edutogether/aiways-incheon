@@ -1,6 +1,7 @@
 "use strict";
 
 const { protectActorRequest } = require("./protectedActor");
+const { cleanSchoolId, cleanPathSegment } = require("./firestorePathSafety");
 
 const MAX_BODY_BYTES = 4 * 1024;
 const ALLOWED_ORIGIN = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
@@ -62,10 +63,10 @@ function createGetSchoolDashboardHandler(dependencies = {}) {
     const body = req.body || {};
     const allowed = new Set(["schoolId", "grade", "classNum"]);
     if (Object.keys(body).some((key) => !allowed.has(key))) return res.status(400).json({ ok: false, code: "unknown_field" });
-    const schoolId = cleanText(body.schoolId, 80);
+    const schoolId = cleanSchoolId(body.schoolId);
     if (!schoolId) return res.status(400).json({ ok: false, code: "invalid_school_id" });
-    const grade = cleanText(body.grade, 10);
-    const classNum = cleanText(body.classNum, 10);
+    const grade = cleanPathSegment(body.grade);
+    const classNum = cleanPathSegment(body.classNum);
     if ((grade && !classNum) || (!grade && classNum)) return res.status(400).json({ ok: false, code: "invalid_class_selector" });
 
     // 실명가입(4단계)이 들어오기 전까지의 임시 격리: 이 actor(기기)가 처음

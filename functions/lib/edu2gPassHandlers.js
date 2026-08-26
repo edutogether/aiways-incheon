@@ -34,6 +34,13 @@ async function protect(req, res, functionName, dependencies) {
   if (observed.httpStatus) { response(res, observed.httpStatus, { ok: false, code: observed.code }); return null; }
   const access = await (functionName === "redeemEdu2gPass" ? dependencies.access.authenticate(req) : dependencies.access.resolve(req));
   if (!access.ok) { response(res, access.httpStatus, { ok: false, code: access.code }); return null; }
+  // redeemEdu2gPass hasn't resolved an actorId yet at this point (only a raw
+  // uid) -- its own blockedActors check happens later in redeem(), once the
+  // registry lookup produces the actorId being redeemed against.
+  if (dependencies.blockedActors && access.actorId) {
+    const blocked = await dependencies.blockedActors.isBlocked(access.actorId).catch(() => false);
+    if (blocked) { response(res, 403, { ok: false, code: "actor_blocked" }); return null; }
+  }
   const limit = await dependencies.rateLimiter.check(functionName);
   if (!limit?.allowed) { response(res, limit?.outcome === "unavailable" ? 503 : 429, { ok: false, code: limit?.outcome === "unavailable" ? "protection_unavailable" : "rate_limited" }); return null; }
   const scoped = await dependencies.actorRateLimiter?.check?.(functionName, functionName === "redeemEdu2gPass" ? access.uid : access.actorId);
@@ -122,6 +129,10 @@ function createEdu2gHandlers(dependencies) {
     const body = req.body || {};
     if (typeof body.loginId !== "string" || typeof body.confirm !== "boolean" || (body.replaceManagementId !== undefined && !MANAGEMENT_ID.test(body.replaceManagementId || "")) || !LABEL.test(body.deviceLabel || "") || !PLATFORM.test(body.platform || "")) return response(res, 400, { ok: false, code: "invalid_request" });
     const match = await dependencies.registry.identify(body.loginId); if (!match.ok) return response(res, 403, { ok: false, code: "login_not_approved" });
+    if (dependencies.blockedActors) {
+      const blocked = await dependencies.blockedActors.isBlocked(match.actor.actorId).catch(() => false);
+      if (blocked) return response(res, 403, { ok: false, code: "actor_blocked" });
+    }
     const actor = { ...match.actor, deviceLabel: body.deviceLabel, platform: body.platform };
     if (!body.confirm) { const prepared = await dependencies.store.prepare({ uid: access.uid, actor }); if (!prepared.ok) return response(res, prepared.code === "device_limit_reached" || prepared.code === "device_already_bound" ? 409 : 503, { ok: false, code: prepared.code, devices: prepared.devices }); return response(res, 200, { ok: true, displayName: actor.displayName, maxDevices: MAX_DEVICES, ...prepared }); }
     const result = await dependencies.store.redeem({ uid: access.uid, actor, replaceManagementId: body.replaceManagementId || "" });

@@ -19,7 +19,7 @@ async function call(handler, body) {
 test("stores completed and held records with server timestamps and idempotency", async () => {
   const { handler, db } = setup();
   const first = await call(handler, payload());
-  assert.equal(first.status, 201); assert.equal(first.body.expireAt, "2026-10-26T00:00:00.000Z");
+  assert.equal(first.status, 201); assert.equal(first.body.expireAt, undefined);
   assert.equal([...db.values()][0].record.createdAt, "SERVER_TIMESTAMP");
   const duplicate = await call(handler, payload());
   assert.equal(duplicate.status, 200); assert.equal(duplicate.body.duplicate, true); assert.equal(db.size, 1);

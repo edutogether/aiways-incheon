@@ -60,6 +60,13 @@ function createSortingRecordAggregator({ db, serverTimestamp, now = () => new Da
     await db.runTransaction(async (transaction) => {
       const snap = await transaction.get(classRef);
       const data = snap.exists ? snap.data() : {};
+      // schoolName은 학생 자율입력이라 검증 수단이 없다 - 매번 최신 값으로
+      // 덮어쓰면 아무 학생이나 전국 랭킹판에 뜨는 학교 표시명을 마음대로
+      // 바꿔칠 수 있다. 그 학교의 첫 기록이 정한 이름을 그대로 고정해
+      // ("최초 작성자 승리") 이후 기록은 절대 못 바꾸게 한다 - 완벽한
+      // 검증은 아니지만 "누구나 아무때나 변조 가능"은 막는다.
+      const schoolSnap = schoolName ? await transaction.get(schoolRef) : null;
+      const schoolNameLocked = !!schoolSnap?.exists && typeof schoolSnap.data()?.schoolName === "string" && schoolSnap.data().schoolName;
       const observedToday = data.lastResetDate === today ? Number(data.observedToday) || 0 : 0;
       const itemCounts = { ...(data.itemCounts && typeof data.itemCounts === "object" ? data.itemCounts : {}) };
       let completedTotal = Number(data.completedTotal) || 0;
@@ -85,7 +92,7 @@ function createSortingRecordAggregator({ db, serverTimestamp, now = () => new Da
         completedTotal, heldTotal, convertedTotal, itemCounts,
         updatedAt: serverTimestamp()
       }, { merge: true });
-      if (schoolName) transaction.set(schoolRef, { schoolName, updatedAt: serverTimestamp() }, { merge: true });
+      if (schoolName && !schoolNameLocked) transaction.set(schoolRef, { schoolName, updatedAt: serverTimestamp() }, { merge: true });
       if (studentRef && isCompleted) {
         const studentData = studentSnap?.exists ? studentSnap.data() : {};
         const studentCompletedTotal = (Number(studentData.completedTotal) || 0) + 1;

@@ -32,9 +32,9 @@ const baseDeps = {
   store: {}
 };
 
-async function assertBlocked(name, handler, body = {}) {
+async function assertBlocked(name, handler, body = {}, extraHeaders = {}) {
   const response = res();
-  await handler({ method: "POST", headers: { origin: "https://edutogether.github.io" }, body }, response);
+  await handler({ method: "POST", headers: { origin: "https://edutogether.github.io", ...extraHeaders }, body }, response);
   assert.equal(response.out.status, 403, `${name}: expected 403, got ${response.out.status} (${JSON.stringify(response.out.body)})`);
   assert.equal(response.out.body?.code, "actor_blocked", `${name}: expected actor_blocked`);
 }
@@ -48,8 +48,8 @@ test("blocked actor is rejected by every handler that wires blockedActors throug
   const { createCheckCampusLocationHandler } = require("../lib/campusLocation");
   await assertBlocked("checkCampusLocation", createCheckCampusLocationHandler(baseDeps));
 
-  const { createGetNationalRankingHandler } = require("../lib/nationalRanking");
-  await assertBlocked("getNationalRanking", createGetNationalRankingHandler(baseDeps));
+  const { createGetClassRankingHandler } = require("../lib/classRanking");
+  await assertBlocked("getClassRanking", createGetClassRankingHandler(baseDeps));
 
   const { createGetSchoolDashboardHandler } = require("../lib/schoolDashboard");
   await assertBlocked("getSchoolDashboard", createGetSchoolDashboardHandler(baseDeps));
@@ -68,4 +68,20 @@ test("blocked actor is rejected by every handler that wires blockedActors throug
 
   const { createSortingSafetyObserverHandler } = require("../lib/sortingSafetyObserver");
   await assertBlocked("analyzeSortingSafetyObserver", createSortingSafetyObserverHandler(baseDeps));
+});
+
+test("blocked actor is rejected by every edu2g handler (session/list/revoke/redeem)", async () => {
+  const { createEdu2gHandlers } = require("../lib/edu2gPassHandlers");
+  const edu2gDeps = {
+    ...baseDeps,
+    access: { resolve: async () => ({ ok: true, actorId: "blocked_actor", uid: "blocked_uid" }), authenticate: async () => ({ ok: true, uid: "blocked_uid" }) },
+    registry: { identify: async () => ({ ok: true, actor: { actorId: "blocked_actor", displayName: "테스트" } }) },
+    store: { prepare: async () => ({ ok: true }), session: async () => ({ actor: {}, device: {} }), list: async () => [], revoke: async () => ({ ok: true }) }
+  };
+  const handlers = createEdu2gHandlers(edu2gDeps);
+  const json = { "content-type": "application/json" };
+  await assertBlocked("getEdu2gSession", handlers.session, {}, json);
+  await assertBlocked("listEdu2gTrustedDevices", handlers.list, {}, json);
+  await assertBlocked("revokeEdu2gTrustedDevice", handlers.revoke, { targetManagementId: "00000000-0000-4000-8000-000000000001", confirm: true }, json);
+  await assertBlocked("redeemEdu2gPass", handlers.redeem, { loginId: "student alpha", deviceLabel: "내 기기", platform: "web", confirm: true }, json);
 });

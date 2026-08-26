@@ -80,7 +80,11 @@ function doPost(e) {
 function doGet(e) {
   const callback = e && e.parameter ? e.parameter.callback : "";
   const action = (e && e.parameter && e.parameter.action) || "list";
+  const token = (e && e.parameter && e.parameter.token) || "";
   try {
+    if (token !== SHARED_SUBMIT_TOKEN) {
+      return json_({ ok: false, error: "unauthorized", rows: [], summary: null }, callback);
+    }
     if (action === "summary") {
       return json_({ ok: true, summary: readSummary_() }, callback);
     }

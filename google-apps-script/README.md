@@ -22,9 +22,13 @@ AIWays 판단 기록을 Google Sheets에 사람이 읽기 좋은 형태로 누�
 7. 배포 URL을 `app.js`의 `DATA_CONFIG.appsScriptUrl`에 넣으면 메인 대시보드가 Sheet 데이터를 우선 읽습니다.
 8. `miniapp/3second.html`의 `AIWAYS_SYNC_CONFIG.appsScriptUrl`에 같은 URL을 넣으면 미니앱 기록도 전송됩니다.
 
-## 읽기 API
+## 읽기 API (2026-08-26부터 인증 필요)
 
-- `GET ?action=list` — 판단기록 원본 전체 (JSON, `callback=` 붙이면 JSONP)
-- `GET ?action=summary` — 반별 오늘 관찰/판단보류/완료 건수 + 헷갈린 물건 TOP 5 (대시보드 실시간 연동용)
+- `GET ?action=list&token=<SHARED_SUBMIT_TOKEN>` — 판단기록 원본 전체 (JSON, `callback=` 붙이면 JSONP)
+- `GET ?action=summary&token=<SHARED_SUBMIT_TOKEN>` — 반별 오늘 관찰/판단보류/완료 건수 + 헷갈린 물건 TOP 5
+
+**2026-08-26 정밀감사에서 발견**: 이 GET 엔드포인트에 원래 인증이 전혀 없어서, `app.js`에 노출된 배포 URL을 누구나 복사해 판단기록 전체를 조회할 수 있었습니다. `doPost`와 동일한 `SHARED_SUBMIT_TOKEN`을 쿼리파라미터로 요구하도록 고쳤습니다. 현재 `app.js`/`mobile/`은 이 GET 엔드포인트를 실제로 호출하지 않습니다(대시보드 조회는 Firestore로 이관 완료) — 이 API는 수동 점검용으로만 남아있는 상태입니다.
 
 URL이 비어 있거나 연결이 실패하면 메인 사이트는 `base-data-seed.tsv`의 고정 데이터로 표시됩니다.
+
+**Code.gs를 고친 뒤에는 Apps Script 편집기에서 `배포 > 배포 관리 > 수정(연필 아이콘) > 새 버전 > 배포`로 재배포해야 실제로 반영됩니다** — git push만으로는 라이브에 적용되지 않습니다(대표님만 실행 가능).

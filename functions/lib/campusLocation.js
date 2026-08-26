@@ -6,6 +6,7 @@
 // is a short-lived, single-use check id (actors/{actorId}/campusChecks/{id})
 // that saveSortingRecord later consumes to attach onCampus to a record.
 const { protectActorRequest } = require("./protectedActor");
+const { cleanSchoolId } = require("./firestorePathSafety");
 
 const MAX_BODY_BYTES = 1 * 1024;
 const ALLOWED_ORIGIN = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
@@ -62,7 +63,7 @@ function createCheckCampusLocationHandler(dependencies = {}) {
     const body = req.body || {};
     const allowed = new Set(["schoolId", "lat", "lng"]);
     if (Object.keys(body).some((key) => !allowed.has(key))) return res.status(400).json({ ok: false, code: "unknown_field" });
-    const schoolId = cleanText(body.schoolId, 80);
+    const schoolId = cleanSchoolId(body.schoolId);
     const lat = Number(body.lat);
     const lng = Number(body.lng);
     if (!schoolId || !Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
@@ -81,7 +82,7 @@ function createCheckCampusLocationHandler(dependencies = {}) {
     // lat/lng go out of scope here -- nothing below this line ever sees them again.
 
     const checkRef = db.collection("actors").doc(protectedActor.actorId).collection("campusChecks").doc();
-    await checkRef.set({ onCampus, consumed: false, createdAt: serverTimestamp(), expiresAt: new Date(now().getTime() + CHECK_TTL_MS) });
+    await checkRef.set({ schoolId, onCampus, consumed: false, createdAt: serverTimestamp(), expiresAt: new Date(now().getTime() + CHECK_TTL_MS) });
     return res.status(200).json({ ok: true, onCampus, campusCheckId: checkRef.id });
   };
 }

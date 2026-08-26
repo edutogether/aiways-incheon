@@ -46,6 +46,7 @@ function toSchool(row) {
 function createSearchSchoolHandler(dependencies = {}) {
   const getApiKey = dependencies.getApiKey;
   const fetchImpl = dependencies.fetch || fetch;
+  const logger = dependencies.logger || (() => {});
   return async (req, res) => {
     if (!applyCors(req, res)) return res.status(403).json({ ok: false, code: "invalid_origin" });
     if (req.method === "OPTIONS") return res.status(204).send("");
@@ -79,7 +80,11 @@ function createSearchSchoolHandler(dependencies = {}) {
       const rows = data?.schoolInfo?.[1]?.row;
       const schools = Array.isArray(rows) ? rows.map(toSchool).filter((school) => school.schoolCode && school.schoolName) : [];
       return res.status(200).json({ ok: true, schools });
-    } catch {
+    } catch (error) {
+      // 2026-08-27 재감사 지적: 이 catch가 조용해서, NEIS가 장애나면
+      // 모든 학생의 학교검색이 실패하는데 Cloud Logging엔 아무 흔적도
+      // 안 남았다.
+      logger({ message: "search_school_provider_failed", error: String(error && error.message ? error.message : error) });
       return res.status(502).json({ ok: false, code: "provider_unavailable" });
     } finally {
       clearTimeout(timer);

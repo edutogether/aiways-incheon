@@ -19,7 +19,13 @@ const RATE_LIMITS = Object.freeze({
   // 하루 종일 최대치로 돌리는 트래픽을 못 막는다. 5초 폴링 x 넉넉히
   // 20대(4학교 x PC/패드 5대) 기준 하루 약 34.5만 회(17,280 x 20)가
   // 정상 사용 상한선이라, 그 위에 여유를 둔 50만으로 잡는다.
-  getSchoolDashboard: { perMinute: 600, perDay: 500000 },
+  // shards: 이 함수만 분당 상한이 초당 1회를 크게 넘어(600/분=초당10회)
+  // 실제 문서 경합 위험이 있다 - 나머지 13개 함수는 전부 분당 120 이하
+  // (초당 2회 이하)라 애초에 단일 문서로도 경합이 안 난다. 2026-08-26에
+  // 전체 함수에 샤딩을 걸었다가 요청당 읽기가 1→9로 늘어 비용이 오히려
+  // 늘어난 걸 재감사에서 지적받아, 실제로 필요한 이 함수 하나에만 걸도록
+  // 좁혔다(2026-08-27).
+  getSchoolDashboard: { perMinute: 600, perDay: 500000, shards: 8 },
   checkStudentProfile: { perMinute: 30 }, registerStudentProfile: { perMinute: 10 },
   checkCampusLocation: { perMinute: 60 },
   changeStudentClass: { perMinute: 10 },
@@ -56,26 +62,55 @@ function expireAtFor(now) {
 // 경합했다. getSchoolDashboard의 분당 상한(600=초당10회)이 Firestore의
 // 단일 문서 권장 쓰기 속도(초당~1회)를 크게 넘어서, 상한에 도달하기도
 // 전에 문서 경합만으로 트랜잭션이 실패해 503이 났다. 여기서는 같은
-// (함수,날짜) 카운터를 GLOBAL_LIMITER_SHARD_COUNT개 문서로 쪼개
-// 분산시킨다 - 상한 판정은 모든 샤드를 합산(일반 읽기, 트랜잭션 불필요)
-// 해서 하고, 실제 카운트 증가만 무작위로 고른 샤드 1개에 트랜잭션으로
-// 쓴다. 그 결과 한 문서가 받는 지속 쓰기 속도가 1/샤드수로 줄어든다.
+// (함수,날짜) 카운터를 그 함수의 RATE_LIMITS 설정에 적힌 shards개
+// 문서로 쪼개 분산시킨다 - 상한 판정은 모든 샤드를 합산(일반 읽기,
+// 트랜잭션 불필요)해서 하고, 실제 카운트 증가만 무작위로 고른 샤드
+// 1개에 트랜잭션으로 쓴다. 그 결과 한 문서가 받는 지속 쓰기 속도가
+// 1/샤드수로 줄어든다.
 // 트레이드오프: 합산 판정(읽기)과 실제 증가(쓰기) 사이에 아주 짧은
 // 틈이 있어서, 상한 경계에서 동시 요청이 몰리면 몇 건이 상한을 살짝
 // 넘겨 통과할 수 있다 - 이건 과금 방어용 소프트 상한이라 허용 가능한
 // 수준이고(정확한 하드 리밋이 필요한 곳이 아님), 반대급부로 얻는
 // "경합으로 인한 전체 503 방지"가 훨씬 중요하다.
-const GLOBAL_LIMITER_SHARD_COUNT = 8;
+// shards 미지정(대부분의 함수)이면 1로, 즉 기존과 똑같이 요청당 읽기
+// 1회+쓰기 1회다 - 2026-08-27 재감사에서 "전체 14개 함수에 일괄로
+// 8샤딩을 걸어서 요청당 읽기가 1→9로 늘었다"는 비용 회귀를 지적받아,
+// 실제로 경합 위험이 있는 함수(초당 1회를 넘는 것)에만 좁혔다.
+const DEFAULT_SHARD_COUNT = 1;
 
-function createGlobalRateLimiter({ db, now = () => new Date(), serverTimestamp = () => new Date(), shardCount = GLOBAL_LIMITER_SHARD_COUNT, logger = () => {} }) {
+function createGlobalRateLimiter({ db, now = () => new Date(), serverTimestamp = () => new Date(), logger = () => {} }) {
   return {
     async check(functionName) {
       const limit = RATE_LIMITS[functionName];
       if (!limit || !db?.runTransaction) return { allowed: false, outcome: "unavailable" };
       const current = new Date(now());
       const { utcDate, minuteKey } = getUtcBuckets(current);
+      const shardCount = Math.max(1, Number(limit.shards) || DEFAULT_SHARD_COUNT);
       const shardRefs = Array.from({ length: shardCount }, (_, index) => db.collection("system_rate_limits").doc(`${functionName}-${utcDate}-${index}`));
       try {
+        // shardCount 1(대부분의 함수)일 땐 트랜잭션 밖에서 미리 합산할
+        // 필요가 없다 - 트랜잭션 안에서 그 문서 하나만 읽고 바로 판정하면
+        // 읽기 1회(+쓰기 1회)로 끝난다, 샤딩 이전과 정확히 같은 비용이다.
+        // shardCount>1일 때만(지금은 getSchoolDashboard 하나) 모든 샤드를
+        // 먼저 합산해서 판정한다.
+        if (shardCount === 1) {
+          const shardRef = shardRefs[0];
+          return await db.runTransaction(async (transaction) => {
+            const snap = await transaction.get(shardRef);
+            const data = snap.exists ? (snap.data() || {}) : {};
+            const minuteCounts = data.minuteCounts && typeof data.minuteCounts === "object" ? data.minuteCounts : {};
+            const minuteCount = Number(minuteCounts[minuteKey] || 0);
+            const totalCount = Number(data.totalCount || 0);
+            const outcome = minuteCount >= limit.perMinute ? "minute_limited" : (limit.perDay && totalCount >= limit.perDay ? "daily_limited" : "allowed");
+            if (outcome !== "allowed") return { allowed: false, outcome, retryAfterSeconds: getRetryAfterSeconds(current, outcome) };
+            transaction.set(shardRef, {
+              schemaVersion: RATE_LIMIT_SCHEMA, functionName, utcDate,
+              totalCount: totalCount + 1, minuteCounts: { ...minuteCounts, [minuteKey]: minuteCount + 1 },
+              ...(snap.exists ? {} : { createdAt: serverTimestamp(), expireAt: expireAtFor(current) }), updatedAt: serverTimestamp()
+            }, { merge: true });
+            return { allowed: true, outcome: "allowed" };
+          });
+        }
         const snaps = await Promise.all(shardRefs.map((ref) => ref.get()));
         let minuteCount = 0, totalCount = 0;
         for (const snap of snaps) {

@@ -1896,7 +1896,12 @@
     dashboardApiFailureStreak += 1;
     console.warn("[aiways] 대시보드 갱신 실패", response?.status, response?.code);
     const isRateLimited = response?.status === 429 || response?.code === "rate_limit_exceeded";
-    if (isRateLimited) {
+    // 2026-08-27 재감사 지적: 429만 백오프 대상이었는데, 레이트리미터
+    // 자체가 내부 오류로 막히면 서버는 429가 아니라 503+
+    // protection_unavailable을 돌려준다(globalRateLimit.js) - 그 경우도
+    // 똑같이 계속 5초마다 두드리면 장애 중인 백엔드를 더 몰아붙이게 된다.
+    const isProtectionUnavailable = response?.status === 503 || response?.code === "protection_unavailable";
+    if (isRateLimited || isProtectionUnavailable) {
       const serverRetryAfter = Number(response?.data?.retryAfterSeconds ?? response?.retryAfterSeconds);
       dashboardApiBackoffSeconds = Number.isFinite(serverRetryAfter) && serverRetryAfter > 0 ? serverRetryAfter : 10;
     }
@@ -1904,7 +1909,7 @@
     // 그 시점에 딱 한 번만 토스트를 띄운다(재접속/새로고침 전까지 반복 안 함).
     if (dashboardApiFailureStreak >= 3 && !dashboardApiFailureToastShown) {
       dashboardApiFailureToastShown = true;
-      showDashboardToast(isRateLimited
+      showDashboardToast(isRateLimited || isProtectionUnavailable
         ? "실시간 갱신이 잠시 지연되고 있어요. 화면은 곧 다시 정상적으로 업데이트돼요."
         : "대시보드 갱신에 문제가 생겼어요. 화면을 새로고침 해주세요.");
     }

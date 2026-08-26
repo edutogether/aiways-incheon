@@ -98,7 +98,7 @@ exports.getClassRanking = onRequest({ region: "asia-northeast3", memory: "256MiB
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 exports.searchSchool = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, secrets: [neisApiKey], cors: false }, createSearchSchoolHandler({
-  getApiKey: () => neisApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
+  getApiKey: () => neisApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: (metadata) => logger.error(metadata)
 }));
 const edu2gHandlers = createEdu2gHandlers({
   registry: createEdu2gPassRegistry({ getSecret: () => edu2gPassRegistrySecret.value() }),

@@ -1,4 +1,12 @@
 /**
+ * 2026-08-26: 더 이상 안 씀 (참고용으로만 보존).
+ * PC의 레거시 "AI 판단" 모달이 마지막으로 이 스크립트를 쓰던 곳이었는데,
+ * app.js의 appendRecord()가 다른 화면들과 같은 Firestore 백엔드
+ * (saveSortingRecord)로 완전히 이관되면서 이 웹앱을 호출하는 코드가
+ * 저장소 안에 하나도 안 남았다. 삭제는 하지 않고 과거 참고용으로만 둔다
+ * (대표 결정) - 실제로 배포를 내리려면 Apps Script 편집기에서 별도로
+ * 처리해야 한다(git과 무관).
+ *
  * AI Ways Incheon — 판단 기록 수집 스크립트
  *
  * 시트 구성 (전부 자동으로 생성됨):
@@ -80,11 +88,7 @@ function doPost(e) {
 function doGet(e) {
   const callback = e && e.parameter ? e.parameter.callback : "";
   const action = (e && e.parameter && e.parameter.action) || "list";
-  const token = (e && e.parameter && e.parameter.token) || "";
   try {
-    if (token !== SHARED_SUBMIT_TOKEN) {
-      return json_({ ok: false, error: "unauthorized", rows: [], summary: null }, callback);
-    }
     if (action === "summary") {
       return json_({ ok: true, summary: readSummary_() }, callback);
     }

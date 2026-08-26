@@ -1,6 +1,6 @@
 # AIWays Google Sheets 연동
 
-> **2026-08-25 상태 갱신**: 2026-08-19~25 백엔드 재설계로 대시보드 조회와 `mobile/`(진짜 3초판단 앱)은 전부 Firestore로 이관됐다. 이 Apps Script는 더 이상 데이터를 "읽어가는" 경로가 아니고, PC `index.html`의 레거시 "AI 판단" 모달(`#aiModal`)이 여전히 여기로 기록을 쓰고 있는 잔존 경로다(`app.js`의 `appendRecord()` 참고). 완전 폐기 여부는 팀장 판단 대기 — 이 문서는 그 잔존 경로가 살아있는 동안의 설정 안내로만 유효하다.
+> **2026-08-26: 더 이상 안 씀 (참고용으로만 보존)**. PC `index.html`의 "AI 판단" 모달(`#aiModal`)이 마지막으로 이 Apps Script를 쓰던 곳이었는데, `app.js`의 `appendRecord()`가 다른 화면들과 같은 Firestore 백엔드(`saveSortingRecord`)로 완전히 이관되면서 이 문서에 적힌 설정을 실제로 참고할 코드가 저장소 안에 남아있지 않다. 삭제하지 않고 과거 참고용으로만 남겨둔다(대표 결정, 2026-08-25 백엔드 재설계 히스토리와 연결된 마지막 잔존 경로였음).
 
 AIWays 판단 기록을 Google Sheets에 사람이 읽기 좋은 형태로 누적하기 위한 Apps Script입니다.
 

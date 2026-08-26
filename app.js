@@ -10,12 +10,9 @@
   let kioskEventTag = "";
 
   const DATA_CONFIG = {
-    appsScriptUrl: "https://script.google.com/macros/s/AKfycbykh5VyFwzbA55nLTFNsWlhSoqiFl49JA1o3UUBHHsSOTOC9YaNj_e9rCnwZIEsLKR8/exec",
-    // 이 URL 자체가 이미 공개돼 있어 이 토큰도 완전한 비밀은 아니지만,
-    // Code.gs의 SHARED_SUBMIT_TOKEN과 같은 값이어야 임의의 스팸 POST를
-    // 최소한 걸러낼 수 있다. 값을 바꾸면 반드시 Code.gs 쪽도 같이 바꿔서
-    // Apps Script 편집기에서 재배포해야 한다.
-    submitToken: "aiways-2026-expo-9f3c",
+    // 2026-08-26: Google Sheets/Apps Script 연동(appsScriptUrl/submitToken)
+    // 완전 제거 - PC의 AI 판단 모달도 이제 다른 화면들과 같은 Firestore
+    // 백엔드(saveSortingRecordToFirestore(), 아래)에만 기록한다.
     seedUrl: "./base-data-seed.tsv",
     currentSchool: "AIWays초",
     currentGrade: "5학년",
@@ -464,6 +461,12 @@
 
   let teachableMachineModelPromise = null;
   let currentDraft = null;
+  // classifyImage()'s full return value, kept alongside the simplified
+  // currentDraft (UI-facing only: mapped_item/suggested_category/etc) so the
+  // #confirmDecision handler can still build a schema-correct
+  // saveSortingRecord() analysis.objectCandidates entry (needs judgementKey/
+  // provider/confidenceBand, none of which currentDraft carries).
+  let currentAnalysisDraft = null;
   let pendingDecision = null;
   let previewUrl = "";
   let sessionImageFile = null;
@@ -2586,6 +2589,42 @@
     return allStoredRecords();
   }
 
+  function createPcRecordIdempotencyKey() {
+    return createAnalysisIdempotencyKey() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+
+  // 2026-08-26: PC "AI 판단" 모달을 Google Sheets 대신 다른 화면들과 같은
+  // Firestore 백엔드(saveSortingRecord, mobile/app.js의 submitSortingRecord()와
+  // 같은 패턴)로 옮긴 지점. PC는 mobile/처럼 학교/반 실명 연결이 없는
+  // 발표용 데모 화면이라 classContext/campusCheckId는 보내지 않는다 -
+  // 기록 자체는 저장되지만(개인 기록), 반/학교 집계에는 반영되지 않는다.
+  async function saveSortingRecordToFirestore(record) {
+    const client = window.AIWaysEdu2gClient;
+    if (!client?.saveSortingRecord) return false;
+    const draft = currentAnalysisDraft;
+    const isAiResult = !!draft?.liveGemini;
+    const selectedItemId = cleanText(draft?.judgementKey || record.mapped_item || "hold", 40) || "hold";
+    const payload = {
+      schemaVersion: "sorting-record-v1",
+      status: record.hold_flag ? "held" : "completed",
+      provider: cleanText(draft?.provider || (record.hold_flag ? "manual_hold" : "manual_select"), 80) || "manual_select",
+      analysis: {
+        objectCandidates: isAiResult ? [{ label: cleanText(draft.item, 40) || selectedItemId, itemId: selectedItemId, objectType: selectedItemId, confidenceBand: draft.confidenceBand || "unknown" }] : [],
+        materialCandidates: [], visibleCautions: []
+      },
+      checklist: [],
+      userDecision: { selectedItemId, action: record.hold_flag ? "held" : "recorded", userConfirmed: true },
+      hold: record.hold_flag ? { recommended: true, reasons: ["PC 수동 판단"] } : null,
+      idempotencyKey: createPcRecordIdempotencyKey()
+    };
+    try {
+      const response = await client.saveSortingRecord(payload);
+      return response.ok === true;
+    } catch {
+      return false;
+    }
+  }
+
   async function appendRecord(record) {
     const parts = classParts(selectedClassName());
     const safeRecord = {
@@ -2608,26 +2647,11 @@
       action: record.hold_flag ? "hold" : "confirm",
       image_saved: false,
       app_version: "clean-2026-07",
-      shared_token: DATA_CONFIG.submitToken,
       ...(kioskEventTag ? { event_channel: kioskEventTag } : {})
     };
 
-    let result = DATA_CONFIG.appsScriptUrl ? true : "queued";
-    try {
-      if (DATA_CONFIG.appsScriptUrl) {
-        await fetch(DATA_CONFIG.appsScriptUrl, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(safeRecord)
-        });
-      } else {
-        const pending = readJson(STORAGE_PENDING, []);
-        pending.push(safeRecord);
-        writeJson(STORAGE_PENDING, pending);
-      }
-    } catch {
-      result = false;
+    const result = await saveSortingRecordToFirestore(record);
+    if (!result) {
       const pending = readJson(STORAGE_PENDING, []);
       pending.push(safeRecord);
       writeJson(STORAGE_PENDING, pending);
@@ -3227,7 +3251,7 @@
   function updateSortingFromRecord(record, saved = true) {
     const label = cleanText(record.mapped_item || record.ai_raw_label || record.final_decision || "판단 기록");
     if (record.hold_flag || cleanText(record.final_decision).includes("보류")) {
-      addSortingHoldLocally(label, "Google Sheets 기록 반영 대기 안건", saved);
+      addSortingHoldLocally(label, "기록 반영 대기 안건", saved);
       return;
     }
 
@@ -3241,7 +3265,7 @@
   }
 
   function storageMessage(saved, kind = "record") {
-    if (saved === true) return kind === "hold" ? "판단 보류를 Google Sheets에 저장하고 보류함에 반영했어요." : "기록을 Google Sheets에 저장하고 실천 통계에 반영했어요.";
+    if (saved === true) return kind === "hold" ? "판단 보류를 저장하고 보류함에 반영했어요." : "기록을 저장하고 실천 통계에 반영했어요.";
     return "현재 연결이 불안정해 임시 저장 후 다시 전송을 시도합니다.";
   }
 
@@ -3930,6 +3954,7 @@
   function resetModalState() {
     pendingDecision = null;
     currentDraft = null;
+    currentAnalysisDraft = null;
     setScanning(false);
     document.body.classList.remove("modal-open");
     setDecisionConfirm(false);
@@ -4008,6 +4033,7 @@
       userContext: { selectedCorrectionType: currentSortingJudgement?.selectedCorrectionType || "" }
     });
     if (session !== modalSession) return;
+    currentAnalysisDraft = draft;
     currentDraft = {
       input_type: "image",
       ai_engine: draft.source || "fallback-rule",
@@ -4369,7 +4395,7 @@
 
     $("#confirmDecision")?.addEventListener("click", async () => {
       if (!pendingDecision) return;
-      setSaveState(pendingDecision.hold_flag ? "판단 보류를 Google Sheets에 저장 중입니다..." : "학생 최종 판단을 Google Sheets에 저장 중입니다...");
+      setSaveState(pendingDecision.hold_flag ? "판단 보류를 저장 중입니다..." : "학생 최종 판단을 저장 중입니다...");
       const decision = pendingDecision;
       const saved = await appendRecord(pendingDecision);
       updateSortingFromRecord(decision, saved);

@@ -11,7 +11,7 @@
 ## 현재 상태 요약 (2026-08-25 기준)
 
 **2026-08-19~25, 백엔드 전면 재설계 완료.** 8/19 사용자가 라이브 상태를 직접 캐물으며 코드를 확인한 결과 "실제로 작동하는 시스템이 아니었음"을 발견(모바일 앱에 네트워크 호출이 0줄, Code.gs/Firestore 이중 백엔드, 화면에 뜨는 최종 판단을 Gemini가 아니라 MobileNet이 정하고 있던 버그 등 — 상세 경위는 `HANDOFF.md` -1절). 그 자리에서 확정한 새 방향을 8단계로 순서대로 구현 완료했다:
-- Firestore 단일 백엔드로 전환 — `mobile/`(진짜 3초판단 앱)과 대시보드 조회는 완료. MobileNet 완전 제거(Gemini 단독 판정). **단, PC `index.html`의 레거시 "AI 판단" 모달(`#aiModal`)은 아직 `appendRecord()`로 Code.gs/Google Sheets에 직접 기록을 쓰고 있어 "완전 폐기"는 아직 아니다(2026-08-26 문서 점검에서 발견, 상세는 `README.md`/`google-apps-script/README.md` 참고).**
+- Firestore 단일 백엔드로 완전 전환(2026-08-26) — `mobile/`, 대시보드 조회, PC `index.html`의 "AI 판단" 모달(`#aiModal`, `app.js`의 `saveSortingRecordToFirestore()`) 전부 Firestore/Functions로 이관 완료. Google Sheets/Apps Script(`google-apps-script/`)는 더 이상 안 씀(삭제하지 않고 참고용으로만 보존). MobileNet 완전 제거(Gemini 단독 판정).
 - 최초 1회 실명 가입 + 기기 영구 고정(이중 확인창), 학교 식별자를 자유텍스트에서 NEIS 학교코드로 전환.
 - GPS로 교내/교외만 판정(좌표 자체는 저장 안 하고 통과여부만 저장) — 교내 기록만 학급/학교 경쟁에 반영, 교외 기록은 개인 업적에만 반영.
 - 반 변경 서버 쿨다운, 안전관찰자 조건부 호출(메인 판별이 애매할 때만), 개수 제한 대신 이상 패턴 감지.

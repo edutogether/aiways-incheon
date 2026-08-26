@@ -7,6 +7,7 @@ const { createAnalyzeSortingHandler } = require("./lib/sortingVision");
 const { createAnalyzeSortingTextHandler } = require("./lib/sortingTextTip");
 const { createSortingSafetyObserverHandler } = require("./lib/sortingSafetyObserver");
 const { createSaveSortingRecordHandler } = require("./lib/sortingRecord");
+const { createRecordStore } = require("./lib/sortingRecordStore");
 const { createListSortingRecordsHandler, createResolveSortingRecordHandler } = require("./lib/sortingRecordQuery");
 const { createSortingRecordAggregator } = require("./lib/schoolDashboardAggregate");
 const { createGetSchoolDashboardHandler } = require("./lib/schoolDashboard");
@@ -47,20 +48,7 @@ exports.analyzeSortingText = onRequest({
   secrets: [geminiApiKey], cors: false
 }, createAnalyzeSortingTextHandler({ getApiKey: () => geminiApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, analysisRequests, logAppCheck, blockedActors }));
 exports.analyzeSortingSafetyObserver = onRequest({ region:"asia-northeast3", memory:"256MiB", timeoutSeconds:30, minInstances:0, maxInstances:2, concurrency:1, secrets:[geminiApiKey], cors:false }, createSortingSafetyObserverHandler({getApiKey:()=>geminiApiKey.value(),access:deviceAccess,rateLimiter,actorRateLimiter,analysisRequests,logAppCheck,blockedActors}));
-const recordStore = {
-  async createOrGet(actorId, idempotencyKey, record, response) {
-    const actor = db.collection("actors").doc(actorId);
-    const idempotency = actor.collection("_idempotency").doc(idempotencyKey);
-    return db.runTransaction(async (transaction) => {
-      const existing = await transaction.get(idempotency);
-      if (existing.exists) return { ...existing.data(), duplicate: true };
-      const recordRef = actor.collection("records").doc();
-      transaction.create(recordRef, record);
-      transaction.create(idempotency, { recordId: recordRef.id, status: record.status, createdAt: response.createdAt });
-      return { recordId: recordRef.id, status: record.status, ...response, duplicate: false };
-    });
-  }
-};
+const recordStore = createRecordStore({ db });
 exports.saveSortingRecord = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createSaveSortingRecordHandler({
   serverTimestamp: () => FieldValue.serverTimestamp(), store: recordStore, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, db
 }));

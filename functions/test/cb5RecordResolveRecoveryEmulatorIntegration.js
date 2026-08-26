@@ -106,7 +106,6 @@ function createRecordStores(db) {
             recordId: recordRef.id,
             status: record.status,
             createdAt: response.createdAt,
-            expireAt: response.expireAt,
           });
           return { recordId: recordRef.id, status: record.status, ...response, duplicate: false };
         });

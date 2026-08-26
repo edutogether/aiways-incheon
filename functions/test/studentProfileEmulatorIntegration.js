@@ -84,7 +84,7 @@ const student = { schoolId: "7321071", schoolName: "테스트초등학교", grad
         if (prior.exists) return { ...prior.data(), duplicate: true };
         const ref = actor.collection("records").doc();
         tx.create(ref, record);
-        tx.create(idem, { recordId: ref.id, status: record.status, createdAt: response.createdAt, expireAt: response.expireAt });
+        tx.create(idem, { recordId: ref.id, status: record.status, createdAt: response.createdAt });
         return { recordId: ref.id, status: record.status, ...response, duplicate: false };
       });
     } };

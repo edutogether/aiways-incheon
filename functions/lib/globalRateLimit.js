@@ -51,31 +51,60 @@ function expireAtFor(now) {
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 3, 0, 0, 0));
 }
 
-function createGlobalRateLimiter({ db, now = () => new Date(), serverTimestamp = () => new Date() }) {
+// 2026-08-26 재감사 지적사항: 이전엔 함수 하나당 하루짜리 문서가 딱 1개라,
+// 모든 actor의 모든 요청이 그 문서 하나를 두고 트랜잭션(읽기→쓰기)으로
+// 경합했다. getSchoolDashboard의 분당 상한(600=초당10회)이 Firestore의
+// 단일 문서 권장 쓰기 속도(초당~1회)를 크게 넘어서, 상한에 도달하기도
+// 전에 문서 경합만으로 트랜잭션이 실패해 503이 났다. 여기서는 같은
+// (함수,날짜) 카운터를 GLOBAL_LIMITER_SHARD_COUNT개 문서로 쪼개
+// 분산시킨다 - 상한 판정은 모든 샤드를 합산(일반 읽기, 트랜잭션 불필요)
+// 해서 하고, 실제 카운트 증가만 무작위로 고른 샤드 1개에 트랜잭션으로
+// 쓴다. 그 결과 한 문서가 받는 지속 쓰기 속도가 1/샤드수로 줄어든다.
+// 트레이드오프: 합산 판정(읽기)과 실제 증가(쓰기) 사이에 아주 짧은
+// 틈이 있어서, 상한 경계에서 동시 요청이 몰리면 몇 건이 상한을 살짝
+// 넘겨 통과할 수 있다 - 이건 과금 방어용 소프트 상한이라 허용 가능한
+// 수준이고(정확한 하드 리밋이 필요한 곳이 아님), 반대급부로 얻는
+// "경합으로 인한 전체 503 방지"가 훨씬 중요하다.
+const GLOBAL_LIMITER_SHARD_COUNT = 8;
+
+function createGlobalRateLimiter({ db, now = () => new Date(), serverTimestamp = () => new Date(), shardCount = GLOBAL_LIMITER_SHARD_COUNT, logger = () => {} }) {
   return {
     async check(functionName) {
       const limit = RATE_LIMITS[functionName];
       if (!limit || !db?.runTransaction) return { allowed: false, outcome: "unavailable" };
       const current = new Date(now());
       const { utcDate, minuteKey } = getUtcBuckets(current);
-      const ref = db.collection("system_rate_limits").doc(`${functionName}-${utcDate}`);
+      const shardRefs = Array.from({ length: shardCount }, (_, index) => db.collection("system_rate_limits").doc(`${functionName}-${utcDate}-${index}`));
       try {
-        return await db.runTransaction(async (transaction) => {
-          const snap = await transaction.get(ref);
+        const snaps = await Promise.all(shardRefs.map((ref) => ref.get()));
+        let minuteCount = 0, totalCount = 0;
+        for (const snap of snaps) {
           const data = snap.exists ? (snap.data() || {}) : {};
           const minuteCounts = data.minuteCounts && typeof data.minuteCounts === "object" ? data.minuteCounts : {};
-          const minuteCount = Number(minuteCounts[minuteKey] || 0);
-          const totalCount = Number(data.totalCount || 0);
-          const outcome = minuteCount >= limit.perMinute ? "minute_limited" : (limit.perDay && totalCount >= limit.perDay ? "daily_limited" : "allowed");
-          if (outcome !== "allowed") return { allowed: false, outcome, retryAfterSeconds: getRetryAfterSeconds(current, outcome) };
-          transaction.set(ref, {
+          minuteCount += Number(minuteCounts[minuteKey] || 0);
+          totalCount += Number(data.totalCount || 0);
+        }
+        const outcome = minuteCount >= limit.perMinute ? "minute_limited" : (limit.perDay && totalCount >= limit.perDay ? "daily_limited" : "allowed");
+        if (outcome !== "allowed") return { allowed: false, outcome, retryAfterSeconds: getRetryAfterSeconds(current, outcome) };
+        const shardRef = shardRefs[Math.floor(Math.random() * shardCount)];
+        await db.runTransaction(async (transaction) => {
+          const snap = await transaction.get(shardRef);
+          const data = snap.exists ? (snap.data() || {}) : {};
+          const minuteCounts = data.minuteCounts && typeof data.minuteCounts === "object" ? data.minuteCounts : {};
+          const shardMinuteCount = Number(minuteCounts[minuteKey] || 0);
+          const shardTotalCount = Number(data.totalCount || 0);
+          transaction.set(shardRef, {
             schemaVersion: RATE_LIMIT_SCHEMA, functionName, utcDate,
-            totalCount: totalCount + 1, minuteCounts: { ...minuteCounts, [minuteKey]: minuteCount + 1 },
+            totalCount: shardTotalCount + 1, minuteCounts: { ...minuteCounts, [minuteKey]: shardMinuteCount + 1 },
             ...(snap.exists ? {} : { createdAt: serverTimestamp(), expireAt: expireAtFor(current) }), updatedAt: serverTimestamp()
           }, { merge: true });
-          return { allowed: true, outcome: "allowed" };
         });
-      } catch {
+        return { allowed: true, outcome: "allowed" };
+      } catch (error) {
+        // 이 리미터는 14개 엔드포인트 전부의 앞단에 있는 단일 장애점이다 -
+        // 실패하면 전부 fail-closed(503)로 막히는데, 정작 그 실패 자체가
+        // 어디에도 안 남으면 아무도 원인을 못 찾는다(2026-08-26 재감사 지적).
+        logger({ message: "global_rate_limiter_failed", functionName, error: String(error && error.message ? error.message : error) });
         return { allowed: false, outcome: "unavailable" };
       }
     }
@@ -100,7 +129,7 @@ const ACTOR_RATE_LIMITS = Object.freeze({
   redeemEdu2gPass: { perMinute: 5 }
 });
 function hashRateLimitScope(value) { return createHash("sha256").update(String(value)).digest("hex"); }
-function createActorRateLimiter({ db, now = () => new Date(), serverTimestamp = () => new Date(), limits = ACTOR_RATE_LIMITS }) {
+function createActorRateLimiter({ db, now = () => new Date(), serverTimestamp = () => new Date(), limits = ACTOR_RATE_LIMITS, logger = () => {} }) {
   return { async check(functionName, scope) {
     const limit = limits[functionName];
     if (!limit) return { allowed: true, outcome: "not_configured" };
@@ -114,7 +143,10 @@ function createActorRateLimiter({ db, now = () => new Date(), serverTimestamp = 
       if (outcome !== "allowed") return { allowed: false, outcome, retryAfterSeconds: getRetryAfterSeconds(current, outcome) };
       transaction.set(ref, { schemaVersion: "actor-rate-limit-v1", functionName, utcDate, totalCount: totalCount + 1, minuteCounts: { ...counts, [minuteKey]: minuteCount + 1 }, ...(snap.exists ? {} : { createdAt: serverTimestamp(), expireAt: expireAtFor(current) }), updatedAt: serverTimestamp() }, { merge: true });
       return { allowed: true, outcome: "allowed" };
-    }); } catch { return { allowed: false, outcome: "unavailable" }; }
+    }); } catch (error) {
+      logger({ message: "actor_rate_limiter_failed", functionName, error: String(error && error.message ? error.message : error) });
+      return { allowed: false, outcome: "unavailable" };
+    }
   } };
 }
 

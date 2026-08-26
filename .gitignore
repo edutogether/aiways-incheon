@@ -2,3 +2,11 @@ _backups/
 functions/firestore-debug.log
 .aiways-secrets.local
 .claude/settings.local.json
+
+# COMMON_STANDARDS.md §2 baseline
+node_modules/
+dist/
+build/
+*.log
+.env
+.cache/

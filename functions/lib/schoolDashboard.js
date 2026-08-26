@@ -44,8 +44,33 @@ function classSummary(doc) {
   };
 }
 
+// 2026-08-26 재감사 지적: 화면이 5초마다 이 함수를 다시 부르는데, 매번
+// 그 학교의 반 전체 컬렉션을 캐시 없이 다시 읽고 있었다("요청 수" 상한은
+// 있어도 "요청 하나당 읽기 수"는 안 세서, 실질적으로 하루 수백만 건
+// 읽기가 가능했던 원인 중 하나). 학교 단위로 아주 짧은(기본 4초, 폴링
+// 주기 5초보다 살짝 짧게) 인스턴스 메모리 캐시를 둔다 - Cloud Functions
+// 인스턴스가 따뜻한 상태로 재사용되는 동안에는 연속된 폴링 다수가 이
+// 캐시 하나를 공유해서 실제 Firestore 읽기 횟수를 줄인다. 격리 원칙은
+// 그대로 유지된다 - 캐시 키가 schoolId라 학교 간 데이터가 섞이지 않는다.
+const DASHBOARD_CACHE_TTL_MS = 4000;
+function createSchoolDashboardCache() {
+  const store = new Map();
+  return {
+    get(schoolId, now) {
+      const entry = store.get(schoolId);
+      if (!entry || now - entry.cachedAt > DASHBOARD_CACHE_TTL_MS) return null;
+      return entry.value;
+    },
+    set(schoolId, value, now) {
+      store.set(schoolId, { value, cachedAt: now });
+    }
+  };
+}
+
 function createGetSchoolDashboardHandler(dependencies = {}) {
   const db = dependencies.db;
+  const now = dependencies.now || (() => Date.now());
+  const cache = dependencies.cache || createSchoolDashboardCache();
   return async (req, res) => {
     if (!applyCors(req, res)) return res.status(403).json({ ok: false, code: "invalid_origin" });
     if (req.method === "OPTIONS") return res.status(204).send("");
@@ -88,9 +113,17 @@ function createGetSchoolDashboardHandler(dependencies = {}) {
     if (!binding.ok) return res.status(403).json({ ok: false, code: "school_mismatch" });
 
     const schoolRef = db.collection("schools").doc(schoolId);
-    const [classesSnap, schoolSnap] = await Promise.all([schoolRef.collection("classes").get(), schoolRef.get()]);
-    const classes = classesSnap.docs.map(classSummary);
-    const schoolName = cleanText(schoolSnap.exists ? schoolSnap.data()?.schoolName : "", 80);
+    const requestTime = now();
+    const cached = cache.get(schoolId, requestTime);
+    let classes, schoolName;
+    if (cached) {
+      ({ classes, schoolName } = cached);
+    } else {
+      const [classesSnap, schoolSnap] = await Promise.all([schoolRef.collection("classes").get(), schoolRef.get()]);
+      classes = classesSnap.docs.map(classSummary);
+      schoolName = cleanText(schoolSnap.exists ? schoolSnap.data()?.schoolName : "", 80);
+      cache.set(schoolId, { classes, schoolName }, requestTime);
+    }
 
     const byGrade = new Map();
     let schoolObservedToday = 0, schoolCompletedTotal = 0, schoolHeldTotal = 0;

@@ -1887,14 +1887,23 @@
 
   let dashboardApiFailureStreak = 0;
   let dashboardApiFailureToastShown = false;
+  // 2026-08-26 재감사 지적: 서버가 429(요청 초과)나 Retry-After를 돌려줘도
+  // 그동안은 그냥 무시하고 5초마다 똑같이 재시도해서, 상한에 걸린 기기가
+  // 스스로 자기 장애를 계속 연장시켰다. 다음 폴링까지 최소 이만큼(초)은
+  // 쉬어야 한다는 값을 여기 저장해두고, 폴링 루프가 이 값을 참고한다.
+  let dashboardApiBackoffSeconds = 0;
   function noteDashboardApiFailure(response) {
     dashboardApiFailureStreak += 1;
     console.warn("[aiways] 대시보드 갱신 실패", response?.status, response?.code);
+    const isRateLimited = response?.status === 429 || response?.code === "rate_limit_exceeded";
+    if (isRateLimited) {
+      const serverRetryAfter = Number(response?.data?.retryAfterSeconds ?? response?.retryAfterSeconds);
+      dashboardApiBackoffSeconds = Number.isFinite(serverRetryAfter) && serverRetryAfter > 0 ? serverRetryAfter : 10;
+    }
     // 5초 폴링 기준 3연속 실패면 최소 15초는 화면이 멈춰있었다는 뜻 -
     // 그 시점에 딱 한 번만 토스트를 띄운다(재접속/새로고침 전까지 반복 안 함).
     if (dashboardApiFailureStreak >= 3 && !dashboardApiFailureToastShown) {
       dashboardApiFailureToastShown = true;
-      const isRateLimited = response?.status === 429 || response?.code === "rate_limit_exceeded";
       showDashboardToast(isRateLimited
         ? "실시간 갱신이 잠시 지연되고 있어요. 화면은 곧 다시 정상적으로 업데이트돼요."
         : "대시보드 갱신에 문제가 생겼어요. 화면을 새로고침 해주세요.");
@@ -1906,9 +1915,12 @@
     if (schoolDashboardLiveRefreshTimer) return;
     // 이 파일럿 규모(학교 4곳)에서는 20초든 5초든 Firestore/Functions
     // 비용 차이가 무시할 수준이라, 체감(박람회에서 찍자마자 화면 앞으로
-    // 달려와 확인하는 상황)을 기준으로 5초로 줄였다.
+    // 달려와 확인하는 상황)을 기준으로 5초로 줄였다. 다만 서버가 429를
+    // 돌려주면(dashboardApiBackoffSeconds) 그 시간만큼은 이 5초 주기를
+    // 건너뛴다 - 매 tick마다 카운트다운만 하고 실제 요청은 안 보낸다.
     schoolDashboardLiveRefreshTimer = window.setInterval(() => {
       if (document.hidden) return;
+      if (dashboardApiBackoffSeconds > 0) { dashboardApiBackoffSeconds -= 5; return; }
       loadSchoolDashboardFromApi();
     }, 5000);
   }

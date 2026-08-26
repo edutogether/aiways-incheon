@@ -338,29 +338,14 @@
 
     <!-- 자바스크립트 로직 -->
     <script>
-        const AIWAYS_SYNC_CONFIG = {
-            appsScriptUrl: ""
-        };
-
-        function sendDecisionLog(payload) {
-            if (!AIWAYS_SYNC_CONFIG.appsScriptUrl) return;
-
-            const safePayload = {
-                school: "AIWays초",
-                grade: "5",
-                className: "5-1",
-                imageName: "",
-                ...payload,
-                image_saved: false
-            };
-
-            fetch(AIWAYS_SYNC_CONFIG.appsScriptUrl, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify(safePayload)
-            }).catch(function() {});
-        }
+        // 2026-08-27: 이 3초판단 체험 화면(vibe-coding 실습용, 진짜 mobile/
+        // 앱과 별개)이 예전에 쓰던 Google Apps Script 동기화 경로를 완전히
+        // 제거했다 - 빈 URL 조건부로만 막혀있던 죽은 fetch였는데, 설정값
+        // 하나만 채우면 이미 폐기된 백엔드로 다시 데이터가 새는 경로가
+        // 부활할 수 있어 아예 없앴다. 호출부는 그대로 두되 함수는 아무
+        // 일도 하지 않는다 - 이 화면은 원래도 실제 기록을 저장하지 않는
+        // 체험용이다.
+        function sendDecisionLog() {}
 
         // -----------------------------------------
         // 1. 공용 데이터베이스 (인천광역시 교육청 및 환경부 지침 표준화)

@@ -220,8 +220,8 @@
   // 학년 데이터를 조회하지도, 응답에 담지도 않는다.
   // -----------------------------------------------------------------
   async function loadClassRanking() {
-    const list = $("nationalRankingList");
-    const status = $("nationalRankingStatus");
+    const list = $("classRankingList");
+    const status = $("classRankingStatus");
     if (!list || !status) return;
     const client = window.AIWaysEdu2gClient;
     if (!client?.getClassRanking) { status.textContent = "지금은 랭킹을 불러올 수 없어요."; return; }
@@ -1008,7 +1008,7 @@
     initClassContextForm();
     initSignupForm();
     loadClassRanking();
-    $("nationalRankingRefreshBtn")?.addEventListener("click", loadClassRanking);
+    $("classRankingRefreshBtn")?.addEventListener("click", loadClassRanking);
     renderQuizRankLadder();
     startQuiz();
     syncTabHeights();

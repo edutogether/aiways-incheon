@@ -55,6 +55,27 @@ function createGetClassRankingHandler(dependencies = {}) {
     const highlightClassNum = body.classNum === undefined ? "" : cleanPathSegment(body.classNum);
     if (body.classNum !== undefined && !highlightClassNum) return res.status(400).json({ ok: false, code: "invalid_request" });
 
+    // schoolDashboard.js와 같은 "이 기기가 처음 요청한 학교로 고정" 잠금을
+    // 같은 필드(dashboardSchoolId)로 공유한다 - 안 그러면 아무 actor나
+    // 임의의 schoolId+grade를 보내 다른 학교의 반 점수를 조회할 수 있다
+    // (2026-08-26 재감사 지적사항). 점수 자체엔 개인정보가 없지만, "우리
+    // 학교 데이터만 봐야 한다"는 격리 원칙은 이 엔드포인트에도 동일하게
+    // 적용돼야 한다.
+    if (db) {
+      const actorRef = db.collection("actors").doc(protectedActor.actorId);
+      const binding = await db.runTransaction(async (transaction) => {
+        const snap = await transaction.get(actorRef);
+        const data = snap.exists ? snap.data() : null;
+        const boundSchoolId = cleanSchoolId(data?.dashboardSchoolId || "");
+        if (!boundSchoolId) {
+          transaction.set(actorRef, { dashboardSchoolId: schoolId }, { merge: true });
+          return true;
+        }
+        return boundSchoolId === schoolId;
+      });
+      if (!binding) return res.status(403).json({ ok: false, code: "school_mismatch" });
+    }
+
     // 같은 학교, 같은 학년의 반만 조회한다 - 다른 학년/다른 학교 데이터는
     // 이 쿼리 자체가 절대 안 읽는다(전국 스캔이었던 예전 구조와의 핵심 차이).
     const classesSnap = await db.collection("schools").doc(schoolId).collection("classes").where("grade", "==", grade).get();

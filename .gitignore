@@ -1,3 +1,4 @@
 _backups/
 functions/firestore-debug.log
 .aiways-secrets.local
+.claude/settings.local.json

@@ -3,6 +3,30 @@
 const { createHash } = require("node:crypto");
 
 const RATE_LIMIT_SCHEMA = "global-rate-limit-v1";
+// 2026-08-29 - 100점 목표 4번(비용상한을 "요청당 읽기수" 기준으로 재점검):
+// 아래 perDay/perMinute는 전부 "요청 횟수" 상한이라, 요청 하나가 실제로
+// 몇 번 Firestore를 읽는지는 함수마다 다른데도 숫자만 보면 똑같이
+// 비교돼 왔다. 실측(핸들러 코드 기준 캐시 miss 최악의 경우)을 여기 남겨
+// 둔다 - 12개 함수는 액터 문서 하나만 보는 단순 CRUD라 요청당 1~2회로
+// 고정이고, getSchoolDashboard/getClassRanking 둘만 학교 규모에 따라
+// 커지는 다건 쿼리라 캐시가 붙어 있다(둘 다 2026-08-26/29에 캐시 추가 -
+// 캐시 적중 시 락 트랜잭션 1회로 줄어든다). searchSchool은 Firestore를
+// 아예 안 읽는다(외부 NEIS API 호출). perDay 자체를 더 낮추려면
+// "하루 총 읽기 몇 회까지 허용할지" 목표 예산이 필요한데 이건 코드만
+// 봐서 알 수 없는 값이라(Firestore 플랜/실사용량에 달림) 임의로 정하지
+// 않았다 - 아래 최악값 x perDay를 보고 대표님/팀장이 예산과 비교해
+// 판단할 수 있게 명시만 해 둔다.
+const READS_PER_REQUEST_WORST_CASE = Object.freeze({
+  getSchoolDashboard: 4, // 락tx 1 + (classes+school) 캐시miss 2 + students 캐시miss 1
+  getClassRanking: 2, // 락tx 1 + classes where-쿼리 캐시miss 1
+  searchSchool: 0 // Firestore 안 읽음(NEIS API만 호출)
+  // 나머지 11개 함수(analyzeSorting*, saveSortingRecord, listSortingRecords,
+  // resolveSortingRecord, checkStudentProfile, registerStudentProfile,
+  // checkCampusLocation, changeStudentClass, redeemEdu2gPass,
+  // getEdu2gSession, listEdu2gTrustedDevices, revokeEdu2gTrustedDevice)는
+  // 전부 actors/{actorId} 문서 하나만 읽거나(+쓰거나) 하는 단순 구조라
+  // 요청당 1~2회로 고정, 여기 따로 안 적어도 이미 안전하다.
+});
 const RATE_LIMITS = Object.freeze({
   analyzeSortingImage: { perMinute: 20, perDay: 1000 },
   analyzeSortingSafetyObserver: { perMinute: 20, perDay: 1000 },
@@ -187,4 +211,4 @@ function createActorRateLimiter({ db, now = () => new Date(), serverTimestamp = 
 
 async function checkGlobalRateLimit(limiter, functionName) { return limiter.check(functionName); }
 
-module.exports = { RATE_LIMIT_SCHEMA, RATE_LIMITS, ACTOR_RATE_LIMITS, getUtcBuckets, getRetryAfterSeconds, expireAtFor, checkGlobalRateLimit, createGlobalRateLimiter, createActorRateLimiter, hashRateLimitScope };
+module.exports = { RATE_LIMIT_SCHEMA, RATE_LIMITS, ACTOR_RATE_LIMITS, READS_PER_REQUEST_WORST_CASE, getUtcBuckets, getRetryAfterSeconds, expireAtFor, checkGlobalRateLimit, createGlobalRateLimiter, createActorRateLimiter, hashRateLimitScope };

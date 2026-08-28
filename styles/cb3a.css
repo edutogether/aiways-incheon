@@ -1460,30 +1460,40 @@ a.source-link:hover {
    폭으로 한 단계 키운다. */
 .gallery-description { font-size: clamp(1.02rem, .62rem + .45vw, 1.12rem) !important; }
 
-/* ---------- 3단 기기 라우팅 (2026-08-21) ----------
+/* ---------- 3단 기기 라우팅 (2026-08-21, 2026-08-27 판정 단일화) ----------
    폰 폭: index.html 자체 콘텐츠를 전부 숨기고, deviceTier.js가 src를 채운
    #phoneShellFrame(mobile/ 앱 iframe)만 풀스크린으로 보여준다.
    패드 폭: 대시보드 씬의 4개 패널만 남기고 나머지(헤더/히어로/다른 씬)는
    전부 숨긴다 - PC와 같은 다크 유리 카드를 그대로 재사용(이 규칙이 파일
    뒤쪽 unlayered라서, 앞쪽 @layer의 밝은 테마 축소판 규칙을 이긴다).
-   PC 폭: 기존 그대로. */
+   PC 폭: 기존 그대로.
+
+   2026-08-27: 실사용 교사 제보(학교 PC에서 모바일 화면이 풀스크린으로
+   뜸) 원인 수정 - 이 블록이 예전엔 여기서도 @media (max-width: 47.99rem)
+   로 독자적으로 폭을 rem 단위로 쟀는데, deviceTier.js는 px(767)로 잰다.
+   브라우저 기본 글꼴크기가 16px가 아닌 환경(접근성 설정 등)에서는 두
+   판정이 어긋나서, JS는 "PC"라고 판단해도 이 CSS는 이미 폰으로 판정해
+   모바일 iframe을 풀스크린으로 강제 표시했다. 이제 폭 판정은
+   deviceTier.js 한 곳에서만 하고, 그 결과를 <html data-tier="phone">
+   으로 남긴다 - 이 블록은 더 이상 폭을 직접 재지 않고 그 속성만 그대로
+   따른다. */
 .phone-shell-frame { display: none; }
 
-@media (max-width: 47.99rem) {
-  .site-header, .mobile-quick-nav, .snap-root { display: none !important; }
-  /* edu2gBetaUi.js가 만드는 <dialog>는 네이티브 top-layer라 iframe의
-     z-index로는 절대 못 가린다 - 폰 폭에서는 이 다이얼로그 자체를 숨긴다
-     (이 별도 베타게이트 시스템 자체는 건드리지 않음, 화면에서만 뺌). */
-  .edu2g-beta-dialog { display: none !important; }
-  .phone-shell-frame {
-    display: block;
-    position: fixed;
-    inset: 0;
-    inline-size: 100vw;
-    block-size: 100vh;
-    border: 0;
-    z-index: 9999;
-  }
+html[data-tier="phone"] .site-header,
+html[data-tier="phone"] .mobile-quick-nav,
+html[data-tier="phone"] .snap-root { display: none !important; }
+/* edu2gBetaUi.js가 만드는 <dialog>는 네이티브 top-layer라 iframe의
+   z-index로는 절대 못 가린다 - 폰 폭에서는 이 다이얼로그 자체를 숨긴다
+   (이 별도 베타게이트 시스템 자체는 건드리지 않음, 화면에서만 뺌). */
+html[data-tier="phone"] .edu2g-beta-dialog { display: none !important; }
+html[data-tier="phone"] .phone-shell-frame {
+  display: block;
+  position: fixed;
+  inset: 0;
+  inline-size: 100vw;
+  block-size: 100vh;
+  border: 0;
+  z-index: 9999;
 }
 
 /* 태블릿 대시보드 전용 뷰: 48~64rem 구간은 폭만으로(브라우저 창을 늘렸다

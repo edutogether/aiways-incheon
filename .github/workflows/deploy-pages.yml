@@ -26,7 +26,40 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # 2026-08-27 추가: 이 저장소엔 배포 전 테스트를 자동으로 돌리는 CI가
+  # 전혀 없었다 - functions/의 유닛테스트 120여 개가 전부 로컬에서
+  # 수동으로만 돌고 있어서, 실제로 프로덕션을 통째로 막았던 버그(90일
+  # 삭제 필드 제거 후 index.js가 그 필드를 여전히 참조해 saveSortingRecord가
+  # 전부 500으로 실패)가 테스트 120/120 초록불인 채로 배포까지 나갔다.
+  # 이 job이 그 배선 검증 게이트다 - functions/ 테스트가 실패하면 아래
+  # deploy job이 아예 실행되지 않는다(needs: test).
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: functions
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: functions/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Syntax check
+        run: npm run check
+
+      - name: Run unit tests
+        run: npm test
+
   deploy:
+    needs: test
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

@@ -100,7 +100,12 @@ function createEdu2gDeviceAccess({ auth, db, serverTimestamp = () => new Date() 
         if (!device) return failure("access_state_invalid", 503);
         if (device.status === "revoked") return failure("device_revoked", 403);
         if (device.status !== "active" || device.uid !== uid || !MANAGEMENT_ID.test(device.managementId || "")) return failure("access_state_invalid", 503);
-        await Promise.all([bindingRef.update({ lastSeenAt: serverTimestamp() }), deviceRef.update({ lastSeenAt: serverTimestamp() })]);
+        // 2026-08-27 재감사 지적: 이 자리에서 매 요청(14개 엔드포인트
+        // 전부)마다 lastSeenAt을 문서 2개에 갱신하고 있었는데, 이 값을
+        // 읽는 코드가 저장소 어디에도 없었다 - 아무도 안 쓰는 필드에
+        // 요청마다 쓰기 비용만 나가고 있어서 제거함. (기기 생성/교체/
+        // 해제 시점의 lastSeenAt은 edu2gPassHandlers.js에 그대로 남아있고,
+        // 그건 일회성 이벤트라 이 항목과는 무관하다.)
         return { ok: true, actorId: binding.actorId, uid, actor: actorSnap.data(), device };
       } catch { return failure("access_state_invalid", 503); }
     }

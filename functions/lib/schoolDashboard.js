@@ -163,13 +163,28 @@ function createGetSchoolDashboardHandler(dependencies = {}) {
       // 소속이 없음)에게는 topStudents를 아예 비워서 준다.
       const profile = binding.profile;
       const profileMatches = !!profile && profile.schoolId === schoolId && profile.grade === grade && profile.classNum === classNum;
-      const studentsSnap = profileMatches ? await schoolRef.collection("classes").doc(`${grade}_${classNum}`).collection("students").get() : null;
-      const topStudents = !studentsSnap ? [] : studentsSnap.docs
-        .map((doc) => doc.data())
-        .map((item) => ({ studentNumber: cleanText(item.studentNumber, 10), studentName: cleanText(item.studentName, 80), completedTotal: Number(item.completedTotal) || 0 }))
-        .filter((item) => item.studentNumber && item.completedTotal > 0)
-        .sort((a, b) => b.completedTotal - a.completedTotal)
-        .slice(0, 5);
+      // 2026-08-27 재감사 지적: topStudents가 위 캐시 범위 밖에 있어서
+      // 특정 반을 선택한 폴링마다 학생 목록을 매번 다시 읽고 있었다.
+      // 같은 (schoolId,grade,classNum) 캐시 공간을 studentsCacheKey로
+      // 따로 둬서 위와 같은 TTL로 재사용한다 - 접근권한 검사
+      // (profileMatches)는 캐시 조회보다 먼저 이미 끝나 있으므로, 캐시를
+      // 쓴다고 권한 없는 요청에 새어나갈 위험은 없다(profileMatches가
+      // false면애초에 이 블록에 안 들어옴).
+      const studentsCacheKey = `students:${schoolId}_${grade}_${classNum}`;
+      const cachedStudents = profileMatches ? cache.get(studentsCacheKey, requestTime) : null;
+      let topStudents;
+      if (cachedStudents) {
+        topStudents = cachedStudents;
+      } else {
+        const studentsSnap = profileMatches ? await schoolRef.collection("classes").doc(`${grade}_${classNum}`).collection("students").get() : null;
+        topStudents = !studentsSnap ? [] : studentsSnap.docs
+          .map((doc) => doc.data())
+          .map((item) => ({ studentNumber: cleanText(item.studentNumber, 10), studentName: cleanText(item.studentName, 80), completedTotal: Number(item.completedTotal) || 0 }))
+          .filter((item) => item.studentNumber && item.completedTotal > 0)
+          .sort((a, b) => b.completedTotal - a.completedTotal)
+          .slice(0, 5);
+        if (profileMatches) cache.set(studentsCacheKey, topStudents, requestTime);
+      }
       selectedClass = {
         grade: match.grade, classNum: match.classNum,
         observedToday: match.observedToday, completedTotal: match.completedTotal, heldTotal: match.heldTotal, convertedTotal: match.convertedTotal,

@@ -7,16 +7,30 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { createGetSchoolDashboardHandler } = require("../lib/schoolDashboard");
 
-function makeCountingDb(schools) {
+function makeCountingDb(schools, actorsInit = {}) {
   let classesReadCount = 0;
-  const actors = {};
+  let studentsReadCount = 0;
+  const actors = { ...actorsInit };
+  function classDocRef(schoolId, classDocId) {
+    const school = schools[schoolId] || { classes: {} };
+    const students = (school.students && school.students[classDocId]) || [];
+    return {
+      collection(name) {
+        assert.equal(name, "students");
+        return { async get() { studentsReadCount += 1; return { docs: students.map((s) => ({ data: () => s })) }; } };
+      }
+    };
+  }
   function schoolDocRef(schoolId) {
     const school = schools[schoolId] || { classes: {} };
     return {
       async get() { return { exists: true, data: () => school }; },
       collection(name) {
-        assert.equal(name, "classes");
-        return { async get() { classesReadCount += 1; return { docs: Object.values(school.classes).map((c) => ({ data: () => c })) }; } };
+        if (name === "classes") return {
+          async get() { classesReadCount += 1; return { docs: Object.values(school.classes).map((c) => ({ data: () => c })) }; },
+          doc: (classDocId) => classDocRef(schoolId, classDocId)
+        };
+        throw new Error("unsupported subcollection " + name);
       }
     };
   }
@@ -28,7 +42,7 @@ function makeCountingDb(schools) {
     },
     async runTransaction(cb) { return cb({ async get(ref) { return ref.get(); }, set(ref, data, opts) { ref.set(data, opts); } }); }
   };
-  return { db, readCount: () => classesReadCount };
+  return { db, readCount: () => classesReadCount, studentsReadCount: () => studentsReadCount };
 }
 async function call(handler, body) {
   const result = {};
@@ -76,4 +90,26 @@ test("cache is isolated per school", async () => {
   const second = await call(handler2, { schoolId: "9999999" });
   assert.equal(second.status, 200);
   assert.equal(readCount(), 2, "each school's first request should read Firestore independently");
+});
+
+test("topStudents (2026-08-27 fix) also reuses the cache within TTL for a verified profile's own class", async () => {
+  const { db, studentsReadCount } = makeCountingDb(
+    { "7341025": { classes: {}, students: { "5_1": [{ studentNumber: "3", studentName: "김철수", completedTotal: 4 }] } } },
+    { actor_1: { studentProfile: { schoolId: "7341025", grade: "5", classNum: "1" } } }
+  );
+  let clock = 1000;
+  const handler = createGetSchoolDashboardHandler({
+    appCheck: async () => ({ status: "valid" }), access: { resolve: async () => ({ ok: true, actorId: "actor_1" }) },
+    rateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) }, actorRateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) },
+    db, now: () => clock
+  });
+  const first = await call(handler, { schoolId: "7341025", grade: "5", classNum: "1" });
+  assert.equal(first.body.selectedClass.topStudents.length, 1);
+  assert.equal(studentsReadCount(), 1);
+  clock += 2000; // still inside the 5.5s TTL
+  await call(handler, { schoolId: "7341025", grade: "5", classNum: "1" });
+  assert.equal(studentsReadCount(), 1, "second poll inside TTL should reuse the cached student list");
+  clock += 5000; // now past the TTL
+  await call(handler, { schoolId: "7341025", grade: "5", classNum: "1" });
+  assert.equal(studentsReadCount(), 2, "poll after TTL expiry should re-read the student list");
 });

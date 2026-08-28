@@ -121,3 +121,12 @@ test("class-level aggregate numbers (observedToday, topItems, rank) are unaffect
   assert.equal(result.body.selectedClass.observedToday, 3);
   assert.equal(result.body.selectedClass.completedTotal, 2);
 });
+
+test("returns 503 protection_unavailable instead of crashing when the school-lock transaction throws", async () => {
+  const db = makeFakeDb({ actors: {}, schools: { "111": SCHOOL } });
+  db.runTransaction = async () => { throw new Error("firestore unavailable"); };
+  const handler = createGetSchoolDashboardHandler(baseDeps(db));
+  const result = await call(handler, { schoolId: "111", grade: "5", classNum: "1" });
+  assert.equal(result.status, 503);
+  assert.equal(result.body.code, "protection_unavailable");
+});

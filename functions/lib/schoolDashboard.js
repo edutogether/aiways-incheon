@@ -89,16 +89,21 @@ function createGetSchoolDashboardHandler(dependencies = {}) {
     // 다른 schoolId를 보내도 거절돼서, 최소한 "아무 학교나 조회 가능"은 막힌다.
     // 4단계가 들어오면 이 필드를 실제 가입 시 확인된 값으로 대체하면 된다.
     const actorRef = db.collection("actors").doc(protectedActor.actorId);
-    const binding = await db.runTransaction(async (transaction) => {
-      const snap = await transaction.get(actorRef);
-      const data = snap.exists ? snap.data() : null;
-      const boundSchoolId = cleanText(data?.dashboardSchoolId, 80);
-      if (!boundSchoolId) {
-        transaction.set(actorRef, { dashboardSchoolId: schoolId }, { merge: true });
-        return { ok: true, profile: data?.studentProfile || null };
-      }
-      return { ok: boundSchoolId === schoolId, profile: data?.studentProfile || null };
-    });
+    let binding;
+    try {
+      binding = await db.runTransaction(async (transaction) => {
+        const snap = await transaction.get(actorRef);
+        const data = snap.exists ? snap.data() : null;
+        const boundSchoolId = cleanText(data?.dashboardSchoolId, 80);
+        if (!boundSchoolId) {
+          transaction.set(actorRef, { dashboardSchoolId: schoolId }, { merge: true });
+          return { ok: true, profile: data?.studentProfile || null };
+        }
+        return { ok: boundSchoolId === schoolId, profile: data?.studentProfile || null };
+      });
+    } catch {
+      return res.status(503).json({ ok: false, code: "protection_unavailable" });
+    }
     if (!binding.ok) return res.status(403).json({ ok: false, code: "school_mismatch" });
 
     const schoolRef = db.collection("schools").doc(schoolId);

@@ -15,8 +15,34 @@ const { applyCors } = require("./httpGuard");
 
 const MAX_BODY_BYTES = 1 * 1024;
 
+// 2026-08-29 - 100점 목표 4번(비용상한을 "요청당 읽기수" 기준으로 재점검):
+// 이 함수는 schoolDashboard.js(2026-08-26)와 달리 캐시가 전혀 없어서 호출마다
+// (락 트랜잭션 1회 읽기 + classes where-쿼리 1회) = 요청 하나당 최대 2회
+// Firestore 읽기가 고정으로 나갔다. school-panel의 반 목록과 같은
+// 데이터 신선도(같은 폴링 주기)면 충분하므로, schoolDashboard.js와 동일한
+// 패턴(같은 TTL, 같은 "폴링 주기보다 길게" 원칙)으로 (schoolId,grade) 단위
+// 인스턴스 캐시를 둔다 - 캐시 적중 시 요청당 읽기가 2회에서 락 트랜잭션
+// 1회로 줄어든다. isMine(요청자 본인 반 여부)은 요청마다 다를 수 있어
+// 캐시 대상에서 제외하고 캐시 조회 이후에 매번 새로 계산한다.
+const RANKING_CACHE_TTL_MS = 5500;
+function createClassRankingCache() {
+  const store = new Map();
+  return {
+    get(key, now) {
+      const entry = store.get(key);
+      if (!entry || now - entry.cachedAt > RANKING_CACHE_TTL_MS) return null;
+      return entry.value;
+    },
+    set(key, value, now) {
+      store.set(key, { value, cachedAt: now });
+    }
+  };
+}
+
 function createGetClassRankingHandler(dependencies = {}) {
   const db = dependencies.db;
+  const now = dependencies.now || (() => Date.now());
+  const cache = dependencies.cache || createClassRankingCache();
   return async (req, res) => {
     if (!applyCors(req, res)) return res.status(403).json({ ok: false, code: "invalid_origin" });
     if (req.method === "OPTIONS") return res.status(204).send("");
@@ -48,30 +74,41 @@ function createGetClassRankingHandler(dependencies = {}) {
     // 적용돼야 한다.
     if (db) {
       const actorRef = db.collection("actors").doc(protectedActor.actorId);
-      const binding = await db.runTransaction(async (transaction) => {
-        const snap = await transaction.get(actorRef);
-        const data = snap.exists ? snap.data() : null;
-        const boundSchoolId = cleanSchoolId(data?.dashboardSchoolId || "");
-        if (!boundSchoolId) {
-          transaction.set(actorRef, { dashboardSchoolId: schoolId }, { merge: true });
-          return true;
-        }
-        return boundSchoolId === schoolId;
-      });
+      let binding;
+      try {
+        binding = await db.runTransaction(async (transaction) => {
+          const snap = await transaction.get(actorRef);
+          const data = snap.exists ? snap.data() : null;
+          const boundSchoolId = cleanSchoolId(data?.dashboardSchoolId || "");
+          if (!boundSchoolId) {
+            transaction.set(actorRef, { dashboardSchoolId: schoolId }, { merge: true });
+            return true;
+          }
+          return boundSchoolId === schoolId;
+        });
+      } catch {
+        return res.status(503).json({ ok: false, code: "protection_unavailable" });
+      }
       if (!binding) return res.status(403).json({ ok: false, code: "school_mismatch" });
     }
 
     // 같은 학교, 같은 학년의 반만 조회한다 - 다른 학년/다른 학교 데이터는
     // 이 쿼리 자체가 절대 안 읽는다(전국 스캔이었던 예전 구조와의 핵심 차이).
-    const classesSnap = await db.collection("schools").doc(schoolId).collection("classes").where("grade", "==", grade).get();
-    const classes = classesSnap.docs.map((doc) => {
-      const data = doc.data() || {};
-      const completedTotal = Number(data.completedTotal) || 0;
-      const heldTotal = Number(data.heldTotal) || 0;
-      return { classNum: data.classNum || "", score: completedTotal, observedTotal: completedTotal + heldTotal };
-    });
+    const requestTime = now();
+    const cacheKey = `${schoolId}_${grade}`;
+    let classes = cache.get(cacheKey, requestTime);
+    if (!classes) {
+      const classesSnap = await db.collection("schools").doc(schoolId).collection("classes").where("grade", "==", grade).get();
+      classes = classesSnap.docs.map((doc) => {
+        const data = doc.data() || {};
+        const completedTotal = Number(data.completedTotal) || 0;
+        const heldTotal = Number(data.heldTotal) || 0;
+        return { classNum: data.classNum || "", score: completedTotal, observedTotal: completedTotal + heldTotal };
+      });
+      cache.set(cacheKey, classes, requestTime);
+    }
 
-    const ranked = classes.sort((a, b) => b.score - a.score);
+    const ranked = [...classes].sort((a, b) => b.score - a.score);
     const rankedWithPosition = ranked.map((item, index) => ({ ...item, rank: index + 1, isMine: !!highlightClassNum && item.classNum === highlightClassNum }));
 
     return res.status(200).json({ ok: true, schoolId, grade, classCount: rankedWithPosition.length, classes: rankedWithPosition });

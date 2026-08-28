@@ -104,3 +104,54 @@ test("locks the actor's device to the first school it requests, rejects a later 
   const third = await call(handler, { schoolId: "7341025", grade: "6" });
   assert.equal(third.status, 200); // same school, different grade is fine
 });
+
+test("repeated polls within the cache TTL reuse the cached classes read (2026-08-29: read-cost redesign)", async () => {
+  let classesReadCount = 0;
+  const db = fakeDb({ 7341025: [{ grade: "5", classNum: "1", completedTotal: 10, heldTotal: 0 }] });
+  const rawCollection = db.collection.bind(db);
+  db.collection = (name) => {
+    const col = rawCollection(name);
+    if (name !== "schools") return col;
+    const rawDoc = col.doc.bind(col);
+    return { doc: (schoolId) => {
+      const docRef = rawDoc(schoolId);
+      const rawSub = docRef.collection.bind(docRef);
+      return { ...docRef, collection: (sub) => {
+        const subCol = rawSub(sub);
+        const rawWhere = subCol.where.bind(subCol);
+        return { ...subCol, where: (...args) => {
+          const query = rawWhere(...args);
+          const rawGet = query.get.bind(query);
+          return { ...query, get: async () => { classesReadCount += 1; return rawGet(); } };
+        } };
+      } };
+    } };
+  };
+  const handler = createGetClassRankingHandler({
+    appCheck: async () => ({ status: "valid" }),
+    access: { resolve: async () => ({ ok: true, actorId: "actor_1" }) },
+    rateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) },
+    actorRateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) },
+    db
+  });
+  await call(handler, { schoolId: "7341025", grade: "5" });
+  await call(handler, { schoolId: "7341025", grade: "5" });
+  const third = await call(handler, { schoolId: "7341025", grade: "5" });
+  assert.equal(classesReadCount, 1);
+  assert.equal(third.body.classCount, 1);
+});
+
+test("returns 503 protection_unavailable instead of crashing when the school-lock transaction throws", async () => {
+  const db = fakeDb({ 7341025: [] });
+  db.runTransaction = async () => { throw new Error("firestore unavailable"); };
+  const handler = createGetClassRankingHandler({
+    appCheck: async () => ({ status: "valid" }),
+    access: { resolve: async () => ({ ok: true, actorId: "actor_1" }) },
+    rateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) },
+    actorRateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) },
+    db
+  });
+  const result = await call(handler, { schoolId: "7341025", grade: "5" });
+  assert.equal(result.status, 503);
+  assert.equal(result.body.code, "protection_unavailable");
+});

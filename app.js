@@ -1220,7 +1220,7 @@
       const grade = gradeSelect.value;
       const classNum = classNumSelect.value;
       if (grade !== config.grade || Number(classNum) > config.totalClasses) {
-        showDashboardToast(`${school.schoolName} ${grade}학년 ${classNum}반은 아직 서비스 준비중이에요. 곧 만나요!`);
+        showDashboardToast(`${school.schoolName} ${grade}학년 ${classNum}반은 서비스 준비중이에요. 곧 만나요 !`);
         return;
       }
       try {
@@ -1291,7 +1291,7 @@
     let searchToken = 0;
     function selectSchool(school) {
       if (!DASHBOARD_LAUNCHED_SCHOOLS.has(school.schoolCode)) {
-        showDashboardToast(`"${school.schoolName}"은(는) 아직 서비스 준비중이에요. 곧 만나요!`);
+        showDashboardToast(`"${school.schoolName}"은(는) 서비스 준비중이에요. 곧 만나요 !`);
         return;
       }
       showClassStep(school);

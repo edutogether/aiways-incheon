@@ -1555,32 +1555,42 @@ html[data-tier="phone"] .phone-shell-frame {
      끼여 글자가 세로로 한 자씩 쪼개지는 버그가 났다(실측: getBoundingClientRect
      width 12px, height 204px). 태블릿에서는 아예 한 칸짜리 세로 스택으로
      고정해 이 종류의 버그 자체를 차단한다. */
-  .school-panel,
-  .class-panel {
-    grid-template-columns: 1fr !important;
-    grid-template-areas: none !important;
+  /* 2026-08-29 대표님 지적 - "안 겹치면 끝"이 아니다. 위 2026-08-28 수정은
+     겹침만 없애려고 school-panel/class-panel을 통째로 1칸짜리 세로 스택으로
+     눌러놔서, PC의 "좁은 숫자열 + 넓은 시각화열"(라인 562 "kpi visual")
+     밀도가 사라지고 큰 숫자만 뚝뚝 떨어져 쌓인 느낌이 났다. PC와 같은
+     2열 골격을 이 태블릿 폭에 맞게 다시 만든다 - 단, PC 전용 영역 이름
+     (head/select/kpi/visual, 라인 78/562/697)을 그대로 재사용하면 2026-08-28에
+     겪은 이름-충돌 버그가 재발하므로, 이 블록 안에서만 쓰는 새 이름
+     (t-head/t-kpi/t-visual/t-note)을 쓴다. */
+  .school-panel, .class-panel { position: relative; }
+  .school-panel {
+    grid-template-columns: minmax(7.25rem, 8.25rem) minmax(0, 1fr) !important;
+    grid-template-areas: "t-head t-head" "t-kpi t-visual" !important;
   }
-  .school-panel .panel-head,
-  .school-panel .select-line,
-  .school-panel .kpi-row,
-  .school-panel .school-visuals,
-  .class-panel .panel-head,
-  .class-panel .select-line,
-  .class-panel .class-kpis,
-  .class-panel .confusion,
-  .class-panel .rank-note {
-    grid-column: 1 / -1 !important;
-    /* 2026-08-28 실사용 제보(대표님, 768x1024 패드 세로) - 학년 선택
-       드롭다운이 "406 배출 관찰"/"36 판단 보류" 숫자와 완전히 겹쳐
-       보였다. 실측: 위에서 grid-template-areas를 none으로 지웠는데
-       이 자식들은 여전히 옛 이름(select/kpi/head/visual, 라인 78/562
-       "head head select"/"kpi visual visual" 2행 정의에서 옴)으로
-       grid-area를 참조하고 있어서, 이름 붙은 줄(named line)들이 암묵
-       그리드에 뒤엉켜 만들어지면서 행 4개 중 2개가 0px로 찌그러지고
-       칸이 서로 겹쳤다. grid-column은 이미 고쳐놨는데 grid-row(=행
-       배치)는 그대로 두면 이름 충돌이 안 풀린다 - auto로 초기화해서
-       선언 순서 그대로 위→아래 한 줄씩 쌓이게 한다. */
-    grid-row: auto !important;
+  .class-panel {
+    grid-template-columns: minmax(5.25rem, 6.25rem) minmax(0, 1fr) !important;
+    grid-template-areas: "t-head t-head" "t-kpi t-visual" "t-note t-note" !important;
+  }
+  .school-panel .panel-head, .class-panel .panel-head {
+    grid-area: t-head !important;
+    padding-inline-end: 5.4rem !important;
+  }
+  .school-panel .kpi-row { grid-area: t-kpi !important; grid-template-columns: 1fr !important; align-content: start; }
+  .class-panel .class-kpis { grid-area: t-kpi !important; grid-template-columns: 1fr !important; align-content: start; }
+  .school-panel .school-visuals { grid-area: t-visual !important; }
+  .class-panel .confusion { grid-area: t-visual !important; }
+  .class-panel .rank-note { grid-area: t-note !important; }
+  /* select-line을 kpi/head와 같은 t-head 칸에 그냥 그리드 배치하면 같은
+     칸을 공유하는 두 형제(panel-head, select-line)가 서로 겹쳐 그려진다
+     (2026-08-28에 겪은 것과 같은 종류의 겹침) - PC(라인 553)처럼 절대
+     위치로 빼서 패널 우상단에 얹는다. */
+  .school-panel .select-line, .class-panel .select-line {
+    position: absolute !important;
+    inset-block-start: .1rem;
+    inset-inline-end: 0;
+    grid-area: auto !important;
+    z-index: 2;
   }
   /* 아래는 전부 1440px PC 화면에서 getComputedStyle로 실측한 값을 그대로
      옮긴 것이다(추측 금지 - "아주 좁은 화면" 구간용 옛 규칙이 이 태블릿
@@ -1716,6 +1726,16 @@ html[data-tier="phone"] .phone-shell-frame {
   .dashboard-grid > .panel .landfill-metrics span {
     color: rgb(158 179 199) !important;
   }
+  /* 2026-08-29 - kpi-row/class-kpis가 이제 전체 폭이 아니라 t-kpi 칸(약
+     7.25-8.25rem/5.25-6.25rem 너비)에만 있으므로, 옛 max-width:63.99rem
+     블록의 clamp(2rem,10vw,2.8rem)(전체 폭 기준으로 잡은 값이라 이 좁은
+     칸에서는 자간이 빡빡하다)를 이 칸 너비에 맞게 다시 잡는다. */
+  .school-panel .kpi-row strong, .class-panel .class-kpis strong {
+    font-size: 1.85rem !important;
+  }
+  .school-panel .kpi-row > div, .class-panel .class-kpis > div {
+    padding: .55rem .6rem !important;
+  }
   /* 2026-08-28 실사용 제보(대표님, 768x1024 패드 세로) - "16,400t
      -9.4% 68.3% 32.7%" 4개 큰 숫자가 서로 겹쳐 보였다. 실측: 이 폭에서
      .landfill-metrics가 4열 그리드로 남아있어 칸 하나가 66px인데,
@@ -1737,9 +1757,15 @@ html[data-tier="phone"] .phone-shell-frame {
      템플릿(5.75rem+2.625rem=134px)이 .school-visuals가 이 폭에서
      .bar-list에 배정한 칸(120px)보다 넓어서 숫자가 옆 도넛 칸으로
      흘러나왔다. .bar-list 칸을 그 최소필요폭보다 넉넉하게 늘린다. */
+  /* 2026-08-29 - school-visuals가 이제 패널 전체 폭이 아니라 t-visual 칸
+     (숫자 rail 옆의 좁은 나머지 폭)에만 있어서, 막대목록+도넛을 가로로
+     나누던 이전 2열 분할은 너무 좁아져 도넛이 짜부라진다. 세로로
+     쌓는다(막대목록 위, 도넛 아래 가운데 정렬). */
   .school-panel .school-visuals {
-    grid-template-columns: minmax(9.4rem, .42fr) minmax(0, .58fr) !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    row-gap: .6rem;
   }
+  .school-panel .donut-pair { justify-content: center !important; }
   .upload-panel::after { content: none !important; }
 }
 

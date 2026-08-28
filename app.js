@@ -25,8 +25,6 @@
   const SORTING_STATS_KEY = "aiways_main_sorting_stats_v1";
   const SORTING_HOLD_KEY = "aiways_main_sorting_hold_v1";
   const SORTING_DECISIONS_V2_KEY = "aiways_sorting_decisions_v2";
-  const localSortingStore = window.AIWaysSortingLocalStore?.createSortingLocalStore?.();
-  window.AIWaysLocalSortingPersistence = { persistSortingDecisionLocally: input => localSortingStore?.saveLocalSortingRecord(input), listPendingSortingRecords: () => localSortingStore?.listPendingSortingRecords(), syncPendingSortingRecords: syncOne => localSortingStore?.syncPendingSortingRecords(syncOne), resolveLocalHeldRecord: (id, patch) => localSortingStore?.resolveLocalHeldRecord(id, patch), buildSortingRecordsCsv: records => window.AIWaysSortingLocalStore?.buildSortingRecordsCsv(records) };
   const classProfileStore = window.AIWaysClassProfileStore?.createClassProfileStore?.();
   let activeClassProfile = classProfileStore?.loadClassProfile?.() || null;
   const classroomSkillRegistry = window.AIWaysClassroomSkillRegistry?.createRegistry?.();
@@ -1340,6 +1338,69 @@
     searchBtn?.addEventListener("click", () => { clearTimeout(debounceTimer); runSearch(input.value); });
   }
 
+  // 100점 목표 4번(CSV 내보내기) - listSortingRecords는 "이 기기(actor)가
+  // 저장한 기록"만 돌려준다(반/학교 전체를 모아 보는 교사용 기능이 아니라,
+  // 학생 개인 기기가 자기 판단 이력을 CSV로 가져가는 용도). 학교/반 전체
+  // 데이터를 모으는 진짜 "선생님용 내보내기"는 지금 이 앱에 교사 인증
+  // 개념 자체가 없어서 별도 설계 결정이 필요하다(임의로 만들지 않음).
+  function csvQuote(value) {
+    let text = String(value ?? "");
+    if (/^[=+\-@]/.test(text)) text = "'" + text; // 스프레드시트 수식 주입 방지
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+  function csvRowForSortingRecord(record) {
+    const createdAt = record.createdAt ? new Date(record.createdAt) : null;
+    const dateLabel = createdAt && !Number.isNaN(createdAt.getTime()) ? createdAt.toLocaleString("ko-KR") : "";
+    const statusLabel = record.status === "completed" ? "완료" : record.status === "held" ? "보류" : record.status || "";
+    const selectedItemId = record.userDecision?.selectedItemId || "";
+    const matchedCandidate = (record.analysis?.objectCandidates || []).find((item) => item?.itemId === selectedItemId);
+    const itemLabel = matchedCandidate?.label || selectedItemId;
+    const reviewLabel = record.resolutionType ? "재검토 완료" : record.status === "held" ? "재검토 대기" : "";
+    return [dateLabel, statusLabel, itemLabel, reviewLabel];
+  }
+  function buildSortingRecordsCsv(records) {
+    const header = ["날짜", "처리 상태", "판단 품목", "재검토 상태"];
+    const rows = records.map(csvRowForSortingRecord);
+    const bom = String.fromCharCode(0xfeff); // 엑셀에서 한글이 깨지지 않도록 BOM을 앞에 붙인다
+    return bom + [header, ...rows].map((row) => row.map(csvQuote).join(",")).join("\r\n");
+  }
+  const CSV_MAX_PAGES = 25; // pageSize 40 * 25 = 최대 1000건까지 한 번에 모음(방어적 상한)
+  async function exportMySortingRecordsAsCsv() {
+    const client = window.AIWaysEdu2gClient;
+    if (!client?.listSortingRecords) return;
+    showDashboardToast("기록을 모으고 있어요...");
+    const records = [];
+    let cursor = "";
+    try {
+      for (let page = 0; page < CSV_MAX_PAGES; page += 1) {
+        const response = await client.listSortingRecords({ pageSize: 40, cursor, statusFilter: "all" });
+        if (!response.ok || !response.data) {
+          showDashboardToast(client?.errorMessageFor?.(response?.code) || "기록을 불러오지 못했어요. 다시 시도해주세요.");
+          return;
+        }
+        records.push(...(response.data.records || []));
+        if (!response.data.hasMore || !response.data.nextCursor) break;
+        cursor = response.data.nextCursor;
+      }
+    } catch {
+      showDashboardToast("기록을 불러오지 못했어요. 다시 시도해주세요.");
+      return;
+    }
+    if (!records.length) {
+      showDashboardToast("아직 저장된 기록이 없어요.");
+      return;
+    }
+    const csv = buildSortingRecordsCsv(records);
+    const stamp = new Date().toISOString().replace(/[-:]/g, "").replace("T", "-").slice(0, 13);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `aiways-my-sorting-records-${stamp}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   // 헤더 우상단 톱니바퀴 설정 메뉴: 학교/반 다시 설정, 샘플 데이터 보기,
   // 초기화. "샘플 데이터 보기"는 실제 학교가 설정돼 있어도 언제든 눌러서
   // 볼 수 있게 세션 동안만 유지되는 미리보기 상태로 전환한다(저장된
@@ -1366,6 +1427,10 @@
     $("[data-settings-action='reconfigure']")?.addEventListener("click", () => {
       closeMenu();
       openDashboardClassStepForCurrentSchool();
+    });
+    $("[data-settings-action='csv']")?.addEventListener("click", () => {
+      closeMenu();
+      exportMySortingRecordsAsCsv();
     });
     $("[data-settings-action='reset']")?.addEventListener("click", () => {
       closeMenu();
@@ -1899,6 +1964,25 @@
   function noteDashboardApiFailure(response) {
     dashboardApiFailureStreak += 1;
     console.warn("[aiways] 대시보드 갱신 실패", response?.status, response?.code);
+    // 2026-08-29 대표님 지시: 이 기기(actor)는 최초 조회한 학교로 서버에
+    // 영구히 고정돼 있어서(schoolDashboard.js dashboardSchoolId 잠금),
+    // 다른 학교를 골라도 매번 이 403이 돌아온다 - 새로고침으로도, 재시도로도
+    // 절대 안 풀린다. 그런데 예전엔 이 경우도 그냥 "대시보드 갱신에 문제가
+    // 생겼어요, 새로고침 해주세요"로 뭉뚱그려 보여줬는데, 새로고침을 아무리
+    // 해도 안 풀리니 사용자를 오도하는 문구였다 - 원인을 정확히 알리고,
+    // 절대 성공 못 할 폴링을 계속 두드리지 않게 멈춘다.
+    const isSchoolMismatch = response?.status === 403 && response?.code === "school_mismatch";
+    if (isSchoolMismatch) {
+      if (!dashboardApiFailureToastShown) {
+        dashboardApiFailureToastShown = true;
+        showDashboardToast("이 기기는 이미 다른 학교로 연결되어 있어 학교를 바꿀 수 없어요. 관리자에게 문의해주세요.", 4200);
+      }
+      if (schoolDashboardLiveRefreshTimer) {
+        window.clearInterval(schoolDashboardLiveRefreshTimer);
+        schoolDashboardLiveRefreshTimer = 0;
+      }
+      return;
+    }
     const isRateLimited = response?.status === 429 || response?.code === "rate_limit_exceeded";
     // 2026-08-27 재감사 지적: 429만 백오프 대상이었는데, 레이트리미터
     // 자체가 내부 오류로 막히면 서버는 429가 아니라 503+

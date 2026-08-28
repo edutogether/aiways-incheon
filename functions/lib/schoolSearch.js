@@ -6,29 +6,11 @@
 // 학교명/지역/급별)만 추려서 돌려준다 - 나이스 원본 응답의 다른 필드들은
 // 클라이언트에 노출할 이유가 없다.
 const { protectActorRequest } = require("./protectedActor");
+const { cleanText, applyCors } = require("./httpGuard");
 
 const MAX_BODY_BYTES = 1 * 1024;
-const ALLOWED_ORIGIN = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
 const NEIS_TIMEOUT_MS = 8000;
 const NEIS_URL = "https://open.neis.go.kr/hub/schoolInfo";
-
-function cleanText(value, max = 80) {
-  return typeof value === "string" && value.length <= max && value.trim() && !/[<>\x00-\x1f]/.test(value) ? value.trim() : "";
-}
-function isAllowedOrigin(origin) {
-  return origin === "https://edutogether.github.io" || ALLOWED_ORIGIN.test(origin);
-}
-function applyCors(req, res) {
-  const origin = String(req.headers?.origin || "");
-  if (origin && !isAllowedOrigin(origin)) return false;
-  if (origin) {
-    res.set("Access-Control-Allow-Origin", origin);
-    res.set("Vary", "Origin");
-    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.set("Access-Control-Allow-Headers", "Content-Type, X-Firebase-AppCheck, Authorization");
-  }
-  return true;
-}
 
 function toSchool(row) {
   return {

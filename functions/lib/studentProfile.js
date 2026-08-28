@@ -8,31 +8,12 @@
 // changeStudentClass (step 6) is the only sanctioned way to move grade/class
 // afterward, and it's cooldown-limited so a device can't hop classes freely.
 const { protectActorRequest } = require("./protectedActor");
+const { cleanText, applyCors } = require("./httpGuard");
 
 const MAX_BODY_BYTES = 2 * 1024;
-const ALLOWED_ORIGIN = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
 const DIGITS = /^\d{1,2}$/;
 const CLASS_CHANGE_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 const MAX_CHANGE_HISTORY = 10;
-
-function cleanText(value, max = 80) {
-  return typeof value === "string" && value.length <= max && value.trim() && !/[<>\x00-\x1f]/.test(value) ? value.trim() : "";
-}
-function isAllowedOrigin(origin) {
-  return origin === "https://edutogether.github.io" || ALLOWED_ORIGIN.test(origin);
-}
-function applyCors(req, res) {
-  const origin = String(req.headers?.origin || "");
-  if (origin && !isAllowedOrigin(origin)) return false;
-  if (origin) {
-    res.set("Access-Control-Allow-Origin", origin);
-    res.set("Vary", "Origin");
-    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.set("Access-Control-Allow-Headers", "Content-Type, X-Firebase-AppCheck, Authorization");
-  }
-  return true;
-}
-
 function publicProfile(profile) {
   if (!profile) return null;
   const { schoolId, schoolName, grade, classNum, studentNumber, name } = profile;

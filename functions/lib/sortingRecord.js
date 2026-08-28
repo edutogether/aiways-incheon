@@ -6,35 +6,18 @@ const MAX_BODY_BYTES = 24 * 1024;
 // legitimate keys like classContext.schoolName would false-positive as PII
 // (schoolName isn't a student's real name, just a school's display label).
 const FORBIDDEN_KEY = /(?:image|base64|data:image|url|authorization|api[_-]?key|secret|prompt|raw.*response|email|\bname\b|access.*code)/i;
-const ALLOWED_ORIGIN = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
 const { observeAppCheck } = require("./appCheckProtection");
 const { protectActorRequest } = require("./protectedActor");
 const { cleanSchoolId, cleanPathSegment } = require("./firestorePathSafety");
+const { cleanText, applyCors } = require("./httpGuard");
 
 function reject(code) { return { valid: false, code }; }
-function cleanText(value, max = 200) {
-  return typeof value === "string" && value.length <= max && value.trim() && !/[<>\u0000-\u001f]/.test(value) ? value.trim() : "";
-}
 function hasForbiddenKey(value) {
   return !!value && typeof value === "object" && Object.keys(value).some((key) => FORBIDDEN_KEY.test(key));
 }
-function isAllowedOrigin(origin) {
-  return origin === "https://edutogether.github.io" || ALLOWED_ORIGIN.test(origin);
-}
-function applyCors(req, res) {
-  const origin = String(req.headers?.origin || "");
-  if (origin && !isAllowedOrigin(origin)) return false;
-  if (origin) {
-    res.set("Access-Control-Allow-Origin", origin);
-    res.set("Vary", "Origin");
-    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.set("Access-Control-Allow-Headers", "Content-Type, X-Firebase-AppCheck, Authorization");
-  }
-  return true;
-}
 function normalizeCandidate(value, material) {
   if (!value || typeof value !== "object" || hasForbiddenKey(value)) return null;
-  const label = cleanText(value.label);
+  const label = cleanText(value.label, 200);
   const confidenceBand = cleanText(value.confidenceBand, 20);
   if (!label || !["high", "medium", "low", "unknown"].includes(confidenceBand)) return null;
   if (material) return { label, confidenceBand };
@@ -45,7 +28,7 @@ function normalizeCandidate(value, material) {
 function normalizeChecklist(value) {
   if (!value || typeof value !== "object" || hasForbiddenKey(value)) return null;
   const id = cleanText(value.id, 80);
-  const label = cleanText(value.label);
+  const label = cleanText(value.label, 200);
   return id && label && typeof value.checked === "boolean" ? { id, label, checked: value.checked } : null;
 }
 // Interim, student-typed school/grade/class (step 4 will replace this with a
@@ -78,7 +61,7 @@ function validateRecordRequest(body) {
   if (!Array.isArray(objects) || objects.length > 3 || !Array.isArray(materials) || materials.length > 3 || !Array.isArray(cautions) || cautions.length > 5) return reject("analysis_limit");
   const objectCandidates = objects.map((item) => normalizeCandidate(item, false));
   const materialCandidates = materials.map((item) => normalizeCandidate(item, true));
-  const visibleCautions = cautions.map((item) => cleanText(item));
+  const visibleCautions = cautions.map((item) => cleanText(item, 200));
   if (objectCandidates.some((item) => !item) || materialCandidates.some((item) => !item) || visibleCautions.some((item) => !item)) return reject("invalid_analysis");
   if (!Array.isArray(body.checklist) || body.checklist.length > 20) return reject("checklist_limit");
   const checklist = body.checklist.map(normalizeChecklist);
@@ -92,7 +75,7 @@ function validateRecordRequest(body) {
   const hold = body.hold === null || body.hold === undefined ? null : body.hold;
   const normalizedHold = hold && typeof hold === "object" && !hasForbiddenKey(hold) ? {
     recommended: hold.recommended === true,
-    reasons: Array.isArray(hold.reasons) ? hold.reasons.map((item) => cleanText(item)).filter(Boolean).slice(0, 5) : []
+    reasons: Array.isArray(hold.reasons) ? hold.reasons.map((item) => cleanText(item, 200)).filter(Boolean).slice(0, 5) : []
   } : null;
   if (body.status === "completed" && (action !== "recorded" || !checklist.every((item) => item.checked) || normalizedHold?.recommended)) return reject("invalid_completed_state");
   if (body.status === "held" && (action !== "held" || !normalizedHold?.recommended)) return reject("invalid_held_state");

@@ -2,27 +2,9 @@
 
 const { protectActorRequest } = require("./protectedActor");
 const { cleanSchoolId, cleanPathSegment } = require("./firestorePathSafety");
+const { cleanText, applyCors } = require("./httpGuard");
 
 const MAX_BODY_BYTES = 4 * 1024;
-const ALLOWED_ORIGIN = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
-
-function cleanText(value, max = 80) {
-  return typeof value === "string" && value.length <= max && value.trim() && !/[<>\x00-\x1f]/.test(value) ? value.trim() : "";
-}
-function isAllowedOrigin(origin) {
-  return origin === "https://edutogether.github.io" || ALLOWED_ORIGIN.test(origin);
-}
-function applyCors(req, res) {
-  const origin = String(req.headers?.origin || "");
-  if (origin && !isAllowedOrigin(origin)) return false;
-  if (origin) {
-    res.set("Access-Control-Allow-Origin", origin);
-    res.set("Vary", "Origin");
-    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.set("Access-Control-Allow-Headers", "Content-Type, X-Firebase-AppCheck, Authorization");
-  }
-  return true;
-}
 
 function topItems(itemCounts, limit = 5) {
   return Object.entries(itemCounts && typeof itemCounts === "object" ? itemCounts : {})

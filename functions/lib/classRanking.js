@@ -11,24 +11,9 @@
 // 구조적으로 사라진다.
 const { protectActorRequest } = require("./protectedActor");
 const { cleanSchoolId, cleanPathSegment } = require("./firestorePathSafety");
+const { applyCors } = require("./httpGuard");
 
 const MAX_BODY_BYTES = 1 * 1024;
-const ALLOWED_ORIGIN = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
-
-function isAllowedOrigin(origin) {
-  return origin === "https://edutogether.github.io" || ALLOWED_ORIGIN.test(origin);
-}
-function applyCors(req, res) {
-  const origin = String(req.headers?.origin || "");
-  if (origin && !isAllowedOrigin(origin)) return false;
-  if (origin) {
-    res.set("Access-Control-Allow-Origin", origin);
-    res.set("Vary", "Origin");
-    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.set("Access-Control-Allow-Headers", "Content-Type, X-Firebase-AppCheck, Authorization");
-  }
-  return true;
-}
 
 function createGetClassRankingHandler(dependencies = {}) {
   const db = dependencies.db;

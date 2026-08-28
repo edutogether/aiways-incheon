@@ -6,6 +6,7 @@ const { randomUUID } = require("node:crypto");
 const { SCHEMA, ITEM_TYPES, errorResponse, validateRequest, validateResponse } = require("./sortingVisionSchema");
 const { observeAppCheck } = require("./appCheckProtection");
 const { protectActorRequest } = require("./protectedActor");
+const { applyCors } = require("./httpGuard");
 
 const GEMINI_MODEL_ID = "gemini-3.5-flash-lite";
 
@@ -19,22 +20,6 @@ const RESPONSE_SCHEMA = {
     visibleCautions: { type: "array", maxItems: 5, items: { type: "string" } }, uncertainty: { type: "string", enum: ["low", "medium", "high"] }, needsUserCheck: { type: "boolean" }
   }
 };
-
-function isAllowedOrigin(origin) {
-  return origin === "https://edutogether.github.io" || /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(origin);
-}
-
-function applyCors(req, res) {
-  const origin = String(req.headers?.origin || "");
-  if (origin && !isAllowedOrigin(origin)) return false;
-  if (origin) {
-    res.set("Access-Control-Allow-Origin", origin);
-    res.set("Vary", "Origin");
-    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.set("Access-Control-Allow-Headers", "Content-Type, X-Firebase-AppCheck, Authorization");
-  }
-  return true;
-}
 
 function createGeminiClient(apiKey) { return new GoogleGenAI({ apiKey }); }
 
@@ -169,4 +154,4 @@ function createAnalyzeSortingHandler(dependencies = {}) {
   };
 }
 
-module.exports = { RESPONSE_SCHEMA, GEMINI_MODEL_ID, redactProviderMessage, classifyProviderError, createSafeProviderErrorMeta, isAllowedOrigin, createGeminiClient, analyzeWithGemini, createAnalyzeSortingHandler };
+module.exports = { RESPONSE_SCHEMA, GEMINI_MODEL_ID, redactProviderMessage, classifyProviderError, createSafeProviderErrorMeta, createGeminiClient, analyzeWithGemini, createAnalyzeSortingHandler };

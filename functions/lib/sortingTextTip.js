@@ -5,9 +5,10 @@ const { SCHEMA, errorResponse, validateRequest, validateResponse } = require("./
 const { ITEM_TYPES } = require("./sortingVisionSchema");
 const { protectActorRequest } = require("./protectedActor");
 const {
-  GEMINI_MODEL_ID, isAllowedOrigin, createGeminiClient,
+  GEMINI_MODEL_ID, createGeminiClient,
   redactProviderMessage, classifyProviderError, createSafeProviderErrorMeta
 } = require("./sortingVision");
+const { applyCors } = require("./httpGuard");
 
 const RESPONSE_SCHEMA = {
   type: "object",
@@ -19,18 +20,6 @@ const RESPONSE_SCHEMA = {
     visibleCautions: { type: "array", maxItems: 5, items: { type: "string" } }, uncertainty: { type: "string", enum: ["low", "medium", "high"] }, needsUserCheck: { type: "boolean" }
   }
 };
-
-function applyCors(req, res) {
-  const origin = String(req.headers?.origin || "");
-  if (origin && !isAllowedOrigin(origin)) return false;
-  if (origin) {
-    res.set("Access-Control-Allow-Origin", origin);
-    res.set("Vary", "Origin");
-    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.set("Access-Control-Allow-Headers", "Content-Type, X-Firebase-AppCheck, Authorization");
-  }
-  return true;
-}
 
 const TEXT_TIP_PROMPT_TEXT = [
   "Return JSON only. requestId must be {{requestId}}.",

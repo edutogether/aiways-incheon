@@ -172,6 +172,14 @@ function createGlobalRateLimiter({ db, now = () => new Date(), serverTimestamp =
 
 const ACTOR_RATE_LIMITS = Object.freeze({
   analyzeSortingImage: { perMinute: 4, perDay: 50 }, analyzeSortingText: { perMinute: 6, perDay: 80 },
+  // 2026-08-29 - 대표님 지시로 함수별 실제 최대 호출량을 점검하다 발견:
+  // 이 함수만 액터별 상한이 아예 없었다(대응하는 ACTOR_RATE_LIMITS 항목이
+  // 없으면 check()가 무조건 allowed=true를 돌려줌, 위 194행). 서버 조건부
+  // 호출(analyzeSortingImage가 애매할 때만)이 원 설계지만, 클라이언트가
+  // 직접 부를 수 있는 엔드포인트로도 노출돼 있어(edu2gBetaClient.js
+  // ALLOWED 목록) 액터 하나가 이 함수 하나의 전역 상한(1000/일)을 혼자
+  // 다 써버릴 수 있었다. analyzeSortingText와 같은 크기로 맞춘다.
+  analyzeSortingSafetyObserver: { perMinute: 6, perDay: 80 },
   saveSortingRecord: { perMinute: 12, perDay: 200 },
   listSortingRecords: { perMinute: 60, perDay: 500 }, resolveSortingRecord: { perMinute: 20, perDay: 100 },
   // 24시간 내내 켜있는 키오스크 기기가 5초마다 폴링하면 하루 최대

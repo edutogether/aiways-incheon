@@ -10,6 +10,7 @@ const { createGetSchoolDashboardHandler } = require("../lib/schoolDashboard");
 function makeCountingDb(schools, actorsInit = {}) {
   let classesReadCount = 0;
   let studentsReadCount = 0;
+  let actorReadCount = 0;
   const actors = { ...actorsInit };
   function classDocRef(schoolId, classDocId) {
     const school = schools[schoolId] || { classes: {} };
@@ -36,13 +37,13 @@ function makeCountingDb(schools, actorsInit = {}) {
   }
   const db = {
     collection(name) {
-      if (name === "actors") return { doc: (id) => ({ async get() { const data = actors[id]; return { exists: !!data, data: () => data }; }, set(data, opts) { actors[id] = opts?.merge ? { ...(actors[id] || {}), ...data } : data; } }) };
+      if (name === "actors") return { doc: (id) => ({ async get() { actorReadCount += 1; const data = actors[id]; return { exists: !!data, data: () => data }; }, set(data, opts) { actors[id] = opts?.merge ? { ...(actors[id] || {}), ...data } : data; } }) };
       if (name === "schools") return { doc: schoolDocRef };
       throw new Error("unsupported collection " + name);
     },
     async runTransaction(cb) { return cb({ async get(ref) { return ref.get(); }, set(ref, data, opts) { ref.set(data, opts); } }); }
   };
-  return { db, readCount: () => classesReadCount, studentsReadCount: () => studentsReadCount };
+  return { db, readCount: () => classesReadCount, studentsReadCount: () => studentsReadCount, actorReadCount: () => actorReadCount };
 }
 async function call(handler, body) {
   const result = {};
@@ -90,6 +91,30 @@ test("cache is isolated per school", async () => {
   const second = await call(handler2, { schoolId: "9999999" });
   assert.equal(second.status, 200);
   assert.equal(readCount(), 2, "each school's first request should read Firestore independently");
+});
+
+test("2026-08-29 (cost review): repeated polls within TTL reuse the cached school-lock check, but a different school from the same actor is still correctly rejected", async () => {
+  const { db, actorReadCount } = makeCountingDb({ "7341025": { classes: {} }, "9999999": { classes: {} } });
+  let clock = 1000;
+  const handler = createGetSchoolDashboardHandler({
+    appCheck: async () => ({ status: "valid" }), access: { resolve: async () => ({ ok: true, actorId: "actor_1" }) },
+    rateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) }, actorRateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) },
+    db, now: () => clock
+  });
+  const first = await call(handler, { schoolId: "7341025" });
+  assert.equal(first.status, 200);
+  assert.equal(actorReadCount(), 1);
+  clock += 2000; // still inside the 5.5s lock-cache TTL
+  const second = await call(handler, { schoolId: "7341025" });
+  assert.equal(second.status, 200);
+  assert.equal(actorReadCount(), 1, "second poll inside TTL should reuse the cached lock check, not re-read the actor doc");
+  // Regression check (this exact bug shipped once and was caught by classRanking's
+  // equivalent test): the cache must not blindly replay the FIRST request's verdict --
+  // a request for a different schoolId, even while the lock cache is still warm,
+  // must still be freshly compared and rejected.
+  const thirdWrongSchool = await call(handler, { schoolId: "9999999" });
+  assert.equal(thirdWrongSchool.status, 403);
+  assert.equal(thirdWrongSchool.body.code, "school_mismatch");
 });
 
 test("topStudents (2026-08-27 fix) also reuses the cache within TTL for a verified profile's own class", async () => {

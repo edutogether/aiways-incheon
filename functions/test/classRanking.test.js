@@ -105,6 +105,31 @@ test("locks the actor's device to the first school it requests, rejects a later 
   assert.equal(third.status, 200); // same school, different grade is fine
 });
 
+test("2026-08-29 (cost review): repeated polls reuse the cached school-lock check, but a different school from the same actor is still correctly rejected", async () => {
+  let actorReadCount = 0;
+  const db = fakeDb({ 7341025: [], 9999999: [] });
+  const rawRunTransaction = db.runTransaction.bind(db);
+  db.runTransaction = (fn) => rawRunTransaction((tx) => fn({ ...tx, get: async (ref) => { actorReadCount += 1; return tx.get(ref); } }));
+  let clock = 1000;
+  const handler = createGetClassRankingHandler({
+    appCheck: async () => ({ status: "valid" }),
+    access: { resolve: async () => ({ ok: true, actorId: "actor_1" }) },
+    rateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) },
+    actorRateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) },
+    db, now: () => clock
+  });
+  const first = await call(handler, { schoolId: "7341025", grade: "5" });
+  assert.equal(first.status, 200);
+  assert.equal(actorReadCount, 1);
+  clock += 2000; // still inside the 5.5s lock-cache TTL
+  const second = await call(handler, { schoolId: "7341025", grade: "5" });
+  assert.equal(second.status, 200);
+  assert.equal(actorReadCount, 1, "second poll inside TTL should reuse the cached lock check");
+  const thirdWrongSchool = await call(handler, { schoolId: "9999999", grade: "5" });
+  assert.equal(thirdWrongSchool.status, 403);
+  assert.equal(thirdWrongSchool.body.code, "school_mismatch");
+});
+
 test("repeated polls within the cache TTL reuse the cached classes read (2026-08-29: read-cost redesign)", async () => {
   let classesReadCount = 0;
   const db = fakeDb({ 7341025: [{ grade: "5", classNum: "1", completedTotal: 10, heldTotal: 0 }] });

@@ -89,21 +89,41 @@ function createGetSchoolDashboardHandler(dependencies = {}) {
     // 다른 schoolId를 보내도 거절돼서, 최소한 "아무 학교나 조회 가능"은 막힌다.
     // 4단계가 들어오면 이 필드를 실제 가입 시 확인된 값으로 대체하면 된다.
     const actorRef = db.collection("actors").doc(protectedActor.actorId);
-    let binding;
-    try {
-      binding = await db.runTransaction(async (transaction) => {
-        const snap = await transaction.get(actorRef);
-        const data = snap.exists ? snap.data() : null;
-        const boundSchoolId = cleanText(data?.dashboardSchoolId, 80);
-        if (!boundSchoolId) {
-          transaction.set(actorRef, { dashboardSchoolId: schoolId }, { merge: true });
-          return { ok: true, profile: data?.studentProfile || null };
-        }
-        return { ok: boundSchoolId === schoolId, profile: data?.studentProfile || null };
-      });
-    } catch {
-      return res.status(503).json({ ok: false, code: "protection_unavailable" });
+    const requestTimeForLock = now();
+    // 2026-08-29 대표님 지시(비용 실측 결과) - 학교잠금 확인 트랜잭션은
+    // 한 번 고정되면 절대 안 바뀌는 값인데도 폴링마다(5초) 매번 다시
+    // 읽고 있었다 - 전체 Firestore 읽기 비용의 약 65%가 여기서 나가는
+    // 걸 계산으로 확인했다. classes/school/students와 같은 캐시(같은
+    // TTL, "폴링 주기(5초)보다 길게" 원칙 그대로 - 지연 체감 없이 캐시
+    // 효율만 최대)를 actorId별로 하나 더 둬서, 이 읽기도 같은 방식으로
+    // 줄인다. studentProfile은 등록 이후 바뀔 수 있는 값이라(가입/반변경)
+    // 이 TTL(5.5초)만큼만 지연 반영되는 것도 나머지 대시보드 데이터와
+    // 동일한 수준이라 문제 없다.
+    // 캐시에는 "이 요청의 ok 여부"가 아니라 boundSchoolId/profile 자체(둘 다
+    // 한 번 정해지면 이 TTL 동안은 그대로인 값)만 담는다 - ok는 매번 이번
+    // 요청의 schoolId와 새로 비교해서 계산해야, 같은 기기가 (캐시가 아직
+    // 살아있는 동안) 다른 schoolId로 다시 요청했을 때도 정확히 거절된다
+    // (캐시된 "true"를 그대로 돌려주면 다른 학교 요청까지 통과되는 버그가 됨).
+    const lockCacheKey = `lock:${protectedActor.actorId}`;
+    let lockState = cache.get(lockCacheKey, requestTimeForLock);
+    if (!lockState) {
+      try {
+        lockState = await db.runTransaction(async (transaction) => {
+          const snap = await transaction.get(actorRef);
+          const data = snap.exists ? snap.data() : null;
+          const boundSchoolId = cleanText(data?.dashboardSchoolId, 80);
+          if (!boundSchoolId) {
+            transaction.set(actorRef, { dashboardSchoolId: schoolId }, { merge: true });
+            return { boundSchoolId: schoolId, profile: data?.studentProfile || null };
+          }
+          return { boundSchoolId, profile: data?.studentProfile || null };
+        });
+      } catch {
+        return res.status(503).json({ ok: false, code: "protection_unavailable" });
+      }
+      cache.set(lockCacheKey, lockState, requestTimeForLock);
     }
+    const binding = { ok: lockState.boundSchoolId === schoolId, profile: lockState.profile };
     if (!binding.ok) return res.status(403).json({ ok: false, code: "school_mismatch" });
 
     const schoolRef = db.collection("schools").doc(schoolId);

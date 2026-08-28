@@ -74,22 +74,34 @@ function createGetClassRankingHandler(dependencies = {}) {
     // 적용돼야 한다.
     if (db) {
       const actorRef = db.collection("actors").doc(protectedActor.actorId);
-      let binding;
-      try {
-        binding = await db.runTransaction(async (transaction) => {
-          const snap = await transaction.get(actorRef);
-          const data = snap.exists ? snap.data() : null;
-          const boundSchoolId = cleanSchoolId(data?.dashboardSchoolId || "");
-          if (!boundSchoolId) {
-            transaction.set(actorRef, { dashboardSchoolId: schoolId }, { merge: true });
-            return true;
-          }
-          return boundSchoolId === schoolId;
-        });
-      } catch {
-        return res.status(503).json({ ok: false, code: "protection_unavailable" });
+      // 2026-08-29 - schoolDashboard.js와 같은 이유로 이 락 확인도 캐시한다
+      // (한 번 고정되면 안 바뀌는 값을 폴링마다 다시 읽던 게 비용의 큰
+      // 부분이었음 - 대표님 지시로 계산 후 승인됨). 캐시엔 boundSchoolId
+      // 자체만 담고, 이번 요청의 schoolId와의 일치 여부는 매번 새로
+      // 계산한다 - 그래야 같은 기기가 캐시가 살아있는 동안 다른 schoolId로
+      // 다시 요청해도 정확히 거절된다(schoolDashboard.js에서 먼저 겪은
+      // 회귀 - 결과만 캐시하면 다른 학교 요청까지 통과되는 버그가 났었음).
+      const lockCacheKey = `lock:${protectedActor.actorId}`;
+      const lockRequestTime = now();
+      let boundSchoolId = cache.get(lockCacheKey, lockRequestTime);
+      if (boundSchoolId === null) {
+        try {
+          boundSchoolId = await db.runTransaction(async (transaction) => {
+            const snap = await transaction.get(actorRef);
+            const data = snap.exists ? snap.data() : null;
+            const existing = cleanSchoolId(data?.dashboardSchoolId || "");
+            if (!existing) {
+              transaction.set(actorRef, { dashboardSchoolId: schoolId }, { merge: true });
+              return schoolId;
+            }
+            return existing;
+          });
+        } catch {
+          return res.status(503).json({ ok: false, code: "protection_unavailable" });
+        }
+        cache.set(lockCacheKey, boundSchoolId, lockRequestTime);
       }
-      if (!binding) return res.status(403).json({ ok: false, code: "school_mismatch" });
+      if (boundSchoolId !== schoolId) return res.status(403).json({ ok: false, code: "school_mismatch" });
     }
 
     // 같은 학교, 같은 학년의 반만 조회한다 - 다른 학년/다른 학교 데이터는

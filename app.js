@@ -1305,7 +1305,11 @@
       const token = ++searchToken;
       const response = await client?.searchSchool?.({ query });
       if (token !== searchToken) return; // a newer search already superseded this one
-      if (!response?.ok) { status.textContent = "검색에 실패했어요. 잠시 후 다시 시도해 주세요."; return; }
+      // 2026-08-27 실사용 제보: 실제로는 actor_unavailable(403) 등 구체적인
+      // 원인이 있었는데도 화면엔 항상 이 뭉뚱그린 문구만 떠서 원인 파악이
+      // 안 됐다. edu2gBetaClient.js의 errorMessageFor()가 이미 코드별
+      // 안내문구를 갖고 있으니 그걸 쓴다.
+      if (!response?.ok) { status.textContent = client?.errorMessageFor?.(response?.code) || "검색에 실패했어요. 잠시 후 다시 시도해 주세요."; return; }
       const schools = response.data?.schools || [];
       if (!schools.length) { status.textContent = "검색 결과가 없어요. 학교 이름을 다시 확인해 주세요."; return; }
       status.textContent = `${schools.length}개 학교를 찾았어요. 목록에서 골라 주세요.`;

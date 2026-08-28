@@ -40,18 +40,24 @@ function createEdu2gDeviceAccess({ auth, db, serverTimestamp = () => new Date() 
     try {
       return await db.runTransaction(async transaction => {
         const [bindingSnap, actorSnap, deviceSnap] = await Promise.all([transaction.get(bindingRef), transaction.get(actorRef), transaction.get(deviceRef)]);
-        if (bindingSnap.exists) {
-          // Lost a race against a concurrent request for the same brand-new uid.
-          if (bindingSnap.data()?.status !== "active" || !actorSnap.exists || !deviceSnap.exists) return failure("access_state_invalid", 503);
+        // 바인딩+액터+기기가 셋 다 이미 일관되게 있으면(동시요청 경합 또는
+        // 이미 프로비저닝된 상태) 그대로 재사용한다.
+        if (bindingSnap.exists && bindingSnap.data()?.status === "active" && actorSnap.exists && deviceSnap.exists) {
           return { ok: true, actorId: uid, uid, actor: actorSnap.data(), device: deviceSnap.data() };
         }
+        // 그 외 모든 경우 - 바인딩이 아예 없거나(진짜 새 방문자), 바인딩은
+        // 있는데 actor/device 문서가 없어진 경우(2026-08-27 실사용 제보로
+        // 발견: 관리자가 actors 컬렉션만 지우고 edu2gDeviceBindings는 안
+        // 지운 경우 이 상태가 되어 이 uid가 영구히 actor_unavailable로
+        // 막혔었다) - 셋 다 새로 만든다. set()이라 기존 문서가 있어도
+        // 덮어써서 안전하다(create()는 기존 문서가 있으면 예외를 던짐).
         const managementId = randomUUID();
         if (!MANAGEMENT_ID.test(managementId)) return failure("access_state_invalid", 503);
         const actor = { plan: OPEN_ACCESS_PLAN, status: "active", displayName: "공개 링크 방문자", maxDevices: 1, activeDeviceCount: 1, createdAt: now, updatedAt: now };
         const device = { uid, managementId, status: "active", deviceLabel: "공개 링크 접속", platform: "web", createdAt: now, lastSeenAt: now };
-        transaction.create(actorRef, actor);
-        transaction.create(deviceRef, device);
-        transaction.create(bindingRef, { actorId: uid, status: "active", createdAt: now, lastSeenAt: now });
+        transaction.set(actorRef, actor);
+        transaction.set(deviceRef, device);
+        transaction.set(bindingRef, { actorId: uid, status: "active", createdAt: now, lastSeenAt: now });
         return { ok: true, actorId: uid, uid, actor, device };
       });
     } catch { return failure("access_state_invalid", 503); }
@@ -72,7 +78,20 @@ function createEdu2gDeviceAccess({ auth, db, serverTimestamp = () => new Date() 
         const actorRef = db.collection("actors").doc(binding.actorId);
         const deviceRef = actorRef.collection("trustedDevices").doc(uid);
         const [actorSnap, deviceSnap] = await Promise.all([actorRef.get(), deviceRef.get()]);
-        if (!actorSnap.exists || actorSnap.data()?.status !== "active" || !["closed_beta", OPEN_ACCESS_PLAN].includes(actorSnap.data()?.plan)) return failure("actor_unavailable", 403);
+        if (!actorSnap.exists) {
+          // 2026-08-27 실사용 제보(searchSchool이 항상 403 actor_unavailable)로
+          // 발견: open_access 방식(1기기=1액터, actorId===uid)은 binding은
+          // 남아있는데 actors 문서만 없어지면(예: 관리자가 actors 컬렉션만
+          // 지우고 edu2gDeviceBindings는 안 지운 경우) 이 uid가 영구히
+          // actor_unavailable로 막혔다 - 재시도해도, 새로고침해도 절대
+          // 스스로 못 벗어남. 이 조합(actorId===uid)만 새 방문자처럼
+          // 재프로비저닝해서 자가치유시킨다. closed_beta(공유 액터,
+          // actorId!==uid)는 대상에서 제외 - 공유 액터가 사라진 건 다른
+          // 종류의 이상 상태라 그대로 차단 유지한다.
+          if (binding.actorId === uid) return provisionOpenAccessActor(uid);
+          return failure("actor_unavailable", 403);
+        }
+        if (actorSnap.data()?.status !== "active" || !["closed_beta", OPEN_ACCESS_PLAN].includes(actorSnap.data()?.plan)) return failure("actor_unavailable", 403);
         const device = deviceSnap.exists ? deviceSnap.data() || {} : null;
         if (!device) return failure("access_state_invalid", 503);
         if (device.status === "revoked") return failure("device_revoked", 403);

@@ -34,7 +34,8 @@ function fakeDbWithTransaction(initial) {
     async runTransaction(fn) {
       return fn({
         get: async ref => ref.get(),
-        create: (ref, data) => { if (store[ref.key] !== undefined) throw new Error("already exists"); store[ref.key] = data; }
+        create: (ref, data) => { if (store[ref.key] !== undefined) throw new Error("already exists"); store[ref.key] = data; },
+        set: (ref, data) => { store[ref.key] = data; }
       });
     },
     _store: store
@@ -54,4 +55,25 @@ test("auto-provisions an open-access actor for a brand-new anonymous uid (no cod
   const second = await access.resolve(request());
   assert.equal(second.ok, true);
   assert.equal(second.actorId, "u1");
+});
+test("self-heals an open-access uid whose actor doc vanished while its binding survived (2026-08-27 live bug report: searchSchool always 403 actor_unavailable)", async () => {
+  // Reproduces exactly what an admin deleting the `actors` collection
+  // without also clearing `edu2gDeviceBindings` leaves behind: a binding
+  // that points at an actorId (here, actorId===uid, the open_access shape)
+  // whose actor/device docs no longer exist. Before this fix that uid was
+  // permanently stuck on actor_unavailable with no way to recover.
+  const db = fakeDbWithTransaction({ "edu2gDeviceBindings/u1": { status: "active", actorId: "u1" } });
+  const access = createEdu2gDeviceAccess({ auth: auth({ uid: "u1", firebase: { sign_in_provider: "anonymous" } }), db, serverTimestamp: () => "now" });
+  const result = await access.resolve(request());
+  assert.equal(result.ok, true);
+  assert.equal(result.actorId, "u1");
+  assert.equal(result.actor.plan, "open_access");
+  assert.equal(db._store["actors/u1"].plan, "open_access");
+});
+test("does NOT self-heal a closed_beta binding whose shared actor vanished (actorId !== uid stays actor_unavailable)", async () => {
+  const db = fakeDbWithTransaction({ "edu2gDeviceBindings/u1": { status: "active", actorId: "shared_actor" } });
+  const access = createEdu2gDeviceAccess({ auth: auth({ uid: "u1", firebase: { sign_in_provider: "anonymous" } }), db, serverTimestamp: () => "now" });
+  const result = await access.resolve(request());
+  assert.equal(result.ok, false);
+  assert.equal(result.code, "actor_unavailable");
 });

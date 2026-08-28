@@ -79,17 +79,21 @@ function createEdu2gDeviceAccess({ auth, db, serverTimestamp = () => new Date() 
         const deviceRef = actorRef.collection("trustedDevices").doc(uid);
         const [actorSnap, deviceSnap] = await Promise.all([actorRef.get(), deviceRef.get()]);
         if (!actorSnap.exists) {
-          // 2026-08-27 실사용 제보(searchSchool이 항상 403 actor_unavailable)로
-          // 발견: open_access 방식(1기기=1액터, actorId===uid)은 binding은
-          // 남아있는데 actors 문서만 없어지면(예: 관리자가 actors 컬렉션만
-          // 지우고 edu2gDeviceBindings는 안 지운 경우) 이 uid가 영구히
-          // actor_unavailable로 막혔다 - 재시도해도, 새로고침해도 절대
-          // 스스로 못 벗어남. 이 조합(actorId===uid)만 새 방문자처럼
-          // 재프로비저닝해서 자가치유시킨다. closed_beta(공유 액터,
-          // actorId!==uid)는 대상에서 제외 - 공유 액터가 사라진 건 다른
-          // 종류의 이상 상태라 그대로 차단 유지한다.
-          if (binding.actorId === uid) return provisionOpenAccessActor(uid);
-          return failure("actor_unavailable", 403);
+          // 2026-08-27 실사용 제보(searchSchool이 항상 403 actor_unavailable,
+          // 이어서 카카오톡 인앱브라우저에서 아예 접속 자체가 안 됨)로 발견:
+          // binding은 남아있는데 actors 문서만 없어지면(예: 관리자가 actors
+          // 컬렉션만 지우고 edu2gDeviceBindings는 안 지운 경우) 이 uid가
+          // 영구히 actor_unavailable로 막혔다 - 재시도해도, 새로고침해도
+          // 절대 스스로 못 벗어남. 처음엔 open_access(actorId===uid)만
+          // 자가치유 대상으로 좁혔었는데, closed_beta(공유 액터,
+          // actorId!==uid)로 바인딩된 기기도 실사용에서 같은 증상으로
+          // 걸리는 게 확인됐다 - closed-beta 시크릿코드 게이트 자체가
+          // 이미 퇴역했으므로(위 provisionOpenAccessActor 주석 참고), 공유
+          // 액터가 사라진 것도 더 이상 "의도적으로 막힌 상태"가 아니라
+          // 똑같이 방치된 잔재일 뿐이다. actor 문서가 실제로 없으면(단순
+          // status가 비활성인 것과는 다름, 아래 줄에서 별도 처리) 무조건
+          // 이 기기를 새 open_access 방문자로 재프로비저닝한다.
+          return provisionOpenAccessActor(uid);
         }
         if (actorSnap.data()?.status !== "active" || !["closed_beta", OPEN_ACCESS_PLAN].includes(actorSnap.data()?.plan)) return failure("actor_unavailable", 403);
         const device = deviceSnap.exists ? deviceSnap.data() || {} : null;

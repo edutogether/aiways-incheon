@@ -70,8 +70,21 @@ test("self-heals an open-access uid whose actor doc vanished while its binding s
   assert.equal(result.actor.plan, "open_access");
   assert.equal(db._store["actors/u1"].plan, "open_access");
 });
-test("does NOT self-heal a closed_beta binding whose shared actor vanished (actorId !== uid stays actor_unavailable)", async () => {
+test("also self-heals a closed_beta binding whose shared actor vanished (2026-08-27: KakaoTalk in-app browser live bug report, same root cause as open_access but binding.actorId !== uid) - the closed-beta gate is already retired so a missing shared actor is just more of the same abandoned-relic state, not a deliberate block", async () => {
   const db = fakeDbWithTransaction({ "edu2gDeviceBindings/u1": { status: "active", actorId: "shared_actor" } });
+  const access = createEdu2gDeviceAccess({ auth: auth({ uid: "u1", firebase: { sign_in_provider: "anonymous" } }), db, serverTimestamp: () => "now" });
+  const result = await access.resolve(request());
+  assert.equal(result.ok, true);
+  // Re-provisioning converts this device to a fresh open_access actor keyed
+  // by its own uid, not the old shared "shared_actor" id.
+  assert.equal(result.actorId, "u1");
+  assert.equal(result.actor.plan, "open_access");
+});
+test("still fails closed when the actor exists but is inactive/wrong-plan (distinct from a missing actor doc)", async () => {
+  const db = fakeDbWithTransaction({
+    "edu2gDeviceBindings/u1": { status: "active", actorId: "shared_actor" },
+    "actors/shared_actor": { status: "disabled", plan: "closed_beta" }
+  });
   const access = createEdu2gDeviceAccess({ auth: auth({ uid: "u1", firebase: { sign_in_provider: "anonymous" } }), db, serverTimestamp: () => "now" });
   const result = await access.resolve(request());
   assert.equal(result.ok, false);

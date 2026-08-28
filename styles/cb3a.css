@@ -1570,6 +1570,17 @@ html[data-tier="phone"] .phone-shell-frame {
   .class-panel .confusion,
   .class-panel .rank-note {
     grid-column: 1 / -1 !important;
+    /* 2026-08-28 실사용 제보(대표님, 768x1024 패드 세로) - 학년 선택
+       드롭다운이 "406 배출 관찰"/"36 판단 보류" 숫자와 완전히 겹쳐
+       보였다. 실측: 위에서 grid-template-areas를 none으로 지웠는데
+       이 자식들은 여전히 옛 이름(select/kpi/head/visual, 라인 78/562
+       "head head select"/"kpi visual visual" 2행 정의에서 옴)으로
+       grid-area를 참조하고 있어서, 이름 붙은 줄(named line)들이 암묵
+       그리드에 뒤엉켜 만들어지면서 행 4개 중 2개가 0px로 찌그러지고
+       칸이 서로 겹쳤다. grid-column은 이미 고쳐놨는데 grid-row(=행
+       배치)는 그대로 두면 이름 충돌이 안 풀린다 - auto로 초기화해서
+       선언 순서 그대로 위→아래 한 줄씩 쌓이게 한다. */
+    grid-row: auto !important;
   }
   /* 아래는 전부 1440px PC 화면에서 getComputedStyle로 실측한 값을 그대로
      옮긴 것이다(추측 금지 - "아주 좁은 화면" 구간용 옛 규칙이 이 태블릿
@@ -1704,6 +1715,30 @@ html[data-tier="phone"] .phone-shell-frame {
   .dashboard-grid > .panel .class-kpis span,
   .dashboard-grid > .panel .landfill-metrics span {
     color: rgb(158 179 199) !important;
+  }
+  /* 2026-08-28 실사용 제보(대표님, 768x1024 패드 세로) - "16,400t
+     -9.4% 68.3% 32.7%" 4개 큰 숫자가 서로 겹쳐 보였다. 실측: 이 폭에서
+     .landfill-metrics가 4열 그리드로 남아있어 칸 하나가 66px인데,
+     그 안의 숫자(<strong>)가 32px 폰트로 렌더링돼 실제로는 119px가
+     필요했다(그리드 트랙 폭을 53px 초과해서 옆 칸을 덮어 겹쳐 보인
+     것). 폰 폭(114행)이 이미 쓰고 있는 "2열로 줄이기" 해법을 여기도
+     그대로 적용하고, 늘어난 칸 폭(약 140px)에 맞춰 폰트 크기를 다시
+     잡는다. */
+  .landfill-panel .landfill-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    row-gap: .5rem;
+  }
+  .landfill-panel .landfill-metrics strong {
+    font-size: 1.35rem !important;
+    white-space: nowrap;
+  }
+  /* 같은 실사용 제보 - 학년별 표("3학년 214" 등, .bar-list)가 도넛
+     차트와 살짝 겹쳐 보였다. 실측: .bar-list>div의 라벨+숫자 칸
+     템플릿(5.75rem+2.625rem=134px)이 .school-visuals가 이 폭에서
+     .bar-list에 배정한 칸(120px)보다 넓어서 숫자가 옆 도넛 칸으로
+     흘러나왔다. .bar-list 칸을 그 최소필요폭보다 넉넉하게 늘린다. */
+  .school-panel .school-visuals {
+    grid-template-columns: minmax(9.4rem, .42fr) minmax(0, .58fr) !important;
   }
   .upload-panel::after { content: none !important; }
 }

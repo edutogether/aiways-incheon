@@ -31,8 +31,13 @@ jobs:
   # 수동으로만 돌고 있어서, 실제로 프로덕션을 통째로 막았던 버그(90일
   # 삭제 필드 제거 후 index.js가 그 필드를 여전히 참조해 saveSortingRecord가
   # 전부 500으로 실패)가 테스트 120/120 초록불인 채로 배포까지 나갔다.
-  # 이 job이 그 배선 검증 게이트다 - functions/ 테스트가 실패하면 아래
-  # deploy job이 아예 실행되지 않는다(needs: test).
+  # 이 job이 그 배선 검증 게이트다 - 테스트가 실패하면 아래 deploy-backend/
+  # deploy-pages 둘 다 아예 실행되지 않는다(needs: test).
+  # 2026-08-29 추가: firestore.rules 에뮬레이터 스모크테스트도 여기 포함.
+  # 규칙 자체는 "전부 deny"라 문법 오류는 `firebase deploy`가 잡아주지만,
+  # 누군가 실수로 규칙을 느슨하게 고쳐도 문법은 유효해서 배포가 그냥
+  # 성공해버리는 경우까진 문법검사로 못 잡는다 - 실제 에뮬레이터에 붙여서
+  # "인증 없는 클라이언트 직접 read/write가 여전히 거부되는지" 확인한다.
   test:
     runs-on: ubuntu-latest
     defaults:
@@ -58,8 +63,65 @@ jobs:
       - name: Run unit tests
         run: npm test
 
-  deploy:
+      - name: Setup Java (Firestore emulator dependency)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install firebase-tools
+        run: npm install -g firebase-tools
+
+      - name: Firestore rules emulator smoke test
+        run: npm run emulator:test:firestore-rules
+
+  # 2026-08-29 추가: functions/firestore.rules/firestore.indexes.json은
+  # 지금까지 자동배포가 전혀 없었다 - 개발자가 로컬에서 매번 수동으로
+  # `firebase deploy --only functions:<name>`을 쳐야만 실제로 반영됐다
+  # (그래서 코드는 main에 merge됐는데 프로덕션엔 안 나간 상태가 여러 번
+  # 있었다). 이 job이 그 수동 단계를 대체한다 - test가 통과해야만
+  # 실행되고(needs: test), 아래 deploy-pages job도 이 job이 성공해야만
+  # 실행된다(needs: deploy-backend) - "규칙+functions 먼저, hosting은
+  # 그 다음"이라는 순서를 job 의존성으로 강제한다.
+  #
+  # 필요한 사전 설정(저장소 관리자가 GitHub Actions로는 만들 수 없는,
+  # 사람이 직접 해야 하는 1회성 작업): GCP에서 이 Firebase 프로젝트
+  # (ai-ways-incheon)에 배포 권한을 가진 서비스계정을 만들고, 그 JSON
+  # 키를 저장소 Settings > Secrets > Actions에 FIREBASE_SERVICE_ACCOUNT
+  # 라는 이름으로 등록해야 이 job이 실제로 동작한다. 이 시크릿이
+  # 없으면 이 job은 인증 단계에서 실패한다(의도된 동작 - 조용히
+  # 건너뛰지 않고 확실하게 실패해서 알려준다).
+  deploy-backend:
     needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: functions/package-lock.json
+
+      - name: Install functions dependencies
+        working-directory: functions
+        run: npm ci
+
+      - name: Install firebase-tools
+        run: npm install -g firebase-tools
+
+      - name: Authenticate to Google Cloud
+        run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > "${{ runner.temp }}/firebase-service-account.json"
+
+      - name: Deploy Firestore rules, indexes, and Cloud Functions
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-service-account.json
+        run: firebase deploy --only firestore:rules,firestore:indexes,functions --project ai-ways-incheon --non-interactive
+
+  deploy-pages:
+    needs: deploy-backend
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

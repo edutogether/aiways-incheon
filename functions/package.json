@@ -25,6 +25,7 @@
     "emulator:test:protected-actor": "firebase emulators:exec --only auth,firestore --project demo-aiways-incheon \"node test/protectedActorEmulatorIntegration.js\"",
     "emulator:test:cb5-device-matrix": "firebase emulators:exec --config ../firebase.cb5-emulators.json --only auth,firestore --project demo-aiways-incheon \"node test/cb5DeviceMatrixEmulatorIntegration.js\"",
     "emulator:test:cb5-record-resolve-recovery": "firebase emulators:exec --config ../firebase.cb5-emulators.json --only auth,firestore --project demo-aiways-incheon \"node test/cb5RecordResolveRecoveryEmulatorIntegration.js\"",
+    "emulator:test:firestore-rules": "firebase emulators:exec --only firestore --project demo-aiways-incheon \"node test/firestoreRulesEmulatorSmoke.js\"",
     "gate1:final": "firebase emulators:exec --only auth,functions,firestore --project demo-aiways-incheon \"node test/gate1FinalSuite.js\"",
     "gate2a:final": "firebase emulators:exec --only auth,functions,firestore --project demo-aiways-incheon \"node test/gate2aFinalSuite.js\""
   },

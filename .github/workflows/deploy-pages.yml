@@ -125,6 +125,12 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
+      # 임시 디버그: IAM 권한 부여가 실제로 이 서비스계정에 적용된 게
+      # 맞는지 확인하기 위해 client_email만 출력한다(비밀키는 안 건드림).
+      # 원인 확인되면 이 스텝은 지운다.
+      - name: Debug - show service account identity
+        run: node -e "console.log(require(process.env.GOOGLE_APPLICATION_CREDENTIALS).client_email)"
+
       - name: Deploy Firestore rules, indexes, and Cloud Functions
         run: firebase deploy --only firestore:rules,firestore:indexes,functions --project ai-ways-incheon --non-interactive
 

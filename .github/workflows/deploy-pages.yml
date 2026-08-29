@@ -112,12 +112,20 @@ jobs:
       - name: Install firebase-tools
         run: npm install -g firebase-tools
 
+      # 2026-08-29 수정: 서비스계정 JSON을 `echo "${{ secrets.X }}" > file`로
+      # 직접 쓰면, 그 JSON 안에 있는 큰따옴표(모든 JSON 키/값에 당연히
+      # 있음)가 이 run: 문자열의 인용부호와 충돌해서 파일이 깨진 채로
+      # 쓰인다 - 실제로 이렇게 했다가 firebase deploy가 "Failed to
+      # authenticate, have you run firebase login?"로 실패하는 걸 확인했다.
+      # google-github-actions/auth가 셸 문자열 치환을 거치지 않고 안전하게
+      # 자격증명 파일을 써주고 GOOGLE_APPLICATION_CREDENTIALS도 알아서
+      # 설정해준다.
       - name: Authenticate to Google Cloud
-        run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > "${{ runner.temp }}/firebase-service-account.json"
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
       - name: Deploy Firestore rules, indexes, and Cloud Functions
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-service-account.json
         run: firebase deploy --only firestore:rules,firestore:indexes,functions --project ai-ways-incheon --non-interactive
 
   deploy-pages:

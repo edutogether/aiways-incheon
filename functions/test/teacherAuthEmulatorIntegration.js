@@ -48,6 +48,9 @@ function call(handler, token, body) {
     await db.collection("actors").doc(ACTOR_ID).collection("trustedDevices").doc(uid).set({ uid, status: "active", managementId: "123e4567-e89b-42d3-a456-426614174601" });
     await db.collection("edu2gDeviceBindings").doc(uid).set({ actorId: ACTOR_ID, status: "active" });
     await db.collection("teacherCodes").doc(SCHOOL_ID).set({ codeHash: createHash("sha256").update(CODE).digest("hex") });
+    // school-lock 교정(3단계) 확인용 - 이 기기가 엉뚱한 학교로 이미 고정돼
+    // 있었다고 가정한다.
+    await db.collection("actors").doc(ACTOR_ID).set({ dashboardSchoolId: NO_CODE_SCHOOL_ID }, { merge: true });
 
     const access = createEdu2gDeviceAccess({ auth, db, serverTimestamp: () => FieldValue.serverTimestamp() });
     const rateLimiter = createGlobalRateLimiter({ db });
@@ -75,6 +78,8 @@ function call(handler, token, body) {
     assert.equal(correct.status, 200);
     assert.equal(correct.body.verified, true);
     assert.equal(correct.body.schoolId, SCHOOL_ID);
+    const correctedLock = (await db.collection("actors").doc(ACTOR_ID).get()).data();
+    assert.equal(correctedLock.dashboardSchoolId, SCHOOL_ID, "verifying corrects a mis-bound school-lock (3단계)");
 
     const after = await call(checkStatus, token, {});
     assert.equal(after.status, 200);

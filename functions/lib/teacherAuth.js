@@ -76,8 +76,14 @@ function createVerifyTeacherCodeHandler(dependencies = {}) {
       return res.status(401).json({ ok: false, code: "invalid_code" });
     }
 
+    // 3단 권한체계 3단계(2026-08-31) - school-lock(getSchoolDashboard의
+    // dashboardSchoolId, schoolDashboard.js 참고)은 이 기기가 처음 요청한
+    // 학교로 한 번 고정되면 풀 방법이 전혀 없었다. 교사 코드로 신원이
+    // 확인된 순간만큼은 "이 기기는 이 학교 것"이라는 확실한 서버측
+    // 증거이므로, 그 신뢰를 그대로 넘겨 잘못 고정된 school-lock을
+    // 여기서 바로잡는다(새 "관리자" 개념 없이도 가능한 교정).
     const actorRef = db.collection("actors").doc(protectedActor.actorId);
-    await actorRef.set({ teacherVerified: { schoolId, verifiedAt: serverTimestamp() } }, { merge: true });
+    await actorRef.set({ teacherVerified: { schoolId, verifiedAt: serverTimestamp() }, dashboardSchoolId: schoolId }, { merge: true });
     return res.status(200).json({ ok: true, verified: true, schoolId });
   };
 }

@@ -77,7 +77,10 @@ function createDecideRegistrationHandler(dependencies = {}) {
       }
       const actorSnap = await transaction.get(actorRef);
       if (actorSnap.exists && actorSnap.data()?.studentProfile) return { code: "already_registered" };
-      transaction.set(actorRef, { studentProfile: { schoolId: data.schoolId, schoolName: data.schoolName, grade: data.grade, classNum: data.classNum, studentNumber: data.studentNumber, name: data.name, registeredAt: serverTimestamp() } }, { merge: true });
+      // 3단계(2026-08-31) - 승인은 교사가 사람이 눈으로 확인한 신원증명이므로,
+      // 이 기기의 school-lock(dashboardSchoolId)도 승인된 학교로 같이
+      // 바로잡는다(teacherAuth.js의 verifyTeacherCode와 같은 근거).
+      transaction.set(actorRef, { studentProfile: { schoolId: data.schoolId, schoolName: data.schoolName, grade: data.grade, classNum: data.classNum, studentNumber: data.studentNumber, name: data.name, registeredAt: serverTimestamp() }, dashboardSchoolId: data.schoolId }, { merge: true });
       transaction.delete(requestRef);
       return { ok: true, decision: "approved" };
     });

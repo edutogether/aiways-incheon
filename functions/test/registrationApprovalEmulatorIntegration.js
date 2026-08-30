@@ -53,7 +53,7 @@ function call(handler, token, body) {
       await db.collection("actors").doc(actorId).collection("trustedDevices").doc(uid).set({ uid, status: "active", managementId: "123e4567-e89b-42d3-a456-426614174611" });
       await db.collection("edu2gDeviceBindings").doc(uid).set({ actorId, status: "active" });
     }
-    await db.collection("actors").doc(STUDENT_ACTOR_ID).set({ status: "active", plan: "closed_beta" });
+    await db.collection("actors").doc(STUDENT_ACTOR_ID).set({ status: "active", plan: "closed_beta", dashboardSchoolId: SCHOOL_B });
     await bind(STUDENT_ACTOR_ID, studentUid);
     await db.collection("actors").doc(TEACHER_A_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_A } });
     await bind(TEACHER_A_ID, teacherAUid);
@@ -114,6 +114,8 @@ function call(handler, token, body) {
     assert.deepEqual(afterApprove.body.profile, student);
     const emptyList = await call(list, teacherAToken, {});
     assert.deepEqual(emptyList.body.requests, []);
+    const correctedLock = (await db.collection("actors").doc(STUDENT_ACTOR_ID).get()).data();
+    assert.equal(correctedLock.dashboardSchoolId, SCHOOL_A, "approval corrects a mis-bound school-lock to the approved school (3단계)");
 
     // 이미 결정된 요청을 다시 결정하려 하면 깔끔히 실패한다.
     const redecide = await call(decide, teacherAToken, { targetActorId: STUDENT_ACTOR_ID, decision: "approve" });

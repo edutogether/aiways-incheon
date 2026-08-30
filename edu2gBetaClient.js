@@ -35,7 +35,9 @@
     if (visualReviewRequested()) return { ok: false, status: 0, code: "auth_invalid", data: null };
     let headers;
     try { headers = await window.AIWaysBetaAuth?.getEdu2gProtectedHeaders?.({ forceRefresh: retried }); } catch { return { ok: false, status: 0, code: "auth_invalid", data: null }; }
-    if (!headers?.Authorization || !headers["X-Firebase-AppCheck"]) return { ok: false, status: 0, code: "auth_invalid", data: null };
+    // 로컬 에뮬레이터 검증 시엔 App Check 헤더가 없다(firebaseBetaAuth.js
+    // 참고 - 같은 조건으로 서버쪽도 검증을 건너뜀).
+    if (!headers?.Authorization || (!headers["X-Firebase-AppCheck"] && !usingEmulator())) return { ok: false, status: 0, code: "auth_invalid", data: null };
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 15000);
     try {

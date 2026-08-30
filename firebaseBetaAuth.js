@@ -23,7 +23,13 @@
     return authPromise;
   }
   async function getEdu2gDeviceSession({ forceRefresh = false } = {}) { const { auth } = await getBetaAuth(); const user = auth.currentUser; if (!user) throw new Error("anonymous_auth_unavailable"); return { uid: user.uid, idToken: await user.getIdToken(!!forceRefresh) }; }
-  async function getEdu2gProtectedHeaders({ forceRefresh = false } = {}) { const session = await getEdu2gDeviceSession({ forceRefresh }); const appCheck = await window.AIWaysAppCheck?.getAIWaysAppCheckHeaders?.(); if (!appCheck) return null; return { ...appCheck, Authorization: `Bearer ${session.idToken}` }; }
+  // 로컬 에뮬레이터 검증 시엔 실제 App Check 토큰을 못 딴다(localhost가
+  // reCAPTCHA를 막음, HANDOFF.md에 이미 기록된 제약) - 서버쪽도
+  // functions/index.js의 emulatorAppCheck가 같은 조건(FUNCTIONS_EMULATOR)
+  // 으로 검증을 건너뛰므로, 클라이언트도 여기서만 App Check 헤더 없이
+  // 요청을 보낸다. 프로덕션(emulatorRequested()===false)에서는 기존과
+  // 동일하게 App Check 헤더가 없으면 요청 자체를 안 보낸다.
+  async function getEdu2gProtectedHeaders({ forceRefresh = false } = {}) { const session = await getEdu2gDeviceSession({ forceRefresh }); const appCheck = await window.AIWaysAppCheck?.getAIWaysAppCheckHeaders?.(); if (!appCheck && !emulatorRequested()) return null; return { ...appCheck, Authorization: `Bearer ${session.idToken}` }; }
   async function clearEdu2gDeviceSession() { const { auth, signOut } = await getBetaAuth(); await signOut(auth); authPromise = null; }
   window.AIWaysBetaAuth = { getBetaAuth, getEdu2gDeviceSession, getEdu2gProtectedHeaders, clearEdu2gDeviceSession, emulatorRequested, visualReviewRequested };
 })();

@@ -38,6 +38,14 @@ const actorRateLimiter = createActorRateLimiter({ db, serverTimestamp: () => Fie
 const deviceAccess = createEdu2gDeviceAccess({ auth: getAuth(), db, serverTimestamp: () => FieldValue.serverTimestamp() });
 const analysisRequests = createAnalysisIdempotency({ db, serverTimestamp: () => FieldValue.serverTimestamp(), model: "gemini-3.5-flash-lite" });
 const logAppCheck = (metadata) => logger.write({ severity: metadata?.status === "invalid" || metadata?.status === "unavailable" ? "WARNING" : "INFO", ...metadata });
+// FUNCTIONS_EMULATOR는 firebase emulators:start가 Functions 에뮬레이터
+// 프로세스에만 자동으로 심어주는 값이라(프로덕션 Cloud Functions 런타임에는
+// 절대 안 생김 - recordEmulatorSmoke.js/edu2gEmulatorSmoke.js에서도 이미
+// 같은 방식으로 씀) 로컬 검증 시에만 App Check 강제를 건너뛴다. 실제
+// 브라우저에서 HTTP로 로컬 시연할 때 App Check가 localhost를 막는 문제를
+// (functionName마다 dependencies.appCheck를 직접 목업해야 하는 유닛테스트와
+// 달리) 실제 에뮬레이터 HTTP 서버 경로에서도 우회할 유일한 방법이다.
+const emulatorAppCheck = process.env.FUNCTIONS_EMULATOR === "true" ? async () => ({ status: "valid" }) : undefined;
 // 실명 검증이 없어 학생이 자율로 이름/번호를 적게 두기로 한 만큼("우주제일킹왕짱스타"도
 // 허용), 문제가 생겼을 때 "누구인지 특정"은 못 해도 "그 계정을 더 이상 못 쓰게"는
 // 할 수 있어야 한다 - protectActorRequest에서 모든 엔드포인트 공통으로 걸리는
@@ -105,22 +113,22 @@ exports.searchSchool = onRequest({ region: "asia-northeast3", memory: "256MiB", 
   getApiKey: () => neisApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: (metadata) => logger.error(metadata)
 }));
 exports.checkTeacherStatus = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckTeacherStatusHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 exports.verifyTeacherCode = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createVerifyTeacherCodeHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
 }));
 exports.listPendingRegistrations = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createListPendingRegistrationsHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 exports.decideRegistration = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createDecideRegistrationHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
 }));
 exports.manageTeacherCode = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createManageTeacherCodeHandler({
-  db, rateLimiter, logAppCheck, verifyIdToken: (token) => getAuth().verifyIdToken(token), serverTimestamp: () => FieldValue.serverTimestamp()
+  db, appCheck: emulatorAppCheck, rateLimiter, logAppCheck, verifyIdToken: (token) => getAuth().verifyIdToken(token), serverTimestamp: () => FieldValue.serverTimestamp()
 }));
 exports.exportClassRecords = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 30, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createExportClassRecordsHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 const edu2gHandlers = createEdu2gHandlers({
   registry: createEdu2gPassRegistry({ getSecret: () => edu2gPassRegistrySecret.value() }),

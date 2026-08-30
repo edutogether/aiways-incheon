@@ -9,8 +9,15 @@
 (() => {
   const FIREBASE_CONFIG = { apiKey: "AIzaSyCvjSaf9j9IQYm61_sggbWDa_rVaCmc_5M", authDomain: "ai-ways-incheon.firebaseapp.com", projectId: "ai-ways-incheon", storageBucket: "ai-ways-incheon.firebasestorage.app", messagingSenderId: "367235994253", appId: "1:367235994253:web:9f4b82ca9d8e5a1ca0c8c4" };
   const FUNCTIONS_BASE = "https://asia-northeast3-ai-ways-incheon.cloudfunctions.net";
+  const EMULATOR_FUNCTIONS_BASE = "http://127.0.0.1:5001/demo-aiways-incheon/asia-northeast3";
   const $ = (id) => document.getElementById(id);
   let authRef = null;
+
+  // firebaseBetaAuth.js와 같은 로컬 전용 게이트 - 로컬 검증 시에만 인증
+  // 에뮬레이터로 붙는다(프로덕션 계정 없이도 화면을 확인할 수 있게).
+  function emulatorRequested() {
+    return (location.hostname === "localhost" || location.hostname === "127.0.0.1") && new URLSearchParams(location.search).get("auth-emulator") === "1";
+  }
 
   async function getAuthRef() {
     if (authRef) return authRef;
@@ -19,11 +26,22 @@
       import("https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js")
     ]);
     const app = initializeApp(FIREBASE_CONFIG);
-    authRef = { auth: authMod.getAuth(app), ...authMod };
+    const auth = authMod.getAuth(app);
+    if (emulatorRequested()) authMod.connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+    authRef = { auth, ...authMod };
     return authRef;
   }
 
   async function callSuperadminFunction(name, idToken, payload) {
+    if (emulatorRequested()) {
+      let response;
+      try {
+        response = await fetch(`${EMULATOR_FUNCTIONS_BASE}/${name}`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` }, body: JSON.stringify(payload) });
+      } catch { return { ok: false, code: "network_error" }; }
+      let body = null;
+      try { body = await response.json(); } catch {}
+      return { ok: response.ok && body?.ok !== false, code: body?.code || (response.ok ? "ok" : "invalid_response") };
+    }
     const appCheckHeaders = await window.AIWaysAppCheck?.getAIWaysAppCheckHeaders?.();
     if (!appCheckHeaders) return { ok: false, code: "app_check_unavailable" };
     let response;

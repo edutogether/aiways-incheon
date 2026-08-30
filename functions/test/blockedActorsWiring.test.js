@@ -57,6 +57,10 @@ test("blocked actor is rejected by every handler that wires blockedActors throug
   const { createSearchSchoolHandler } = require("../lib/schoolSearch");
   await assertBlocked("searchSchool", createSearchSchoolHandler(baseDeps));
 
+  const { createCheckTeacherStatusHandler, createVerifyTeacherCodeHandler } = require("../lib/teacherAuth");
+  await assertBlocked("checkTeacherStatus", createCheckTeacherStatusHandler(baseDeps));
+  await assertBlocked("verifyTeacherCode", createVerifyTeacherCodeHandler(baseDeps));
+
   const { createSaveSortingRecordHandler } = require("../lib/sortingRecord");
   await assertBlocked("saveSortingRecord", createSaveSortingRecordHandler(baseDeps));
 

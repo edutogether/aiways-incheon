@@ -59,6 +59,9 @@ const RATE_LIMITS = Object.freeze({
   getClassRanking: { perMinute: 60, perDay: 5000 },
   searchSchool: { perMinute: 60 }
   ,redeemEdu2gPass: { perMinute: 5 }, getEdu2gSession: { perMinute: 60 }, listEdu2gTrustedDevices: { perMinute: 60 }, revokeEdu2gTrustedDevice: { perMinute: 20 }
+  // 2026-08-31 - 교사 인증(1단계). verifyTeacherCode는 공유코드를 맞혀보는
+  // 시도이므로 registerStudentProfile과 같은 수준(분당 10)으로 좁힌다.
+  ,checkTeacherStatus: { perMinute: 30 }, verifyTeacherCode: { perMinute: 10 }
 });
 
 function getUtcBuckets(now = new Date()) {
@@ -193,7 +196,11 @@ const ACTOR_RATE_LIMITS = Object.freeze({
   changeStudentClass: { perMinute: 15, perDay: 20 },
   getClassRanking: { perMinute: 30, perDay: 2000 },
   searchSchool: { perMinute: 20, perDay: 500 },
-  redeemEdu2gPass: { perMinute: 5 }
+  redeemEdu2gPass: { perMinute: 5 },
+  // 액터별 상한 - 코드 추측 시도를 한 기기가 하루 종일 반복 못 하게 20회로
+  // 막는다(registerStudentProfile과 동일 값 - 둘 다 "정상적으로는 하루 몇 번
+  // 안 쓰는" 1회성/저빈도 액션).
+  checkTeacherStatus: { perMinute: 10, perDay: 200 }, verifyTeacherCode: { perMinute: 5, perDay: 20 }
 });
 function hashRateLimitScope(value) { return createHash("sha256").update(String(value)).digest("hex"); }
 function createActorRateLimiter({ db, now = () => new Date(), serverTimestamp = () => new Date(), limits = ACTOR_RATE_LIMITS, logger = () => {} }) {

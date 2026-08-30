@@ -1401,6 +1401,35 @@
     URL.revokeObjectURL(url);
   }
 
+  // 3단 권한체계 1단계(2026-08-31) - 학교 전체가 공유하는 코드 1개로 "이
+  // 기기가 교사"임을 서버에 표시한다(actors/{actorId}.teacherVerified).
+  // 코드 발급은 아직 관리자 화면이 없어(슈퍼어드민 단계 예정) 개발자가
+  // functions/scripts/setTeacherCode.js로 미리 심어둬야 한다.
+  async function verifyTeacherCodeFromPrompt() {
+    const client = window.AIWaysEdu2gClient;
+    if (!client?.verifyTeacherCode) return;
+    const already = await client.checkTeacherStatus?.();
+    if (already?.ok && already.data?.verified) {
+      showDashboardToast("이미 선생님 인증이 완료된 기기예요.");
+      return;
+    }
+    const schoolId = resolveDashboardSchoolId();
+    if (!schoolId) {
+      showDashboardToast("먼저 학교를 설정한 뒤 다시 시도해주세요.");
+      return;
+    }
+    const code = window.prompt("학교에서 안내받은 선생님 인증코드를 입력해주세요.");
+    if (!code) return;
+    const response = await client.verifyTeacherCode({ schoolId, code });
+    if (response.ok && response.data?.verified) {
+      showDashboardToast("선생님 인증이 완료됐어요.");
+    } else {
+      showDashboardToast(response.code === "teacher_code_not_set"
+        ? "이 학교는 아직 인증코드가 준비되지 않았어요. 관리자에게 문의해주세요."
+        : client?.errorMessageFor?.(response?.code) || "인증코드를 다시 확인해주세요.");
+    }
+  }
+
   // 헤더 우상단 톱니바퀴 설정 메뉴: 학교/반 다시 설정, 샘플 데이터 보기,
   // 초기화. "샘플 데이터 보기"는 실제 학교가 설정돼 있어도 언제든 눌러서
   // 볼 수 있게 세션 동안만 유지되는 미리보기 상태로 전환한다(저장된
@@ -1431,6 +1460,10 @@
     $("[data-settings-action='csv']")?.addEventListener("click", () => {
       closeMenu();
       exportMySortingRecordsAsCsv();
+    });
+    $("[data-settings-action='teacher']")?.addEventListener("click", () => {
+      closeMenu();
+      verifyTeacherCodeFromPrompt();
     });
     $("[data-settings-action='reset']")?.addEventListener("click", () => {
       closeMenu();

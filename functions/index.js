@@ -15,6 +15,7 @@ const { createCheckStudentProfileHandler, createRegisterStudentProfileHandler, c
 const { createCheckCampusLocationHandler } = require("./lib/campusLocation");
 const { createGetClassRankingHandler } = require("./lib/classRanking");
 const { createSearchSchoolHandler } = require("./lib/schoolSearch");
+const { createCheckTeacherStatusHandler, createVerifyTeacherCodeHandler } = require("./lib/teacherAuth");
 const { getApps, initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
@@ -99,6 +100,12 @@ exports.getClassRanking = onRequest({ region: "asia-northeast3", memory: "256MiB
 }));
 exports.searchSchool = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, secrets: [neisApiKey], cors: false }, createSearchSchoolHandler({
   getApiKey: () => neisApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: (metadata) => logger.error(metadata)
+}));
+exports.checkTeacherStatus = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckTeacherStatusHandler({
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
+}));
+exports.verifyTeacherCode = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createVerifyTeacherCodeHandler({
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
 }));
 const edu2gHandlers = createEdu2gHandlers({
   registry: createEdu2gPassRegistry({ getSecret: () => edu2gPassRegistrySecret.value() }),

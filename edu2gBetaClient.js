@@ -3,7 +3,7 @@
 (() => {
   const REGION = "asia-northeast3";
   const EMULATOR_PROJECT = "demo-aiways-incheon";
-  const ALLOWED = new Set(["redeemEdu2gPass", "getEdu2gSession", "listEdu2gTrustedDevices", "revokeEdu2gTrustedDevice", "analyzeSortingImage", "analyzeSortingText", "analyzeSortingSafetyObserver", "saveSortingRecord", "listSortingRecords", "resolveSortingRecord", "getSchoolDashboard", "checkStudentProfile", "registerStudentProfile", "checkCampusLocation", "changeStudentClass", "getClassRanking", "searchSchool"]);
+  const ALLOWED = new Set(["redeemEdu2gPass", "getEdu2gSession", "listEdu2gTrustedDevices", "revokeEdu2gTrustedDevice", "analyzeSortingImage", "analyzeSortingText", "analyzeSortingSafetyObserver", "saveSortingRecord", "listSortingRecords", "resolveSortingRecord", "getSchoolDashboard", "checkStudentProfile", "registerStudentProfile", "checkCampusLocation", "changeStudentClass", "getClassRanking", "searchSchool", "checkTeacherStatus", "verifyTeacherCode"]);
   const LOCAL = new Set(["localhost", "127.0.0.1"]);
 
   function usingEmulator() {
@@ -81,6 +81,8 @@
     previewClassChange: ({ grade, classNum }) => request("changeStudentClass", { grade, classNum, confirm: false }),
     changeStudentClass: ({ grade, classNum }) => request("changeStudentClass", { grade, classNum, confirm: true }),
     getClassRanking: ({ schoolId, grade, classNum = "" } = {}) => request("getClassRanking", { schoolId, grade, ...(classNum ? { classNum } : {}) }),
-    searchSchool: ({ query }) => request("searchSchool", { query })
+    searchSchool: ({ query }) => request("searchSchool", { query }),
+    checkTeacherStatus: () => request("checkTeacherStatus", {}),
+    verifyTeacherCode: ({ schoolId, code }) => request("verifyTeacherCode", { schoolId, code })
   };
 })();

@@ -75,6 +75,13 @@ jobs:
       - name: Firestore rules emulator smoke test
         run: npm run emulator:test:firestore-rules
 
+      # 2026-08-31 추가: 교사 인증(1단계, verifyTeacherCode/checkTeacherStatus)
+      # 실제 트랜잭션 경로(코드 오답/미설정 학교/정답 시 teacherVerified 기록)를
+      # 에뮬레이터로 검증한다 - 다른 단계 확인용 emulator:test:* 스크립트들과
+      # 같은 이유(부품 단위 유닛테스트만으로는 안 잡히는 배선 오류 방지).
+      - name: Teacher auth emulator integration test
+        run: npm run emulator:test:teacher-auth
+
   # 2026-08-29 추가: functions/firestore.rules/firestore.indexes.json은
   # 지금까지 자동배포가 전혀 없었다 - 개발자가 로컬에서 매번 수동으로
   # `firebase deploy --only functions:<name>`을 쳐야만 실제로 반영됐다

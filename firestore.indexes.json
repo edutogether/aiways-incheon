@@ -15,6 +15,16 @@
         { "fieldPath": "schoolId", "order": "ASCENDING" },
         { "fieldPath": "status", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "records",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "classContext.schoolId", "order": "ASCENDING" },
+        { "fieldPath": "classContext.grade", "order": "ASCENDING" },
+        { "fieldPath": "classContext.classNum", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

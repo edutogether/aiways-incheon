@@ -96,6 +96,12 @@ jobs:
       - name: Superadmin emulator integration test
         run: npm run emulator:test:superadmin
 
+      # 2026-08-31 추가: CSV 반전체 내보내기(5단계, exportClassRecords) -
+      # 학교+학년+반 스코프 격리(다른 반/다른 학교 기록이 안 섞이는지)를
+      # collectionGroup 쿼리 실제 실행으로 검증한다.
+      - name: Class export emulator integration test
+        run: npm run emulator:test:class-export
+
   # 2026-08-29 추가: functions/firestore.rules/firestore.indexes.json은
   # 지금까지 자동배포가 전혀 없었다 - 개발자가 로컬에서 매번 수동으로
   # `firebase deploy --only functions:<name>`을 쳐야만 실제로 반영됐다

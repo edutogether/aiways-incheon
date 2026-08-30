@@ -65,6 +65,9 @@ test("blocked actor is rejected by every handler that wires blockedActors throug
   await assertBlocked("listPendingRegistrations", createListPendingRegistrationsHandler(baseDeps));
   await assertBlocked("decideRegistration", createDecideRegistrationHandler(baseDeps));
 
+  const { createExportClassRecordsHandler } = require("../lib/classExport");
+  await assertBlocked("exportClassRecords", createExportClassRecordsHandler(baseDeps));
+
   const { createSaveSortingRecordHandler } = require("../lib/sortingRecord");
   await assertBlocked("saveSortingRecord", createSaveSortingRecordHandler(baseDeps));
 

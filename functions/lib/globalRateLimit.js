@@ -70,6 +70,10 @@ const RATE_LIMITS = Object.freeze({
   // 액터별 상한은 의미가 없고(anonymous actorId 체계 밖에 있음), 전역
   // 상한만 방어적으로 낮게 건다.
   ,manageTeacherCode: { perMinute: 10, perDay: 100 }
+  // 2026-08-31 - CSV 반전체 내보내기(5단계). collectionGroup 쿼리라
+  // 페이지당 최대 200건을 읽을 수 있어(classExport.js MAX_PAGE_SIZE) 다른
+  // 조회보다 상한을 좁게 잡는다.
+  ,exportClassRecords: { perMinute: 10 }
 });
 
 function getUtcBuckets(now = new Date()) {
@@ -209,7 +213,8 @@ const ACTOR_RATE_LIMITS = Object.freeze({
   // 막는다(registerStudentProfile과 동일 값 - 둘 다 "정상적으로는 하루 몇 번
   // 안 쓰는" 1회성/저빈도 액션).
   checkTeacherStatus: { perMinute: 10, perDay: 200 }, verifyTeacherCode: { perMinute: 5, perDay: 20 },
-  listPendingRegistrations: { perMinute: 20, perDay: 2000 }, decideRegistration: { perMinute: 30, perDay: 500 }
+  listPendingRegistrations: { perMinute: 20, perDay: 2000 }, decideRegistration: { perMinute: 30, perDay: 500 },
+  exportClassRecords: { perMinute: 6, perDay: 100 }
 });
 function hashRateLimitScope(value) { return createHash("sha256").update(String(value)).digest("hex"); }
 function createActorRateLimiter({ db, now = () => new Date(), serverTimestamp = () => new Date(), limits = ACTOR_RATE_LIMITS, logger = () => {} }) {

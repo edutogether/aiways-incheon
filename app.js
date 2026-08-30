@@ -1340,9 +1340,9 @@
 
   // 100점 목표 4번(CSV 내보내기) - listSortingRecords는 "이 기기(actor)가
   // 저장한 기록"만 돌려준다(반/학교 전체를 모아 보는 교사용 기능이 아니라,
-  // 학생 개인 기기가 자기 판단 이력을 CSV로 가져가는 용도). 학교/반 전체
-  // 데이터를 모으는 진짜 "선생님용 내보내기"는 지금 이 앱에 교사 인증
-  // 개념 자체가 없어서 별도 설계 결정이 필요하다(임의로 만들지 않음).
+  // 학생 개인 기기가 자기 판단 이력을 CSV로 가져가는 용도). 학교/반 전체를
+  // 모으는 "선생님용 내보내기"는 exportClassRecordsAsCsv(3단 권한체계
+  // 5단계, teacherVerified 필요) 참고.
   function csvQuote(value) {
     let text = String(value ?? "");
     if (/^[=+\-@]/.test(text)) text = "'" + text; // 스프레드시트 수식 주입 방지
@@ -1397,6 +1397,66 @@
     const a = document.createElement("a");
     a.href = url;
     a.download = `aiways-my-sorting-records-${stamp}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // 3단 권한체계 5단계(2026-08-31) - 위 exportMySortingRecordsAsCsv와 달리
+  // 이 기기 하나가 아니라 반 전체 기록을 모은다(exportClassRecords,
+  // teacherVerified 필요). 번호/이름 컬럼이 추가로 필요해 행 구성이
+  // 다르다.
+  function csvRowForClassRecord(record) {
+    const createdAt = record.createdAt ? new Date(record.createdAt) : null;
+    const dateLabel = createdAt && !Number.isNaN(createdAt.getTime()) ? createdAt.toLocaleString("ko-KR") : "";
+    const statusLabel = record.status === "completed" ? "완료" : record.status === "held" ? "보류" : record.status || "";
+    const reviewLabel = record.resolutionType ? "재검토 완료" : record.status === "held" ? "재검토 대기" : "";
+    return [record.studentNumber || "", record.studentName || "", dateLabel, statusLabel, record.selectedItemId || "", reviewLabel];
+  }
+  function buildClassRecordsCsv(records) {
+    const header = ["번호", "이름", "날짜", "처리 상태", "판단 품목", "재검토 상태"];
+    const rows = records.map(csvRowForClassRecord);
+    const bom = String.fromCharCode(0xfeff);
+    return bom + [header, ...rows].map((row) => row.map(csvQuote).join(",")).join("\r\n");
+  }
+  const CLASS_CSV_MAX_PAGES = 10; // 페이지당 최대 200건 x 10 = 2000건까지 한 번에 모음
+  async function exportClassRecordsAsCsv() {
+    const client = window.AIWaysEdu2gClient;
+    if (!client?.exportClassRecords) return;
+    const grade = window.prompt("내보낼 학년을 입력해주세요.");
+    if (!grade) return;
+    const classNum = window.prompt("내보낼 반을 입력해주세요.");
+    if (!classNum) return;
+    showDashboardToast("반 전체 기록을 모으고 있어요...");
+    const records = [];
+    let cursor;
+    try {
+      for (let page = 0; page < CLASS_CSV_MAX_PAGES; page += 1) {
+        const response = await client.exportClassRecords({ grade, classNum, cursor });
+        if (!response.ok || !response.data) {
+          showDashboardToast(response.code === "teacher_verification_required"
+            ? "이 기기는 아직 선생님 인증이 안 됐어요. 먼저 '선생님 인증하기'를 해주세요."
+            : client?.errorMessageFor?.(response?.code) || "기록을 불러오지 못했어요. 다시 시도해주세요.");
+          return;
+        }
+        records.push(...(response.data.records || []));
+        if (!response.data.hasMore || !response.data.nextCursor) break;
+        cursor = response.data.nextCursor;
+      }
+    } catch {
+      showDashboardToast("기록을 불러오지 못했어요. 다시 시도해주세요.");
+      return;
+    }
+    if (!records.length) {
+      showDashboardToast("아직 저장된 기록이 없어요.");
+      return;
+    }
+    const csv = buildClassRecordsCsv(records);
+    const stamp = new Date().toISOString().replace(/[-:]/g, "").replace("T", "-").slice(0, 13);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `aiways-class-${grade}-${classNum}-records-${stamp}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -1522,6 +1582,10 @@
       const modal = $("#teacherApprovalModal");
       if (typeof modal?.showModal === "function") modal.showModal();
       renderTeacherApprovalList();
+    });
+    $("[data-settings-action='class-csv']")?.addEventListener("click", () => {
+      closeMenu();
+      exportClassRecordsAsCsv();
     });
     $("[data-settings-action='reset']")?.addEventListener("click", () => {
       closeMenu();

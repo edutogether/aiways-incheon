@@ -3,7 +3,7 @@
 (() => {
   const REGION = "asia-northeast3";
   const EMULATOR_PROJECT = "demo-aiways-incheon";
-  const ALLOWED = new Set(["redeemEdu2gPass", "getEdu2gSession", "listEdu2gTrustedDevices", "revokeEdu2gTrustedDevice", "analyzeSortingImage", "analyzeSortingText", "analyzeSortingSafetyObserver", "saveSortingRecord", "listSortingRecords", "resolveSortingRecord", "getSchoolDashboard", "checkStudentProfile", "registerStudentProfile", "checkCampusLocation", "changeStudentClass", "getClassRanking", "searchSchool", "checkTeacherStatus", "verifyTeacherCode", "listPendingRegistrations", "decideRegistration"]);
+  const ALLOWED = new Set(["redeemEdu2gPass", "getEdu2gSession", "listEdu2gTrustedDevices", "revokeEdu2gTrustedDevice", "analyzeSortingImage", "analyzeSortingText", "analyzeSortingSafetyObserver", "saveSortingRecord", "listSortingRecords", "resolveSortingRecord", "getSchoolDashboard", "checkStudentProfile", "registerStudentProfile", "checkCampusLocation", "changeStudentClass", "getClassRanking", "searchSchool", "checkTeacherStatus", "verifyTeacherCode", "listPendingRegistrations", "decideRegistration", "exportClassRecords"]);
   const LOCAL = new Set(["localhost", "127.0.0.1"]);
 
   function usingEmulator() {
@@ -85,6 +85,7 @@
     checkTeacherStatus: () => request("checkTeacherStatus", {}),
     verifyTeacherCode: ({ schoolId, code }) => request("verifyTeacherCode", { schoolId, code }),
     listPendingRegistrations: () => request("listPendingRegistrations", {}),
-    decideRegistration: ({ targetActorId, decision }) => request("decideRegistration", { targetActorId, decision })
+    decideRegistration: ({ targetActorId, decision }) => request("decideRegistration", { targetActorId, decision }),
+    exportClassRecords: ({ grade, classNum, cursor = "" } = {}) => request("exportClassRecords", { grade, classNum, ...(cursor ? { cursor } : {}) })
   };
 })();

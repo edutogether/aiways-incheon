@@ -43,6 +43,18 @@ async function guardedActor(req, res, functionName, dependencies) {
   return protectedActor;
 }
 
+// teacherVerified 필수인 엔드포인트(가입승인대기열, CSV 반전체 내보내기)가
+// 공유하는 가드 - registrationApproval.js/classExport.js에서도 씀(원래
+// 각자 복붙돼 있던 걸 httpGuard.js와 같은 이유로 한 곳으로 모음).
+async function guardedTeacher(req, res, functionName, dependencies) {
+  const protectedActor = await guardedActor(req, res, functionName, dependencies);
+  if (!protectedActor) return null;
+  const teacherSnap = await dependencies.db.collection("actors").doc(protectedActor.actorId).get();
+  const teacherVerified = teacherSnap.exists ? teacherSnap.data()?.teacherVerified : null;
+  if (!teacherVerified?.schoolId) { res.status(403).json({ ok: false, code: "teacher_verification_required" }); return null; }
+  return { actorId: protectedActor.actorId, schoolId: teacherVerified.schoolId };
+}
+
 function createCheckTeacherStatusHandler(dependencies = {}) {
   const db = dependencies.db;
   return async (req, res) => {
@@ -88,4 +100,4 @@ function createVerifyTeacherCodeHandler(dependencies = {}) {
   };
 }
 
-module.exports = { createCheckTeacherStatusHandler, createVerifyTeacherCodeHandler, hashTeacherCode };
+module.exports = { createCheckTeacherStatusHandler, createVerifyTeacherCodeHandler, hashTeacherCode, guardedTeacher };

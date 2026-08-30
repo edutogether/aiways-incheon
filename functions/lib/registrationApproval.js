@@ -5,34 +5,15 @@
 // 실제로 닫는다. registerStudentProfile(studentProfile.js)은 이제 즉시
 // studentProfile을 쓰지 않고 registrationRequests/{actorId}에 대기 상태로만
 // 남긴다 - 여기 두 함수가 그 대기열을 teacherVerified된 actor에게만 열어준다.
-const { protectActorRequest } = require("./protectedActor");
-const { cleanText, applyCors } = require("./httpGuard");
+const { cleanText } = require("./httpGuard");
+const { guardedTeacher } = require("./teacherAuth");
 
-const MAX_BODY_BYTES = 2 * 1024;
 const MAX_LIST_SIZE = 100;
 
 function publicProfile(profile) {
   if (!profile) return null;
   const { schoolId, schoolName, grade, classNum, studentNumber, name } = profile;
   return { schoolId, schoolName, grade, classNum, studentNumber, name };
-}
-
-async function guardedTeacher(req, res, functionName, dependencies) {
-  if (!applyCors(req, res)) { res.status(403).json({ ok: false, code: "invalid_origin" }); return null; }
-  if (req.method === "OPTIONS") { res.status(204).send(""); return null; }
-  if (req.method !== "POST") { res.status(405).json({ ok: false, code: "method_not_allowed" }); return null; }
-  const protectedActor = await protectActorRequest({ req, functionName, access: dependencies.access, appCheck: dependencies.appCheck, globalRateLimiter: dependencies.rateLimiter, actorRateLimiter: dependencies.actorRateLimiter, logAppCheck: dependencies.logAppCheck, blockedActors: dependencies.blockedActors });
-  if (!protectedActor.ok) {
-    if (protectedActor.retryAfterSeconds) res.set("Retry-After", String(protectedActor.retryAfterSeconds));
-    res.status(protectedActor.httpStatus).json({ ok: false, code: protectedActor.code, ...(protectedActor.retryAfterSeconds ? { retryAfterSeconds: protectedActor.retryAfterSeconds } : {}) });
-    return null;
-  }
-  const bodyBytes = req.rawBody?.length ?? Buffer.byteLength(JSON.stringify(req.body || {}));
-  if (bodyBytes > MAX_BODY_BYTES) { res.status(413).json({ ok: false, code: "request_too_large" }); return null; }
-  const teacherSnap = await dependencies.db.collection("actors").doc(protectedActor.actorId).get();
-  const teacherVerified = teacherSnap.exists ? teacherSnap.data()?.teacherVerified : null;
-  if (!teacherVerified?.schoolId) { res.status(403).json({ ok: false, code: "teacher_verification_required" }); return null; }
-  return { actorId: protectedActor.actorId, schoolId: teacherVerified.schoolId };
 }
 
 function createListPendingRegistrationsHandler(dependencies = {}) {

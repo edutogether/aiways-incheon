@@ -1430,6 +1430,58 @@
     }
   }
 
+  // 3단 권한체계 2단계(2026-08-31) - teacherVerified된 기기가 자기 학교의
+  // 가입 신청을 한 명씩 승인/거절한다. 이름/번호는 학생이 자율로 적은
+  // 값이라 innerHTML이 아니라 textContent로만 넣는다(그대로 신뢰하지 않음).
+  async function renderTeacherApprovalList() {
+    const client = window.AIWaysEdu2gClient;
+    const status = $("#teacherApprovalStatus");
+    const list = $("#teacherApprovalList");
+    if (!client || !status || !list) return;
+    status.textContent = "불러오는 중...";
+    list.replaceChildren();
+    const response = await client.listPendingRegistrations();
+    if (!response.ok) {
+      status.textContent = response.code === "teacher_verification_required"
+        ? "이 기기는 아직 선생님 인증이 안 됐어요. 먼저 '선생님 인증하기'를 해주세요."
+        : client?.errorMessageFor?.(response?.code) || "불러오지 못했어요. 다시 시도해주세요.";
+      return;
+    }
+    const requests = response.data?.requests || [];
+    if (!requests.length) { status.textContent = "대기중인 가입 신청이 없어요."; return; }
+    status.textContent = `대기중인 신청 ${requests.length}건`;
+    requests.forEach(request => {
+      const row = document.createElement("li");
+      const info = document.createElement("span");
+      info.textContent = `${request.grade}학년 ${request.classNum}반 ${request.studentNumber}번 ${request.name}`;
+      const approveBtn = document.createElement("button");
+      approveBtn.type = "button";
+      approveBtn.textContent = "승인";
+      approveBtn.addEventListener("click", () => decideTeacherApproval(request.actorId, "approve"));
+      const rejectBtn = document.createElement("button");
+      rejectBtn.type = "button";
+      rejectBtn.textContent = "거절";
+      rejectBtn.addEventListener("click", () => decideTeacherApproval(request.actorId, "reject"));
+      row.append(info, approveBtn, rejectBtn);
+      list.append(row);
+    });
+  }
+  async function decideTeacherApproval(targetActorId, decision) {
+    const client = window.AIWaysEdu2gClient;
+    const response = await client?.decideRegistration?.({ targetActorId, decision });
+    if (response?.ok) {
+      showDashboardToast(decision === "approve" ? "승인했어요." : "거절했어요.");
+      renderTeacherApprovalList();
+    } else {
+      showDashboardToast(client?.errorMessageFor?.(response?.code) || "처리하지 못했어요. 다시 시도해주세요.");
+    }
+  }
+  function initTeacherApprovalModal() {
+    const modal = $("#teacherApprovalModal");
+    if (!modal) return;
+    $$("[data-close-teacher-approval-modal]").forEach(button => button.addEventListener("click", () => modal.close()));
+  }
+
   // 헤더 우상단 톱니바퀴 설정 메뉴: 학교/반 다시 설정, 샘플 데이터 보기,
   // 초기화. "샘플 데이터 보기"는 실제 학교가 설정돼 있어도 언제든 눌러서
   // 볼 수 있게 세션 동안만 유지되는 미리보기 상태로 전환한다(저장된
@@ -1464,6 +1516,12 @@
     $("[data-settings-action='teacher']")?.addEventListener("click", () => {
       closeMenu();
       verifyTeacherCodeFromPrompt();
+    });
+    $("[data-settings-action='approvals']")?.addEventListener("click", () => {
+      closeMenu();
+      const modal = $("#teacherApprovalModal");
+      if (typeof modal?.showModal === "function") modal.showModal();
+      renderTeacherApprovalList();
     });
     $("[data-settings-action='reset']")?.addEventListener("click", () => {
       closeMenu();
@@ -4700,6 +4758,7 @@
     initClassroomSkills();
     initDashboardSchoolSetup();
     initDashboardSettingsMenu();
+    initTeacherApprovalModal();
     initRefreshControls();
     initRankingModal();
     initLandfillSourceLink();

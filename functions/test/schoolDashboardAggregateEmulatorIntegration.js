@@ -14,7 +14,6 @@ const { createGlobalRateLimiter, createActorRateLimiter } = require("../lib/glob
 const { createSaveSortingRecordHandler } = require("../lib/sortingRecord");
 const { createResolveSortingRecordHandler } = require("../lib/sortingRecordQuery");
 const { createGetSchoolDashboardHandler } = require("../lib/schoolDashboard");
-const { createRegisterStudentProfileHandler } = require("../lib/studentProfile");
 
 const projectId = process.env.GCLOUD_PROJECT || "demo-aiways-incheon";
 const authEmulator = new URL(`http://${process.env.FIREBASE_AUTH_EMULATOR_HOST || "127.0.0.1:9099"}`);
@@ -113,7 +112,6 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
     const save = createSaveSortingRecordHandler({ access, rateLimiter, actorRateLimiter, appCheck, store, db, serverTimestamp: () => FieldValue.serverTimestamp() });
     const resolve = createResolveSortingRecordHandler({ store, access, appCheck, serverTimestamp: () => FieldValue.serverTimestamp(), rateLimiter, actorRateLimiter, logAppCheck: () => {} });
     const dashboard = createGetSchoolDashboardHandler({ db, access, appCheck, rateLimiter, actorRateLimiter, logAppCheck: () => {} });
-    const register = createRegisterStudentProfileHandler({ db, access, appCheck, rateLimiter, actorRateLimiter, logAppCheck: () => {}, serverTimestamp: () => FieldValue.serverTimestamp() });
 
     // This suite is about aggregation math, not GPS (that's campusLocationEmulatorIntegration.js's
     // job) -- seed already-verified on-campus checks directly rather than going through
@@ -202,8 +200,12 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
     await db.collection("actors").doc(secondActorId).set({ status: "active", plan: "closed_beta" });
     await db.collection("actors").doc(secondActorId).collection("trustedDevices").doc(studentUid).set({ uid: studentUid, status: "active", managementId: "123e4567-e89b-42d3-a456-426614174601" });
     await db.collection("edu2gDeviceBindings").doc(studentUid).set({ actorId: secondActorId, status: "active" });
-    const registered = await call(register, studentToken, { schoolId: SCHOOL_ID, schoolName: "실측초등학교", grade: "5", classNum: "1", studentNumber: "7", name: "우주제일킹왕짱스타", confirm: true });
-    assert.equal(registered.status, 201);
+    // registerStudentProfile은 이제 즉시 studentProfile을 쓰지 않고 교사
+    // 승인대기열을 거친다(studentProfile.js, registrationApproval.js) - 그
+    // 흐름 자체는 studentProfileEmulatorIntegration.js/
+    // registrationApprovalEmulatorIntegration.js에서 이미 검증하므로, 이
+    // 테스트는 "승인까지 끝난 뒤" 상태만 직접 만들어 집계 로직 검증에 집중한다.
+    await db.collection("actors").doc(secondActorId).set({ studentProfile: { schoolId: SCHOOL_ID, schoolName: "실측초등학교", grade: "5", classNum: "1", studentNumber: "7", name: "우주제일킹왕짱스타", registeredAt: FieldValue.serverTimestamp() } }, { merge: true });
 
     async function seedOnCampusCheckFor(actorIdArg) {
       const ref = db.collection("actors").doc(actorIdArg).collection("campusChecks").doc();

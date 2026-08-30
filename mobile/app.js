@@ -209,6 +209,23 @@
     loadClassRanking();
   }
 
+  // 3단 권한체계 2단계(2026-08-31) - 가입 신청은 교사 승인이 나야 studentProfile이
+  // 생긴다. registerStudentProfile 응답이 이제 즉시 profile을 안 돌려주므로
+  // (pending:true, preview만) 승인 전까지는 이 대기 상태를 보여준다.
+  function showSignupPending(preview) {
+    hideSignupBanner();
+    const card = $("signupCard");
+    if (!card) return;
+    card.innerHTML = `
+      <div class="flex items-center gap-1.5 text-xs font-bold text-amber-800">
+        <span>⏳</span><span>선생님 승인 대기중</span>
+      </div>
+      <p class="text-xs font-semibold text-amber-700">${preview.schoolName || preview.schoolId} ${preview.grade}학년 ${preview.classNum}반 ${preview.studentNumber}번 ${preview.name}</p>
+      <p class="text-[10px] text-amber-600 leading-snug">선생님이 확인하시면 가입이 완료돼요. 잠시 후 다시 열어서 확인해 주세요.</p>
+    `;
+    $("interimClassCard")?.classList.add("hidden");
+  }
+
   function formatCooldownWait(retryAfterSeconds) {
     const hours = Math.ceil((retryAfterSeconds || 0) / 3600);
     return hours > 1 ? `${hours}시간 뒤에 다시 시도해 주세요.` : "잠시 뒤에 다시 시도해 주세요.";
@@ -302,6 +319,7 @@
 
     client?.checkStudentProfile?.().then(response => {
       if (response.ok && response.data?.hasProfile) showSignupLocked(response.data.profile);
+      else if (response.ok && response.data?.pending) showSignupPending(response.data.pendingProfile || {});
       else initSignupBanner();
     }).catch(() => initSignupBanner());
 
@@ -339,9 +357,10 @@
         async () => {
           status.textContent = "가입하는 중입니다...";
           const result = await client.registerStudentProfile({ schoolId, schoolName, grade, classNum, studentNumber, name });
-          if (result.ok) { showSignupLocked(result.data.profile); showVisualAlert(`🎉 "${name}" 학생으로 가입 완료!`, "emerald"); }
+          if (result.ok && result.data?.pending) { showSignupPending(result.data.preview); showVisualAlert(`⏳ "${name}" 학생 가입 신청 완료! 선생님 승인을 기다려 주세요.`, "amber"); }
           else {
-            status.textContent = result.data?.code === "already_registered" ? "이미 가입된 기기예요." : "가입에 실패했어요. 다시 시도해 주세요.";
+            status.textContent = result.data?.code === "already_registered" ? "이미 가입된 기기예요."
+              : result.data?.code === "request_pending" ? "이미 승인 대기중이에요." : "가입에 실패했어요. 다시 시도해 주세요.";
             if (result.data?.profile) showSignupLocked(result.data.profile);
           }
         }

@@ -44,7 +44,11 @@ function createCheckStudentProfileHandler(dependencies = {}) {
     if (Object.keys(body).length) return res.status(400).json({ ok: false, code: "unknown_field" });
     const snap = await db.collection("actors").doc(protectedActor.actorId).get();
     const profile = snap.exists ? snap.data()?.studentProfile : null;
-    return res.status(200).json({ ok: true, hasProfile: !!profile, profile: publicProfile(profile) });
+    if (profile) return res.status(200).json({ ok: true, hasProfile: true, pending: false, rejected: false, profile: publicProfile(profile) });
+    const requestSnap = await db.collection("registrationRequests").doc(protectedActor.actorId).get();
+    const request = requestSnap.exists ? requestSnap.data() : null;
+    const isPending = request?.status === "pending";
+    return res.status(200).json({ ok: true, hasProfile: false, pending: isPending, rejected: request?.status === "rejected", profile: null, pendingProfile: isPending ? publicProfile(request) : null });
   };
 }
 
@@ -82,15 +86,25 @@ function createRegisterStudentProfileHandler(dependencies = {}) {
       return res.status(200).json({ ok: true, confirmed: false, preview: { schoolId, schoolName, grade, classNum, studentNumber, name } });
     }
 
+    // 3단 권한체계 2단계(2026-08-31) - 여기서 바로 studentProfile을 쓰지 않고
+    // registrationRequests/{actorId}에 대기 상태로만 남긴다. teacherVerified된
+    // actor(registrationApproval.js)가 승인해야 실제로 studentProfile이
+    // 생긴다 - 코드만 알면 자기신고로 실명+번호를 무제한 조회할 수 있던
+    // LOCKED 문제를 여기서 닫는다.
+    const requestRef = db.collection("registrationRequests").doc(protectedActor.actorId);
     const result = await db.runTransaction(async (transaction) => {
-      const snap = await transaction.get(actorRef);
-      const already = snap.exists ? snap.data()?.studentProfile : null;
+      const actorSnap = await transaction.get(actorRef);
+      const already = actorSnap.exists ? actorSnap.data()?.studentProfile : null;
       if (already) return { code: "already_registered", profile: already };
-      transaction.set(actorRef, { studentProfile: { schoolId, schoolName, grade, classNum, studentNumber, name, registeredAt: serverTimestamp() } }, { merge: true });
+      const requestSnap = await transaction.get(requestRef);
+      const existingRequest = requestSnap.exists ? requestSnap.data() : null;
+      if (existingRequest?.status === "pending") return { code: "request_pending" };
+      transaction.set(requestRef, { schoolId, schoolName, grade, classNum, studentNumber, name, status: "pending", submittedAt: serverTimestamp() });
       return { ok: true };
     });
     if (result.code === "already_registered") return res.status(409).json({ ok: false, code: "already_registered", profile: publicProfile(result.profile) });
-    return res.status(201).json({ ok: true, confirmed: true, profile: { schoolId, schoolName, grade, classNum, studentNumber, name } });
+    if (result.code === "request_pending") return res.status(409).json({ ok: false, code: "request_pending" });
+    return res.status(202).json({ ok: true, confirmed: true, pending: true, preview: { schoolId, schoolName, grade, classNum, studentNumber, name } });
   };
 }
 

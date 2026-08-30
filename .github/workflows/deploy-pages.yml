@@ -82,6 +82,13 @@ jobs:
       - name: Teacher auth emulator integration test
         run: npm run emulator:test:teacher-auth
 
+      # 2026-08-31 추가: 가입승인대기열(2단계, listPendingRegistrations/
+      # decideRegistration) - 스쿨 격리(다른 학교 요청은 404로 숨김),
+      # 거절 후 재신청 허용, 이미 결정된 요청 재결정 방지를 실제
+      # 트랜잭션으로 검증한다.
+      - name: Registration approval emulator integration test
+        run: npm run emulator:test:registration-approval
+
   # 2026-08-29 추가: functions/firestore.rules/firestore.indexes.json은
   # 지금까지 자동배포가 전혀 없었다 - 개발자가 로컬에서 매번 수동으로
   # `firebase deploy --only functions:<name>`을 쳐야만 실제로 반영됐다

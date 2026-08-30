@@ -112,6 +112,7 @@
         <button type="button" data-settings-action="reconfigure">🏫 학년반 다시 설정하기</button>
         <button type="button" data-settings-action="csv">📥 내 기록 CSV로 저장</button>
         <button type="button" data-settings-action="teacher">🍎 선생님 인증하기</button>
+        <button type="button" data-settings-action="approvals">📋 가입 승인 대기열</button>
         <button type="button" data-settings-action="reset">🔄 모두 초기화하기</button>
       </div>
     </div>
@@ -736,6 +737,18 @@
         </div>
       </div>
       <div id="dashboardToastHostModal" class="dashboard-toast-host" aria-live="assertive"></div>
+    </dialog>
+
+    <!-- 3단 권한체계 2단계(2026-08-31) - 교사가 학생 가입 신청을 한 명씩
+         승인/거절하는 대기열. teacherVerified된 기기에서만 실제 데이터가
+         뜬다(대기열 조회 자체가 서버에서 교사 인증을 요구). -->
+    <dialog class="ai-modal" id="teacherApprovalModal">
+      <button class="close-btn" type="button" aria-label="닫기" data-close-teacher-approval-modal>×</button>
+      <div class="modal-body">
+        <h2>가입 승인 대기열</h2>
+        <p id="teacherApprovalStatus" class="save-state" role="status" aria-live="polite"></p>
+        <ul id="teacherApprovalList" class="classroom-skill-list"></ul>
+      </div>
     </dialog>
 
     <!-- 학교를 아직 설정 안 했거나(또는 "샘플 보기"를 눌렀을 때) 잠깐

@@ -17,6 +17,7 @@ const { createGetClassRankingHandler } = require("./lib/classRanking");
 const { createSearchSchoolHandler } = require("./lib/schoolSearch");
 const { createCheckTeacherStatusHandler, createVerifyTeacherCodeHandler } = require("./lib/teacherAuth");
 const { createListPendingRegistrationsHandler, createDecideRegistrationHandler } = require("./lib/registrationApproval");
+const { createManageTeacherCodeHandler } = require("./lib/superadmin");
 const { getApps, initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
@@ -113,6 +114,9 @@ exports.listPendingRegistrations = onRequest({ region: "asia-northeast3", memory
 }));
 exports.decideRegistration = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createDecideRegistrationHandler({
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
+}));
+exports.manageTeacherCode = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createManageTeacherCodeHandler({
+  db, rateLimiter, logAppCheck, verifyIdToken: (token) => getAuth().verifyIdToken(token), serverTimestamp: () => FieldValue.serverTimestamp()
 }));
 const edu2gHandlers = createEdu2gHandlers({
   registry: createEdu2gPassRegistry({ getSecret: () => edu2gPassRegistrySecret.value() }),

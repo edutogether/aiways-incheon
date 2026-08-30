@@ -89,6 +89,13 @@ jobs:
       - name: Registration approval emulator integration test
         run: npm run emulator:test:registration-approval
 
+      # 2026-08-31 추가: 슈퍼어드민(4단계, manageTeacherCode) - 클레임 없는
+      # 로그인 사용자는 거절되고, 클레임을 받은 뒤 발급한 코드가 실제로
+      # verifyTeacherCode에서 통하는지까지(Firestore에 해시만 써졌다는 것
+      # 이상으로) 끝까지 확인한다.
+      - name: Superadmin emulator integration test
+        run: npm run emulator:test:superadmin
+
   # 2026-08-29 추가: functions/firestore.rules/firestore.indexes.json은
   # 지금까지 자동배포가 전혀 없었다 - 개발자가 로컬에서 매번 수동으로
   # `firebase deploy --only functions:<name>`을 쳐야만 실제로 반영됐다
@@ -168,6 +175,7 @@ jobs:
           set -e
           mkdir -p _site
           cp index.html _site/
+          cp admin.html _site/
           cp *.js _site/ 2>/dev/null || true
           cp *.css _site/ 2>/dev/null || true
           cp base-data-seed.tsv _site/

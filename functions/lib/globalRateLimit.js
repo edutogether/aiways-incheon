@@ -66,6 +66,10 @@ const RATE_LIMITS = Object.freeze({
   // 수 있어 조회는 넉넉히, 승인/거절은 반 규모(수십 명) 감안해 60/분이면
   // 충분하고도 남는다.
   ,listPendingRegistrations: { perMinute: 30 }, decideRegistration: { perMinute: 60 }
+  // 2026-08-31 - 슈퍼어드민(4단계). 유일한 정당 사용자가 대표님 한 명뿐이라
+  // 액터별 상한은 의미가 없고(anonymous actorId 체계 밖에 있음), 전역
+  // 상한만 방어적으로 낮게 건다.
+  ,manageTeacherCode: { perMinute: 10, perDay: 100 }
 });
 
 function getUtcBuckets(now = new Date()) {

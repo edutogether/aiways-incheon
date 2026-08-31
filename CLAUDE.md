@@ -10,7 +10,18 @@
 
 ## LOCKED — 재논의·임의 수정 금지
 - 개인랭킹("우리반 실천왕")의 자율입력 이름 노출은 실명검증 없이 허용하기로 이미 확정된 제품결정 — 재논의 금지.
-- 🔴 `registerStudentProfile` 학생소속증명 우회 문제(아래 크로스체크 섹션 참고)는 대표 결정 전까지 임의 설계·수정 금지.
+- `registerStudentProfile` 학생소속증명 우회 문제는 **2026-08-31 해결됨** — 아래 "3단 권한체계" 섹션 참고. LOCKED 해제.
+
+## 3단 권한체계 (2026-08-31 Bumm님 지시로 5단계 구현·배포 완료)
+
+아래 "2026-08-25 크로스체크 결과"에서 미해결로 남았던 `registerStudentProfile` 학생소속증명 우회 문제를 포함해, 교사/관리자 권한 개념이 아예 없던 근본 원인을 닫기 위해 5단계로 구현했다:
+1. **교사코드 인증**(`functions/lib/teacherAuth.js`) — 학교 전체 공유코드 1개로 `verifyTeacherCode`가 `actors/{actorId}.teacherVerified`를 기록. 코드는 sha256 해시로만 저장.
+2. **가입승인대기열**(`functions/lib/registrationApproval.js`) — `registerStudentProfile`은 이제 즉시 등록 대신 `registrationRequests/{actorId}`에 대기시키고, `teacherVerified`된 교사만 `listPendingRegistrations`/`decideRegistration`으로 자기 학교 신청을 승인/거절한다(다른 학교 요청은 404로 완전히 숨김). 승인해야만 `studentProfile`이 생겨 학생소속증명 우회 문제가 실제로 닫힘.
+3. **학교잠금(school-lock) 교정** — `dashboardSchoolId`가 한 번 잘못 고정되면 풀 방법이 없던 문제를, 새 "관리자" 개념 없이 교사코드 인증 성공 시점과 가입 승인 시점에 같이 바로잡는 방식으로 해결(`teacherAuth.js`/`registrationApproval.js`).
+4. **슈퍼어드민**(`functions/lib/superadmin.js`, `admin.html`) — 이 앱 최초의 실(이메일/비밀번호) 로그인 시스템. Bumm님 본인 Firebase Auth 계정 + 커스텀 클레임(`role:"superadmin"`)으로 인증하며 anonymous actorId 체계와 완전 분리. 첫 기능은 교사코드 발급/회전(`manageTeacherCode`) — 개발자 로컬 스크립트(`functions/scripts/setTeacherCode.js`) 의존을 없앰. 계정 생성은 Bumm님이 Firebase 콘솔에서 직접 해야 하고(비밀번호 대리생성 안 함), `functions/scripts/grantSuperadmin.js <uid>`로 클레임을 부여해야 실사용 가능.
+5. **CSV 반전체 내보내기**(`functions/lib/classExport.js`) — 교사인증이 없어 막혀있던 "반 전체" CSV를 `teacherVerified`된 교사만 `exportClassRecords`로 받을 수 있게 함(collectionGroup 쿼리, 스쿨/반 스코프 격리).
+
+신규 에뮬레이터 통합테스트 4개(`teacherAuthEmulatorIntegration.js`/`registrationApprovalEmulatorIntegration.js`/`superadminEmulatorIntegration.js`/`classExportEmulatorIntegration.js`)가 CI(`test` job)에 실제로 걸려있다. 로컬에서 실제 HTTP 클릭 테스트를 하려면 `functions/scripts/seedLocalPreviewDemo.js`로 데모 데이터를 심고 `?auth-emulator=1` 쿼리로 접속할 것(`functions/index.js`의 `emulatorAppCheck`가 `FUNCTIONS_EMULATOR` 환경변수로만 App Check를 우회 — 프로덕션엔 절대 안 생기는 값).
 
 ## 현재 상태 요약 (2026-08-25 기준)
 
@@ -52,11 +63,11 @@ git config core.hooksPath .githooks
 - 탭 버튼 73×37px, 검색 트리거 20×20px — 모바일 터치 타깃 권장치(44px) 미만. 기능엔 문제 없고 시연에도 지장 없어 이번 라운드에서는 그대로 둠.
 - App Check가 localhost를 막아서 로컬에서는 인증 게이트를 통과할 수 없음. UI 검증이 필요하면 게이트를 화면상으로만 열고(`authGate`에 `hidden` 추가 + `appRoot`에서 제거) 테스트할 것 — 실제 보안은 전부 Functions 쪽에서 강제되므로 이 방식이 보안을 우회하지는 않는다.
 
-## 2026-08-25 크로스체크 결과 — 6건 중 5건 완료, 1건 대표 결정 대기
+## 2026-08-25 크로스체크 결과 — 6건 전부 완료
 
 전체 5개 앱 크로스체크에서 평균 74.6/100(5개 앱 중 최저)으로 나왔다. 지적된 6건 중 5건은 당일 수정·검증·배포까지 끝남: blockedActors 배선(부품은 통과했지만 실제 핸들러까지 이어지는 배선이 안 돼 있던 것 발견해 연결), topStudents 접근제어, 폴링 레이트리밋 상향+429 표시, GitHub Pages 배포 소스를 legacy에서 Actions로 전환(레포 전체 소스 유출 차단), 정규식 위생정리. 나머지 1건은 재현해보니 애초에 기능버그가 아니었음을 확인해 종결.
 
-**🔴 미해결 1건 — 대표 결정 대기 (임의 설계 금지)**: `registerStudentProfile`이 학교 소속을 실제로 증명하지 못한다 — `schoolId`만 NEIS API로 검증되고 학년/반/번호/이름은 자기신고이기 때문에, 시크릿창을 새로 열 때마다(=새 actor) 가짜 프로필로 등록하면 그 반 학생의 실명+번호를 무제한 조회할 수 있다. 이날 함께 고친 topStudents 접근제어가 바로 이 studentProfile을 신뢰 기준으로 삼는 구조라 더 문제가 된다. 해결하려면 교사가 발급하는 반 코드 같은 신규 기능(교사용 코드 발급 화면, 기존 가입자 소급처리, 분실/재발급 정책)이 필요해 단순 버그 수정이 아니라 제품설계 판단이 필요한 영역 — 대표 결정 없이는 진행하지 않는다. 상세는 `D:\Projects\_records\handoff\aiways-incheon.md` 참고.
+**나머지 1건도 2026-08-31 해결됨**: `registerStudentProfile`이 학교 소속을 실제로 증명하지 못하던 문제(`schoolId`만 NEIS API로 검증되고 학년/반/번호/이름은 자기신고라, 시크릿창을 새로 열 때마다(=새 actor) 가짜 프로필로 등록하면 그 반 학생의 실명+번호를 무제한 조회할 수 있었음) — 교사가 발급하는 반 코드 + 가입승인대기열로 해결했다. 위 "3단 권한체계" 섹션 참고. 상세 시행착오는 `D:\Projects\_records\handoff\aiways-incheon.md` 참고.
 
 **재발 방지 교훈**:
 - "기능 완료" 자기보고를 실행 없이 믿지 말 것 — 부품 단위 테스트는 통과해도 배선(핸들러 끝까지 실제 호출) 테스트가 없으면 안 잡힌다. 안전기능은 핸들러 레벨로 실제 실행 검증할 것.

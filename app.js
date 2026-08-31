@@ -1517,7 +1517,13 @@
       const approveBtn = document.createElement("button");
       approveBtn.type = "button";
       approveBtn.textContent = "승인";
-      approveBtn.addEventListener("click", () => decideTeacherApproval(request.actorId, "approve"));
+      approveBtn.addEventListener("click", () => {
+        // 승인은 거절과 달리 되돌릴 방법이 없다(거절은 학생이 재신청 가능,
+        // 승인취소 기능은 없음) - 초기화 버튼도 확인창이 있는데 이보다
+        // 훨씬 되돌리기 어려운 액션에 확인창이 없던 걸 감사에서 지적받음.
+        if (!window.confirm(`"${info.textContent}" 학생의 가입을 승인할까요? 승인은 취소할 수 없어요.`)) return;
+        decideTeacherApproval(request.actorId, "approve");
+      });
       const rejectBtn = document.createElement("button");
       rejectBtn.type = "button";
       rejectBtn.textContent = "거절";

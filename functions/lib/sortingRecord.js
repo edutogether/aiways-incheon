@@ -118,7 +118,15 @@ function createSaveSortingRecordHandler(dependencies = {}) {
     // 실명가입(4단계)으로 이 actor에 검증된 studentProfile이 있으면, 클라이언트가
     // 뭐라고 보냈든 그 값을 무시하고 서버가 기억하는 값으로 덮어쓴다 - 그래야
     // 학생이 임시 입력폼을 조작해서 다른 반으로 기록되는 걸 막을 수 있다.
-    // 아직 가입 전이면(=studentProfile 없으면) 기존처럼 클라이언트 값을 그대로 쓴다.
+    // 재감사 지적사항(2026-09-01, classContext 신뢰 문제) - 예전엔 가입 전
+    // (studentProfile 없음)이면 클라이언트가 보낸 값을 그대로 썼는데, 이게
+    // 가입/승인 절차를 아예 거치지 않은 기기가 임의 학교/학년/반을 자기신고해
+    // 랭킹·대시보드·CSV 반전체 내보내기를 오염시킬 수 있는 구멍이었다(교사
+    // 승인 게이트가 saveSortingRecord까지는 전파가 안 됐던 문제). 이제
+    // 승인된 studentProfile이 없으면 classContext를 아예 저장하지 않는다 -
+    // 승인 전에도 기록 자체는 저장돼 개인 연습에는 지장 없지만, 반/학교
+    // 집계·랭킹·CSV에는 전혀 반영되지 않는다(schoolDashboardAggregate.js가
+    // classContext 없는 기록은 이미 조용히 건너뛰도록 돼 있었음).
     if (db) {
       const actorSnap = await db.collection("actors").doc(actorId).get();
       const profile = actorSnap.exists ? actorSnap.data()?.studentProfile : null;
@@ -128,7 +136,9 @@ function createSaveSortingRecordHandler(dependencies = {}) {
       // schoolName에서 이미 한 번 겪은 문제와 동일한 이유). 실명 검증
       // 없이 학생이 스스로 적은 값 그대로다(교사가 부모 동의 하에 자율
       // 입력을 허용하기로 결정 - 실명이 아니어도 됨).
-      if (profile) record.classContext = { schoolId: profile.schoolId, ...(profile.schoolName ? { schoolName: profile.schoolName } : {}), grade: profile.grade, classNum: profile.classNum, ...(profile.studentNumber ? { studentNumber: profile.studentNumber } : {}), ...(profile.name ? { studentName: profile.name } : {}) };
+      record.classContext = profile
+        ? { schoolId: profile.schoolId, ...(profile.schoolName ? { schoolName: profile.schoolName } : {}), grade: profile.grade, classNum: profile.classNum, ...(profile.studentNumber ? { studentNumber: profile.studentNumber } : {}), ...(profile.name ? { studentName: profile.name } : {}) }
+        : null;
     }
     // GPS 교내판정(5단계): campusCheckId가 있으면 그 일회용 판정 결과를 소비해서
     // record.onCampus에 반영한다 - 좌표 자체는 이 함수도, 그 이전 어떤 단계도

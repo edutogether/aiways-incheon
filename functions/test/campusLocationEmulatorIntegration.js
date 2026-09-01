@@ -16,7 +16,11 @@ const { createCheckCampusLocationHandler } = require("../lib/campusLocation");
 const projectId = process.env.GCLOUD_PROJECT || "demo-aiways-incheon";
 const authEmulator = new URL(`http://${process.env.FIREBASE_AUTH_EMULATOR_HOST || "127.0.0.1:9099"}`);
 const ACTOR_ID = "campus_test_actor";
-const SCHOOL_ID = "campus_test_school";
+// cleanSchoolId(firestorePathSafety.js)가 숫자만(나이스 표준학교코드
+// 형식) 허용하도록 조여진 뒤로 이 문자열 값은 이미 무효했다(발견:
+// 2026-09-01, checkCampusLocation이 항상 400을 냈음 - 이 파일이 CI에
+// 안 걸려있어 아무도 몰랐던 사전 버그, 이번 classContext 수정과는 무관).
+const SCHOOL_ID = "8888888";
 // Seoul City Hall-ish coordinates, arbitrary -- only used as a fixed campus
 // center + a point ~50m away (inside a 100m radius) and a point ~5km away
 // (well outside) for the distance math, nothing location-sensitive.
@@ -69,7 +73,12 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
     const token = signed.idToken;
     const decoded = await auth.verifyIdToken(token);
     uid = decoded.uid;
-    await db.collection("actors").doc(ACTOR_ID).set({ status: "active", plan: "closed_beta" });
+    // 재감사 지적사항(2026-09-01, classContext 신뢰 문제) 대응으로
+    // saveSortingRecord가 승인된 studentProfile 없는 actor의 classContext를
+    // 이제 null로 만든다 - 이 스위트는 GPS/집계 수학을 검증하는 게
+    // 목적이라, 아래 recordPayload의 classContext와 일치하는 studentProfile을
+    // 미리 심어서 그 경로(신뢰된 classContext)로 계속 검증한다.
+    await db.collection("actors").doc(ACTOR_ID).set({ status: "active", plan: "closed_beta", studentProfile: { schoolId: SCHOOL_ID, schoolName: "테스트초등학교", grade: "5", classNum: "1", studentNumber: "1", name: "테스트학생" } });
     await db.collection("actors").doc(ACTOR_ID).collection("trustedDevices").doc(uid).set({ uid, status: "active", managementId: "123e4567-e89b-42d3-a456-426614174801" });
     await db.collection("edu2gDeviceBindings").doc(uid).set({ actorId: ACTOR_ID, status: "active" });
     await db.collection("schoolCampuses").doc(SCHOOL_ID).set(CAMPUS);
@@ -109,8 +118,10 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
     assert.equal(offCheck.status, 200);
     assert.equal(offCheck.body.onCampus, false);
 
-    // 3. Unconfigured school fails safe to off-campus, no error.
-    const unknownCheck = await call(check, token, { schoolId: "no_such_school", ...ON_CAMPUS_POINT });
+    // 3. Unconfigured school fails safe to off-campus, no error (schoolId
+    // 형식은 유효하지만(숫자) schoolCampuses 문서가 없는 경우 - "형식이
+    // 아예 무효한" 경우와는 다른 시나리오라 별도 숫자ID를 쓴다).
+    const unknownCheck = await call(check, token, { schoolId: "9999998", ...ON_CAMPUS_POINT });
     assert.equal(unknownCheck.status, 200);
     assert.equal(unknownCheck.body.onCampus, false);
 

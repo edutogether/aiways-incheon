@@ -1839,6 +1839,11 @@ html[data-tier="phone"] .phone-shell-frame {
 .class-picker-selects select:focus { outline: none; border-color: var(--ssm-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ssm-accent) 14%, transparent); }
 .class-picker-confirm { display: block; inline-size: 100%; max-inline-size: 18.5rem; margin: 1.1rem auto 0; padding: .8rem; border-radius: 999px; border: none; background: var(--ssm-accent); color: #fff; font-weight: 800; font-size: .95rem; cursor: pointer; }
 .class-picker-confirm:hover { background: color-mix(in srgb, var(--ssm-accent) 88%, black); }
+/* 2026-09-01 UX 재감사 대응 - window.prompt() 대신 쓰는 텍스트 입력(교사
+   인증코드 등). .class-picker-selects select와 같은 디자인 언어를 쓰되
+   input용으로 폭을 넓힌다. */
+.class-picker-text-input { display: block; inline-size: 100%; max-inline-size: 18.5rem; margin: 1.3rem auto 0; padding: .65rem .9rem; border-radius: .7rem; border: 1.5px solid var(--ssm-line); background: var(--ssm-bg); color: var(--ssm-ink); font-weight: 700; font-size: .92rem; text-align: center; }
+.class-picker-text-input:focus { outline: none; border-color: var(--ssm-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ssm-accent) 14%, transparent); }
 /* 반 선택 단계에서 학교 검색 단계로 돌아가는 뒤로가기 - 닫기(X)와
    같은 우상단 클러스터에 나란히 둔다(사용자 지적: 뒤로가기가 우상단에
    있어야 함). 학교 검색 단계에서는 갈 곳이 없으니 숨긴다. */

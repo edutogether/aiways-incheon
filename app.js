@@ -1341,8 +1341,8 @@
   // 100점 목표 4번(CSV 내보내기) - listSortingRecords는 "이 기기(actor)가
   // 저장한 기록"만 돌려준다(반/학교 전체를 모아 보는 교사용 기능이 아니라,
   // 학생 개인 기기가 자기 판단 이력을 CSV로 가져가는 용도). 학교/반 전체를
-  // 모으는 "선생님용 내보내기"는 exportClassRecordsAsCsv(3단 권한체계
-  // 5단계, teacherVerified 필요) 참고.
+  // 모으는 "선생님용 내보내기"는 openClassCsvExportModal/runClassCsvExport
+  // (3단 권한체계 5단계, teacherVerified 필요) 참고.
   function csvQuote(value) {
     let text = String(value ?? "");
     if (/^[=+\-@]/.test(text)) text = "'" + text; // 스프레드시트 수식 주입 방지
@@ -1419,13 +1419,9 @@
     return bom + [header, ...rows].map((row) => row.map(csvQuote).join(",")).join("\r\n");
   }
   const CLASS_CSV_MAX_PAGES = 10; // 페이지당 최대 200건 x 10 = 2000건까지 한 번에 모음
-  async function exportClassRecordsAsCsv() {
+  async function runClassCsvExport(grade, classNum) {
     const client = window.AIWaysEdu2gClient;
     if (!client?.exportClassRecords) return;
-    const grade = window.prompt("내보낼 학년을 입력해주세요.");
-    if (!grade) return;
-    const classNum = window.prompt("내보낼 반을 입력해주세요.");
-    if (!classNum) return;
     showDashboardToast("반 전체 기록을 모으고 있어요...");
     const records = [];
     let cursor;
@@ -1460,12 +1456,45 @@
     a.click();
     URL.revokeObjectURL(url);
   }
+  // UX 재감사 지적사항(2026-09-01) 대응 - 학년/반을 window.prompt() 2번이
+  // 아니라, 학교설정 모달의 class-picker-selects와 같은 디자인의 드롭다운
+  // 2개로 받는다(SCHOOL_CLASS_CONFIG 검증은 여기선 필요 없음 - 내보내기는
+  // 어떤 학년/반 조합이든 시도할 수 있어야 함).
+  function openClassCsvExportModal() {
+    const modal = $("#classCsvExportModal");
+    const gradeSelect = $("#classCsvGradeSelect");
+    const classNumSelect = $("#classCsvClassNumSelect");
+    const confirmBtn = $("#classCsvExportConfirmBtn");
+    const status = $("#classCsvExportStatus");
+    if (!modal || !gradeSelect || !classNumSelect || !confirmBtn) return;
+    if (!gradeSelect.childElementCount) {
+      for (let g = 1; g <= 6; g += 1) {
+        const option = document.createElement("option");
+        option.value = String(g);
+        option.textContent = `${g}학년`;
+        gradeSelect.append(option);
+      }
+      for (let n = 1; n <= 15; n += 1) {
+        const option = document.createElement("option");
+        option.value = String(n);
+        option.textContent = `${n}반`;
+        classNumSelect.append(option);
+      }
+    }
+    if (status) status.textContent = "";
+    confirmBtn.onclick = () => {
+      if (typeof modal.close === "function" && modal.open) modal.close();
+      else modal.removeAttribute("open");
+      runClassCsvExport(gradeSelect.value, classNumSelect.value);
+    };
+    if (typeof modal.showModal === "function") modal.showModal();
+  }
 
   // 3단 권한체계 1단계(2026-08-31) - 학교 전체가 공유하는 코드 1개로 "이
   // 기기가 교사"임을 서버에 표시한다(actors/{actorId}.teacherVerified).
   // 코드 발급은 아직 관리자 화면이 없어(슈퍼어드민 단계 예정) 개발자가
   // functions/scripts/setTeacherCode.js로 미리 심어둬야 한다.
-  async function verifyTeacherCodeFromPrompt() {
+  async function openTeacherCodeModal() {
     const client = window.AIWaysEdu2gClient;
     if (!client?.verifyTeacherCode) return;
     const already = await client.checkTeacherStatus?.();
@@ -1478,16 +1507,28 @@
       showDashboardToast("먼저 학교를 설정한 뒤 다시 시도해주세요.");
       return;
     }
-    const code = window.prompt("학교에서 안내받은 선생님 인증코드를 입력해주세요.");
-    if (!code) return;
-    const response = await client.verifyTeacherCode({ schoolId, code });
-    if (response.ok && response.data?.verified) {
-      showDashboardToast("선생님 인증이 완료됐어요.");
-    } else {
-      showDashboardToast(response.code === "teacher_code_not_set"
-        ? "이 학교는 아직 인증코드가 준비되지 않았어요. 관리자에게 문의해주세요."
-        : client?.errorMessageFor?.(response?.code) || "인증코드를 다시 확인해주세요.");
-    }
+    const modal = $("#teacherCodeModal");
+    const input = $("#teacherCodeModalInput");
+    const confirmBtn = $("#teacherCodeModalConfirmBtn");
+    const status = $("#teacherCodeModalStatus");
+    if (!modal || !input || !confirmBtn) return;
+    input.value = "";
+    if (status) status.textContent = "";
+    confirmBtn.onclick = async () => {
+      const code = input.value.trim();
+      if (!code) { if (status) status.textContent = "인증코드를 입력해주세요."; return; }
+      const response = await client.verifyTeacherCode({ schoolId, code });
+      if (response.ok && response.data?.verified) {
+        if (typeof modal.close === "function" && modal.open) modal.close();
+        else modal.removeAttribute("open");
+        showDashboardToast("선생님 인증이 완료됐어요.");
+      } else if (status) {
+        status.textContent = response.code === "teacher_code_not_set"
+          ? "이 학교는 아직 인증코드가 준비되지 않았어요. 관리자에게 문의해주세요."
+          : client?.errorMessageFor?.(response?.code) || "인증코드를 다시 확인해주세요.";
+      }
+    };
+    if (typeof modal.showModal === "function") modal.showModal();
   }
 
   // 3단 권한체계 2단계(2026-08-31) - teacherVerified된 기기가 자기 학교의
@@ -1547,6 +1588,16 @@
     if (!modal) return;
     $$("[data-close-teacher-approval-modal]").forEach(button => button.addEventListener("click", () => modal.close()));
   }
+  function initTeacherCodeModal() {
+    const modal = $("#teacherCodeModal");
+    if (!modal) return;
+    $$("[data-close-teacher-code-modal]").forEach(button => button.addEventListener("click", () => modal.close()));
+  }
+  function initClassCsvExportModal() {
+    const modal = $("#classCsvExportModal");
+    if (!modal) return;
+    $$("[data-close-class-csv-modal]").forEach(button => button.addEventListener("click", () => modal.close()));
+  }
 
   // 헤더 우상단 톱니바퀴 설정 메뉴: 학교/반 다시 설정, 샘플 데이터 보기,
   // 초기화. "샘플 데이터 보기"는 실제 학교가 설정돼 있어도 언제든 눌러서
@@ -1581,7 +1632,7 @@
     });
     $("[data-settings-action='teacher']")?.addEventListener("click", () => {
       closeMenu();
-      verifyTeacherCodeFromPrompt();
+      openTeacherCodeModal();
     });
     $("[data-settings-action='approvals']")?.addEventListener("click", () => {
       closeMenu();
@@ -1591,7 +1642,7 @@
     });
     $("[data-settings-action='class-csv']")?.addEventListener("click", () => {
       closeMenu();
-      exportClassRecordsAsCsv();
+      openClassCsvExportModal();
     });
     $("[data-settings-action='reset']")?.addEventListener("click", () => {
       closeMenu();
@@ -4829,6 +4880,8 @@
     initDashboardSchoolSetup();
     initDashboardSettingsMenu();
     initTeacherApprovalModal();
+    initTeacherCodeModal();
+    initClassCsvExportModal();
     initRefreshControls();
     initRankingModal();
     initLandfillSourceLink();

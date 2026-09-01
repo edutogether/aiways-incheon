@@ -752,6 +752,32 @@
       </div>
     </dialog>
 
+    <!-- UX 재감사 지적사항(2026-09-01) 대응 - window.prompt() 대신 이 앱의
+         기존 모달 패턴(school-setup-modal의 class-picker-selects)을 따르는
+         전용 입력창. -->
+    <dialog class="ai-modal school-setup-modal" id="teacherCodeModal">
+      <button class="close-btn" type="button" aria-label="닫기" data-close-teacher-code-modal>×</button>
+      <div class="modal-body">
+        <h2>선생님 인증코드를 입력해주세요.</h2>
+        <input type="text" id="teacherCodeModalInput" class="class-picker-text-input" placeholder="학교에서 안내받은 인증코드" autocomplete="off" />
+        <button type="button" id="teacherCodeModalConfirmBtn" class="class-picker-confirm">확인</button>
+        <p id="teacherCodeModalStatus" class="save-state" role="status" aria-live="polite"></p>
+      </div>
+    </dialog>
+
+    <dialog class="ai-modal school-setup-modal" id="classCsvExportModal">
+      <button class="close-btn" type="button" aria-label="닫기" data-close-class-csv-modal>×</button>
+      <div class="modal-body">
+        <h2>내보낼 학년·반을 골라주세요.</h2>
+        <div class="class-picker-selects">
+          <select id="classCsvGradeSelect" aria-label="학년"></select>
+          <select id="classCsvClassNumSelect" aria-label="반"></select>
+        </div>
+        <button type="button" id="classCsvExportConfirmBtn" class="class-picker-confirm">CSV로 내보내기</button>
+        <p id="classCsvExportStatus" class="save-state" role="status" aria-live="polite"></p>
+      </div>
+    </dialog>
+
     <!-- 학교를 아직 설정 안 했거나(또는 "샘플 보기"를 눌렀을 때) 잠깐
          뜨는 안내 팝업 - "서비스 준비중이에요" 같은 걸 조용히 문단 텍스트로
          바꾸는 대신 눈에 띄는 이벤트로 튀어나오게 해달라는 요청. -->

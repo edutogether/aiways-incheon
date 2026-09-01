@@ -8,10 +8,8 @@
     <!-- 이 페이지는 어디에도 링크돼 있지 않다(사이트 내비게이션에 없음) -
          하지만 실제 보안은 링크 유무가 아니라 서버(manageTeacherCode의
          superadmin 커스텀 클레임 검증)에서 강제된다. -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com https://www.recaptcha.net https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://www.google.com https://www.gstatic.com https://asia-northeast3-ai-ways-incheon.cloudfunctions.net https://cdn.jsdelivr.net; frame-src 'self' https://www.google.com https://ai-ways-incheon.firebaseapp.com; object-src 'none'; base-uri 'self';"
-    />
+    <!-- CSP는 2026-09-01 Firebase Hosting 이전과 함께 firebase.json의
+         hosting.headers로 옮겼다(index.html과 동일한 이유). -->
     <style>
       body { font-family: -apple-system, "Pretendard", sans-serif; background: #0f172a; color: #e2e8f0; display: grid; place-items: center; min-height: 100vh; margin: 0; }
       main { width: min(420px, 92vw); display: grid; gap: 1.25rem; }

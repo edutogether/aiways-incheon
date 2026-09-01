@@ -1,16 +1,12 @@
-name: Deploy GitHub Pages
+name: Deploy
 
-# 예전엔 이 워크플로우가 아니라 저장소 Settings > Pages의 "레거시 브랜치
-# 배포"(source: branch main, path /)가 실제 배포를 담당했다 - main
-# 브랜치 루트를 통째로, 아무 예외 없이 그대로 공개했다는 뜻이라
-# functions/(백엔드 소스, 정규식·요청한도 수치 등 포함), HANDOFF.md,
-# google-apps-script/Code.gs가 전부 https://edutogether.github.io/... 로
-# 실제 200 응답을 내며 열려 있었다(실측 확인됨). 이 워크플로우 자체는
-# workflow_dispatch(수동 실행)라 지금까지 한 번도 자동으로 돈 적이
-# 없다 - 그래서 여기 path:.를 고쳐도 그 자체로는 아무 효과가 없었다.
-# 이번에 push 트리거를 추가하고 화이트리스트로 공개 파일만 걸러 담은
-# 뒤, 저장소 Pages 소스를 "GitHub Actions"로 전환해서 이 워크플로우가
-# 실제 배포를 맡게 한다(레거시 브랜치 배포는 그 순간부터 더 이상 안 씀).
+# 2026-09-01: GitHub Pages에서 Firebase Hosting으로 이전(Bumm님 지시) -
+# 예전 .github/workflows/deploy-pages.yml을 대체한다. GitHub Pages 시절
+# 겪었던 "레거시 브랜치 배포가 저장소 전체를 공개했던" 사고(functions/
+# 백엔드 소스, HANDOFF.md 등이 실제로 노출됐음 - CLAUDE.md 참고)를
+# 반복하지 않도록, Firebase Hosting도 여전히 scripts/stageHostingSite.js로
+# 화이트리스트 스테이징한 파일만 배포한다(firebase.json의
+# hosting.public이 그 스테이징 결과물만 가리킴).
 on:
   push:
     branches: [main]
@@ -18,11 +14,9 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: deploy
   cancel-in-progress: true
 
 jobs:
@@ -32,7 +26,7 @@ jobs:
   # 삭제 필드 제거 후 index.js가 그 필드를 여전히 참조해 saveSortingRecord가
   # 전부 500으로 실패)가 테스트 120/120 초록불인 채로 배포까지 나갔다.
   # 이 job이 그 배선 검증 게이트다 - 테스트가 실패하면 아래 deploy-backend/
-  # deploy-pages 둘 다 아예 실행되지 않는다(needs: test).
+  # deploy-hosting 둘 다 아예 실행되지 않는다(needs: test).
   # 2026-08-29 추가: firestore.rules 에뮬레이터 스모크테스트도 여기 포함.
   # 규칙 자체는 "전부 deny"라 문법 오류는 `firebase deploy`가 잡아주지만,
   # 누군가 실수로 규칙을 느슨하게 고쳐도 문법은 유효해서 배포가 그냥
@@ -107,7 +101,7 @@ jobs:
   # `firebase deploy --only functions:<name>`을 쳐야만 실제로 반영됐다
   # (그래서 코드는 main에 merge됐는데 프로덕션엔 안 나간 상태가 여러 번
   # 있었다). 이 job이 그 수동 단계를 대체한다 - test가 통과해야만
-  # 실행되고(needs: test), 아래 deploy-pages job도 이 job이 성공해야만
+  # 실행되고(needs: test), 아래 deploy-hosting job도 이 job이 성공해야만
   # 실행된다(needs: deploy-backend) - "규칙+functions 먼저, hosting은
   # 그 다음"이라는 순서를 job 의존성으로 강제한다.
   #
@@ -117,7 +111,8 @@ jobs:
   # 키를 저장소 Settings > Secrets > Actions에 FIREBASE_SERVICE_ACCOUNT
   # 라는 이름으로 등록해야 이 job이 실제로 동작한다. 이 시크릿이
   # 없으면 이 job은 인증 단계에서 실패한다(의도된 동작 - 조용히
-  # 건너뛰지 않고 확실하게 실패해서 알려준다).
+  # 건너뛰지 않고 확실하게 실패해서 알려준다). Hosting 배포용
+  # firebasehosting.admin(또는 동급) 역할도 같은 서비스계정에 필요하다.
   deploy-backend:
     needs: test
     runs-on: ubuntu-latest
@@ -155,47 +150,34 @@ jobs:
       - name: Deploy Firestore rules, indexes, and Cloud Functions
         run: firebase deploy --only firestore:rules,firestore:indexes,functions --project ai-ways-incheon --non-interactive
 
-  deploy-pages:
+  deploy-hosting:
     needs: deploy-backend
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
 
       # 화이트리스트: 실제 사이트가 브라우저에서 fetch/import하는 파일만
-      # _site로 골라 담는다. functions/(백엔드 소스), docs/(내부 감사
-      # 기록), scripts/(개발 도구), google-apps-script/(Apps Script
-      # 원본), HANDOFF.md/CLAUDE.md/README.md/CB6_*.md(내부 문서),
-      # firebase*.json/firestore.*(백엔드 설정)는 여기 없으면 배포물에
-      # 안 들어간다 - 새 폴더가 생겨도 여기 명시적으로 추가하기 전까진
-      # 자동으로는 절대 공개되지 않는다(블랙리스트 대신 화이트리스트를
-      # 쓴 이유).
+      # _hosting_site로 골라 담는다(scripts/stageHostingSite.js, 로컬
+      # 수동 배포와 같은 스크립트 재사용 - 화이트리스트가 CI/로컬에서
+      # 갈라지지 않게). functions/(백엔드 소스), docs/, scripts/,
+      # google-apps-script/, HANDOFF.md/CLAUDE.md/README.md,
+      # firebase*.json/firestore.*는 여기 없으면 배포물에 안 들어간다.
       - name: Stage public files only
-        run: |
-          set -e
-          mkdir -p _site
-          cp index.html _site/
-          cp admin.html _site/
-          cp *.js _site/ 2>/dev/null || true
-          cp *.css _site/ 2>/dev/null || true
-          cp base-data-seed.tsv _site/
-          cp .nojekyll _site/
-          cp -r assets _site/
-          cp -r styles _site/
-          cp -r mobile _site/
-          cp -r miniapp _site/
+        run: node scripts/stageHostingSite.js
 
-      - name: Upload static site
-        uses: actions/upload-pages-artifact@v3
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          path: _site
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Install firebase-tools
+        run: npm install -g firebase-tools
+
+      - name: Deploy Firebase Hosting
+        run: firebase deploy --only hosting --project ai-ways-incheon --non-interactive

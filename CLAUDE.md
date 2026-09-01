@@ -76,7 +76,13 @@ git config core.hooksPath .githooks
 
 ## 배포
 
-GitHub Pages. `main` 브랜치가 배포 대상 (최상위 CLAUDE.md의 공통 Git 원칙 상속 — merge/배포는 사용자 명시적 허가 후에만).
+**Firebase Hosting** (2026-09-01, Bumm님 지시로 GitHub Pages에서 이전). 라이브 URL: **https://ai-ways-incheon.web.app**(구 URL `https://edutogether.github.io/aiways-incheon/`은 더 이상 갱신 안 됨). `main` 브랜치가 배포 대상, `.github/workflows/deploy.yml`(구 `deploy-pages.yml`)이 `test`→`deploy-backend`(Firestore rules/indexes/Functions)→`deploy-hosting` 순서로 배포한다(최상위 CLAUDE.md의 공통 Git 원칙 상속 — merge/배포는 사용자 명시적 허가 후에만).
+
+배포 파일은 `scripts/stageHostingSite.js`가 화이트리스트로 골라 `_hosting_site/`(git 추적 안 함)에 모으고, `firebase.json`의 `hosting.public`이 그 결과물만 가리킨다 — GitHub Pages legacy 배포가 저장소 전체를 노출시켰던 사고(위 "재발 방지 교훈" 참고)를 반복하지 않기 위함. 로컬에서 수동 배포하려면 `node scripts/stageHostingSite.js && firebase deploy --only hosting --project ai-ways-incheon`.
+
+보안헤더(CSP/X-Frame-Options/Permissions-Policy 등)는 각 HTML의 `<meta>` 태그 대신 `firebase.json`의 `hosting.headers`로 옮겼다(Codyssey 프로젝트 패턴 적용, geolocation은 이 앱이 GPS 교내판정에 실제로 쓰므로 `geolocation=(self)`로 예외를 둠). 로컬 정적 서버(`node functions/test/localStaticServer.js`)로만 열면 이 헤더가 안 붙으니, 헤더까지 재현하려면 `firebase emulators:start --only hosting`을 쓸 것(단, 이 로컬 emulator는 CI/PR에 관계없이 알려진 제약으로 headers 설정을 실제로 적용하지 않는다 - 헤더 자체 검증은 배포 후 `curl -I`로 확인).
+
+**🔴 미확인 1건 — Google Cloud Console 접근 가능한 사람이 확인 필요**: App Check가 쓰는 reCAPTCHA Enterprise 키의 "승인된 도메인" 목록에 새 도메인(`ai-ways-incheon.web.app`, `ai-ways-incheon.firebaseapp.com`)이 등록돼 있는지 이 세션에서는 확인할 방법이 없었다(gcloud CLI 미설치, 콘솔 접근 불가). 기존 `edutogether.github.io`만 등록돼 있고 새 도메인이 안 걸려있으면, 실제 브라우저 사용자도 App Check를 통과 못 해 로그인/모든 API 호출이 실패할 수 있다. Google Cloud Console > reCAPTCHA Enterprise > 키 설정에서 직접 확인·추가할 것.
 
 ## 대표와의 소통 경로 (2026-08-26 확정 — 반드시 지킬 것)
 이 세션은 대표와 직접 대화를 시작하지 않는다. 진행상황 공유·질문·의사결정 요청은 전부 **팀장(D:\Projects 최상위 세션, "Project Engineering")을 거쳐서만** 한다 — 대표가 이 세션 창을 직접 열어서 먼저 말을 걸어온 경우에만 그 건에 한해 답한다(최상위 CLAUDE.md "조직 구조" 섹션 참고). 팀장에게서 온 메시지("Project Engineering의 메시지")는 곧 대표의 지시가 전달된 것이므로 별도로 대표에게 재확인하지 말고 그대로 실행한다.

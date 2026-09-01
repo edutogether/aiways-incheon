@@ -44,27 +44,36 @@ function createDecideRegistrationHandler(dependencies = {}) {
 
     const requestRef = db.collection("registrationRequests").doc(targetActorId);
     const actorRef = db.collection("actors").doc(targetActorId);
-    const result = await db.runTransaction(async (transaction) => {
-      const snap = await transaction.get(requestRef);
-      if (!snap.exists) return { code: "not_found" };
-      const data = snap.data();
-      // 다른 학교 요청이면 "없는 것"처럼 404로 응답한다 - 학교 소속을
-      // 넘어선 actorId 추측 시도로도 다른 학교 학생 정보가 새어나가지 않게.
-      if (data.schoolId !== teacher.schoolId) return { code: "not_found" };
-      if (data.status !== "pending") return { code: "not_pending" };
-      if (decision === "reject") {
-        transaction.set(requestRef, { ...data, status: "rejected", decidedAt: serverTimestamp() }, { merge: true });
-        return { ok: true, decision: "rejected" };
-      }
-      const actorSnap = await transaction.get(actorRef);
-      if (actorSnap.exists && actorSnap.data()?.studentProfile) return { code: "already_registered" };
-      // 3단계(2026-08-31) - 승인은 교사가 사람이 눈으로 확인한 신원증명이므로,
-      // 이 기기의 school-lock(dashboardSchoolId)도 승인된 학교로 같이
-      // 바로잡는다(teacherAuth.js의 verifyTeacherCode와 같은 근거).
-      transaction.set(actorRef, { studentProfile: { schoolId: data.schoolId, schoolName: data.schoolName, grade: data.grade, classNum: data.classNum, studentNumber: data.studentNumber, name: data.name, registeredAt: serverTimestamp() }, dashboardSchoolId: data.schoolId }, { merge: true });
-      transaction.delete(requestRef);
-      return { ok: true, decision: "approved" };
-    });
+    let result;
+    try {
+      result = await db.runTransaction(async (transaction) => {
+        const snap = await transaction.get(requestRef);
+        if (!snap.exists) return { code: "not_found" };
+        const data = snap.data();
+        // 다른 학교 요청이면 "없는 것"처럼 404로 응답한다 - 학교 소속을
+        // 넘어선 actorId 추측 시도로도 다른 학교 학생 정보가 새어나가지 않게.
+        if (data.schoolId !== teacher.schoolId) return { code: "not_found" };
+        if (data.status !== "pending") return { code: "not_pending" };
+        if (decision === "reject") {
+          transaction.set(requestRef, { ...data, status: "rejected", decidedAt: serverTimestamp() }, { merge: true });
+          return { ok: true, decision: "rejected" };
+        }
+        const actorSnap = await transaction.get(actorRef);
+        if (actorSnap.exists && actorSnap.data()?.studentProfile) return { code: "already_registered" };
+        // 3단계(2026-08-31) - 승인은 교사가 사람이 눈으로 확인한 신원증명이므로,
+        // 이 기기의 school-lock(dashboardSchoolId)도 승인된 학교로 같이
+        // 바로잡는다(teacherAuth.js의 verifyTeacherCode와 같은 근거).
+        transaction.set(actorRef, { studentProfile: { schoolId: data.schoolId, schoolName: data.schoolName, grade: data.grade, classNum: data.classNum, studentNumber: data.studentNumber, name: data.name, registeredAt: serverTimestamp() }, dashboardSchoolId: data.schoolId }, { merge: true });
+        transaction.delete(requestRef);
+        return { ok: true, decision: "approved" };
+      });
+    } catch {
+      // 재감사 지적사항(2026-09-01) - 이 트랜잭션만 이 프로젝트의 다른 모든
+      // runTransaction(schoolDashboard.js/classRanking.js)과 달리 try/catch가
+      // 빠져있어서, 두 교사가 같은 요청을 동시에 승인/거절하는 경합이나
+      // 일시적 장애 시 15초 타임아웃까지 조용히 걸리는 문제가 있었다.
+      return res.status(503).json({ ok: false, code: "protection_unavailable" });
+    }
     if (result.code === "not_found") return res.status(404).json({ ok: false, code: "request_not_found" });
     if (result.code === "not_pending") return res.status(409).json({ ok: false, code: "already_decided" });
     if (result.code === "already_registered") return res.status(409).json({ ok: false, code: "already_registered" });

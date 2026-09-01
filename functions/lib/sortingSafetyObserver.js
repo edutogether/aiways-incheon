@@ -1,4 +1,4 @@
-"use strict";const {GoogleGenAI}=require("@google/genai");const {validateRequest,errorResponse}=require("./sortingVisionSchema");const {protectActorRequest}=require("./protectedActor");
+"use strict";const {GoogleGenAI}=require("@google/genai");const {validateRequest,errorResponse}=require("./sortingVisionSchema");const {protectActorRequest}=require("./protectedActor");const {applyCors}=require("./httpGuard");
 const OBSERVER_SCHEMA={type:"object",required:["requestId","observerVersion","targetVisibility","targetDominance","multiObject","occlusion","deformation","contamination","transparencyAmbiguity","compositeMaterial","imageQuality","backgroundClutter","candidateConflict","observerStatus"],properties:{requestId:{type:"string"},observerVersion:{type:"string"},targetVisibility:{type:"string",enum:["clear","partial","poor"]},targetDominance:{type:"string",enum:["high","medium","low"]},multiObject:{type:"boolean"},occlusion:{type:"string",enum:["none","mild","severe"]},deformation:{type:"boolean"},contamination:{type:"boolean"},transparencyAmbiguity:{type:"boolean"},compositeMaterial:{type:"boolean"},imageQuality:{type:"string",enum:["good","usable","poor"]},backgroundClutter:{type:"string",enum:["low","medium","high"]},candidateConflict:{type:"string",enum:["none","low","high"]},observerStatus:{type:"string",enum:["ok"]}}};
 // 같은 사진 한 장마다 analyzeSortingImage와 나란히(Promise.allSettled) 호출되고,
 // 클라이언트는 두 요청에 동일한 idempotencyKey를 보낸다. analysisRequests는
@@ -8,6 +8,8 @@ function namespacedIdempotencyKey(key){return key===undefined?key:`safety:${key}
 function createSortingSafetyObserverHandler(d={}){
   const analysisRequests=d.analysisRequests||{claimAnalysisRequest:async()=>({state:"unavailable"}),completeAnalysisRequest:async()=>false,failAnalysisRequest:async()=>false};
   return async(req,res)=>{
+  if(!applyCors(req,res))return res.status(403).json(errorResponse("invalid_origin"));
+  if(req.method==="OPTIONS")return res.status(204).send("");
   if(req.method!=="POST")return res.status(405).json(errorResponse("method_not_allowed"));
   const protectedActor=await protectActorRequest({req,functionName:"analyzeSortingSafetyObserver",access:d.access,appCheck:d.appCheck,globalRateLimiter:d.rateLimiter,actorRateLimiter:d.actorRateLimiter,logAppCheck:d.logAppCheck,blockedActors:d.blockedActors});
   if(!protectedActor.ok)return res.status(protectedActor.httpStatus).json(errorResponse(protectedActor.code));

@@ -79,6 +79,14 @@ test("blocked actor is rejected by every handler that wires blockedActors throug
 
   const { createSortingSafetyObserverHandler } = require("../lib/sortingSafetyObserver");
   await assertBlocked("analyzeSortingSafetyObserver", createSortingSafetyObserverHandler(baseDeps));
+
+  // 2026-09-01 종합감사에서 발견: sortingRecordQuery.js의 actor() 헬퍼가
+  // dependencies.blockedActors를 protectActorRequest에 넘기지 않아서, index.js가
+  // blockedActors를 넘겨줘도 실제로는 무시되고 있었다(listSortingRecords/
+  // resolveSortingRecord 두 핸들러만). 이 테스트에 없어서 그동안 안 잡혔다.
+  const { createListSortingRecordsHandler, createResolveSortingRecordHandler } = require("../lib/sortingRecordQuery");
+  await assertBlocked("listSortingRecords", createListSortingRecordsHandler(baseDeps));
+  await assertBlocked("resolveSortingRecord", createResolveSortingRecordHandler(baseDeps));
 });
 
 test("blocked actor is rejected by every edu2g handler (session/list/revoke/redeem)", async () => {

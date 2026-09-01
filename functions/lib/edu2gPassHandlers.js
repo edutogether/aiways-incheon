@@ -4,8 +4,8 @@ const { UID } = require("./edu2gDeviceAccess");
 const { MAX_DEVICES } = require("./edu2gPassRegistry");
 const { observeAppCheck } = require("./appCheckProtection");
 const { randomUUID } = require("node:crypto");
+const { isAllowedOrigin } = require("./httpGuard");
 
-const ORIGIN = /^(https:\/\/edutogether\.github\.io|http:\/\/(localhost|127\.0\.0\.1)(:\d+)?)$/;
 const LABEL = /^[^\u0000-\u001f\u007f<>]{1,48}$/u;
 const PLATFORM = /^[^\u0000-\u001f\u007f<>]{1,32}$/u;
 const MANAGEMENT_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -14,7 +14,7 @@ function response(res, status, body) { return res.status(status).json(body); }
 function allowedOrigin(req, res) {
   const origin = req.headers?.origin;
   if (!origin) return true;
-  if (!ORIGIN.test(origin)) { response(res, 403, { ok: false, code: "origin_not_allowed" }); return false; }
+  if (!isAllowedOrigin(origin)) { response(res, 403, { ok: false, code: "origin_not_allowed" }); return false; }
   res.set("Access-Control-Allow-Origin", origin); res.set("Vary", "Origin"); return true;
 }
 function baseGuard(req, res, fields) {
@@ -145,4 +145,4 @@ function createEdu2gHandlers(dependencies) {
   return { redeem, session, list, revoke };
 }
 
-module.exports = { ORIGIN, LABEL, PLATFORM, MANAGEMENT_ID, createFirestoreDeviceStore, createEdu2gHandlers };
+module.exports = { LABEL, PLATFORM, MANAGEMENT_ID, createFirestoreDeviceStore, createEdu2gHandlers };

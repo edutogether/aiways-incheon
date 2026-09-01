@@ -192,7 +192,7 @@
       <div class="flex items-center gap-1.5 text-xs font-bold text-blue-800">
         <span>🎓</span><span>가입 완료</span>
       </div>
-      <p class="text-xs font-semibold text-blue-700">${profile.schoolName || profile.schoolId} ${profile.grade}학년 ${profile.classNum}반 ${profile.studentNumber}번 ${profile.name}</p>
+      <p class="text-xs font-semibold text-blue-700" id="signupLockedInfo"></p>
       <button id="classChangeToggleButton" type="button" class="text-[10px] font-bold text-blue-600 underline">반이 바뀌었어요</button>
       <div id="classChangeForm" class="hidden space-y-2 pt-1">
         <div class="grid grid-cols-2 gap-2">
@@ -204,6 +204,10 @@
       </div>
       <p class="text-[10px] text-blue-500 leading-snug">학교/번호/이름은 못 바꿔요(선생님께 말씀해 주세요). 반은 하루에 한 번만 바꿀 수 있어요.</p>
     `;
+    const lockedInfoEl = $("signupLockedInfo");
+    if (lockedInfoEl) {
+      lockedInfoEl.textContent = `${profile.schoolName || profile.schoolId} ${profile.grade}학년 ${profile.classNum}반 ${profile.studentNumber}번 ${profile.name}`;
+    }
     $("interimClassCard")?.classList.add("hidden");
     initClassChangeControls();
     loadClassRanking();
@@ -220,9 +224,13 @@
       <div class="flex items-center gap-1.5 text-xs font-bold text-amber-800">
         <span>⏳</span><span>선생님 승인 대기중</span>
       </div>
-      <p class="text-xs font-semibold text-amber-700">${preview.schoolName || preview.schoolId} ${preview.grade}학년 ${preview.classNum}반 ${preview.studentNumber}번 ${preview.name}</p>
+      <p class="text-xs font-semibold text-amber-700" id="signupPendingInfo"></p>
       <p class="text-[10px] text-amber-600 leading-snug">선생님이 확인하시면 가입이 완료돼요. 잠시 후 다시 열어서 확인해 주세요.</p>
     `;
+    const pendingInfoEl = $("signupPendingInfo");
+    if (pendingInfoEl) {
+      pendingInfoEl.textContent = `${preview.schoolName || preview.schoolId} ${preview.grade}학년 ${preview.classNum}반 ${preview.studentNumber}번 ${preview.name}`;
+    }
     $("interimClassCard")?.classList.add("hidden");
   }
 

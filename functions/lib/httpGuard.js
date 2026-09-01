@@ -15,8 +15,19 @@ function cleanText(value, max = 80) {
   return typeof value === "string" && value.length <= max && value.trim() && !/[<>\x00-\x1f]/.test(value) ? value.trim() : "";
 }
 
+// 2026-09-01: edutogether.github.io(구 GitHub Pages)만 허용돼 있어서,
+// 같은 날 Firebase Hosting(ai-ways-incheon.web.app)으로 이전한 뒤에도
+// 이 목록이 안 갱신돼 라이브 사이트의 모든 API 호출이 403 invalid_origin으로
+// 막혀 있었다(2026-09-01 종합감사 중 curl로 실측 재현 확인, 대표님 승인 후
+// 즉시 수정). GH Pages는 대표님이 아직 폐기 여부를 결정 전이라 남겨둔다.
+const ALLOWED_STATIC_ORIGINS = new Set([
+  "https://edutogether.github.io",
+  "https://ai-ways-incheon.web.app",
+  "https://ai-ways-incheon.firebaseapp.com",
+]);
+
 function isAllowedOrigin(origin) {
-  return origin === "https://edutogether.github.io" || ALLOWED_ORIGIN.test(origin);
+  return ALLOWED_STATIC_ORIGINS.has(origin) || ALLOWED_ORIGIN.test(origin);
 }
 
 function applyCors(req, res) {

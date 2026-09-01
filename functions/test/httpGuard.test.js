@@ -14,8 +14,10 @@ test("cleanText trims, rejects control chars/angle brackets, and enforces max le
   assert.equal(cleanText(undefined), "");
 });
 
-test("isAllowedOrigin accepts the production origin and localhost dev ports only", () => {
+test("isAllowedOrigin accepts the production origins and localhost dev ports only", () => {
   assert.equal(isAllowedOrigin("https://edutogether.github.io"), true);
+  assert.equal(isAllowedOrigin("https://ai-ways-incheon.web.app"), true);
+  assert.equal(isAllowedOrigin("https://ai-ways-incheon.firebaseapp.com"), true);
   assert.equal(isAllowedOrigin("http://localhost:5173"), true);
   assert.equal(isAllowedOrigin("http://127.0.0.1:8080"), true);
   assert.equal(isAllowedOrigin("https://evil.example.com"), false);

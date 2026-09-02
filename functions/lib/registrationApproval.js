@@ -23,9 +23,19 @@ function createListPendingRegistrationsHandler(dependencies = {}) {
     if (!teacher) return;
     const body = req.body || {};
     if (Object.keys(body).length) return res.status(400).json({ ok: false, code: "unknown_field" });
-    const snap = await db.collection("registrationRequests").where("schoolId", "==", teacher.schoolId).where("status", "==", "pending").limit(MAX_LIST_SIZE).get();
-    const requests = snap.docs.map((doc) => ({ actorId: doc.id, ...publicProfile(doc.data()) }));
-    return res.status(200).json({ ok: true, requests });
+    // 2026-09-02 재감사: 같은 파일의 decideRegistration에는 503 컨벤션이
+    // 붙어 있는데 이 조회만 try/catch가 없어서, 일시적 Firestore 장애 시
+    // 교사 화면이 503이 아니라 정체불명의 500을 받았다.
+    try {
+      const snap = await db.collection("registrationRequests").where("schoolId", "==", teacher.schoolId).where("status", "==", "pending").limit(MAX_LIST_SIZE).get();
+      const requests = snap.docs.map((doc) => ({ actorId: doc.id, ...publicProfile(doc.data()) }));
+      // 대기열이 MAX_LIST_SIZE(100)를 넘으면 넘친 신청은 화면에 아예 안 보이는데
+      // 예전엔 그 사실을 교사가 알 방법이 없었다(승인 안 되면 학생은 계속
+      // "승인 대기중"만 본다) - 잘렸는지 여부를 같이 내려준다.
+      return res.status(200).json({ ok: true, requests, truncated: requests.length >= MAX_LIST_SIZE });
+    } catch {
+      return res.status(503).json({ ok: false, code: "protection_unavailable" });
+    }
   };
 }
 

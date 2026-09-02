@@ -129,6 +129,38 @@ jobs:
       - name: Mobile class context emulator integration test
         run: npm run emulator:test:mobile-class-context
 
+      # 2026-09-02 재감사(운영 안정성 - CI 게이트 커버리지): 위 배선 뒤에도
+      # 로컬에서만 돌던 에뮬레이터 테스트가 7개 남아 있었다. 하필 그 안에
+      # "App Check 강제가 실제 HTTP 경로에서 살아있는지"(appcheck),
+      # "기록 저장 전체 경로"(emulator:test), "분석 멱등성"(analysis),
+      # "기기 바인딩 동시성/한도"(edu2g 계열), "다액터 기록·재검토 회복
+      # 시나리오"(cb5 계열)처럼 보안·데이터 정합성의 핵심이 들어 있어서,
+      # 그것들만 게이트 밖에 있는 상태였다. 2026-09-02에 7개 전부 로컬에서
+      # 실행해 통과를 확인하고 여기로 옮긴다 - 이제 package.json의
+      # emulator:test:* 스크립트 19개가 전부 CI에서 돈다(브라우저가 필요한
+      # test:frontend:*/browser 스모크만 여전히 로컬 전용, 이건 러너에
+      # 브라우저가 없어서 의도적으로 제외).
+      - name: App Check enforcement emulator smoke test
+        run: npm run emulator:test:appcheck
+
+      - name: Sorting record emulator smoke test
+        run: npm run emulator:test
+
+      - name: Analysis idempotency emulator smoke test
+        run: npm run emulator:test:analysis
+
+      - name: Edu2g pass emulator smoke test
+        run: npm run emulator:test:edu2g
+
+      - name: Edu2g device binding emulator integration test
+        run: npm run emulator:test:edu2g:integration
+
+      - name: CB5 device matrix emulator integration test
+        run: npm run emulator:test:cb5-device-matrix
+
+      - name: CB5 record/resolve recovery emulator integration test
+        run: npm run emulator:test:cb5-record-resolve-recovery
+
   # 2026-08-29 추가: functions/firestore.rules/firestore.indexes.json은
   # 지금까지 자동배포가 전혀 없었다 - 개발자가 로컬에서 매번 수동으로
   # `firebase deploy --only functions:<name>`을 쳐야만 실제로 반영됐다

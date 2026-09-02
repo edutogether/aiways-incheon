@@ -7,10 +7,20 @@ test("a low-volume function (no shards configured) costs exactly 1 read per chec
 test("getSchoolDashboard (the only contention-risk function) shards writes across documents but enforces the UTC limit on their sum",async()=>{let now=new Date("2026-07-28T23:59:59.500Z");const db=memoryDb(),limiter=createGlobalRateLimiter({db,now:()=>now,serverTimestamp:()=>"SERVER"});assert.deepEqual(getUtcBuckets(now),{utcDate:"20260728",minuteKey:"2359"});assert.equal(getRetryAfterSeconds(now,"minute_limited"),1);assert.equal(RATE_LIMITS.getSchoolDashboard.shards,8);const perMinute=RATE_LIMITS.getSchoolDashboard.perMinute;for(let i=0;i<perMinute;i++)assert.equal((await limiter.check("getSchoolDashboard")).allowed,true);assert.equal((await limiter.check("getSchoolDashboard")).outcome,"minute_limited");const shardKeys=[...db.docs.keys()].filter(k=>k.startsWith("system_rate_limits/getSchoolDashboard-20260728-"));assert.ok(shardKeys.length>=1,"expected at least one shard document");let summedTotal=0;for(const key of shardKeys){const doc=db.docs.get(key);assert.equal(doc.schemaVersion,RATE_LIMIT_SCHEMA);summedTotal+=doc.totalCount;}assert.equal(summedTotal,perMinute);});
 test("actor limits are isolated and their document ids do not disclose actor scope",async()=>{const db=memoryDb(),limiter=createActorRateLimiter({db,now:()=>new Date("2026-07-28T12:00:00Z"),limits:{saveSortingRecord:{perMinute:1}}});assert.equal((await limiter.check("saveSortingRecord","actor_a")).allowed,true);assert.equal((await limiter.check("saveSortingRecord","actor_a")).outcome,"minute_limited");assert.equal((await limiter.check("saveSortingRecord","actor_b")).allowed,true);for(const key of db.docs.keys()){assert.equal(key.includes("actor_a"),false);assert.equal(key.includes("actor_b"),false);}assert.equal(hashRateLimitScope("actor_a").length,64);});
 test("2026-08-29 (100점 목표 4번) worst-case daily READS - not requests - for the two multi-read functions stay at their documented, reviewed values; a perDay bump must consciously update this too",()=>{
+  // 2026-09-02 재감사: 예전 값(4/2)은 요청당 고정비용을 통째로 빼먹은 수치였다 -
+  // protectActorRequest의 기기해석 3 + 차단목록 1 + 리미터 2(대시보드는 shards:8이라 10)가
+  // 매 요청 무조건 나가는데 표에는 핸들러 본체만 세어져 있었다. 실제 고정값으로 교정.
   const dashboardWorstCaseReadsPerDay=RATE_LIMITS.getSchoolDashboard.perDay*READS_PER_REQUEST_WORST_CASE.getSchoolDashboard;
   const rankingWorstCaseReadsPerDay=RATE_LIMITS.getClassRanking.perDay*READS_PER_REQUEST_WORST_CASE.getClassRanking;
-  assert.equal(dashboardWorstCaseReadsPerDay,2000000,"getSchoolDashboard perDay(500000) x worst-case reads/request(4) changed - re-review the cost budget before adjusting this number");
-  assert.equal(rankingWorstCaseReadsPerDay,10000,"getClassRanking perDay(5000) x worst-case reads/request(2) changed - re-review the cost budget before adjusting this number");
+  assert.equal(READS_PER_REQUEST_WORST_CASE.getSchoolDashboard,16,"14(공통 전처리, shards:8 포함) + 락tx 1 + school 1");
+  assert.equal(READS_PER_REQUEST_WORST_CASE.getClassRanking,7,"6(공통 전처리) + 락tx 1");
+  assert.equal(dashboardWorstCaseReadsPerDay,8000000,"getSchoolDashboard perDay(500000) x 고정 reads/request(16) changed - re-review the cost budget before adjusting this number");
+  assert.equal(rankingWorstCaseReadsPerDay,35000,"getClassRanking perDay(5000) x 고정 reads/request(7) changed - re-review the cost budget before adjusting this number");
+});
+test("2026-09-02 재감사: 상한이 걸린 모든 함수는 '요청당 읽기수' 표에도 항목이 있어야 한다(표가 조용히 낡는 것을 막는 드리프트 가드)",()=>{
+  for(const functionName of Object.keys(RATE_LIMITS)){
+    assert.equal(typeof READS_PER_REQUEST_WORST_CASE[functionName],"number",`${functionName}에 READS_PER_REQUEST_WORST_CASE 항목이 없다 - 새 엔드포인트를 추가했다면 요청당 읽기 비용도 같이 산정해서 적을 것`);
+  }
 });
 test("2026-08-29 (cost review): analyzeSortingSafetyObserver has a per-actor cap - a single actor cannot alone exhaust the function's whole global daily budget",()=>{
   assert.ok(ACTOR_RATE_LIMITS.analyzeSortingSafetyObserver,"analyzeSortingSafetyObserver must have an ACTOR_RATE_LIMITS entry - without one, createActorRateLimiter.check() returns allowed:true unconditionally (see globalRateLimit.js ~line 194), and this function is directly client-callable (edu2gBetaClient.js ALLOWED list), so one actor could consume the entire global perDay budget alone");

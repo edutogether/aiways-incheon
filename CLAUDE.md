@@ -82,7 +82,18 @@ git config core.hooksPath .githooks
 
 보안헤더(CSP/X-Frame-Options/Permissions-Policy 등)는 각 HTML의 `<meta>` 태그 대신 `firebase.json`의 `hosting.headers`로 옮겼다(Codyssey 프로젝트 패턴 적용, geolocation은 이 앱이 GPS 교내판정에 실제로 쓰므로 `geolocation=(self)`로 예외를 둠). 로컬 정적 서버(`node functions/test/localStaticServer.js`)로만 열면 이 헤더가 안 붙으니, 헤더까지 재현하려면 `firebase emulators:start --only hosting`을 쓸 것(단, 이 로컬 emulator는 CI/PR에 관계없이 알려진 제약으로 headers 설정을 실제로 적용하지 않는다 - 헤더 자체 검증은 배포 후 `curl -I`로 확인).
 
-**🔴 미확인 1건 — Google Cloud Console 접근 가능한 사람이 확인 필요**: App Check가 쓰는 reCAPTCHA Enterprise 키의 "승인된 도메인" 목록에 새 도메인(`ai-ways-incheon.web.app`, `ai-ways-incheon.firebaseapp.com`)이 등록돼 있는지 이 세션에서는 확인할 방법이 없었다(gcloud CLI 미설치, 콘솔 접근 불가). 기존 `edutogether.github.io`만 등록돼 있고 새 도메인이 안 걸려있으면, 실제 브라우저 사용자도 App Check를 통과 못 해 로그인/모든 API 호출이 실패할 수 있다. Google Cloud Console > reCAPTCHA Enterprise > 키 설정에서 직접 확인·추가할 것.
+### 롤백 절차 (2026-09-02 재감사에서 "배포 경로는 있는데 롤백 경로가 어디에도 안 적혀 있다"로 지적되어 추가)
+
+배포 워크플로는 `test`→`deploy-backend`→`deploy-hosting`→`postDeploySmoke` 순인데, 마지막 스모크테스트가 실패해도 **자동으로 되돌리지는 않는다**(실패를 알려줄 뿐, 라이브는 깨진 상태로 남는다). 깨진 배포를 되돌리는 방법은 계층마다 다르므로 순서대로:
+
+1. **Hosting(정적 파일)** — 가장 빠르고 안전. Firebase 콘솔 > Hosting > 릴리스 목록에서 직전 버전 "롤백", 또는 CLI로 `firebase hosting:clone ai-ways-incheon:<이전_버전ID> ai-ways-incheon:live --project ai-ways-incheon`. 프론트만 깨진 경우(CSP/스크립트 오류 등) 여기까지만 하면 복구된다.
+2. **Functions(백엔드)** — 버전 롤백 기능이 없다. `git revert <문제 커밋>` 후 `main`에 푸시해서 워크플로를 다시 태우는 것이 정석이고, 급하면 마지막 정상 커밋을 체크아웃해 `firebase deploy --only functions --project ai-ways-incheon`으로 직접 되돌린다.
+3. **Firestore rules/indexes** — 규칙은 콘솔 > Firestore > 규칙 탭에 버전 이력이 있어 이전 버전으로 되돌릴 수 있다. 인덱스는 추가만 되고 삭제되지 않으므로 보통 롤백 대상이 아니다.
+4. **되돌린 뒤 반드시** `node scripts/postDeploySmoke.js`를 로컬에서 다시 돌려 라이브가 실제로 복구됐는지 확인한다(코드가 아니라 라이브 응답을 확인하는 유일한 층).
+
+주의: 백엔드를 되돌리면 프론트와 버전이 어긋날 수 있다 — 1과 2를 같이 되돌리는 것이 기본이고, 한쪽만 되돌리는 건 "그 한쪽만 문제"라고 확인됐을 때만 한다.
+
+**✅ 해결됨(2026-09-02)**: App Check가 쓰는 reCAPTCHA Enterprise 키의 "승인된 도메인" 목록에 `ai-ways-incheon.web.app`/`ai-ways-incheon.firebaseapp.com`을 대표님이 직접 콘솔에서 등록 완료. 실제 브라우저로 재검증(학교 검색 자동완성이 App Check 토큰을 정상 발급받아 실제 API를 호출·응답받는 것까지 확인) — 로그인/API 호출 전부 정상.
 
 ## 대표와의 소통 경로 (2026-08-26 확정 — 반드시 지킬 것)
 이 세션은 대표와 직접 대화를 시작하지 않는다. 진행상황 공유·질문·의사결정 요청은 전부 **팀장(D:\Projects 최상위 세션, "Project Engineering")을 거쳐서만** 한다 — 대표가 이 세션 창을 직접 열어서 먼저 말을 걸어온 경우에만 그 건에 한해 답한다(최상위 CLAUDE.md "조직 구조" 섹션 참고). 팀장에게서 온 메시지("Project Engineering의 메시지")는 곧 대표의 지시가 전달된 것이므로 별도로 대표에게 재확인하지 말고 그대로 실행한다.

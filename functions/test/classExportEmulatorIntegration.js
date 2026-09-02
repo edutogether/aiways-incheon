@@ -6,7 +6,7 @@
 const assert = require("node:assert/strict"), http = require("node:http");
 const { initializeApp, getApps } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
-const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+const { getFirestore, FieldValue, Timestamp } = require("firebase-admin/firestore");
 const { createEdu2gDeviceAccess } = require("../lib/edu2gDeviceAccess");
 const { createGlobalRateLimiter, createActorRateLimiter } = require("../lib/globalRateLimit");
 const { createExportClassRecordsHandler } = require("../lib/classExport");
@@ -94,20 +94,27 @@ function record(schoolId, grade, classNum, studentNumber, studentName, createdAt
     // 있을 때, 첫 기록을 커서로 넘겨도 같은 밀리초의 두 번째 기록이
     // 누락되지 않아야 한다(예전 createdAt-only 커서는 startAfter(Date)가
     // 그 값 "이하" 전부를 건너뛰어서 이런 경우 실제로 누락시켰다).
+    // 2026-09-02 재감사: 이 두 기록의 createdAt에 "밀리초로 자르면 사라지는"
+    // 나노초(0.5ms)를 일부러 넣는다 - 예전엔 커서를 ISO 문자열 -> getTime()로
+    // 왕복시켜 나노초를 버렸고, 그러면 startAfter 기준점이 실제 마지막 기록보다
+    // 앞이라 그 기록이 다음 페이지에 그대로 다시 나왔다(아래 마지막 assert가
+    // 그걸 잡는다). 프로덕션 createdAt은 serverTimestamp라 항상 이 정밀도를 갖는데,
+    // 예전 테스트는 new Date(ms)(나노초 0)만 심어서 이 회귀가 안 보였다.
     const tieMs = base + 500;
+    const tieStamp = new Timestamp(Math.floor(tieMs / 1000), (tieMs % 1000) * 1e6 + 500000);
     const tieActorA = "class_export_test_tie_a";
     const tieActorB = "class_export_test_tie_b";
-    await db.collection("actors").doc(tieActorA).collection("records").add(record(SCHOOL_A, "5", "1", "10", "동시각A", tieMs));
-    await db.collection("actors").doc(tieActorB).collection("records").add(record(SCHOOL_A, "5", "1", "11", "동시각B", tieMs));
+    await db.collection("actors").doc(tieActorA).collection("records").add({ ...record(SCHOOL_A, "5", "1", "10", "동시각A", tieMs), createdAt: tieStamp });
+    await db.collection("actors").doc(tieActorB).collection("records").add({ ...record(SCHOOL_A, "5", "1", "11", "동시각B", tieMs), createdAt: tieStamp });
     const withTies = await call(exportHandler, teacherSignup.idToken, { grade: "5", classNum: "1" });
     assert.equal(withTies.status, 200);
     assert.equal(withTies.body.records.length, 4, "both same-millisecond records must be present, not just one");
-    const tieRecords = withTies.body.records.filter((r) => r.createdAt === new Date(tieMs).toISOString());
+    const tieRecords = withTies.body.records.filter((r) => r.createdAt === tieStamp.toDate().toISOString());
     assert.equal(tieRecords.length, 2);
     // recordId 자체엔 actorId가 없으니, 원본 문서에서 실제 actorId를 다시 찾아 커서를 구성한다.
     const firstTieSnap = await db.collectionGroup("records").where("classContext.studentName", "==", "동시각A").limit(1).get();
     const firstTieDoc = firstTieSnap.docs[0];
-    const cursor = `${tieMs}:${firstTieDoc.ref.parent.parent.id}:${firstTieDoc.id}`;
+    const cursor = `${tieStamp.seconds}-${tieStamp.nanoseconds}:${firstTieDoc.ref.parent.parent.id}:${firstTieDoc.id}`;
     const afterCursor = await call(exportHandler, teacherSignup.idToken, { grade: "5", classNum: "1", cursor });
     assert.equal(afterCursor.status, 200);
     assert.ok(afterCursor.body.records.some((r) => r.studentName === "동시각B"), "the second same-millisecond record must still appear after resuming from the first one's cursor");

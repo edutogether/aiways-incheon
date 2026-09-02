@@ -6,26 +6,68 @@ const RATE_LIMIT_SCHEMA = "global-rate-limit-v1";
 // 2026-08-29 - 100점 목표 4번(비용상한을 "요청당 읽기수" 기준으로 재점검):
 // 아래 perDay/perMinute는 전부 "요청 횟수" 상한이라, 요청 하나가 실제로
 // 몇 번 Firestore를 읽는지는 함수마다 다른데도 숫자만 보면 똑같이
-// 비교돼 왔다. 실측(핸들러 코드 기준 캐시 miss 최악의 경우)을 여기 남겨
-// 둔다 - 12개 함수는 액터 문서 하나만 보는 단순 CRUD라 요청당 1~2회로
-// 고정이고, getSchoolDashboard/getClassRanking 둘만 학교 규모에 따라
-// 커지는 다건 쿼리라 캐시가 붙어 있다(둘 다 2026-08-26/29에 캐시 추가 -
-// 캐시 적중 시 락 트랜잭션 1회로 줄어든다). searchSchool은 Firestore를
-// 아예 안 읽는다(외부 NEIS API 호출). perDay 자체를 더 낮추려면
-// "하루 총 읽기 몇 회까지 허용할지" 목표 예산이 필요한데 이건 코드만
-// 봐서 알 수 없는 값이라(Firestore 플랜/실사용량에 달림) 임의로 정하지
-// 않았다 - 아래 최악값 x perDay를 보고 대표님/팀장이 예산과 비교해
-// 판단할 수 있게 명시만 해 둔다.
+// 비교돼 왔다. 실측(핸들러 코드 기준 캐시 miss 최악의 경우)을 여기 남겨 둔다.
+//
+// 2026-09-02 재감사 - 이 표가 실제 코드와 크게 어긋나 있었다(예산 판단의
+// 근거로 쓰라고 만든 표가 3~6배 과소계상이면 그 자체가 결함이다). 두 가지가
+// 통째로 빠져 있었다:
+//   (1) 공통 전처리 비용 - protectedActor.js의 protectActorRequest가 모든
+//       액터 엔드포인트에서 매번 edu2gDeviceBindings 1 + actors 1 +
+//       trustedDevices 1 (edu2gDeviceAccess.resolve) + blockedActors 1 =
+//       4회를 읽는다. 여기에 전역 리미터 트랜잭션 읽기 + 액터 리미터
+//       트랜잭션 읽기가 각 1회씩 더 붙는다.
+//   (2) 다건 쿼리를 "1회"로 세고 있었다 - Firestore는 쿼리가 돌려주는
+//       문서 수만큼 과금하므로 classes.get()은 그 학교 반 수(N)만큼이다.
+//   추가로 getSchoolDashboard는 shards:8이라 전역 리미터만 8(합산 get)+1(증가
+//   트랜잭션)=9회다(다른 함수는 shards 미지정이라 1회).
+//
+// 아래 BASE_*는 그 공통 전처리 비용이고, READS_PER_REQUEST_WORST_CASE는
+// "공통 전처리 + 핸들러의 고정 읽기"의 합(=요청 하나가 무조건 내는 최소이자
+// 고정 최악값)이다. 여기에 더해지는 "결과 건수만큼 늘어나는" 부분은 숫자로
+// 못 박을 수 없으므로 VARIABLE_READS_PER_REQUEST에 따로 적는다 - 예산 계산은
+// (perDay x 고정값) + (perDay x 가변부 상한)으로 해야 맞다.
+const BASE_ACTOR_READS = 6; // 기기해석 3(binding+actor+device) + 차단목록 1 + 전역리미터 1 + 액터리미터 1
+const BASE_ACTOR_READS_SHARDED = 14; // 위와 같되 전역리미터가 shards:8이라 1 -> 9
 const READS_PER_REQUEST_WORST_CASE = Object.freeze({
-  getSchoolDashboard: 4, // 락tx 1 + (classes+school) 캐시miss 2 + students 캐시miss 1
-  getClassRanking: 2, // 락tx 1 + classes where-쿼리 캐시miss 1
-  searchSchool: 0 // Firestore 안 읽음(NEIS API만 호출)
-  // 나머지 11개 함수(analyzeSorting*, saveSortingRecord, listSortingRecords,
-  // resolveSortingRecord, checkStudentProfile, registerStudentProfile,
-  // checkCampusLocation, changeStudentClass, redeemEdu2gPass,
-  // getEdu2gSession, listEdu2gTrustedDevices, revokeEdu2gTrustedDevice)는
-  // 전부 actors/{actorId} 문서 하나만 읽거나(+쓰거나) 하는 단순 구조라
-  // 요청당 1~2회로 고정, 여기 따로 안 적어도 이미 안전하다.
+  // 폴링(5초)으로 압도적 1위인 비용원. 캐시가 100% 적중해도 이 16은 그대로 나간다.
+  getSchoolDashboard: BASE_ACTOR_READS_SHARDED + 2, // 락tx 1 + school 문서 1
+  getClassRanking: BASE_ACTOR_READS + 1, // 락tx 1
+  exportClassRecords: BASE_ACTOR_READS + 1, // 교사확인 1
+  listPendingRegistrations: BASE_ACTOR_READS + 1, // 교사확인 1
+  listSortingRecords: BASE_ACTOR_READS + 1, // 커서 문서 1
+  // 핸들러 자체(액터 1 + campusCheck tx 1 + 기록 tx 1)에 더해
+  // onSortingRecordWritten 트리거가 별도 호출로 반집계 1 + 학교 1 + 학생 1을
+  // 더 읽는다(트리거는 리미터 밖이라 요청 상한엔 안 잡히지만 과금은 된다).
+  saveSortingRecord: BASE_ACTOR_READS + 3 + 3,
+  registerStudentProfile: BASE_ACTOR_READS + 3,
+  decideRegistration: BASE_ACTOR_READS + 3, // 교사확인 1 + tx 2
+  changeStudentClass: BASE_ACTOR_READS + 2,
+  checkStudentProfile: BASE_ACTOR_READS + 2,
+  resolveSortingRecord: BASE_ACTOR_READS + 2,
+  checkCampusLocation: BASE_ACTOR_READS + 1,
+  checkTeacherStatus: BASE_ACTOR_READS + 1,
+  verifyTeacherCode: BASE_ACTOR_READS + 1,
+  analyzeSortingImage: BASE_ACTOR_READS + 1, // 멱등성 tx 1
+  analyzeSortingText: BASE_ACTOR_READS + 1,
+  analyzeSortingSafetyObserver: BASE_ACTOR_READS + 1,
+  redeemEdu2gPass: BASE_ACTOR_READS + 2,
+  getEdu2gSession: BASE_ACTOR_READS,
+  listEdu2gTrustedDevices: BASE_ACTOR_READS,
+  revokeEdu2gTrustedDevice: BASE_ACTOR_READS + 2,
+  // 액터 체계 밖(슈퍼어드민 ID토큰) - 전역 리미터 트랜잭션 1회만.
+  manageTeacherCode: 1,
+  // Firestore 조회는 전혀 없다(외부 NEIS API만 호출) - 공통 전처리만 든다.
+  searchSchool: BASE_ACTOR_READS
+});
+// 결과 건수에 비례해 늘어나는 부분(전부 캐시 miss / 최대 페이지 기준).
+// N=그 학교의 반 수, K=그 학년의 반 수, M=그 반의 학생 수.
+const VARIABLE_READS_PER_REQUEST = Object.freeze({
+  getSchoolDashboard: "classes N + students M (둘 다 5.5초 인스턴스 캐시 miss 시에만)",
+  getClassRanking: "classes K (5.5초 인스턴스 캐시 miss 시에만)",
+  exportClassRecords: "기록 최대 201 (MAX_PAGE_SIZE+1, classExport.js)",
+  listPendingRegistrations: "대기요청 최대 100 (MAX_LIST_SIZE, registrationApproval.js)",
+  listSortingRecords: "기록 최대 41 (pageSize 최대 40 + 1)",
+  listEdu2gTrustedDevices: "그 액터의 신뢰기기 수(maxDevices 상한 이하)"
 });
 const RATE_LIMITS = Object.freeze({
   analyzeSortingImage: { perMinute: 20, perDay: 1000 },
@@ -240,4 +282,4 @@ function createActorRateLimiter({ db, now = () => new Date(), serverTimestamp = 
 
 async function checkGlobalRateLimit(limiter, functionName) { return limiter.check(functionName); }
 
-module.exports = { RATE_LIMIT_SCHEMA, RATE_LIMITS, ACTOR_RATE_LIMITS, READS_PER_REQUEST_WORST_CASE, getUtcBuckets, getRetryAfterSeconds, expireAtFor, checkGlobalRateLimit, createGlobalRateLimiter, createActorRateLimiter, hashRateLimitScope };
+module.exports = { RATE_LIMIT_SCHEMA, RATE_LIMITS, ACTOR_RATE_LIMITS, READS_PER_REQUEST_WORST_CASE, VARIABLE_READS_PER_REQUEST, getUtcBuckets, getRetryAfterSeconds, expireAtFor, checkGlobalRateLimit, createGlobalRateLimiter, createActorRateLimiter, hashRateLimitScope };

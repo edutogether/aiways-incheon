@@ -143,9 +143,17 @@ function createGetSchoolDashboardHandler(dependencies = {}) {
     if (cached) {
       ({ classes, schoolName } = cached);
     } else {
-      const [classesSnap, schoolSnap] = await Promise.all([schoolRef.collection("classes").get(), schoolRef.get()]);
-      classes = classesSnap.docs.map(classSummary);
-      schoolName = cleanText(schoolSnap.exists ? schoolSnap.data()?.schoolName : "", 80);
+      // 2026-09-02 재감사: 바로 위 락 트랜잭션에는 503 컨벤션이 붙어 있는데
+      // 정작 이 본 쿼리(반 전체 + 학교 문서)에는 try/catch가 없어서, 일시적
+      // Firestore 장애 시 여기만 처리되지 않은 예외로 빠져나가 5초마다
+      // 폴링하는 대시보드가 503 대신 정체불명의 500을 받았다.
+      try {
+        const [classesSnap, schoolSnap] = await Promise.all([schoolRef.collection("classes").get(), schoolRef.get()]);
+        classes = classesSnap.docs.map(classSummary);
+        schoolName = cleanText(schoolSnap.exists ? schoolSnap.data()?.schoolName : "", 80);
+      } catch {
+        return res.status(503).json({ ok: false, code: "protection_unavailable" });
+      }
       cache.set(schoolId, { classes, schoolName }, requestTime);
     }
 
@@ -193,7 +201,12 @@ function createGetSchoolDashboardHandler(dependencies = {}) {
       if (cachedStudents) {
         topStudents = cachedStudents;
       } else {
-        const studentsSnap = profileMatches ? await schoolRef.collection("classes").doc(`${grade}_${classNum}`).collection("students").get() : null;
+        let studentsSnap = null;
+        try {
+          studentsSnap = profileMatches ? await schoolRef.collection("classes").doc(`${grade}_${classNum}`).collection("students").get() : null;
+        } catch {
+          return res.status(503).json({ ok: false, code: "protection_unavailable" });
+        }
         topStudents = !studentsSnap ? [] : studentsSnap.docs
           .map((doc) => doc.data())
           .map((item) => ({ studentNumber: cleanText(item.studentNumber, 10), studentName: cleanText(item.studentName, 80), completedTotal: Number(item.completedTotal) || 0 }))

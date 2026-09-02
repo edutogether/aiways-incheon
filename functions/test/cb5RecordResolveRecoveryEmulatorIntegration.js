@@ -4,6 +4,8 @@ const assert = require("node:assert/strict");
 const { FieldValue } = require("firebase-admin/firestore");
 const { createActorRateLimiter } = require("../lib/globalRateLimit");
 const { createSaveSortingRecordHandler } = require("../lib/sortingRecord");
+const { createRecordStore } = require("../lib/sortingRecordStore");
+const { createRecordQueryStore } = require("../lib/sortingRecordQueryStore");
 const {
   createListSortingRecordsHandler,
   createResolveSortingRecordHandler,
@@ -91,69 +93,13 @@ function analysisResponse(requestId) {
   };
 }
 
+// 2026-09-02 재감사(아키텍처/테스트 커버리지): 이 통합테스트는 records/queries
+// 저장소를 여기 안에 그대로 복붙해서 갖고 있었다 - 즉 "프로덕션 구현"이 아니라
+// "이 파일 안의 사본"을 검증하고 있었고, 실제로 index.js 쪽 구현만 바뀌면
+// 이 테스트는 계속 초록불인 채로 회귀를 통과시킨다(sortingRecordStore.js 주석에
+// 적힌 실제 장애와 정확히 같은 함정). 진짜 모듈을 그대로 쓰도록 교체한다.
 function createRecordStores(db) {
-  return {
-    records: {
-      async createOrGet(actorId, idempotencyKey, record, response) {
-        const actor = db.collection("actors").doc(actorId);
-        const idempotency = actor.collection("_idempotency").doc(idempotencyKey);
-        return db.runTransaction(async (transaction) => {
-          const existing = await transaction.get(idempotency);
-          if (existing.exists) return { ...existing.data(), duplicate: true };
-          const recordRef = actor.collection("records").doc();
-          transaction.create(recordRef, record);
-          transaction.create(idempotency, {
-            recordId: recordRef.id,
-            status: record.status,
-            createdAt: response.createdAt,
-          });
-          return { recordId: recordRef.id, status: record.status, ...response, duplicate: false };
-        });
-      },
-    },
-    queries: {
-      async list(actorId, size, cursor, filter) {
-        const actor = db.collection("actors").doc(actorId);
-        let query = actor.collection("records").orderBy("createdAt", "desc").limit(size + 1);
-        if (filter !== "all") query = query.where("status", "==", filter);
-        if (cursor) query = query.startAfter(await actor.collection("records").doc(cursor).get());
-        const snapshot = await query.get();
-        const records = snapshot.docs.slice(0, size);
-        return {
-          records: records.map((document) => ({ id: document.id, data: document.data() })),
-          nextCursor: snapshot.docs.length > size ? records.at(-1).id : null,
-        };
-      },
-      async resolve(actorId, body, serverTime) {
-        const actor = db.collection("actors").doc(actorId);
-        const record = actor.collection("records").doc(body.recordId);
-        const idempotency = actor.collection("_resolutions").doc(body.idempotencyKey);
-        return db.runTransaction(async (transaction) => {
-          const existing = await transaction.get(idempotency);
-          if (existing.exists) return { ...existing.data(), duplicate: true };
-          const snapshot = await transaction.get(record);
-          if (!snapshot.exists) return { code: "not_found" };
-          if (snapshot.data().status !== "held") return { code: "conflict" };
-          const result = {
-            recordId: body.recordId,
-            status: "completed",
-            resolutionType: body.resolutionType,
-            duplicate: false,
-          };
-          transaction.update(record, {
-            status: "completed",
-            updatedAt: serverTime,
-            resolvedAt: serverTime,
-            resolutionType: body.resolutionType,
-            userDecision: body.userDecision,
-            checklist: body.checklist,
-          });
-          transaction.create(idempotency, result);
-          return result;
-        });
-      },
-    },
-  };
+  return { records: createRecordStore({ db }), queries: createRecordQueryStore({ db }) };
 }
 
 function isSuccess(response) {

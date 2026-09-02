@@ -1,38 +1,95 @@
-"use strict";const {GoogleGenAI}=require("@google/genai");const {validateRequest,errorResponse}=require("./sortingVisionSchema");const {protectActorRequest}=require("./protectedActor");const {applyCors}=require("./httpGuard");
-const OBSERVER_SCHEMA={type:"object",required:["requestId","observerVersion","targetVisibility","targetDominance","multiObject","occlusion","deformation","contamination","transparencyAmbiguity","compositeMaterial","imageQuality","backgroundClutter","candidateConflict","observerStatus"],properties:{requestId:{type:"string"},observerVersion:{type:"string"},targetVisibility:{type:"string",enum:["clear","partial","poor"]},targetDominance:{type:"string",enum:["high","medium","low"]},multiObject:{type:"boolean"},occlusion:{type:"string",enum:["none","mild","severe"]},deformation:{type:"boolean"},contamination:{type:"boolean"},transparencyAmbiguity:{type:"boolean"},compositeMaterial:{type:"boolean"},imageQuality:{type:"string",enum:["good","usable","poor"]},backgroundClutter:{type:"string",enum:["low","medium","high"]},candidateConflict:{type:"string",enum:["none","low","high"]},observerStatus:{type:"string",enum:["ok"]}}};
+"use strict";
+
+const { GoogleGenAI } = require("@google/genai");
+const { validateRequest, errorResponse } = require("./sortingVisionSchema");
+const { protectActorRequest } = require("./protectedActor");
+const { applyCors } = require("./httpGuard");
+
+const OBSERVER_SCHEMA = {
+  type: "object",
+  required: ["requestId", "observerVersion", "targetVisibility", "targetDominance", "multiObject", "occlusion", "deformation", "contamination", "transparencyAmbiguity", "compositeMaterial", "imageQuality", "backgroundClutter", "candidateConflict", "observerStatus"],
+  properties: {
+    requestId: { type: "string" },
+    observerVersion: { type: "string" },
+    targetVisibility: { type: "string", enum: ["clear", "partial", "poor"] },
+    targetDominance: { type: "string", enum: ["high", "medium", "low"] },
+    multiObject: { type: "boolean" },
+    occlusion: { type: "string", enum: ["none", "mild", "severe"] },
+    deformation: { type: "boolean" },
+    contamination: { type: "boolean" },
+    transparencyAmbiguity: { type: "boolean" },
+    compositeMaterial: { type: "boolean" },
+    imageQuality: { type: "string", enum: ["good", "usable", "poor"] },
+    backgroundClutter: { type: "string", enum: ["low", "medium", "high"] },
+    candidateConflict: { type: "string", enum: ["none", "low", "high"] },
+    observerStatus: { type: "string", enum: ["ok"] }
+  }
+};
+
 // 같은 사진 한 장마다 analyzeSortingImage와 나란히(Promise.allSettled) 호출되고,
 // 클라이언트는 두 요청에 동일한 idempotencyKey를 보낸다. analysisRequests는
 // actorId+key 해시 하나로 상태를 저장하므로, 그 key를 그대로 쓰면 이 관찰자의
 // 요청이 메인 분석의 idempotency 기록과 충돌한다("safety:" 접두사로 분리).
-function namespacedIdempotencyKey(key){return key===undefined?key:`safety:${key}`;}
-function createSortingSafetyObserverHandler(d={}){
-  const analysisRequests=d.analysisRequests||{claimAnalysisRequest:async()=>({state:"unavailable"}),completeAnalysisRequest:async()=>false,failAnalysisRequest:async()=>false};
-  return async(req,res)=>{
-  if(!applyCors(req,res))return res.status(403).json(errorResponse("invalid_origin"));
-  if(req.method==="OPTIONS")return res.status(204).send("");
-  if(req.method!=="POST")return res.status(405).json(errorResponse("method_not_allowed"));
-  const protectedActor=await protectActorRequest({req,functionName:"analyzeSortingSafetyObserver",access:d.access,appCheck:d.appCheck,globalRateLimiter:d.rateLimiter,actorRateLimiter:d.actorRateLimiter,logAppCheck:d.logAppCheck,blockedActors:d.blockedActors});
-  if(!protectedActor.ok)return res.status(protectedActor.httpStatus).json(errorResponse(protectedActor.code));
-  const check=validateRequest(req.body);
-  if(!check.valid)return res.status(400).json(errorResponse(check.code,check.requestId));
-  const idKey=namespacedIdempotencyKey(req.body.idempotencyKey);
-  const claim=await analysisRequests.claimAnalysisRequest(protectedActor.actorId,idKey);
-  if(claim.state==="completed")return res.status(200).json(claim.result);
-  if(claim.state==="processing"){res.set("Retry-After","1");return res.status(409).json({...errorResponse("request_in_progress",check.requestId),retryAfterSeconds:1});}
-  if(claim.state==="expired")return res.status(409).json(errorResponse("request_expired",check.requestId));
-  if(claim.state==="failed")return res.status(claim.httpStatus||503).json(errorResponse(claim.errorCode||"protection_unavailable",check.requestId));
-  if(claim.state!=="claimed")return res.status(503).json(errorResponse("protection_unavailable",check.requestId));
-  try{
-    const client=(d.createClient||((key)=>new GoogleGenAI({apiKey:key})))(d.getApiKey());
-    const response=await client.models.generateContent({model:"gemini-3.5-flash-lite",contents:[{role:"user",parts:[{inlineData:{mimeType:req.body.image.mimeType,data:req.body.image.data}},{text:`Return JSON only. requestId must be ${check.requestId}. Do not identify objects, materials, disposal, or answers. Assess only photo visibility, dominance, clutter, occlusion, deformation, contamination, transparency, composite ambiguity and quality.`}]}],config:{responseMimeType:"application/json",responseSchema:OBSERVER_SCHEMA}});
-    const value=JSON.parse(response.text);
-    if(value.requestId!==check.requestId){await analysisRequests.failAnalysisRequest(protectedActor.actorId,idKey,"invalid_model_response",502);return res.status(502).json(errorResponse("invalid_model_response",check.requestId));}
-    if(!await analysisRequests.completeAnalysisRequest(protectedActor.actorId,idKey,value))return res.status(503).json(errorResponse("protection_unavailable",check.requestId));
-    return res.status(200).json(value);
-  }catch{
-    await analysisRequests.failAnalysisRequest(protectedActor.actorId,idKey,"analysis_failed",502);
-    return res.status(502).json(errorResponse("analysis_failed",check.requestId));
-  }
+function namespacedIdempotencyKey(key) {
+  return key === undefined ? key : `safety:${key}`;
+}
+
+function createSortingSafetyObserverHandler(d = {}) {
+  const analysisRequests = d.analysisRequests || {
+    claimAnalysisRequest: async () => ({ state: "unavailable" }),
+    completeAnalysisRequest: async () => false,
+    failAnalysisRequest: async () => false
+  };
+  return async (req, res) => {
+    if (!applyCors(req, res)) return res.status(403).json(errorResponse("invalid_origin"));
+    if (req.method === "OPTIONS") return res.status(204).send("");
+    if (req.method !== "POST") return res.status(405).json(errorResponse("method_not_allowed"));
+    const protectedActor = await protectActorRequest({ req, functionName: "analyzeSortingSafetyObserver", access: d.access, appCheck: d.appCheck, globalRateLimiter: d.rateLimiter, actorRateLimiter: d.actorRateLimiter, logAppCheck: d.logAppCheck, blockedActors: d.blockedActors });
+    // 2026-09-02 재감사: 다른 모든 핸들러는 429일 때 Retry-After 헤더와
+    // retryAfterSeconds를 같이 돌려주는데 이 파일만 빠져 있어서, 클라이언트의
+    // 백오프(app.js/edu2gBetaClient.js)가 이 엔드포인트에서만 서버가 알려준
+    // 대기시간을 못 쓰고 임의값으로 재시도하고 있었다.
+    if (!protectedActor.ok) {
+      if (protectedActor.retryAfterSeconds) res.set("Retry-After", String(protectedActor.retryAfterSeconds));
+      return res.status(protectedActor.httpStatus).json({ ...errorResponse(protectedActor.code), ...(protectedActor.retryAfterSeconds ? { retryAfterSeconds: protectedActor.retryAfterSeconds } : {}) });
+    }
+    const check = validateRequest(req.body);
+    if (!check.valid) return res.status(400).json(errorResponse(check.code, check.requestId));
+    const idKey = namespacedIdempotencyKey(req.body.idempotencyKey);
+    const claim = await analysisRequests.claimAnalysisRequest(protectedActor.actorId, idKey);
+    if (claim.state === "completed") return res.status(200).json(claim.result);
+    if (claim.state === "processing") {
+      res.set("Retry-After", "1");
+      return res.status(409).json({ ...errorResponse("request_in_progress", check.requestId), retryAfterSeconds: 1 });
+    }
+    if (claim.state === "expired") return res.status(409).json(errorResponse("request_expired", check.requestId));
+    if (claim.state === "failed") return res.status(claim.httpStatus || 503).json(errorResponse(claim.errorCode || "protection_unavailable", check.requestId));
+    if (claim.state !== "claimed") return res.status(503).json(errorResponse("protection_unavailable", check.requestId));
+    try {
+      const client = (d.createClient || ((key) => new GoogleGenAI({ apiKey: key })))(d.getApiKey());
+      const response = await client.models.generateContent({
+        model: "gemini-3.5-flash-lite",
+        contents: [{
+          role: "user",
+          parts: [
+            { inlineData: { mimeType: req.body.image.mimeType, data: req.body.image.data } },
+            { text: `Return JSON only. requestId must be ${check.requestId}. Do not identify objects, materials, disposal, or answers. Assess only photo visibility, dominance, clutter, occlusion, deformation, contamination, transparency, composite ambiguity and quality.` }
+          ]
+        }],
+        config: { responseMimeType: "application/json", responseSchema: OBSERVER_SCHEMA }
+      });
+      const value = JSON.parse(response.text);
+      if (value.requestId !== check.requestId) {
+        await analysisRequests.failAnalysisRequest(protectedActor.actorId, idKey, "invalid_model_response", 502);
+        return res.status(502).json(errorResponse("invalid_model_response", check.requestId));
+      }
+      if (!await analysisRequests.completeAnalysisRequest(protectedActor.actorId, idKey, value)) return res.status(503).json(errorResponse("protection_unavailable", check.requestId));
+      return res.status(200).json(value);
+    } catch {
+      await analysisRequests.failAnalysisRequest(protectedActor.actorId, idKey, "analysis_failed", 502);
+      return res.status(502).json(errorResponse("analysis_failed", check.requestId));
+    }
   };
 }
-module.exports={OBSERVER_SCHEMA,createSortingSafetyObserverHandler};
+
+module.exports = { OBSERVER_SCHEMA, createSortingSafetyObserverHandler };

@@ -76,8 +76,15 @@ function createListSortingRecordsHandler(dependencies = {}) {
     if (!Number.isInteger(size) || size < 1 || size > 40 || !["all", "completed", "held"].includes(b.statusFilter || "all") || (b.cursor && !validKey(b.cursor))) {
       return send(res, 400, { ok: false, code: "invalid_request" });
     }
-    const page = await dependencies.store.list(active.actorId, size, b.cursor || "", b.statusFilter || "all");
-    return send(res, 200, { records: page.records.map((r) => publicRecord(r.id, r.data)), nextCursor: page.nextCursor || null, hasMore: !!page.nextCursor, schemaVersion: SCHEMA_VERSION });
+    // 2026-09-02 재감사: store.list/resolve는 Firestore 호출인데 try/catch가
+    // 없었다 - saveSortingRecord 등 나머지 핸들러와 같은 503
+    // protection_unavailable 컨벤션을 여기도 적용한다.
+    try {
+      const page = await dependencies.store.list(active.actorId, size, b.cursor || "", b.statusFilter || "all");
+      return send(res, 200, { records: page.records.map((r) => publicRecord(r.id, r.data)), nextCursor: page.nextCursor || null, hasMore: !!page.nextCursor, schemaVersion: SCHEMA_VERSION });
+    } catch {
+      return send(res, 503, { ok: false, code: "protection_unavailable" });
+    }
   };
 }
 
@@ -94,8 +101,12 @@ function createResolveSortingRecordHandler(dependencies = {}) {
     if (!validKey(b.recordId) || !validKey(b.idempotencyKey) || !["confirmed_after_review", "corrected_after_review"].includes(b.resolutionType) || !b.userDecision?.userConfirmed || !Array.isArray(b.checklist) || b.checklist.some((x) => !x?.checked)) {
       return send(res, 400, { ok: false, code: "invalid_resolution" });
     }
-    const result = await dependencies.store.resolve(active.actorId, b, dependencies.serverTimestamp?.());
-    return send(res, result.code === "not_found" ? 404 : result.code === "conflict" ? 409 : 200, result);
+    try {
+      const result = await dependencies.store.resolve(active.actorId, b, dependencies.serverTimestamp?.());
+      return send(res, result.code === "not_found" ? 404 : result.code === "conflict" ? 409 : 200, result);
+    } catch {
+      return send(res, 503, { ok: false, code: "protection_unavailable" });
+    }
   };
 }
 

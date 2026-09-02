@@ -115,13 +115,20 @@ function createGetClassRankingHandler(dependencies = {}) {
     const cacheKey = `${schoolId}_${grade}`;
     let classes = cache.get(cacheKey, requestTime);
     if (!classes) {
-      const classesSnap = await db.collection("schools").doc(schoolId).collection("classes").where("grade", "==", grade).get();
-      classes = classesSnap.docs.map((doc) => {
-        const data = doc.data() || {};
-        const completedTotal = Number(data.completedTotal) || 0;
-        const heldTotal = Number(data.heldTotal) || 0;
-        return { classNum: data.classNum || "", score: completedTotal, observedTotal: completedTotal + heldTotal };
-      });
+      // 2026-09-02 재감사: 위 락 트랜잭션에만 503 컨벤션이 있고 이 본 쿼리엔
+      // try/catch가 없어서, 일시적 Firestore 장애가 처리되지 않은 예외로
+      // 빠져나갔다(schoolDashboard.js에서 발견한 것과 같은 누락).
+      try {
+        const classesSnap = await db.collection("schools").doc(schoolId).collection("classes").where("grade", "==", grade).get();
+        classes = classesSnap.docs.map((doc) => {
+          const data = doc.data() || {};
+          const completedTotal = Number(data.completedTotal) || 0;
+          const heldTotal = Number(data.heldTotal) || 0;
+          return { classNum: data.classNum || "", score: completedTotal, observedTotal: completedTotal + heldTotal };
+        });
+      } catch {
+        return res.status(503).json({ ok: false, code: "protection_unavailable" });
+      }
       cache.set(cacheKey, classes, requestTime);
     }
 

@@ -8,6 +8,7 @@ const { createAnalyzeSortingTextHandler } = require("./lib/sortingTextTip");
 const { createSortingSafetyObserverHandler } = require("./lib/sortingSafetyObserver");
 const { createSaveSortingRecordHandler } = require("./lib/sortingRecord");
 const { createRecordStore } = require("./lib/sortingRecordStore");
+const { createRecordQueryStore } = require("./lib/sortingRecordQueryStore");
 const { createListSortingRecordsHandler, createResolveSortingRecordHandler } = require("./lib/sortingRecordQuery");
 const { createSortingRecordAggregator } = require("./lib/schoolDashboardAggregate");
 const { createGetSchoolDashboardHandler } = require("./lib/schoolDashboard");
@@ -70,10 +71,7 @@ const recordStore = createRecordStore({ db });
 exports.saveSortingRecord = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createSaveSortingRecordHandler({
   serverTimestamp: () => FieldValue.serverTimestamp(), store: recordStore, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, db
 }));
-const queryStore = {
-  async list(actorId, size, cursor, filter) { let q=db.collection("actors").doc(actorId).collection("records").orderBy("createdAt","desc").limit(size+1); if(filter!=="all") q=q.where("status","==",filter); if(cursor) q=q.startAfter(await db.collection("actors").doc(actorId).collection("records").doc(cursor).get()); const snap=await q.get(); const docs=snap.docs.slice(0,size); return {records:docs.map(d=>({id:d.id,data:d.data()})),nextCursor:snap.docs.length>size?docs.at(-1).id:null}; },
-  async resolve(actorId,b,serverTime) { const record=db.collection("actors").doc(actorId).collection("records").doc(b.recordId); const key=db.collection("actors").doc(actorId).collection("_resolutions").doc(b.idempotencyKey); return db.runTransaction(async tx=>{const prior=await tx.get(key); if(prior.exists)return {...prior.data(),duplicate:true}; const snap=await tx.get(record); if(!snap.exists)return {code:"not_found"}; if(snap.data().status!=="held")return {code:"conflict"}; const result={recordId:b.recordId,status:"completed",resolutionType:b.resolutionType,duplicate:false}; tx.update(record,{status:"completed",updatedAt:serverTime,resolvedAt:serverTime,resolutionType:b.resolutionType,userDecision:b.userDecision,checklist:b.checklist}); tx.create(key,result); return result;}); }
-};
+const queryStore = createRecordQueryStore({ db });
 exports.listSortingRecords=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createListSortingRecordsHandler({store:queryStore,access:deviceAccess,rateLimiter,actorRateLimiter,logAppCheck,blockedActors}));
 exports.resolveSortingRecord=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createResolveSortingRecordHandler({store:queryStore,access:deviceAccess,serverTimestamp:()=>FieldValue.serverTimestamp(),rateLimiter,actorRateLimiter,logAppCheck,blockedActors}));
 // Keeps schools/{schoolId}/classes/{grade_classNum} aggregate docs in sync
@@ -81,7 +79,14 @@ exports.resolveSortingRecord=onRequest({region:"asia-northeast3",memory:"256MiB"
 // transition (resolveSortingRecord) -- the PC dashboard reads only these
 // small aggregate docs, never a student's individual records.
 const aggregateSortingRecordWrite = createSortingRecordAggregator({ db, serverTimestamp: () => FieldValue.serverTimestamp() });
-exports.onSortingRecordWritten = onDocumentWritten({ region: "asia-northeast3", document: "actors/{actorId}/records/{recordId}" }, async (event) => {
+// 2026-09-02 재감사(비용 안전장치): 이 저장소의 20개 함수 중 유일하게 이
+// 트리거만 memory/maxInstances가 비어 있었다 - HTTP 함수들은 전부
+// maxInstances:2로 동시 인스턴스 수(=과금 상한)를 못박아 뒀는데, 기록이
+// 써질 때마다 뜨는 이 트리거만 플랫폼 기본값(수백 인스턴스까지 확장 가능)
+// 이라 컴퓨트 비용 상한이 사실상 없었다. 상류인 saveSortingRecord가 이미
+// 전역 60/분으로 막혀 있어 실제 유입은 초당 1건 수준이고, 인스턴스 2개면
+// (트랜잭션 1회당 ~100ms) 그 10배 이상을 처리한다.
+exports.onSortingRecordWritten = onDocumentWritten({ region: "asia-northeast3", memory: "256MiB", maxInstances: 2, document: "actors/{actorId}/records/{recordId}" }, async (event) => {
   const before = event.data?.before?.exists ? event.data.before.data() : null;
   const after = event.data?.after?.exists ? event.data.after.data() : null;
   try {

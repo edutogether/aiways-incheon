@@ -78,14 +78,16 @@
     $("teacherCodeSubmitBtn")?.addEventListener("click", async () => {
       const status = $("teacherCodeStatus");
       const schoolId = $("teacherCodeSchoolId")?.value.trim();
+      const grade = $("teacherCodeGrade")?.value.trim();
+      const classNum = $("teacherCodeClassNum")?.value.trim();
       const code = $("teacherCodeValue")?.value.trim();
-      if (!schoolId || !code) { status.textContent = "학교 코드와 새 인증코드를 입력해주세요."; return; }
+      if (!schoolId || !grade || !classNum || !code) { status.textContent = "학교 코드, 학년/반, 새 인증코드를 모두 입력해주세요."; return; }
       status.textContent = "처리 중...";
       const { auth } = await getAuthRef();
       const user = auth.currentUser;
       if (!user) { status.textContent = "먼저 로그인해주세요."; return; }
       const idToken = await user.getIdToken();
-      const result = await callSuperadminFunction("manageTeacherCode", idToken, { schoolId, code });
+      const result = await callSuperadminFunction("manageTeacherCode", idToken, { schoolId, grade, classNum, code });
       status.textContent = result.ok ? "발급/회전 완료했어요."
         : result.code === "superadmin_required" ? "이 계정은 관리자 권한이 없어요."
         : result.code === "invalid_request" ? "학교 코드 형식 또는 인증코드 길이(6자 이상)를 확인해주세요."

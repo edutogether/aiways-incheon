@@ -5,12 +5,8 @@ const http = require("node:http");
 const { initializeApp, getApps } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
-const { createEdu2gPassRegistry } = require("../lib/edu2gPassRegistry");
+const { createFirestoreDeviceStore } = require("../lib/deviceBindingStore");
 const { createEdu2gDeviceAccess } = require("../lib/edu2gDeviceAccess");
-const {
-  createFirestoreDeviceStore,
-  createEdu2gHandlers,
-} = require("../lib/edu2gPassHandlers");
 
 const projectId = "demo-aiways-incheon";
 const actorKeys = ["a", "b", "c", "d", "e"];
@@ -88,21 +84,24 @@ function call(handler, token, body, options = {}) {
   ).then(() => response);
 }
 
+// 2026-09-02: 클로즈베타 시크릿코드 시스템(edu2gPassRegistry.js/
+// edu2gPassHandlers.js, 대표님 지시로 폐기) 위에서 이 25개 기기 매트릭스를
+// 만들고 있었는데, 그 시스템이 없어져도 saveSortingRecord/기록조회 쪽
+// 동시성 테스트(cb5DeviceMatrixEmulatorIntegration.js/
+// cb5RecordResolveRecoveryEmulatorIntegration.js)는 그대로 유효하고
+// 계속 필요하다 - HTTP 핸들러+loginId 레지스트리 경유 대신
+// deviceBindingStore.js의 store.redeem/list/revoke를 직접 호출해서
+// 같은 매트릭스를 만들도록 바꿨다(만드는 결과물은 동일: actor당 활성
+// 기기 5개, 6번째는 거절).
 async function setupCb5DeviceMatrix() {
   const { authUrl } = configureProject();
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
   const participants = actorKeys.map((key, index) => ({
-    loginId: `cb5 participant ${index}`,
     actorId: `cb5_actor_${key}`,
     displayName: `CB5 ${key}`,
-    enabled: true,
-    maxDevices: 5,
   }));
-  const registry = createEdu2gPassRegistry({
-    getSecret: () => JSON.stringify({ version: 2, participants }),
-  });
   const store = createFirestoreDeviceStore({
     db,
     serverTimestamp: () => FieldValue.serverTimestamp(),
@@ -111,13 +110,6 @@ async function setupCb5DeviceMatrix() {
     auth,
     db,
     serverTimestamp: () => FieldValue.serverTimestamp(),
-  });
-  const handlers = createEdu2gHandlers({
-    registry,
-    store,
-    access,
-    appCheck: async () => ({ status: "valid" }),
-    rateLimiter: { check: async () => ({ allowed: true, outcome: "allowed" }) },
   });
   const users = [];
 
@@ -130,26 +122,23 @@ async function setupCb5DeviceMatrix() {
       group.push({ token: signed.body.idToken, uid: decoded.uid });
     }
     users.push(group);
+    const participant = participants[actorIndex];
     for (let deviceIndex = 0; deviceIndex < 5; deviceIndex += 1) {
-      const response = await call(handlers.redeem, group[deviceIndex].token, {
-        loginId: `cb5 participant ${actorIndex}`,
-        deviceLabel: `${actorKeys[actorIndex]}${deviceIndex + 1}`,
-        platform: "web",
-        confirm: true,
+      const result = await store.redeem({
+        uid: group[deviceIndex].uid,
+        actor: { ...participant, deviceLabel: `${actorKeys[actorIndex]}${deviceIndex + 1}`, platform: "web" },
       });
-      assert.equal(response.statusCode, 200);
+      assert.equal(result.ok, true);
     }
-    const sixth = await call(handlers.redeem, group[5].token, {
-      loginId: `cb5 participant ${actorIndex}`,
-      deviceLabel: `${actorKeys[actorIndex]}6`,
-      platform: "web",
-      confirm: true,
+    const sixth = await store.redeem({
+      uid: group[5].uid,
+      actor: { ...participant, deviceLabel: `${actorKeys[actorIndex]}6`, platform: "web" },
     });
-    assert.equal(sixth.statusCode, 409);
+    assert.equal(sixth.code, "device_limit_reached");
   }
 
   await assertActiveDeviceMatrix({ db });
-  return { app, auth, db, access, handlers, users, actorKeys, participants };
+  return { app, auth, db, store, access, users, actorKeys, participants };
 }
 
 async function assertActiveDeviceMatrix({ db }) {
@@ -167,39 +156,27 @@ async function assertActiveDeviceMatrix({ db }) {
 }
 
 async function revokeAndReplaceDevice(fixture, actorIndex) {
-  const { db, handlers, users, actorKeys } = fixture;
-  const list = await call(handlers.list, users[actorIndex][0].token, {});
-  assert.equal(list.statusCode, 200);
-  const target = list.body.devices.find((device) => !device.currentDevice);
+  const { db, store, users, actorKeys, participants } = fixture;
+  const actorId = `cb5_actor_${actorKeys[actorIndex]}`;
+  const devices = await store.list(actorId, users[actorIndex][0].uid);
+  const target = devices.find((device) => !device.currentDevice);
   assert.ok(target);
-  assert.equal(
-    (
-      await call(handlers.revoke, users[actorIndex][0].token, {
-        targetManagementId: target.managementId,
-        confirm: true,
-      })
-    ).statusCode,
-    200,
-  );
+  const revokeResult = await store.revoke(actorId, target.managementId, users[actorIndex][0].uid);
+  assert.equal(revokeResult.ok, true);
   const targetDocument = await db
     .collection("actors")
-    .doc(`cb5_actor_${actorKeys[actorIndex]}`)
+    .doc(actorId)
     .collection("trustedDevices")
     .where("managementId", "==", target.managementId)
     .get();
   const revoked = users[actorIndex].find((user) => user.uid === targetDocument.docs[0].id);
   assert.ok(revoked);
-  assert.equal(
-    (
-      await call(handlers.redeem, users[actorIndex][5].token, {
-        loginId: `cb5 participant ${actorIndex}`,
-        deviceLabel: `${actorKeys[actorIndex]}6`,
-        platform: "web",
-        confirm: true,
-      })
-    ).statusCode,
-    200,
-  );
+  const replaceResult = await store.redeem({
+    uid: users[actorIndex][5].uid,
+    actor: { ...participants[actorIndex], deviceLabel: `${actorKeys[actorIndex]}6`, platform: "web" },
+    replaceManagementId: target.managementId,
+  });
+  assert.equal(replaceResult.ok, true);
   await assertActiveDeviceMatrix({ db });
   return { revoked, replacement: users[actorIndex][5] };
 }

@@ -26,11 +26,8 @@ const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
 const { createGlobalRateLimiter, createActorRateLimiter } = require("./lib/globalRateLimit");
 const { createAnalysisIdempotency } = require("./lib/analysisIdempotency");
-const { createEdu2gPassRegistry } = require("./lib/edu2gPassRegistry");
 const { createEdu2gDeviceAccess } = require("./lib/edu2gDeviceAccess");
-const { createFirestoreDeviceStore, createEdu2gHandlers } = require("./lib/edu2gPassHandlers");
 const geminiApiKey = defineSecret("GEMINI_API_KEY");
-const edu2gPassRegistrySecret = defineSecret("EDU2G_PASS_REGISTRY_JSON");
 const neisApiKey = defineSecret("NEIS_API_KEY");
 if (!getApps().length) initializeApp();
 const db = getFirestore();
@@ -144,13 +141,3 @@ exports.exportClassRecords = onRequest({ region: "asia-northeast3", memory: "256
 exports.anonymizeStudent = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createAnonymizeStudentHandler({
   db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
 }));
-const edu2gHandlers = createEdu2gHandlers({
-  registry: createEdu2gPassRegistry({ getSecret: () => edu2gPassRegistrySecret.value() }),
-  access: deviceAccess,
-  store: createFirestoreDeviceStore({ db, serverTimestamp: () => FieldValue.serverTimestamp() }), rateLimiter, actorRateLimiter, logAppCheck, blockedActors
-});
-const edu2gOptions = { region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false };
-exports.redeemEdu2gPass = onRequest({ ...edu2gOptions, secrets: [edu2gPassRegistrySecret] }, edu2gHandlers.redeem);
-exports.getEdu2gSession = onRequest(edu2gOptions, edu2gHandlers.session);
-exports.listEdu2gTrustedDevices = onRequest(edu2gOptions, edu2gHandlers.list);
-exports.revokeEdu2gTrustedDevice = onRequest(edu2gOptions, edu2gHandlers.revoke);

@@ -80,9 +80,13 @@
     gateContent.append(box);
   }
 
+  // 2026-09-02: getEdu2gSession(클로즈베타 시스템, 폐기)을 "인증됐는지만
+  // 확인하는 용도"로 재사용하고 있었다 - checkStudentProfile도 인증만
+  // 되면 200을 주고(가입 여부와 무관), 코드 삭제 없이 그대로 쓸 수 있는
+  // 다른 protected 엔드포인트라 그대로 대체한다.
   async function restore() {
     renderLoading();
-    const result = await client().getSession();
+    const result = await client().checkStudentProfile();
     if (result.ok) { showApp(); return; }
     renderRetry(result.code);
   }

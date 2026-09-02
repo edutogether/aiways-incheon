@@ -3,7 +3,7 @@
 (() => {
   const REGION = "asia-northeast3";
   const EMULATOR_PROJECT = "demo-aiways-incheon";
-  const ALLOWED = new Set(["redeemEdu2gPass", "getEdu2gSession", "listEdu2gTrustedDevices", "revokeEdu2gTrustedDevice", "analyzeSortingImage", "analyzeSortingText", "analyzeSortingSafetyObserver", "saveSortingRecord", "listSortingRecords", "resolveSortingRecord", "getSchoolDashboard", "checkStudentProfile", "registerStudentProfile", "checkCampusLocation", "changeStudentClass", "getClassRanking", "searchSchool", "checkTeacherStatus", "verifyTeacherCode", "listPendingRegistrations", "decideRegistration", "exportClassRecords"]);
+  const ALLOWED = new Set(["analyzeSortingImage", "analyzeSortingText", "analyzeSortingSafetyObserver", "saveSortingRecord", "listSortingRecords", "resolveSortingRecord", "getSchoolDashboard", "checkStudentProfile", "registerStudentProfile", "checkCampusLocation", "changeStudentClass", "getClassRanking", "searchSchool", "checkTeacherStatus", "verifyTeacherCode", "listPendingRegistrations", "decideRegistration", "exportClassRecords", "anonymizeStudent"]);
   const LOCAL = new Set(["localhost", "127.0.0.1"]);
 
   function usingEmulator() {
@@ -64,11 +64,6 @@
   }
   window.AIWaysEdu2gClient = {
     functionUrl, usingEmulator, visualReviewRequested, request, getPlatformLabel, errorMessageFor,
-    requestAccess: ({ loginId, deviceLabel, platform }) => request("redeemEdu2gPass", { loginId, deviceLabel, platform, confirm: false }),
-    confirmDeviceRegistration: ({ loginId, deviceLabel, platform, replaceManagementId = "" }) => request("redeemEdu2gPass", { loginId, deviceLabel, platform, confirm: true, ...(replaceManagementId ? { replaceManagementId } : {}) }),
-    getSession: () => request("getEdu2gSession"),
-    listTrustedDevices: () => request("listEdu2gTrustedDevices"),
-    revokeTrustedDevice: ({ targetManagementId }) => request("revokeEdu2gTrustedDevice", { targetManagementId, confirm: true }),
     analyzeSortingImage: (payload) => request("analyzeSortingImage", payload),
     analyzeSortingText: (payload) => request("analyzeSortingText", payload),
     analyzeSortingSafetyObserver: (payload) => request("analyzeSortingSafetyObserver", payload),
@@ -88,6 +83,7 @@
     verifyTeacherCode: ({ schoolId, code }) => request("verifyTeacherCode", { schoolId, code }),
     listPendingRegistrations: () => request("listPendingRegistrations", {}),
     decideRegistration: ({ targetActorId, decision }) => request("decideRegistration", { targetActorId, decision }),
-    exportClassRecords: ({ grade, classNum, cursor = "" } = {}) => request("exportClassRecords", { grade, classNum, ...(cursor ? { cursor } : {}) })
+    exportClassRecords: ({ grade, classNum, cursor = "" } = {}) => request("exportClassRecords", { grade, classNum, ...(cursor ? { cursor } : {}) }),
+    anonymizeStudent: ({ targetActorId }) => request("anonymizeStudent", { targetActorId })
   };
 })();

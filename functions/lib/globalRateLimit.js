@@ -51,10 +51,6 @@ const READS_PER_REQUEST_WORST_CASE = Object.freeze({
   analyzeSortingImage: BASE_ACTOR_READS + 1, // 멱등성 tx 1
   analyzeSortingText: BASE_ACTOR_READS + 1,
   analyzeSortingSafetyObserver: BASE_ACTOR_READS + 1,
-  redeemEdu2gPass: BASE_ACTOR_READS + 2,
-  getEdu2gSession: BASE_ACTOR_READS,
-  listEdu2gTrustedDevices: BASE_ACTOR_READS,
-  revokeEdu2gTrustedDevice: BASE_ACTOR_READS + 2,
   // 액터 체계 밖(슈퍼어드민 ID토큰) - 전역 리미터 트랜잭션 1회만.
   manageTeacherCode: 1,
   // Firestore 조회는 전혀 없다(외부 NEIS API만 호출) - 공통 전처리만 든다.
@@ -67,8 +63,7 @@ const VARIABLE_READS_PER_REQUEST = Object.freeze({
   getClassRanking: "classes K (5.5초 인스턴스 캐시 miss 시에만)",
   exportClassRecords: "기록 최대 201 (MAX_PAGE_SIZE+1, classExport.js)",
   listPendingRegistrations: "대기요청 최대 100 (MAX_LIST_SIZE, registrationApproval.js)",
-  listSortingRecords: "기록 최대 41 (pageSize 최대 40 + 1)",
-  listEdu2gTrustedDevices: "그 액터의 신뢰기기 수(maxDevices 상한 이하)"
+  listSortingRecords: "기록 최대 41 (pageSize 최대 40 + 1)"
 });
 const RATE_LIMITS = Object.freeze({
   analyzeSortingImage: { perMinute: 20, perDay: 1000 },
@@ -101,7 +96,6 @@ const RATE_LIMITS = Object.freeze({
   // perDay가 아예 없던 문제는 그대로 남아있어 같이 추가.
   getClassRanking: { perMinute: 60, perDay: 5000 },
   searchSchool: { perMinute: 60 }
-  ,redeemEdu2gPass: { perMinute: 5 }, getEdu2gSession: { perMinute: 60 }, listEdu2gTrustedDevices: { perMinute: 60 }, revokeEdu2gTrustedDevice: { perMinute: 20 }
   // 2026-08-31 - 교사 인증(1단계). verifyTeacherCode는 공유코드를 맞혀보는
   // 시도이므로 registerStudentProfile과 같은 수준(분당 10)으로 좁힌다.
   ,checkTeacherStatus: { perMinute: 30 }, verifyTeacherCode: { perMinute: 10 }
@@ -254,7 +248,6 @@ const ACTOR_RATE_LIMITS = Object.freeze({
   changeStudentClass: { perMinute: 15, perDay: 20 },
   getClassRanking: { perMinute: 30, perDay: 2000 },
   searchSchool: { perMinute: 20, perDay: 500 },
-  redeemEdu2gPass: { perMinute: 5 },
   // 액터별 상한 - 코드 추측 시도를 한 기기가 하루 종일 반복 못 하게 20회로
   // 막는다(registerStudentProfile과 동일 값 - 둘 다 "정상적으로는 하루 몇 번
   // 안 쓰는" 1회성/저빈도 액션).

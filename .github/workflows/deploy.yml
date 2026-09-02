@@ -152,11 +152,8 @@ jobs:
       - name: Analysis idempotency emulator smoke test
         run: npm run emulator:test:analysis
 
-      - name: Edu2g pass emulator smoke test
+      - name: App Check enforcement HTTP smoke test
         run: npm run emulator:test:edu2g
-
-      - name: Edu2g device binding emulator integration test
-        run: npm run emulator:test:edu2g:integration
 
       - name: CB5 device matrix emulator integration test
         run: npm run emulator:test:cb5-device-matrix

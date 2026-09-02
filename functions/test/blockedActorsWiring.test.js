@@ -68,6 +68,9 @@ test("blocked actor is rejected by every handler that wires blockedActors throug
   const { createExportClassRecordsHandler } = require("../lib/classExport");
   await assertBlocked("exportClassRecords", createExportClassRecordsHandler(baseDeps));
 
+  const { createAnonymizeStudentHandler } = require("../lib/studentAnonymization");
+  await assertBlocked("anonymizeStudent", createAnonymizeStudentHandler(baseDeps));
+
   const { createSaveSortingRecordHandler } = require("../lib/sortingRecord");
   await assertBlocked("saveSortingRecord", createSaveSortingRecordHandler(baseDeps));
 

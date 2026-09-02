@@ -20,6 +20,7 @@ const { createCheckTeacherStatusHandler, createVerifyTeacherCodeHandler } = requ
 const { createListPendingRegistrationsHandler, createDecideRegistrationHandler } = require("./lib/registrationApproval");
 const { createManageTeacherCodeHandler } = require("./lib/superadmin");
 const { createExportClassRecordsHandler } = require("./lib/classExport");
+const { createAnonymizeStudentHandler } = require("./lib/studentAnonymization");
 const { getApps, initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
@@ -139,6 +140,9 @@ exports.manageTeacherCode = onRequest({ region: "asia-northeast3", memory: "256M
 }));
 exports.exportClassRecords = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 30, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createExportClassRecordsHandler({
   db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: auditLog
+}));
+exports.anonymizeStudent = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createAnonymizeStudentHandler({
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
 }));
 const edu2gHandlers = createEdu2gHandlers({
   registry: createEdu2gPassRegistry({ getSecret: () => edu2gPassRegistrySecret.value() }),

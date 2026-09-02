@@ -41,6 +41,7 @@ const READS_PER_REQUEST_WORST_CASE = Object.freeze({
   saveSortingRecord: BASE_ACTOR_READS + 3 + 3,
   registerStudentProfile: BASE_ACTOR_READS + 3,
   decideRegistration: BASE_ACTOR_READS + 3, // 교사확인 1 + tx 2
+  anonymizeStudent: BASE_ACTOR_READS + 2, // 교사확인 1 + tx(actor 조회) 1
   changeStudentClass: BASE_ACTOR_READS + 2,
   checkStudentProfile: BASE_ACTOR_READS + 2,
   resolveSortingRecord: BASE_ACTOR_READS + 2,
@@ -116,6 +117,9 @@ const RATE_LIMITS = Object.freeze({
   // 페이지당 최대 200건을 읽을 수 있어(classExport.js MAX_PAGE_SIZE) 다른
   // 조회보다 상한을 좁게 잡는다.
   ,exportClassRecords: { perMinute: 10 }
+  // 2026-09-02 - 학생 삭제·탈퇴 요청 대응(익명화). decideRegistration과
+  // 같은 이유(교사 화면에서 드물게 쓰는 관리 작업)로 넉넉하게 잡는다.
+  ,anonymizeStudent: { perMinute: 30 }
 });
 
 function getUtcBuckets(now = new Date()) {
@@ -256,7 +260,8 @@ const ACTOR_RATE_LIMITS = Object.freeze({
   // 안 쓰는" 1회성/저빈도 액션).
   checkTeacherStatus: { perMinute: 10, perDay: 200 }, verifyTeacherCode: { perMinute: 5, perDay: 20 },
   listPendingRegistrations: { perMinute: 20, perDay: 2000 }, decideRegistration: { perMinute: 30, perDay: 500 },
-  exportClassRecords: { perMinute: 6, perDay: 100 }
+  exportClassRecords: { perMinute: 6, perDay: 100 },
+  anonymizeStudent: { perMinute: 20, perDay: 500 }
 });
 function hashRateLimitScope(value) { return createHash("sha256").update(String(value)).digest("hex"); }
 function createActorRateLimiter({ db, now = () => new Date(), serverTimestamp = () => new Date(), limits = ACTOR_RATE_LIMITS, logger = () => {} }) {

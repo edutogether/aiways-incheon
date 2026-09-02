@@ -111,6 +111,9 @@ jobs:
       - name: Student profile emulator integration test
         run: npm run emulator:test:student-profile
 
+      - name: Student anonymization emulator integration test
+        run: npm run emulator:test:student-anonymization
+
       - name: Campus location emulator integration test
         run: npm run emulator:test:campus-location
 

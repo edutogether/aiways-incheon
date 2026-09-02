@@ -2138,6 +2138,41 @@
     }
   }
 
+  // 비용절감 4번 2단계(2026-09-02 대표님 승인) - 5초 폴링과 나란히,
+  // school-lock이 확정된 뒤부터는 Firestore onSnapshot으로도 같은 반 집계를
+  // 받는다(dashboardRealtime.js). 이 구독은 폴링을 대체하지 않는다 - 실패해도
+  // (권한/네트워크) 폴링이 계속 화면을 갱신하므로 사용자에게는 아무 영향이
+  // 없다. schoolId가 바뀌지 않는 한 재구독하지 않도록 마지막으로 구독한
+  // schoolId를 기억해둔다.
+  let dashboardRealtimeSchoolId = "";
+  let dashboardRealtimeUnsubscribe = null;
+  async function startSchoolDashboardRealtimeIfNeeded(schoolId) {
+    if (!schoolId || schoolId === dashboardRealtimeSchoolId) return;
+    if (!window.AIWaysDashboardRealtime?.subscribeSchoolClasses) return;
+    dashboardRealtimeUnsubscribe?.();
+    dashboardRealtimeSchoolId = schoolId;
+    dashboardRealtimeUnsubscribe = await window.AIWaysDashboardRealtime.subscribeSchoolClasses({
+      schoolId,
+      onUpdate: ({ classDocs, schoolName }) => {
+        const grade = digitsOnly(selectedGrade());
+        const classNum = digitsOnly(classParts(selectedClassName()).className);
+        const data = window.AIWaysDashboardRealtime.computeDashboardData({ classDocs, schoolName, grade, classNum, previousTopStudents: latestTopStudents });
+        renderSchoolPanelFromDashboardApi(data);
+        renderClassPanelFromDashboardApi(data.selectedClass);
+        consumeDashboardIntroRender();
+      },
+      onError: (error) => {
+        // 권한 문제(클레임 아직 반영 전 등)나 일시적 네트워크 오류 - 조용히
+        // 포기한다. 5초 폴링이 이미 같은 데이터를 계속 갱신하고 있으므로
+        // 사용자 화면에는 어떤 영향도 없다. 다음 school-lock 확정 시점에
+        // dashboardRealtimeSchoolId가 다시 비어있지 않으면 재시도하지
+        // 않으므로, 실패 시 다음 폴링에서 재구독을 시도하도록 상태를 되돌린다.
+        console.warn("[aiways] 대시보드 실시간 구독 실패(폴링으로 계속 갱신됩니다)", error?.code || error?.message);
+        dashboardRealtimeSchoolId = "";
+      }
+    });
+  }
+
   let dashboardApiSchoolNotice = false;
   async function loadSchoolDashboardFromApi() {
     // "샘플 데이터 보기"로 미리보기 중이면 실제 학교가 설정돼 있어도
@@ -2174,6 +2209,7 @@
       renderSchoolPanelFromDashboardApi(response.data);
       renderClassPanelFromDashboardApi(response.data.selectedClass);
       consumeDashboardIntroRender();
+      startSchoolDashboardRealtimeIfNeeded(schoolId);
       return response.data;
     } catch (error) {
       noteDashboardApiFailure({ status: 0, code: error?.name || "network_error" });

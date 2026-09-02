@@ -3,7 +3,7 @@
 // code-set-for-school rejected distinctly, correct code marks the actor as
 // teacherVerified for that schoolId, and checkTeacherStatus reflects it.
 const assert = require("node:assert/strict"), http = require("node:http");
-const { createHash } = require("node:crypto");
+const { hashTeacherCode } = require("../lib/teacherCodeHash");
 const { initializeApp, getApps } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
@@ -47,7 +47,7 @@ function call(handler, token, body) {
     await db.collection("actors").doc(ACTOR_ID).set({ status: "active", plan: "closed_beta" });
     await db.collection("actors").doc(ACTOR_ID).collection("trustedDevices").doc(uid).set({ uid, status: "active", managementId: "123e4567-e89b-42d3-a456-426614174601" });
     await db.collection("edu2gDeviceBindings").doc(uid).set({ actorId: ACTOR_ID, status: "active" });
-    await db.collection("teacherCodes").doc(SCHOOL_ID).set({ codeHash: createHash("sha256").update(CODE).digest("hex") });
+    await db.collection("teacherCodes").doc(SCHOOL_ID).set(hashTeacherCode(CODE));
     // school-lock 교정(3단계) 확인용 - 이 기기가 엉뚱한 학교로 이미 고정돼
     // 있었다고 가정한다.
     await db.collection("actors").doc(ACTOR_ID).set({ dashboardSchoolId: NO_CODE_SCHOOL_ID }, { merge: true });

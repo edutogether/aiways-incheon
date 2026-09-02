@@ -10,9 +10,9 @@
 // 지금 유일한 기능은 교사 인증코드 발급/회전(manageTeacherCode) - 지금까지
 // scripts/setTeacherCode.js를 개발자가 로컬에서 수동 실행해야만 했던 걸
 // 대표님이 admin.html에서 직접 할 수 있게 대체한다.
-const { createHash } = require("node:crypto");
 const { cleanText, applyCors } = require("./httpGuard");
 const { observeAppCheck } = require("./appCheckProtection");
+const { hashTeacherCode } = require("./teacherCodeHash");
 
 const MAX_BODY_BYTES = 2 * 1024;
 const SCHOOL_ID_PATTERN = /^\d{1,12}$/;
@@ -47,6 +47,7 @@ async function guardedSuperadmin(req, res, functionName, dependencies) {
 function createManageTeacherCodeHandler(dependencies = {}) {
   const db = dependencies.db;
   const serverTimestamp = dependencies.serverTimestamp || (() => new Date());
+  const logger = dependencies.logger || (() => {});
   return async (req, res) => {
     const admin = await guardedSuperadmin(req, res, "manageTeacherCode", dependencies);
     if (!admin) return;
@@ -56,8 +57,11 @@ function createManageTeacherCodeHandler(dependencies = {}) {
     const schoolId = typeof body.schoolId === "string" && SCHOOL_ID_PATTERN.test(body.schoolId) ? body.schoolId : "";
     const code = cleanText(body.code, 40);
     if (!schoolId || !code || code.length < 6) return res.status(400).json({ ok: false, code: "invalid_request" });
-    const codeHash = createHash("sha256").update(code).digest("hex");
-    await db.collection("teacherCodes").doc(schoolId).set({ codeHash, updatedAt: serverTimestamp(), updatedByUid: admin.uid }, { merge: true });
+    // 2026-09-01 종합감사(B그룹 6번): sha256 단일해시 -> scrypt+솔트(teacherCodeHash.js) -
+    // 학교당 코드 1개를 공유하는 구조라 문서 유출 시 원문 역산 저항력이 중요하다.
+    const { codeHash, codeSalt } = hashTeacherCode(code);
+    await db.collection("teacherCodes").doc(schoolId).set({ codeHash, codeSalt, updatedAt: serverTimestamp(), updatedByUid: admin.uid }, { merge: true });
+    logger({ severity: "INFO", message: "teacher_code_rotated", schoolId, updatedByUid: admin.uid });
     return res.status(200).json({ ok: true, schoolId });
   };
 }

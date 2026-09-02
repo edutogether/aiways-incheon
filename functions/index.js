@@ -38,6 +38,11 @@ const actorRateLimiter = createActorRateLimiter({ db, serverTimestamp: () => Fie
 const deviceAccess = createEdu2gDeviceAccess({ auth: getAuth(), db, serverTimestamp: () => FieldValue.serverTimestamp() });
 const analysisRequests = createAnalysisIdempotency({ db, serverTimestamp: () => FieldValue.serverTimestamp(), model: "gemini-3.5-flash-lite" });
 const logAppCheck = (metadata) => logger.write({ severity: metadata?.status === "invalid" || metadata?.status === "unavailable" ? "WARNING" : "INFO", ...metadata });
+// 2026-09-01 종합감사(B그룹 6번): 교사코드 실패시도/CSV 반전체 내보내기/
+// 가입승인·거절에 감사로그가 전혀 없었다 - "누가 언제 우리 반 명단을
+// 뽑았나"에 답할 수 없던 문제를 닫는다. 호출부가 metadata.severity로
+// WARNING(실패시도)/INFO(정상 감사기록)를 직접 고른다.
+const auditLog = (metadata) => logger.write({ severity: metadata?.severity || "INFO", ...metadata });
 // FUNCTIONS_EMULATOR는 firebase emulators:start가 Functions 에뮬레이터
 // 프로세스에만 자동으로 심어주는 값이라(프로덕션 Cloud Functions 런타임에는
 // 절대 안 생김 - recordEmulatorSmoke.js/edu2gEmulatorSmoke.js에서도 이미
@@ -116,19 +121,19 @@ exports.checkTeacherStatus = onRequest({ region: "asia-northeast3", memory: "256
   db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 exports.verifyTeacherCode = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createVerifyTeacherCodeHandler({
-  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
 }));
 exports.listPendingRegistrations = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createListPendingRegistrationsHandler({
   db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 exports.decideRegistration = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createDecideRegistrationHandler({
-  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
 }));
 exports.manageTeacherCode = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createManageTeacherCodeHandler({
-  db, appCheck: emulatorAppCheck, rateLimiter, logAppCheck, verifyIdToken: (token) => getAuth().verifyIdToken(token), serverTimestamp: () => FieldValue.serverTimestamp()
+  db, appCheck: emulatorAppCheck, rateLimiter, logAppCheck, verifyIdToken: (token) => getAuth().verifyIdToken(token), serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
 }));
 exports.exportClassRecords = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 30, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createExportClassRecordsHandler({
-  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: auditLog
 }));
 const edu2gHandlers = createEdu2gHandlers({
   registry: createEdu2gPassRegistry({ getSecret: () => edu2gPassRegistrySecret.value() }),

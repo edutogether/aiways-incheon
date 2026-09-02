@@ -28,6 +28,7 @@ function timestamp(value) {
 
 function createExportClassRecordsHandler(dependencies = {}) {
   const db = dependencies.db;
+  const logger = dependencies.logger || (() => {});
   return async (req, res) => {
     const teacher = await guardedTeacher(req, res, "exportClassRecords", dependencies);
     if (!teacher) return;
@@ -76,6 +77,10 @@ function createExportClassRecordsHandler(dependencies = {}) {
       const nextCursor = hasMore && lastCreatedAt && lastDoc
         ? `${new Date(lastCreatedAt).getTime()}:${lastDoc.ref.parent.parent.id}:${lastDoc.id}`
         : null;
+      // 2026-09-01 종합감사(B그룹 6번): 반 전체 실명+번호 CSV를 내보내면서
+      // 아무 기록도 안 남기고 있었다 - "누가 언제 우리 반 명단을 뽑았나"에
+      // 답할 수 있게 감사로그를 남긴다(개인정보 자체는 로그에 안 넣음).
+      logger({ severity: "INFO", message: "class_records_exported", teacherActorId: teacher.actorId, schoolId: teacher.schoolId, grade, classNum, recordCount: records.length });
       return res.status(200).json({ ok: true, records, nextCursor, hasMore });
     } catch {
       return res.status(503).json({ ok: false, code: "protection_unavailable" });

@@ -9,24 +9,12 @@
 // 평문을 DB에 두지 않는다. 아직 이 코드를 발급/회전하는 관리자 화면이 없어서
 // (그건 슈퍼어드민 단계에서 만들 것), 지금은 scripts/setTeacherCode.js를
 // 개발자가 로컬에서 1회 실행해 심어야 한다.
-const { createHash, timingSafeEqual } = require("node:crypto");
 const { cleanText, applyCors } = require("./httpGuard");
 const { protectActorRequest } = require("./protectedActor");
+const { verifyTeacherCode: verifyStoredTeacherCode } = require("./teacherCodeHash");
 
 const MAX_BODY_BYTES = 2 * 1024;
 const SCHOOL_ID_PATTERN = /^\d{1,12}$/;
-
-function hashTeacherCode(code) {
-  return createHash("sha256").update(code).digest("hex");
-}
-
-// 코드는 사람이 입력하는 값이라 처리 시간 자체로 정답 여부를 추측할 수 없게
-// timingSafeEqual로 비교한다(sha256 다이제스트는 항상 같은 길이라 안전하게 씀).
-function safeEqualHex(a, b) {
-  const bufA = Buffer.from(a, "hex");
-  const bufB = Buffer.from(b, "hex");
-  return bufA.length === bufB.length && timingSafeEqual(bufA, bufB);
-}
 
 async function guardedActor(req, res, functionName, dependencies) {
   if (!applyCors(req, res)) { res.status(403).json({ ok: false, code: "invalid_origin" }); return null; }
@@ -80,6 +68,7 @@ function createCheckTeacherStatusHandler(dependencies = {}) {
 function createVerifyTeacherCodeHandler(dependencies = {}) {
   const db = dependencies.db;
   const serverTimestamp = dependencies.serverTimestamp || (() => new Date());
+  const logger = dependencies.logger || (() => {});
   return async (req, res) => {
     const protectedActor = await guardedActor(req, res, "verifyTeacherCode", dependencies);
     if (!protectedActor) return;
@@ -93,8 +82,13 @@ function createVerifyTeacherCodeHandler(dependencies = {}) {
     try {
       const codeSnap = await db.collection("teacherCodes").doc(schoolId).get();
       if (!codeSnap.exists) return res.status(404).json({ ok: false, code: "teacher_code_not_set" });
-      const codeHash = codeSnap.data()?.codeHash;
-      if (typeof codeHash !== "string" || !safeEqualHex(hashTeacherCode(code), codeHash)) {
+      if (!verifyStoredTeacherCode(code, codeSnap.data() || {})) {
+        // 2026-09-01 종합감사(B그룹 6번): 실패 시도 자체를 아무 데도 안 남기고
+        // 있었다 - 코드 값은 절대 남기지 않고(actorId+schoolId만) 몇 번이나
+        // 틀렸는지 나중에 확인할 수 있게 한다. 잠금은 아직 안 함(공유코드
+        // 특성상 여러 교사가 동시에 오타를 낼 수 있어 성급한 잠금은 오히려
+        // 정상 교사를 막을 위험 - 잠금 도입은 별도 결정 필요).
+        logger({ severity: "WARNING", message: "teacher_code_verification_failed", schoolId, actorId: protectedActor.actorId });
         return res.status(401).json({ ok: false, code: "invalid_code" });
       }
 
@@ -113,4 +107,4 @@ function createVerifyTeacherCodeHandler(dependencies = {}) {
   };
 }
 
-module.exports = { createCheckTeacherStatusHandler, createVerifyTeacherCodeHandler, hashTeacherCode, guardedTeacher };
+module.exports = { createCheckTeacherStatusHandler, createVerifyTeacherCodeHandler, guardedTeacher };

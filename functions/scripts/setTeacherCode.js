@@ -6,9 +6,9 @@
 // 예: node scripts/setTeacherCode.js 7321071 sunrise-teachers-2026
 // 프로덕션에 쓰려면 firebase-tools 로그인 상태거나
 // GOOGLE_APPLICATION_CREDENTIALS 환경변수가 배포용 서비스계정을 가리켜야 한다.
-const { createHash } = require("node:crypto");
 const { initializeApp, getApps } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+const { hashTeacherCode } = require("../lib/teacherCodeHash");
 
 const [schoolId, code] = process.argv.slice(2);
 if (!schoolId || !/^\d{1,12}$/.test(schoolId)) {
@@ -21,8 +21,8 @@ if (!schoolId || !/^\d{1,12}$/.test(schoolId)) {
   (async () => {
     const app = getApps()[0] || initializeApp({ projectId: process.env.GCLOUD_PROJECT || "ai-ways-incheon" });
     const db = getFirestore(app);
-    const codeHash = createHash("sha256").update(code).digest("hex");
-    await db.collection("teacherCodes").doc(schoolId).set({ codeHash, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    const { codeHash, codeSalt } = hashTeacherCode(code);
+    await db.collection("teacherCodes").doc(schoolId).set({ codeHash, codeSalt, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
     process.stdout.write(`schoolId ${schoolId}의 교사코드를 설정했습니다.\n`);
   })().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });
 }

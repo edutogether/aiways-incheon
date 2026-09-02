@@ -222,6 +222,10 @@
                     <span>🎓</span><span>정식 가입하기</span>
                 </div>
                 <p class="text-[10px] text-blue-600 leading-snug">한 번만 가입하면 이 기기에 영구히 저장돼요(다시 못 바꿔요). 가입하면 우리반 순위·통계에 내 기록이 정확히 반영됩니다. 안 해도 판단/퀴즈는 그대로 쓸 수 있어요.</p>
+                <div id="signupRoleGroup" class="grid grid-cols-2 gap-2 text-xs font-bold" role="radiogroup" aria-label="가입 유형">
+                    <button type="button" id="signupRoleHomeroomBtn" data-role="homeroom" class="bg-white border border-blue-200 text-blue-700 rounded-xl py-2 transition-all" aria-pressed="false">담임 선생님</button>
+                    <button type="button" id="signupRoleStudentBtn" data-role="student" class="bg-blue-600 border border-blue-600 text-white rounded-xl py-2 transition-all" aria-pressed="true">학생</button>
+                </div>
                 <div class="grid grid-cols-3 gap-2">
                     <div class="col-span-3 sm:col-span-1 relative">
                         <input type="text" id="signupSchoolInput" placeholder="학교 이름 검색" autocomplete="off" class="w-full bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
@@ -231,9 +235,13 @@
                     <input type="text" inputmode="numeric" id="signupGradeInput" placeholder="학년" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
                     <input type="text" inputmode="numeric" id="signupClassInput" placeholder="반" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 </div>
-                <div class="grid grid-cols-3 gap-2">
+                <div id="signupStudentFields" class="grid grid-cols-3 gap-2">
                     <input type="text" inputmode="numeric" id="signupNumberInput" placeholder="번호" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
                     <input type="text" id="signupNameInput" placeholder="이름" class="col-span-2 bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                </div>
+                <div id="signupHomeroomFields" class="hidden grid grid-cols-3 gap-2">
+                    <input type="text" id="signupHomeroomNameInput" placeholder="담임 선생님 성함" class="col-span-3 bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                    <input type="text" id="signupTeacherCodeInput" placeholder="학교에서 안내받은 담임 인증코드" class="col-span-3 bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 </div>
                 <button id="signupSubmitButton" type="button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 rounded-xl transition-all">가입하기</button>
                 <p id="signupStatus" class="text-[10px] font-semibold text-blue-500"></p>

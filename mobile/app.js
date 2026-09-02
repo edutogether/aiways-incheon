@@ -318,6 +318,53 @@
     });
   }
 
+  function showTeacherVerified({ schoolName, schoolId, grade, classNum, name }) {
+    hideSignupBanner();
+    const card = $("signupCard");
+    if (!card) return;
+    card.innerHTML = `
+      <div class="flex items-center gap-1.5 text-xs font-bold text-blue-800">
+        <span>🍎</span><span>담임 인증 완료</span>
+      </div>
+      <p class="text-xs font-semibold text-blue-700">${schoolName || schoolId} ${grade}학년 ${classNum}반 담임 ${name}</p>
+      <p class="text-[10px] text-blue-500 leading-snug">우리 반 학생들의 가입 승인은 PC 대시보드에서 처리할 수 있어요.</p>
+    `;
+    $("interimClassCard")?.classList.add("hidden");
+  }
+
+  // 2026-09-02 재설계(대표님 지시): "가입 경로를 두 개나 만들지 말라 - 학생과
+  // 담임 전부 하나의 가입 화면에서 학교/학년/반 + 역할을 선택"하는 단일
+  // 플로우 요구사항. 담임 선택 시 번호 입력 대신 인증코드 입력으로 바뀐다
+  // (별도 화면·별도 코드입력 다이얼로그 없음).
+  function initSignupRoleToggle() {
+    const homeroomBtn = $("signupRoleHomeroomBtn");
+    const studentBtn = $("signupRoleStudentBtn");
+    const studentFields = $("signupStudentFields");
+    const homeroomFields = $("signupHomeroomFields");
+    if (!homeroomBtn || !studentBtn || !studentFields || !homeroomFields) return { getRole: () => "student" };
+    let role = "student";
+    function apply() {
+      const isHomeroom = role === "homeroom";
+      studentFields.classList.toggle("hidden", isHomeroom);
+      homeroomFields.classList.toggle("hidden", !isHomeroom);
+      homeroomBtn.classList.toggle("bg-blue-600", isHomeroom);
+      homeroomBtn.classList.toggle("border-blue-600", isHomeroom);
+      homeroomBtn.classList.toggle("text-white", isHomeroom);
+      homeroomBtn.classList.toggle("bg-white", !isHomeroom);
+      homeroomBtn.classList.toggle("text-blue-700", !isHomeroom);
+      homeroomBtn.setAttribute("aria-pressed", String(isHomeroom));
+      studentBtn.classList.toggle("bg-blue-600", !isHomeroom);
+      studentBtn.classList.toggle("border-blue-600", !isHomeroom);
+      studentBtn.classList.toggle("text-white", !isHomeroom);
+      studentBtn.classList.toggle("bg-white", isHomeroom);
+      studentBtn.classList.toggle("text-blue-700", isHomeroom);
+      studentBtn.setAttribute("aria-pressed", String(!isHomeroom));
+    }
+    homeroomBtn.addEventListener("click", () => { role = "homeroom"; apply(); });
+    studentBtn.addEventListener("click", () => { role = "student"; apply(); });
+    return { getRole: () => role };
+  }
+
   function initSignupForm() {
     const card = $("signupCard");
     const submitBtn = $("signupSubmitButton");
@@ -332,11 +379,40 @@
     }).catch(() => initSignupBanner());
 
     const schoolSearch = initSchoolSearch({ inputId: "signupSchoolInput", hiddenId: "signupSchoolCode", resultsId: "signupSchoolResults" });
+    const roleToggle = initSignupRoleToggle();
 
     submitBtn.addEventListener("click", async () => {
+      const role = roleToggle.getRole();
       const schoolSelection = schoolSearch?.getSelection();
       const grade = cleanForSignup($("signupGradeInput")?.value);
       const classNum = cleanForSignup($("signupClassInput")?.value);
+      if (!client?.previewStudentProfile || !client?.registerStudentProfile) {
+        status.textContent = "지금은 가입을 처리할 수 없어요. 잠시 후 다시 시도해 주세요.";
+        return;
+      }
+
+      if (role === "homeroom") {
+        const name = cleanForSignup($("signupHomeroomNameInput")?.value);
+        const teacherCode = cleanForSignup($("signupTeacherCodeInput")?.value);
+        if (!schoolSelection || !grade || !classNum || !name || !teacherCode) {
+          status.textContent = "학교를 검색해서 목록에서 고르고, 학년/반/성함/인증코드를 모두 입력해 주세요.";
+          return;
+        }
+        const { schoolId, schoolName } = schoolSelection;
+        submitBtn.disabled = true;
+        status.textContent = "확인하는 중입니다...";
+        const result = await client.registerStudentProfile({ schoolId, schoolName, grade, classNum, name, role, teacherCode });
+        submitBtn.disabled = false;
+        if (result.ok && result.data?.verified) {
+          showTeacherVerified({ schoolId, schoolName, grade, classNum, name });
+          showVisualAlert(`🍎 ${grade}학년 ${classNum}반 담임 인증 완료!`, "emerald");
+        } else {
+          status.textContent = result.data?.code === "teacher_code_not_set" ? "이 반은 아직 인증코드가 준비되지 않았어요. 관리자에게 문의해 주세요."
+            : result.data?.code === "invalid_code" ? "인증코드를 다시 확인해 주세요." : "인증에 실패했어요. 다시 시도해 주세요.";
+        }
+        return;
+      }
+
       const studentNumber = cleanForSignup($("signupNumberInput")?.value);
       const name = cleanForSignup($("signupNameInput")?.value);
       if (!schoolSelection || !grade || !classNum || !studentNumber || !name) {
@@ -344,13 +420,9 @@
         return;
       }
       const { schoolId, schoolName } = schoolSelection;
-      if (!client?.previewStudentProfile || !client?.registerStudentProfile) {
-        status.textContent = "지금은 가입을 처리할 수 없어요. 잠시 후 다시 시도해 주세요.";
-        return;
-      }
       submitBtn.disabled = true;
       status.textContent = "확인 중입니다...";
-      const preview = await client.previewStudentProfile({ schoolId, schoolName, grade, classNum, studentNumber, name });
+      const preview = await client.previewStudentProfile({ schoolId, schoolName, grade, classNum, studentNumber, name, role });
       submitBtn.disabled = false;
       if (!preview.ok) {
         status.textContent = preview.data?.code === "already_registered" ? "이미 가입된 기기예요." : "입력 내용을 다시 확인해 주세요.";
@@ -364,7 +436,7 @@
         "bg-blue-600 hover:bg-blue-700",
         async () => {
           status.textContent = "가입하는 중입니다...";
-          const result = await client.registerStudentProfile({ schoolId, schoolName, grade, classNum, studentNumber, name });
+          const result = await client.registerStudentProfile({ schoolId, schoolName, grade, classNum, studentNumber, name, role });
           if (result.ok && result.data?.pending) { showSignupPending(result.data.preview); showVisualAlert(`⏳ "${name}" 학생 가입 신청 완료! 선생님 승인을 기다려 주세요.`, "amber"); }
           else {
             status.textContent = result.data?.code === "already_registered" ? "이미 가입된 기기예요."

@@ -1427,7 +1427,7 @@
     let cursor;
     try {
       for (let page = 0; page < CLASS_CSV_MAX_PAGES; page += 1) {
-        const response = await client.exportClassRecords({ grade, classNum, cursor });
+        const response = await client.exportClassRecords({ cursor });
         if (!response.ok || !response.data) {
           showDashboardToast(response.code === "teacher_verification_required"
             ? "이 기기는 아직 선생님 인증이 안 됐어요. 먼저 '선생님 인증하기'를 해주세요."
@@ -1458,34 +1458,43 @@
   }
   // UX 재감사 지적사항(2026-09-01) 대응 - 학년/반을 window.prompt() 2번이
   // 아니라, 학교설정 모달의 class-picker-selects와 같은 디자인의 드롭다운
-  // 2개로 받는다(SCHOOL_CLASS_CONFIG 검증은 여기선 필요 없음 - 내보내기는
-  // 어떤 학년/반 조합이든 시도할 수 있어야 함).
-  function openClassCsvExportModal() {
+  // 2개로 받는다. 2026-09-02 재설계로 teacherVerified가 반 단위로 좁혀져
+  // (teacherAuth.js) 담임은 애초에 자기 반 하나만 있으므로, 서버도 이제
+  // 클라이언트가 보낸 grade/classNum을 무시하고 teacherVerified에 저장된
+  // 값만 쓴다(classExport.js) - 드롭다운을 그대로 두면 다른 학년/반을
+  // 골라도 조용히 내 반이 나가는 오해를 부르므로, checkTeacherStatus로
+  // 받아온 값으로 채우고 잠가서 "고를 필요 없는 정보 표시"로 바꾼다.
+  async function openClassCsvExportModal() {
+    const client = window.AIWaysEdu2gClient;
     const modal = $("#classCsvExportModal");
     const gradeSelect = $("#classCsvGradeSelect");
     const classNumSelect = $("#classCsvClassNumSelect");
     const confirmBtn = $("#classCsvExportConfirmBtn");
     const status = $("#classCsvExportStatus");
     if (!modal || !gradeSelect || !classNumSelect || !confirmBtn) return;
-    if (!gradeSelect.childElementCount) {
-      for (let g = 1; g <= 6; g += 1) {
-        const option = document.createElement("option");
-        option.value = String(g);
-        option.textContent = `${g}학년`;
-        gradeSelect.append(option);
-      }
-      for (let n = 1; n <= 15; n += 1) {
-        const option = document.createElement("option");
-        option.value = String(n);
-        option.textContent = `${n}반`;
-        classNumSelect.append(option);
-      }
+    const teacherStatus = await client?.checkTeacherStatus?.();
+    if (!teacherStatus?.ok || !teacherStatus.data?.verified) {
+      showDashboardToast("이 기기는 아직 선생님 인증이 안 됐어요. 먼저 '선생님 인증하기'를 해주세요.");
+      return;
     }
+    const { grade, classNum } = teacherStatus.data;
+    gradeSelect.replaceChildren();
+    classNumSelect.replaceChildren();
+    const gradeOption = document.createElement("option");
+    gradeOption.value = grade;
+    gradeOption.textContent = `${grade}학년`;
+    gradeSelect.append(gradeOption);
+    const classOption = document.createElement("option");
+    classOption.value = classNum;
+    classOption.textContent = `${classNum}반`;
+    classNumSelect.append(classOption);
+    gradeSelect.disabled = true;
+    classNumSelect.disabled = true;
     if (status) status.textContent = "";
     confirmBtn.onclick = () => {
       if (typeof modal.close === "function" && modal.open) modal.close();
       else modal.removeAttribute("open");
-      runClassCsvExport(gradeSelect.value, classNumSelect.value);
+      runClassCsvExport(grade, classNum);
     };
     if (typeof modal.showModal === "function") modal.showModal();
   }
@@ -1509,15 +1518,21 @@
     }
     const modal = $("#teacherCodeModal");
     const input = $("#teacherCodeModalInput");
+    const gradeInput = $("#teacherCodeModalGradeInput");
+    const classInput = $("#teacherCodeModalClassInput");
     const confirmBtn = $("#teacherCodeModalConfirmBtn");
     const status = $("#teacherCodeModalStatus");
-    if (!modal || !input || !confirmBtn) return;
+    if (!modal || !input || !gradeInput || !classInput || !confirmBtn) return;
     input.value = "";
+    gradeInput.value = "";
+    classInput.value = "";
     if (status) status.textContent = "";
     confirmBtn.onclick = async () => {
       const code = input.value.trim();
-      if (!code) { if (status) status.textContent = "인증코드를 입력해주세요."; return; }
-      const response = await client.verifyTeacherCode({ schoolId, code });
+      const grade = gradeInput.value.trim();
+      const classNum = classInput.value.trim();
+      if (!grade || !classNum || !code) { if (status) status.textContent = "담임 학년/반과 인증코드를 모두 입력해주세요."; return; }
+      const response = await client.verifyTeacherCode({ schoolId, grade, classNum, code });
       if (response.ok && response.data?.verified) {
         if (typeof modal.close === "function" && modal.open) modal.close();
         else modal.removeAttribute("open");

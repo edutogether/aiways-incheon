@@ -72,18 +72,18 @@
     resolveSortingRecord: (payload) => request("resolveSortingRecord", payload),
     getSchoolDashboard: ({ schoolId, grade = "", classNum = "" } = {}) => request("getSchoolDashboard", { schoolId, ...(grade ? { grade } : {}), ...(classNum ? { classNum } : {}) }),
     checkStudentProfile: () => request("checkStudentProfile", {}),
-    previewStudentProfile: ({ schoolId, schoolName, grade, classNum, studentNumber, name }) => request("registerStudentProfile", { schoolId, schoolName, grade, classNum, studentNumber, name, confirm: false }),
-    registerStudentProfile: ({ schoolId, schoolName, grade, classNum, studentNumber, name }) => request("registerStudentProfile", { schoolId, schoolName, grade, classNum, studentNumber, name, confirm: true }),
+    previewStudentProfile: ({ schoolId, schoolName, grade, classNum, studentNumber, name, role, teacherCode }) => request("registerStudentProfile", { schoolId, schoolName, grade, classNum, name, ...(role === "homeroom" ? { role, teacherCode } : { studentNumber }), confirm: false }),
+    registerStudentProfile: ({ schoolId, schoolName, grade, classNum, studentNumber, name, role, teacherCode }) => request("registerStudentProfile", { schoolId, schoolName, grade, classNum, name, ...(role === "homeroom" ? { role, teacherCode } : { studentNumber }), confirm: true }),
     checkCampusLocation: ({ schoolId, lat, lng }) => request("checkCampusLocation", { schoolId, lat, lng }),
     previewClassChange: ({ grade, classNum }) => request("changeStudentClass", { grade, classNum, confirm: false }),
     changeStudentClass: ({ grade, classNum }) => request("changeStudentClass", { grade, classNum, confirm: true }),
     getClassRanking: ({ schoolId, grade, classNum = "" } = {}) => request("getClassRanking", { schoolId, grade, ...(classNum ? { classNum } : {}) }),
     searchSchool: ({ query }) => request("searchSchool", { query }),
     checkTeacherStatus: () => request("checkTeacherStatus", {}),
-    verifyTeacherCode: ({ schoolId, code }) => request("verifyTeacherCode", { schoolId, code }),
+    verifyTeacherCode: ({ schoolId, grade, classNum, code }) => request("verifyTeacherCode", { schoolId, grade, classNum, code }),
     listPendingRegistrations: () => request("listPendingRegistrations", {}),
     decideRegistration: ({ targetActorId, decision }) => request("decideRegistration", { targetActorId, decision }),
-    exportClassRecords: ({ grade, classNum, cursor = "" } = {}) => request("exportClassRecords", { grade, classNum, ...(cursor ? { cursor } : {}) }),
+    exportClassRecords: ({ cursor = "" } = {}) => request("exportClassRecords", { ...(cursor ? { cursor } : {}) }),
     anonymizeStudent: ({ targetActorId }) => request("anonymizeStudent", { targetActorId })
   };
 })();

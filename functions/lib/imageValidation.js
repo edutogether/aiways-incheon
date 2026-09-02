@@ -1,5 +1,45 @@
 "use strict";
-const MAX_IMAGE_BYTES=4*1024*1024, MAX_EDGE=5000, MAX_PIXELS=16000000;
-function dimensions(b,m){try{if(m==='image/png'&&b.length>=24&&b.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))return{w:b.readUInt32BE(16),h:b.readUInt32BE(20)};if(m==='image/jpeg'&&b[0]===255&&b[1]===216){let i=2;while(i+9<b.length){if(b[i]!==255){i++;continue}const t=b[i+1],l=b.readUInt16BE(i+2);if(l<2||i+2+l>b.length)break;if(t>=192&&t<=195)return{w:b.readUInt16BE(i+7),h:b.readUInt16BE(i+5)};i+=2+l}}if(m==='image/webp'&&b.subarray(0,4).toString()==='RIFF'&&b.subarray(8,12).toString()==='WEBP'){const t=b.subarray(12,16).toString();if(t==='VP8X')return{w:1+b.readUIntLE(24,3),h:1+b.readUIntLE(27,3)};if(t==='VP8 ')return{w:b.readUInt16LE(26)&8191,h:b.readUInt16LE(28)&8191};if(t==='VP8L'){const x=b.readUInt32LE(21);return{w:(x&16383)+1,h:((x>>14)&16383)+1}}}}catch{}return null}
-function validateImage(data,mime){if(typeof data!=="string"||!data||data.length%4||!/^[A-Za-z0-9+/]+={0,2}$/.test(data))return{ok:false,code:"invalid_base64"};const b=Buffer.from(data,"base64");if(b.length>MAX_IMAGE_BYTES)return{ok:false,code:"image_too_large"};const d=dimensions(b,mime);if(!d)return{ok:false,code:"image_signature_mismatch"};if(d.w>MAX_EDGE||d.h>MAX_EDGE||d.w*d.h>MAX_PIXELS)return{ok:false,code:"image_dimensions_too_large"};return{ok:true,bytes:b.length,...d}}
-module.exports={MAX_IMAGE_BYTES,MAX_EDGE,MAX_PIXELS,validateImage};
+
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+const MAX_EDGE = 5000;
+const MAX_PIXELS = 16000000;
+
+function dimensions(b, m) {
+  try {
+    if (m === "image/png" && b.length >= 24 && b.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) {
+      return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
+    }
+    if (m === "image/jpeg" && b[0] === 255 && b[1] === 216) {
+      let i = 2;
+      while (i + 9 < b.length) {
+        if (b[i] !== 255) { i++; continue; }
+        const t = b[i + 1], l = b.readUInt16BE(i + 2);
+        if (l < 2 || i + 2 + l > b.length) break;
+        if (t >= 192 && t <= 195) return { w: b.readUInt16BE(i + 7), h: b.readUInt16BE(i + 5) };
+        i += 2 + l;
+      }
+    }
+    if (m === "image/webp" && b.subarray(0, 4).toString() === "RIFF" && b.subarray(8, 12).toString() === "WEBP") {
+      const t = b.subarray(12, 16).toString();
+      if (t === "VP8X") return { w: 1 + b.readUIntLE(24, 3), h: 1 + b.readUIntLE(27, 3) };
+      if (t === "VP8 ") return { w: b.readUInt16LE(26) & 8191, h: b.readUInt16LE(28) & 8191 };
+      if (t === "VP8L") {
+        const x = b.readUInt32LE(21);
+        return { w: (x & 16383) + 1, h: ((x >> 14) & 16383) + 1 };
+      }
+    }
+  } catch {}
+  return null;
+}
+
+function validateImage(data, mime) {
+  if (typeof data !== "string" || !data || data.length % 4 || !/^[A-Za-z0-9+/]+={0,2}$/.test(data)) return { ok: false, code: "invalid_base64" };
+  const b = Buffer.from(data, "base64");
+  if (b.length > MAX_IMAGE_BYTES) return { ok: false, code: "image_too_large" };
+  const d = dimensions(b, mime);
+  if (!d) return { ok: false, code: "image_signature_mismatch" };
+  if (d.w > MAX_EDGE || d.h > MAX_EDGE || d.w * d.h > MAX_PIXELS) return { ok: false, code: "image_dimensions_too_large" };
+  return { ok: true, bytes: b.length, ...d };
+}
+
+module.exports = { MAX_IMAGE_BYTES, MAX_EDGE, MAX_PIXELS, validateImage };

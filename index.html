@@ -56,6 +56,13 @@
       </span>
       <style>@keyframes aiways-boot-bar{0%{margin-left:-40%}100%{margin-left:100%}}</style>
     </div>
+    <!-- 2026-09-01 종합감사(B그룹 7번): firebase.json의 CSP script-src가
+         이 인라인 스크립트만 sha256 해시로 허용한다('unsafe-inline' 제거) -
+         아래 스크립트 태그 안쪽 내용을 한 글자라도 바꾸면 그 해시가 안 맞아
+         브라우저가 조용히 실행을 막는다(부팅 스플래시가 5초 타임아웃으로
+         자동 숨겨지긴 하지만). 내용을 바꿀 땐 반드시 새 해시를 계산해서
+         firebase.json도 같이 갱신할 것(Node crypto로 이 태그 안쪽 텍스트를
+         그대로 sha256 후 base64 인코딩). -->
     <script>
       (function () {
         var el = document.getElementById("bootSplash");

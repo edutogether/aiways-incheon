@@ -7,10 +7,19 @@
 // teacherVerified된 actor만, 자기 학교의 특정 반 기록을 collectionGroup
 // 쿼리로 모아 돌려준다 - actors/*/records는 개인 actor마다 나뉜 서브컬렉션
 // 이라 반 단위로 보려면 collectionGroup 쿼리가 유일한 방법이다.
+const { FieldPath } = require("firebase-admin/firestore");
 const { guardedTeacher } = require("./teacherAuth");
 
 const DIGITS = /^\d{1,2}$/;
-const CURSOR_PATTERN = /^\d{1,20}$/;
+// 2026-09-01 종합감사(B그룹 5번): 예전엔 createdAt(ms) 단독 커서라 ①같은
+// 밀리초에 여러 기록이 있으면 페이지 경계에서 일부가 조용히 누락될 수
+// 있었고(startAfter(Date)는 그 값 "이하" 전부를 건너뜀), ②정확히
+// MAX_PAGE_SIZE인 마지막 페이지 뒤에 빈 요청이 한 번 더 나갔다. createdAt +
+// 문서경로(actorId/recordId)를 함께 정렬·커서로 써서 완전히 결정론적인
+// 페이지 경계를 만든다 - collectionGroup 쿼리라 이전 페이지의
+// DocumentSnapshot을 들고 있을 수 없으므로, 커서 문자열 자체에 다음 페이지
+// 시작점을 재구성할 수 있는 값(ms:actorId:recordId)을 왕복시킨다.
+const CURSOR_PATTERN = /^\d{1,20}:[A-Za-z0-9_-]{1,128}:[A-Za-z0-9]{1,40}$/;
 const MAX_PAGE_SIZE = 200;
 
 function timestamp(value) {
@@ -28,9 +37,6 @@ function createExportClassRecordsHandler(dependencies = {}) {
     const grade = typeof body.grade === "string" && DIGITS.test(body.grade) ? body.grade : "";
     const classNum = typeof body.classNum === "string" && DIGITS.test(body.classNum) ? body.classNum : "";
     if (!grade || !classNum) return res.status(400).json({ ok: false, code: "invalid_request" });
-    // 커서는 마지막으로 받은 기록의 createdAt(ms since epoch)이다 - collectionGroup
-    // 쿼리라 이전 페이지의 DocumentSnapshot을 들고 있을 수 없어서, startAfter에
-    // 쓸 수 있는 값(createdAt) 자체를 커서로 왕복시킨다.
     if (body.cursor !== undefined && !CURSOR_PATTERN.test(String(body.cursor))) return res.status(400).json({ ok: false, code: "invalid_request" });
 
     let query = db.collectionGroup("records")
@@ -38,15 +44,22 @@ function createExportClassRecordsHandler(dependencies = {}) {
       .where("classContext.grade", "==", grade)
       .where("classContext.classNum", "==", classNum)
       .orderBy("createdAt", "asc")
-      .limit(MAX_PAGE_SIZE);
-    if (body.cursor) query = query.startAfter(new Date(Number(body.cursor)));
+      .orderBy(FieldPath.documentId(), "asc")
+      .limit(MAX_PAGE_SIZE + 1); // +1 so we know if there's a next page without a trailing empty request
+    if (body.cursor) {
+      const [ms, actorId, recordId] = String(body.cursor).split(":");
+      const cursorRef = db.collection("actors").doc(actorId).collection("records").doc(recordId);
+      query = query.startAfter(new Date(Number(ms)), cursorRef);
+    }
 
     // 2026-09-01 종합감사(B그룹 3번): collectionGroup 쿼리에 try/catch가
     // 없어서 일시적 Firestore 장애 시 타임아웃까지 응답 없이 멈출 수 있었다 -
     // 다른 핸들러들과 같은 503 protection_unavailable 컨벤션 적용.
     try {
       const snap = await query.get();
-      const records = snap.docs.map((doc) => {
+      const hasMore = snap.docs.length > MAX_PAGE_SIZE;
+      const pageDocs = hasMore ? snap.docs.slice(0, MAX_PAGE_SIZE) : snap.docs;
+      const records = pageDocs.map((doc) => {
         const data = doc.data();
         return {
           recordId: doc.id,
@@ -58,10 +71,12 @@ function createExportClassRecordsHandler(dependencies = {}) {
           studentName: data.classContext?.studentName || ""
         };
       });
-      const lastDoc = snap.docs.at(-1);
+      const lastDoc = pageDocs.at(-1);
       const lastCreatedAt = lastDoc ? timestamp(lastDoc.data().createdAt) : null;
-      const nextCursor = snap.docs.length === MAX_PAGE_SIZE && lastCreatedAt ? String(new Date(lastCreatedAt).getTime()) : null;
-      return res.status(200).json({ ok: true, records, nextCursor, hasMore: !!nextCursor });
+      const nextCursor = hasMore && lastCreatedAt && lastDoc
+        ? `${new Date(lastCreatedAt).getTime()}:${lastDoc.ref.parent.parent.id}:${lastDoc.id}`
+        : null;
+      return res.status(200).json({ ok: true, records, nextCursor, hasMore });
     } catch {
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }

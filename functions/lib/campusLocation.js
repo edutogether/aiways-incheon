@@ -69,7 +69,12 @@ function createCheckCampusLocationHandler(dependencies = {}) {
       // lat/lng go out of scope here -- nothing below this line ever sees them again.
 
       const checkRef = db.collection("actors").doc(protectedActor.actorId).collection("campusChecks").doc();
-      await checkRef.set({ schoolId, onCampus, consumed: false, createdAt: serverTimestamp(), expiresAt: new Date(now().getTime() + CHECK_TTL_MS) });
+      // 2026-09-01 종합감사(B그룹 5번): 다른 TTL 대상 컬렉션
+      // (system_rate_limits 등, globalRateLimit.js/analysisIdempotency.js)은
+      // 전부 "expireAt" 필드명을 쓰는데 이 컬렉션만 "expiresAt"이었다 -
+      // Firestore TTL 정책은 필드명 단위로 걸리므로, expireAt 기준으로
+      // 정책을 설정하면 이 컬렉션만 삭제 대상에서 조용히 빠진다. 통일.
+      await checkRef.set({ schoolId, onCampus, consumed: false, createdAt: serverTimestamp(), expireAt: new Date(now().getTime() + CHECK_TTL_MS) });
       return res.status(200).json({ ok: true, onCampus, campusCheckId: checkRef.id });
     } catch {
       return res.status(503).json({ ok: false, code: "protection_unavailable" });

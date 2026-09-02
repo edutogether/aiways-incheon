@@ -137,7 +137,7 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
       // 이 필드가 없으면 항상 불일치로 처리돼 onCampus가 조용히 false가
       // 되고, 트리거가 매번 아무 것도 안 하고 조용히 리턴해 집계가 하나도
       // 안 쌓인다 - 이 파일이 CI에 안 걸려있어 아무도 몰랐던 사전 버그.
-      await ref.set({ schoolId: SCHOOL_ID, onCampus: true, consumed: false, createdAt: FieldValue.serverTimestamp(), expiresAt: new Date(Date.now() + 120000) });
+      await ref.set({ schoolId: SCHOOL_ID, onCampus: true, consumed: false, createdAt: FieldValue.serverTimestamp(), expireAt: new Date(Date.now() + 120000) });
       return ref.id;
     }
 
@@ -241,7 +241,7 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
     async function seedOnCampusCheckFor(actorIdArg) {
       const ref = db.collection("actors").doc(actorIdArg).collection("campusChecks").doc();
       // 위 seedOnCampusCheck와 같은 이유로 schoolId를 반드시 넣어야 한다.
-      await ref.set({ schoolId: SCHOOL_ID, onCampus: true, consumed: false, createdAt: FieldValue.serverTimestamp(), expiresAt: new Date(Date.now() + 120000) });
+      await ref.set({ schoolId: SCHOOL_ID, onCampus: true, consumed: false, createdAt: FieldValue.serverTimestamp(), expireAt: new Date(Date.now() + 120000) });
       return ref.id;
     }
     // classContext는 registerStudentProfile로 저장된 프로필에서 서버가

@@ -102,6 +102,14 @@ function call(handler, token, body) {
     assert.equal(afterReject.body.pending, false);
     assert.equal(afterReject.body.rejected, true);
 
+    // 2026-09-01 종합감사(B그룹 5번): 거절된 신청의 실명+번호는 더 이상
+    // Firestore에 남지 않아야 한다(승인 경로는 원래 요청 문서를 삭제해서
+    // 이미 안전했는데, 거절 경로만 ...data를 그대로 남겨 영구 잔존했음).
+    const rejectedDoc = await db.collection("registrationRequests").doc(STUDENT_ACTOR_ID).get();
+    assert.equal(rejectedDoc.data().status, "rejected");
+    assert.equal("name" in rejectedDoc.data(), false, "rejected request must not retain the student's name");
+    assert.equal("studentNumber" in rejectedDoc.data(), false, "rejected request must not retain the student's number");
+
     const resubmit = await call(register, studentToken, { ...student, confirm: true });
     assert.equal(resubmit.status, 202, "a rejected request must be resubmittable, not permanently stuck");
 

@@ -90,6 +90,29 @@ function record(schoolId, grade, classNum, studentNumber, studentName, createdAt
     assert.equal(invalid.status, 400);
     assert.equal(invalid.body.code, "invalid_request");
 
+    // 2026-09-01 종합감사(B그룹 5번): 같은 createdAt(ms)을 가진 두 기록이
+    // 있을 때, 첫 기록을 커서로 넘겨도 같은 밀리초의 두 번째 기록이
+    // 누락되지 않아야 한다(예전 createdAt-only 커서는 startAfter(Date)가
+    // 그 값 "이하" 전부를 건너뛰어서 이런 경우 실제로 누락시켰다).
+    const tieMs = base + 500;
+    const tieActorA = "class_export_test_tie_a";
+    const tieActorB = "class_export_test_tie_b";
+    await db.collection("actors").doc(tieActorA).collection("records").add(record(SCHOOL_A, "5", "1", "10", "동시각A", tieMs));
+    await db.collection("actors").doc(tieActorB).collection("records").add(record(SCHOOL_A, "5", "1", "11", "동시각B", tieMs));
+    const withTies = await call(exportHandler, teacherSignup.idToken, { grade: "5", classNum: "1" });
+    assert.equal(withTies.status, 200);
+    assert.equal(withTies.body.records.length, 4, "both same-millisecond records must be present, not just one");
+    const tieRecords = withTies.body.records.filter((r) => r.createdAt === new Date(tieMs).toISOString());
+    assert.equal(tieRecords.length, 2);
+    // recordId 자체엔 actorId가 없으니, 원본 문서에서 실제 actorId를 다시 찾아 커서를 구성한다.
+    const firstTieSnap = await db.collectionGroup("records").where("classContext.studentName", "==", "동시각A").limit(1).get();
+    const firstTieDoc = firstTieSnap.docs[0];
+    const cursor = `${tieMs}:${firstTieDoc.ref.parent.parent.id}:${firstTieDoc.id}`;
+    const afterCursor = await call(exportHandler, teacherSignup.idToken, { grade: "5", classNum: "1", cursor });
+    assert.equal(afterCursor.status, 200);
+    assert.ok(afterCursor.body.records.some((r) => r.studentName === "동시각B"), "the second same-millisecond record must still appear after resuming from the first one's cursor");
+    assert.equal(afterCursor.body.records.some((r) => r.studentName === "동시각A"), false, "the cursor's own record must not repeat on the next page");
+
     process.stdout.write(JSON.stringify({ classExportEmulatorIntegration: "passed" }) + "\n");
   } finally {
     const batch = db.batch();
@@ -98,7 +121,7 @@ function record(schoolId, grade, classNum, studentNumber, studentName, createdAt
     const devices = await teacherRoot.collection("trustedDevices").get();
     devices.docs.forEach((d) => batch.delete(d.ref));
     batch.delete(teacherRoot);
-    for (const actorId of STUDENT_ACTOR_IDS) {
+    for (const actorId of [...STUDENT_ACTOR_IDS, "class_export_test_tie_a", "class_export_test_tie_b"]) {
       const recordsSnap = await db.collection("actors").doc(actorId).collection("records").get();
       recordsSnap.docs.forEach((d) => batch.delete(d.ref));
     }

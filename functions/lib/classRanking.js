@@ -25,15 +25,20 @@ const MAX_BODY_BYTES = 1 * 1024;
 // 1회로 줄어든다. isMine(요청자 본인 반 여부)은 요청마다 다를 수 있어
 // 캐시 대상에서 제외하고 캐시 조회 이후에 매번 새로 계산한다.
 const RANKING_CACHE_TTL_MS = 5500;
+// 2026-09-01 종합감사(B그룹 5번): schoolDashboard.js의 createSchoolDashboardCache와
+// 같은 이유(만료 항목 미삭제 -> 무한증가) - 같은 수정 적용.
+const MAX_CACHE_ENTRIES = 500;
 function createClassRankingCache() {
   const store = new Map();
   return {
     get(key, now) {
       const entry = store.get(key);
-      if (!entry || now - entry.cachedAt > RANKING_CACHE_TTL_MS) return null;
+      if (!entry) return null;
+      if (now - entry.cachedAt > RANKING_CACHE_TTL_MS) { store.delete(key); return null; }
       return entry.value;
     },
     set(key, value, now) {
+      if (!store.has(key) && store.size >= MAX_CACHE_ENTRIES) store.delete(store.keys().next().value);
       store.set(key, { value, cachedAt: now });
     }
   };

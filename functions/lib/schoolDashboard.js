@@ -42,15 +42,25 @@ function classSummary(doc) {
 // 맞히게 한다 - 그만큼 화면이 최대 5.5초까지 늦게 반영될 수 있지만,
 // 이미 5초 폴링 자체가 그 정도 지연은 전제하고 있다.
 const DASHBOARD_CACHE_TTL_MS = 5500;
+// 2026-09-01 종합감사(B그룹 5번): 만료된 항목을 지우지 않고 get()이 그냥
+// null만 돌려주고 있어서, 이 캐시는 실제로는 schoolId 하나가 아니라
+// lock:{actorId}/students:{schoolId}_{grade}_{classNum} 키도 같이 쓰다 보니
+// 접속한 고유 기기 수만큼 무한정 쌓였다(만료돼도 메모리에는 계속 남음).
+// 만료된 항목은 get()에서 실제로 삭제하고, 그래도 순간적으로 많은 키가
+// 몰리는 상황에 대비해 크기 상한(MAX_CACHE_ENTRIES)을 두어 넘으면 가장
+// 오래된 항목부터 지운다(Map은 삽입 순서를 보존하므로 첫 키가 최고령).
+const MAX_CACHE_ENTRIES = 500;
 function createSchoolDashboardCache() {
   const store = new Map();
   return {
     get(schoolId, now) {
       const entry = store.get(schoolId);
-      if (!entry || now - entry.cachedAt > DASHBOARD_CACHE_TTL_MS) return null;
+      if (!entry) return null;
+      if (now - entry.cachedAt > DASHBOARD_CACHE_TTL_MS) { store.delete(schoolId); return null; }
       return entry.value;
     },
     set(schoolId, value, now) {
+      if (!store.has(schoolId) && store.size >= MAX_CACHE_ENTRIES) store.delete(store.keys().next().value);
       store.set(schoolId, { value, cachedAt: now });
     }
   };

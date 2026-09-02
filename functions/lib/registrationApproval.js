@@ -55,7 +55,13 @@ function createDecideRegistrationHandler(dependencies = {}) {
         if (data.schoolId !== teacher.schoolId) return { code: "not_found" };
         if (data.status !== "pending") return { code: "not_pending" };
         if (decision === "reject") {
-          transaction.set(requestRef, { ...data, status: "rejected", decidedAt: serverTimestamp() }, { merge: true });
+          // 2026-09-01 종합감사(B그룹 5번): 승인 경로(67행)는 요청 문서를
+          // 아예 삭제하는데 거절 경로만 ...data를 그대로 남겨서 학생
+          // 실명+번호가 영구 잔존했다 - 재신청 가능 여부 판단(status)과
+          // 교사 화면 표시(schoolId/schoolName/grade/classNum)에 필요한
+          // 것만 남기고, 개인 식별용인 studentNumber/name은 뺀다(merge:false로
+          // 완전 교체 - merge:true였다면 기존 필드가 안 지워짐).
+          transaction.set(requestRef, { schoolId: data.schoolId, schoolName: data.schoolName, grade: data.grade, classNum: data.classNum, status: "rejected", decidedAt: serverTimestamp() });
           return { ok: true, decision: "rejected" };
         }
         const actorSnap = await transaction.get(actorRef);

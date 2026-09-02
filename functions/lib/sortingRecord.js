@@ -158,8 +158,8 @@ function createSaveSortingRecordHandler(dependencies = {}) {
           const snap = await transaction.get(checkRef);
           if (!snap.exists) return false;
           const data = snap.data() || {};
-          const expiresAt = data.expiresAt?.toDate ? data.expiresAt.toDate() : new Date(data.expiresAt);
-          if (data.consumed === true || !(expiresAt instanceof Date) || Number.isNaN(expiresAt.getTime()) || expiresAt.getTime() < now().getTime()) return false;
+          const expireAt = data.expireAt?.toDate ? data.expireAt.toDate() : new Date(data.expireAt);
+          if (data.consumed === true || !(expireAt instanceof Date) || Number.isNaN(expireAt.getTime()) || expireAt.getTime() < now().getTime()) return false;
           transaction.update(checkRef, { consumed: true });
           // The check was performed for a specific school (campusLocation.js
           // stores it at creation time); a record whose classContext claims a

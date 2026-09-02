@@ -49,10 +49,15 @@ async function guardedActor(req, res, functionName, dependencies) {
 async function guardedTeacher(req, res, functionName, dependencies) {
   const protectedActor = await guardedActor(req, res, functionName, dependencies);
   if (!protectedActor) return null;
-  const teacherSnap = await dependencies.db.collection("actors").doc(protectedActor.actorId).get();
-  const teacherVerified = teacherSnap.exists ? teacherSnap.data()?.teacherVerified : null;
-  if (!teacherVerified?.schoolId) { res.status(403).json({ ok: false, code: "teacher_verification_required" }); return null; }
-  return { actorId: protectedActor.actorId, schoolId: teacherVerified.schoolId };
+  try {
+    const teacherSnap = await dependencies.db.collection("actors").doc(protectedActor.actorId).get();
+    const teacherVerified = teacherSnap.exists ? teacherSnap.data()?.teacherVerified : null;
+    if (!teacherVerified?.schoolId) { res.status(403).json({ ok: false, code: "teacher_verification_required" }); return null; }
+    return { actorId: protectedActor.actorId, schoolId: teacherVerified.schoolId };
+  } catch {
+    res.status(503).json({ ok: false, code: "protection_unavailable" });
+    return null;
+  }
 }
 
 function createCheckTeacherStatusHandler(dependencies = {}) {
@@ -62,9 +67,13 @@ function createCheckTeacherStatusHandler(dependencies = {}) {
     if (!protectedActor) return;
     const body = req.body || {};
     if (Object.keys(body).length) return res.status(400).json({ ok: false, code: "unknown_field" });
-    const snap = await db.collection("actors").doc(protectedActor.actorId).get();
-    const teacherVerified = snap.exists ? snap.data()?.teacherVerified : null;
-    return res.status(200).json({ ok: true, verified: !!teacherVerified, schoolId: teacherVerified?.schoolId || null });
+    try {
+      const snap = await db.collection("actors").doc(protectedActor.actorId).get();
+      const teacherVerified = snap.exists ? snap.data()?.teacherVerified : null;
+      return res.status(200).json({ ok: true, verified: !!teacherVerified, schoolId: teacherVerified?.schoolId || null });
+    } catch {
+      return res.status(503).json({ ok: false, code: "protection_unavailable" });
+    }
   };
 }
 
@@ -81,22 +90,26 @@ function createVerifyTeacherCodeHandler(dependencies = {}) {
     const code = cleanText(body.code, 40);
     if (!schoolId || !code) return res.status(400).json({ ok: false, code: "invalid_request" });
 
-    const codeSnap = await db.collection("teacherCodes").doc(schoolId).get();
-    if (!codeSnap.exists) return res.status(404).json({ ok: false, code: "teacher_code_not_set" });
-    const codeHash = codeSnap.data()?.codeHash;
-    if (typeof codeHash !== "string" || !safeEqualHex(hashTeacherCode(code), codeHash)) {
-      return res.status(401).json({ ok: false, code: "invalid_code" });
-    }
+    try {
+      const codeSnap = await db.collection("teacherCodes").doc(schoolId).get();
+      if (!codeSnap.exists) return res.status(404).json({ ok: false, code: "teacher_code_not_set" });
+      const codeHash = codeSnap.data()?.codeHash;
+      if (typeof codeHash !== "string" || !safeEqualHex(hashTeacherCode(code), codeHash)) {
+        return res.status(401).json({ ok: false, code: "invalid_code" });
+      }
 
-    // 3단 권한체계 3단계(2026-08-31) - school-lock(getSchoolDashboard의
-    // dashboardSchoolId, schoolDashboard.js 참고)은 이 기기가 처음 요청한
-    // 학교로 한 번 고정되면 풀 방법이 전혀 없었다. 교사 코드로 신원이
-    // 확인된 순간만큼은 "이 기기는 이 학교 것"이라는 확실한 서버측
-    // 증거이므로, 그 신뢰를 그대로 넘겨 잘못 고정된 school-lock을
-    // 여기서 바로잡는다(새 "관리자" 개념 없이도 가능한 교정).
-    const actorRef = db.collection("actors").doc(protectedActor.actorId);
-    await actorRef.set({ teacherVerified: { schoolId, verifiedAt: serverTimestamp() }, dashboardSchoolId: schoolId }, { merge: true });
-    return res.status(200).json({ ok: true, verified: true, schoolId });
+      // 3단 권한체계 3단계(2026-08-31) - school-lock(getSchoolDashboard의
+      // dashboardSchoolId, schoolDashboard.js 참고)은 이 기기가 처음 요청한
+      // 학교로 한 번 고정되면 풀 방법이 전혀 없었다. 교사 코드로 신원이
+      // 확인된 순간만큼은 "이 기기는 이 학교 것"이라는 확실한 서버측
+      // 증거이므로, 그 신뢰를 그대로 넘겨 잘못 고정된 school-lock을
+      // 여기서 바로잡는다(새 "관리자" 개념 없이도 가능한 교정).
+      const actorRef = db.collection("actors").doc(protectedActor.actorId);
+      await actorRef.set({ teacherVerified: { schoolId, verifiedAt: serverTimestamp() }, dashboardSchoolId: schoolId }, { merge: true });
+      return res.status(200).json({ ok: true, verified: true, schoolId });
+    } catch {
+      return res.status(503).json({ ok: false, code: "protection_unavailable" });
+    }
   };
 }
 

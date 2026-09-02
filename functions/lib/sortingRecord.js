@@ -127,47 +127,57 @@ function createSaveSortingRecordHandler(dependencies = {}) {
     // 승인 전에도 기록 자체는 저장돼 개인 연습에는 지장 없지만, 반/학교
     // 집계·랭킹·CSV에는 전혀 반영되지 않는다(schoolDashboardAggregate.js가
     // classContext 없는 기록은 이미 조용히 건너뛰도록 돼 있었음).
-    if (db) {
-      const actorSnap = await db.collection("actors").doc(actorId).get();
-      const profile = actorSnap.exists ? actorSnap.data()?.studentProfile : null;
-      // studentNumber/studentName도 같이 넘겨야 반별 개인 랭킹(6단계)을
-      // 집계할 수 있다 - 필드명은 "studentName"으로, 그냥 "name"을 쓰면
-      // FORBIDDEN_KEY(\bname\b)에 걸려 기록 자체가 거부된다(이 세션에
-      // schoolName에서 이미 한 번 겪은 문제와 동일한 이유). 실명 검증
-      // 없이 학생이 스스로 적은 값 그대로다(교사가 부모 동의 하에 자율
-      // 입력을 허용하기로 결정 - 실명이 아니어도 됨).
-      record.classContext = profile
-        ? { schoolId: profile.schoolId, ...(profile.schoolName ? { schoolName: profile.schoolName } : {}), grade: profile.grade, classNum: profile.classNum, ...(profile.studentNumber ? { studentNumber: profile.studentNumber } : {}), ...(profile.name ? { studentName: profile.name } : {}) }
-        : null;
+    // 2026-09-01 종합감사(B그룹 3번): 여기부터 store.createOrGet까지는 전부
+    // Firestore 읽기/쓰기/트랜잭션인데 try/catch가 없어서, 일시적 Firestore
+    // 장애 시 classRanking.js/schoolDashboard.js에 이미 있는 "503
+    // protection_unavailable로 깔끔하게 응답" 컨벤션 대신 15초 타임아웃까지
+    // 응답 없이 멈추는 쪽으로 나갈 수 있었다(saveSortingRecord는 앱에서
+    // 가장 트래픽이 많은 엔드포인트라 영향이 가장 큼) - 같은 컨벤션 적용.
+    try {
+      if (db) {
+        const actorSnap = await db.collection("actors").doc(actorId).get();
+        const profile = actorSnap.exists ? actorSnap.data()?.studentProfile : null;
+        // studentNumber/studentName도 같이 넘겨야 반별 개인 랭킹(6단계)을
+        // 집계할 수 있다 - 필드명은 "studentName"으로, 그냥 "name"을 쓰면
+        // FORBIDDEN_KEY(\bname\b)에 걸려 기록 자체가 거부된다(이 세션에
+        // schoolName에서 이미 한 번 겪은 문제와 동일한 이유). 실명 검증
+        // 없이 학생이 스스로 적은 값 그대로다(교사가 부모 동의 하에 자율
+        // 입력을 허용하기로 결정 - 실명이 아니어도 됨).
+        record.classContext = profile
+          ? { schoolId: profile.schoolId, ...(profile.schoolName ? { schoolName: profile.schoolName } : {}), grade: profile.grade, classNum: profile.classNum, ...(profile.studentNumber ? { studentNumber: profile.studentNumber } : {}), ...(profile.name ? { studentName: profile.name } : {}) }
+          : null;
+      }
+      // GPS 교내판정(5단계): campusCheckId가 있으면 그 일회용 판정 결과를 소비해서
+      // record.onCampus에 반영한다 - 좌표 자체는 이 함수도, 그 이전 어떤 단계도
+      // 저장/기록하지 않는다(checkCampusLocation에서 이미 boolean만 남기고 버림).
+      // 아이디가 없거나, 없거나, 만료/중복사용이면 안전하게 교외(false)로 취급한다.
+      if (db && record.campusCheckId) {
+        const recordSchoolId = record.classContext?.schoolId || "";
+        const checkRef = db.collection("actors").doc(actorId).collection("campusChecks").doc(record.campusCheckId);
+        record.onCampus = await db.runTransaction(async (transaction) => {
+          const snap = await transaction.get(checkRef);
+          if (!snap.exists) return false;
+          const data = snap.data() || {};
+          const expiresAt = data.expiresAt?.toDate ? data.expiresAt.toDate() : new Date(data.expiresAt);
+          if (data.consumed === true || !(expiresAt instanceof Date) || Number.isNaN(expiresAt.getTime()) || expiresAt.getTime() < now().getTime()) return false;
+          transaction.update(checkRef, { consumed: true });
+          // The check was performed for a specific school (campusLocation.js
+          // stores it at creation time); a record whose classContext claims a
+          // different school cannot borrow that school's on-campus result --
+          // otherwise an actor could stand on their own campus, mint a passing
+          // check, then submit a record tagged with someone else's schoolId.
+          if (!recordSchoolId || data.schoolId !== recordSchoolId) return false;
+          return data.onCampus === true;
+        });
+      }
+      delete record.idempotencyKey;
+      delete record.campusCheckId;
+      const result = await store.createOrGet(actorId, checked.value.idempotencyKey, record, { createdAt: createdAt.toISOString() });
+      logger({ recordId: result.recordId, status: result.status, provider: record.provider, schemaVersion: SCHEMA_VERSION, duplicate: result.duplicate === true });
+      return res.status(result.duplicate ? 200 : 201).json({ recordId: result.recordId, status: result.status, createdAt: result.createdAt, schemaVersion: SCHEMA_VERSION, duplicate: result.duplicate === true });
+    } catch {
+      return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }
-    // GPS 교내판정(5단계): campusCheckId가 있으면 그 일회용 판정 결과를 소비해서
-    // record.onCampus에 반영한다 - 좌표 자체는 이 함수도, 그 이전 어떤 단계도
-    // 저장/기록하지 않는다(checkCampusLocation에서 이미 boolean만 남기고 버림).
-    // 아이디가 없거나, 없거나, 만료/중복사용이면 안전하게 교외(false)로 취급한다.
-    if (db && record.campusCheckId) {
-      const recordSchoolId = record.classContext?.schoolId || "";
-      const checkRef = db.collection("actors").doc(actorId).collection("campusChecks").doc(record.campusCheckId);
-      record.onCampus = await db.runTransaction(async (transaction) => {
-        const snap = await transaction.get(checkRef);
-        if (!snap.exists) return false;
-        const data = snap.data() || {};
-        const expiresAt = data.expiresAt?.toDate ? data.expiresAt.toDate() : new Date(data.expiresAt);
-        if (data.consumed === true || !(expiresAt instanceof Date) || Number.isNaN(expiresAt.getTime()) || expiresAt.getTime() < now().getTime()) return false;
-        transaction.update(checkRef, { consumed: true });
-        // The check was performed for a specific school (campusLocation.js
-        // stores it at creation time); a record whose classContext claims a
-        // different school cannot borrow that school's on-campus result --
-        // otherwise an actor could stand on their own campus, mint a passing
-        // check, then submit a record tagged with someone else's schoolId.
-        if (!recordSchoolId || data.schoolId !== recordSchoolId) return false;
-        return data.onCampus === true;
-      });
-    }
-    delete record.idempotencyKey;
-    delete record.campusCheckId;
-    const result = await store.createOrGet(actorId, checked.value.idempotencyKey, record, { createdAt: createdAt.toISOString() });
-    logger({ recordId: result.recordId, status: result.status, provider: record.provider, schemaVersion: SCHEMA_VERSION, duplicate: result.duplicate === true });
-    return res.status(result.duplicate ? 200 : 201).json({ recordId: result.recordId, status: result.status, createdAt: result.createdAt, schemaVersion: SCHEMA_VERSION, duplicate: result.duplicate === true });
   };
 }
 module.exports = { SCHEMA_VERSION, validateRecordRequest, createSaveSortingRecordHandler };

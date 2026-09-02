@@ -41,23 +41,30 @@ function createExportClassRecordsHandler(dependencies = {}) {
       .limit(MAX_PAGE_SIZE);
     if (body.cursor) query = query.startAfter(new Date(Number(body.cursor)));
 
-    const snap = await query.get();
-    const records = snap.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        recordId: doc.id,
-        createdAt: timestamp(data.createdAt),
-        status: data.status,
-        selectedItemId: data.userDecision?.selectedItemId || "",
-        resolutionType: data.resolutionType || "",
-        studentNumber: data.classContext?.studentNumber || "",
-        studentName: data.classContext?.studentName || ""
-      };
-    });
-    const lastDoc = snap.docs.at(-1);
-    const lastCreatedAt = lastDoc ? timestamp(lastDoc.data().createdAt) : null;
-    const nextCursor = snap.docs.length === MAX_PAGE_SIZE && lastCreatedAt ? String(new Date(lastCreatedAt).getTime()) : null;
-    return res.status(200).json({ ok: true, records, nextCursor, hasMore: !!nextCursor });
+    // 2026-09-01 종합감사(B그룹 3번): collectionGroup 쿼리에 try/catch가
+    // 없어서 일시적 Firestore 장애 시 타임아웃까지 응답 없이 멈출 수 있었다 -
+    // 다른 핸들러들과 같은 503 protection_unavailable 컨벤션 적용.
+    try {
+      const snap = await query.get();
+      const records = snap.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          recordId: doc.id,
+          createdAt: timestamp(data.createdAt),
+          status: data.status,
+          selectedItemId: data.userDecision?.selectedItemId || "",
+          resolutionType: data.resolutionType || "",
+          studentNumber: data.classContext?.studentNumber || "",
+          studentName: data.classContext?.studentName || ""
+        };
+      });
+      const lastDoc = snap.docs.at(-1);
+      const lastCreatedAt = lastDoc ? timestamp(lastDoc.data().createdAt) : null;
+      const nextCursor = snap.docs.length === MAX_PAGE_SIZE && lastCreatedAt ? String(new Date(lastCreatedAt).getTime()) : null;
+      return res.status(200).json({ ok: true, records, nextCursor, hasMore: !!nextCursor });
+    } catch {
+      return res.status(503).json({ ok: false, code: "protection_unavailable" });
+    }
   };
 }
 

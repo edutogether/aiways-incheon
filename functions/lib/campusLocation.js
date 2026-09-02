@@ -52,20 +52,28 @@ function createCheckCampusLocationHandler(dependencies = {}) {
       return res.status(400).json({ ok: false, code: "invalid_request" });
     }
 
-    const campusSnap = await db.collection("schoolCampuses").doc(schoolId).get();
-    let onCampus = false;
-    if (campusSnap.exists) {
-      const campus = campusSnap.data() || {};
-      const campusLat = Number(campus.lat), campusLng = Number(campus.lng), radius = Number(campus.radiusMeters);
-      if (Number.isFinite(campusLat) && Number.isFinite(campusLng) && Number.isFinite(radius) && radius > 0) {
-        onCampus = distanceMeters(lat, lng, campusLat, campusLng) <= radius;
+    // 2026-09-01 종합감사(B그룹 3번): Firestore 읽기/쓰기에 try/catch가
+    // 없어서 일시적 장애 시 classRanking.js 등에 이미 있는 503
+    // protection_unavailable 컨벤션 대신 타임아웃까지 응답 없이 멈출 수
+    // 있었다 - 같은 컨벤션 적용.
+    try {
+      const campusSnap = await db.collection("schoolCampuses").doc(schoolId).get();
+      let onCampus = false;
+      if (campusSnap.exists) {
+        const campus = campusSnap.data() || {};
+        const campusLat = Number(campus.lat), campusLng = Number(campus.lng), radius = Number(campus.radiusMeters);
+        if (Number.isFinite(campusLat) && Number.isFinite(campusLng) && Number.isFinite(radius) && radius > 0) {
+          onCampus = distanceMeters(lat, lng, campusLat, campusLng) <= radius;
+        }
       }
-    }
-    // lat/lng go out of scope here -- nothing below this line ever sees them again.
+      // lat/lng go out of scope here -- nothing below this line ever sees them again.
 
-    const checkRef = db.collection("actors").doc(protectedActor.actorId).collection("campusChecks").doc();
-    await checkRef.set({ schoolId, onCampus, consumed: false, createdAt: serverTimestamp(), expiresAt: new Date(now().getTime() + CHECK_TTL_MS) });
-    return res.status(200).json({ ok: true, onCampus, campusCheckId: checkRef.id });
+      const checkRef = db.collection("actors").doc(protectedActor.actorId).collection("campusChecks").doc();
+      await checkRef.set({ schoolId, onCampus, consumed: false, createdAt: serverTimestamp(), expiresAt: new Date(now().getTime() + CHECK_TTL_MS) });
+      return res.status(200).json({ ok: true, onCampus, campusCheckId: checkRef.id });
+    } catch {
+      return res.status(503).json({ ok: false, code: "protection_unavailable" });
+    }
   };
 }
 

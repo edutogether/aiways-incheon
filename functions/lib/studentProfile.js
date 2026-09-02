@@ -42,13 +42,17 @@ function createCheckStudentProfileHandler(dependencies = {}) {
     if (!protectedActor) return;
     const body = req.body || {};
     if (Object.keys(body).length) return res.status(400).json({ ok: false, code: "unknown_field" });
-    const snap = await db.collection("actors").doc(protectedActor.actorId).get();
-    const profile = snap.exists ? snap.data()?.studentProfile : null;
-    if (profile) return res.status(200).json({ ok: true, hasProfile: true, pending: false, rejected: false, profile: publicProfile(profile) });
-    const requestSnap = await db.collection("registrationRequests").doc(protectedActor.actorId).get();
-    const request = requestSnap.exists ? requestSnap.data() : null;
-    const isPending = request?.status === "pending";
-    return res.status(200).json({ ok: true, hasProfile: false, pending: isPending, rejected: request?.status === "rejected", profile: null, pendingProfile: isPending ? publicProfile(request) : null });
+    try {
+      const snap = await db.collection("actors").doc(protectedActor.actorId).get();
+      const profile = snap.exists ? snap.data()?.studentProfile : null;
+      if (profile) return res.status(200).json({ ok: true, hasProfile: true, pending: false, rejected: false, profile: publicProfile(profile) });
+      const requestSnap = await db.collection("registrationRequests").doc(protectedActor.actorId).get();
+      const request = requestSnap.exists ? requestSnap.data() : null;
+      const isPending = request?.status === "pending";
+      return res.status(200).json({ ok: true, hasProfile: false, pending: isPending, rejected: request?.status === "rejected", profile: null, pendingProfile: isPending ? publicProfile(request) : null });
+    } catch {
+      return res.status(503).json({ ok: false, code: "protection_unavailable" });
+    }
   };
 }
 
@@ -74,37 +78,41 @@ function createRegisterStudentProfileHandler(dependencies = {}) {
     if (!schoolId || !schoolName || !grade || !classNum || !studentNumber || !name) return res.status(400).json({ ok: false, code: "invalid_request" });
     if (typeof body.confirm !== "boolean") return res.status(400).json({ ok: false, code: "invalid_request" });
 
-    const actorRef = db.collection("actors").doc(protectedActor.actorId);
-    const existingSnap = await actorRef.get();
-    const existingProfile = existingSnap.exists ? existingSnap.data()?.studentProfile : null;
-    if (existingProfile) return res.status(409).json({ ok: false, code: "already_registered", profile: publicProfile(existingProfile) });
+    try {
+      const actorRef = db.collection("actors").doc(protectedActor.actorId);
+      const existingSnap = await actorRef.get();
+      const existingProfile = existingSnap.exists ? existingSnap.data()?.studentProfile : null;
+      if (existingProfile) return res.status(409).json({ ok: false, code: "already_registered", profile: publicProfile(existingProfile) });
 
-    if (!body.confirm) {
-      // Preview only -- nothing written yet. The client shows this back to
-      // the student ("정말 OO초 5학년 1반 홍길동 맞나요?") before calling again
-      // with confirm:true.
-      return res.status(200).json({ ok: true, confirmed: false, preview: { schoolId, schoolName, grade, classNum, studentNumber, name } });
+      if (!body.confirm) {
+        // Preview only -- nothing written yet. The client shows this back to
+        // the student ("정말 OO초 5학년 1반 홍길동 맞나요?") before calling again
+        // with confirm:true.
+        return res.status(200).json({ ok: true, confirmed: false, preview: { schoolId, schoolName, grade, classNum, studentNumber, name } });
+      }
+
+      // 3단 권한체계 2단계(2026-08-31) - 여기서 바로 studentProfile을 쓰지 않고
+      // registrationRequests/{actorId}에 대기 상태로만 남긴다. teacherVerified된
+      // actor(registrationApproval.js)가 승인해야 실제로 studentProfile이
+      // 생긴다 - 코드만 알면 자기신고로 실명+번호를 무제한 조회할 수 있던
+      // LOCKED 문제를 여기서 닫는다.
+      const requestRef = db.collection("registrationRequests").doc(protectedActor.actorId);
+      const result = await db.runTransaction(async (transaction) => {
+        const actorSnap = await transaction.get(actorRef);
+        const already = actorSnap.exists ? actorSnap.data()?.studentProfile : null;
+        if (already) return { code: "already_registered", profile: already };
+        const requestSnap = await transaction.get(requestRef);
+        const existingRequest = requestSnap.exists ? requestSnap.data() : null;
+        if (existingRequest?.status === "pending") return { code: "request_pending" };
+        transaction.set(requestRef, { schoolId, schoolName, grade, classNum, studentNumber, name, status: "pending", submittedAt: serverTimestamp() });
+        return { ok: true };
+      });
+      if (result.code === "already_registered") return res.status(409).json({ ok: false, code: "already_registered", profile: publicProfile(result.profile) });
+      if (result.code === "request_pending") return res.status(409).json({ ok: false, code: "request_pending" });
+      return res.status(202).json({ ok: true, confirmed: true, pending: true, preview: { schoolId, schoolName, grade, classNum, studentNumber, name } });
+    } catch {
+      return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }
-
-    // 3단 권한체계 2단계(2026-08-31) - 여기서 바로 studentProfile을 쓰지 않고
-    // registrationRequests/{actorId}에 대기 상태로만 남긴다. teacherVerified된
-    // actor(registrationApproval.js)가 승인해야 실제로 studentProfile이
-    // 생긴다 - 코드만 알면 자기신고로 실명+번호를 무제한 조회할 수 있던
-    // LOCKED 문제를 여기서 닫는다.
-    const requestRef = db.collection("registrationRequests").doc(protectedActor.actorId);
-    const result = await db.runTransaction(async (transaction) => {
-      const actorSnap = await transaction.get(actorRef);
-      const already = actorSnap.exists ? actorSnap.data()?.studentProfile : null;
-      if (already) return { code: "already_registered", profile: already };
-      const requestSnap = await transaction.get(requestRef);
-      const existingRequest = requestSnap.exists ? requestSnap.data() : null;
-      if (existingRequest?.status === "pending") return { code: "request_pending" };
-      transaction.set(requestRef, { schoolId, schoolName, grade, classNum, studentNumber, name, status: "pending", submittedAt: serverTimestamp() });
-      return { ok: true };
-    });
-    if (result.code === "already_registered") return res.status(409).json({ ok: false, code: "already_registered", profile: publicProfile(result.profile) });
-    if (result.code === "request_pending") return res.status(409).json({ ok: false, code: "request_pending" });
-    return res.status(202).json({ ok: true, confirmed: true, pending: true, preview: { schoolId, schoolName, grade, classNum, studentNumber, name } });
   };
 }
 
@@ -137,41 +145,45 @@ function createChangeStudentClassHandler(dependencies = {}) {
     if (typeof body.confirm !== "boolean") return res.status(400).json({ ok: false, code: "invalid_request" });
 
     const actorRef = db.collection("actors").doc(protectedActor.actorId);
-    const existingSnap = await actorRef.get();
-    const existingProfile = existingSnap.exists ? existingSnap.data()?.studentProfile : null;
-    if (!existingProfile) return res.status(409).json({ ok: false, code: "not_registered" });
+    try {
+      const existingSnap = await actorRef.get();
+      const existingProfile = existingSnap.exists ? existingSnap.data()?.studentProfile : null;
+      if (!existingProfile) return res.status(409).json({ ok: false, code: "not_registered" });
 
-    const lastChanged = timestampToDate(existingProfile.lastChangedAt) || timestampToDate(existingProfile.registeredAt) || now();
-    const elapsedMs = now().getTime() - lastChanged.getTime();
-    if (elapsedMs < CLASS_CHANGE_COOLDOWN_MS) {
-      return res.status(429).json({ ok: false, code: "cooldown_active", retryAfterSeconds: Math.ceil((CLASS_CHANGE_COOLDOWN_MS - elapsedMs) / 1000) });
-    }
-    if (existingProfile.grade === grade && existingProfile.classNum === classNum) {
-      return res.status(400).json({ ok: false, code: "no_change" });
-    }
+      const lastChanged = timestampToDate(existingProfile.lastChangedAt) || timestampToDate(existingProfile.registeredAt) || now();
+      const elapsedMs = now().getTime() - lastChanged.getTime();
+      if (elapsedMs < CLASS_CHANGE_COOLDOWN_MS) {
+        return res.status(429).json({ ok: false, code: "cooldown_active", retryAfterSeconds: Math.ceil((CLASS_CHANGE_COOLDOWN_MS - elapsedMs) / 1000) });
+      }
+      if (existingProfile.grade === grade && existingProfile.classNum === classNum) {
+        return res.status(400).json({ ok: false, code: "no_change" });
+      }
 
-    if (!body.confirm) {
-      return res.status(200).json({ ok: true, confirmed: false, preview: { schoolId: existingProfile.schoolId, schoolName: existingProfile.schoolName, grade, classNum, studentNumber: existingProfile.studentNumber, name: existingProfile.name } });
-    }
+      if (!body.confirm) {
+        return res.status(200).json({ ok: true, confirmed: false, preview: { schoolId: existingProfile.schoolId, schoolName: existingProfile.schoolName, grade, classNum, studentNumber: existingProfile.studentNumber, name: existingProfile.name } });
+      }
 
-    const result = await db.runTransaction(async (transaction) => {
-      const snap = await transaction.get(actorRef);
-      const current = snap.exists ? snap.data()?.studentProfile : null;
-      if (!current) return { code: "not_registered" };
-      const currentLastChanged = timestampToDate(current.lastChangedAt) || timestampToDate(current.registeredAt) || now();
-      if (now().getTime() - currentLastChanged.getTime() < CLASS_CHANGE_COOLDOWN_MS) return { code: "cooldown_active" };
-      // FieldValue.serverTimestamp() can't be used inside an array element,
-      // so this one entry uses a plain client Date instead of the usual
-      // server sentinel -- fine here since it's only an audit trail, not
-      // anything the cooldown math itself relies on (that reads lastChangedAt).
-      const historyEntry = { fromGrade: current.grade, fromClassNum: current.classNum, toGrade: grade, toClassNum: classNum, changedAt: now() };
-      const history = [...(Array.isArray(current.changeHistory) ? current.changeHistory : []), historyEntry].slice(-MAX_CHANGE_HISTORY);
-      transaction.set(actorRef, { studentProfile: { ...current, grade, classNum, lastChangedAt: serverTimestamp(), changeHistory: history } }, { merge: true });
-      return { ok: true };
-    });
-    if (result.code === "not_registered") return res.status(409).json({ ok: false, code: "not_registered" });
-    if (result.code === "cooldown_active") return res.status(429).json({ ok: false, code: "cooldown_active" });
-    return res.status(200).json({ ok: true, confirmed: true, profile: { schoolId: existingProfile.schoolId, schoolName: existingProfile.schoolName, grade, classNum, studentNumber: existingProfile.studentNumber, name: existingProfile.name } });
+      const result = await db.runTransaction(async (transaction) => {
+        const snap = await transaction.get(actorRef);
+        const current = snap.exists ? snap.data()?.studentProfile : null;
+        if (!current) return { code: "not_registered" };
+        const currentLastChanged = timestampToDate(current.lastChangedAt) || timestampToDate(current.registeredAt) || now();
+        if (now().getTime() - currentLastChanged.getTime() < CLASS_CHANGE_COOLDOWN_MS) return { code: "cooldown_active" };
+        // FieldValue.serverTimestamp() can't be used inside an array element,
+        // so this one entry uses a plain client Date instead of the usual
+        // server sentinel -- fine here since it's only an audit trail, not
+        // anything the cooldown math itself relies on (that reads lastChangedAt).
+        const historyEntry = { fromGrade: current.grade, fromClassNum: current.classNum, toGrade: grade, toClassNum: classNum, changedAt: now() };
+        const history = [...(Array.isArray(current.changeHistory) ? current.changeHistory : []), historyEntry].slice(-MAX_CHANGE_HISTORY);
+        transaction.set(actorRef, { studentProfile: { ...current, grade, classNum, lastChangedAt: serverTimestamp(), changeHistory: history } }, { merge: true });
+        return { ok: true };
+      });
+      if (result.code === "not_registered") return res.status(409).json({ ok: false, code: "not_registered" });
+      if (result.code === "cooldown_active") return res.status(429).json({ ok: false, code: "cooldown_active" });
+      return res.status(200).json({ ok: true, confirmed: true, profile: { schoolId: existingProfile.schoolId, schoolName: existingProfile.schoolName, grade, classNum, studentNumber: existingProfile.studentNumber, name: existingProfile.name } });
+    } catch {
+      return res.status(503).json({ ok: false, code: "protection_unavailable" });
+    }
   };
 }
 

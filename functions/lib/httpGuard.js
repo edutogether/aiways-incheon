@@ -20,10 +20,17 @@ function cleanText(value, max = 80) {
 // 이 목록이 안 갱신돼 라이브 사이트의 모든 API 호출이 403 invalid_origin으로
 // 막혀 있었다(2026-09-01 종합감사 중 curl로 실측 재현 확인, 대표님 승인 후
 // 즉시 수정). GH Pages는 대표님이 아직 폐기 여부를 결정 전이라 남겨둔다.
+// 2026-09-01 추가: 6개 앱 주소를 edutogether.kr/앱이름으로 통일하는 리버스
+// 프록시가 Portal에 구축 중인데, 그 프록시는 정적 페이지만 다루고 Cloud
+// Functions API 도메인은 프록시하지 않는다 - 즉 브라우저는 프록시된 페이지에서도
+// API는 원래 Cloud Functions 주소로 직접 호출하고, 그때 Origin은
+// https://edutogether.kr가 된다(Voice Cinema 프로젝트에서 먼저 발견된 동일
+// 구조 - projects-42 전달). 페이지 코드 변경 없이 서버 허용목록에만 추가.
 const ALLOWED_STATIC_ORIGINS = new Set([
   "https://edutogether.github.io",
   "https://ai-ways-incheon.web.app",
   "https://ai-ways-incheon.firebaseapp.com",
+  "https://edutogether.kr",
 ]);
 
 function isAllowedOrigin(origin) {

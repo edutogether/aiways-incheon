@@ -181,3 +181,11 @@ jobs:
 
       - name: Deploy Firebase Hosting
         run: firebase deploy --only hosting --project ai-ways-incheon --non-interactive
+
+      # 2026-09-01 추가(재발방지): 배포된 "코드"가 아니라 배포된 "결과"(실제
+      # 라이브 응답)를 확인한다. 이 스텝이 없어서 그날 도메인 이전 때 CORS
+      # 허용목록 미갱신으로 모든 API가 403인 상태가 아무 신호 없이 그대로
+      # 나갔다 - scripts/postDeploySmoke.js가 대표 엔드포인트 몇 개를 실제
+      # 프로덕션 Origin으로 두드려서 invalid_origin/헤더 누락을 잡는다.
+      - name: Post-deploy smoke test (live CORS + security headers)
+        run: node scripts/postDeploySmoke.js

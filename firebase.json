@@ -13,7 +13,7 @@
           { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(self)" },
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' 'sha256-VlEoLly6nrCHzZ9yYflROMKgub24XbiNQsMtiOmmxK8=' https://www.gstatic.com https://www.google.com https://www.recaptcha.net https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.googleapis.com https://*.google.com https://*.firebaseio.com wss://*.firebaseio.com https://*.cloudfunctions.net https://*.run.app https://cdn.jsdelivr.net; frame-src 'self' https://www.google.com https://ai-ways-incheon.firebaseapp.com; object-src 'none'; base-uri 'self'; frame-ancestors 'self'"
+            "value": "default-src 'self'; script-src 'self' 'sha256-VlEoLly6nrCHzZ9yYflROMKgub24XbiNQsMtiOmmxK8=' https://www.gstatic.com https://www.google.com https://www.recaptcha.net https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.googleapis.com https://*.google.com https://*.firebaseio.com wss://*.firebaseio.com https://*.cloudfunctions.net https://*.run.app https://cdn.jsdelivr.net; frame-src 'self' https://www.google.com https://ai-ways-incheon.firebaseapp.com; object-src 'none'; base-uri 'self'; frame-ancestors 'self'"
           }
         ]
       }

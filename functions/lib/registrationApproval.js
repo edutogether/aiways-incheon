@@ -5,6 +5,9 @@
 // 실제로 닫는다. registerStudentProfile(studentProfile.js)은 이제 즉시
 // studentProfile을 쓰지 않고 registrationRequests/{actorId}에 대기 상태로만
 // 남긴다 - 여기 두 함수가 그 대기열을 teacherVerified된 actor에게만 열어준다.
+// 2026-09-02 재설계(대표님 지시): 교사 인증이 학교 단위에서 반 단위로
+// 좁혀지면서, 이 대기열도 "같은 학교"가 아니라 "같은 학교+학년+반"으로만
+// 열린다 - 담임은 자기 반 학생만 승인/거절할 수 있다.
 const { cleanText } = require("./httpGuard");
 const { guardedTeacher } = require("./teacherAuth");
 
@@ -23,16 +26,17 @@ function createListPendingRegistrationsHandler(dependencies = {}) {
     if (!teacher) return;
     const body = req.body || {};
     if (Object.keys(body).length) return res.status(400).json({ ok: false, code: "unknown_field" });
-    // 2026-09-02 재감사: 같은 파일의 decideRegistration에는 503 컨벤션이
-    // 붙어 있는데 이 조회만 try/catch가 없어서, 일시적 Firestore 장애 시
-    // 교사 화면이 503이 아니라 정체불명의 500을 받았다.
     try {
-      const snap = await db.collection("registrationRequests").where("schoolId", "==", teacher.schoolId).where("status", "==", "pending").limit(MAX_LIST_SIZE).get();
-      const requests = snap.docs.map((doc) => ({ actorId: doc.id, ...publicProfile(doc.data()) }));
-      // 대기열이 MAX_LIST_SIZE(100)를 넘으면 넘친 신청은 화면에 아예 안 보이는데
-      // 예전엔 그 사실을 교사가 알 방법이 없었다(승인 안 되면 학생은 계속
-      // "승인 대기중"만 본다) - 잘렸는지 여부를 같이 내려준다.
-      return res.status(200).json({ ok: true, requests, truncated: requests.length >= MAX_LIST_SIZE });
+      const snap = await db.collection("registrationRequests")
+        .where("schoolId", "==", teacher.schoolId)
+        .where("grade", "==", teacher.grade)
+        .where("classNum", "==", teacher.classNum)
+        .where("status", "==", "pending")
+        .limit(MAX_LIST_SIZE + 1)
+        .get();
+      const truncated = snap.docs.length > MAX_LIST_SIZE;
+      const requests = snap.docs.slice(0, MAX_LIST_SIZE).map((doc) => ({ actorId: doc.id, ...publicProfile(doc.data()) }));
+      return res.status(200).json({ ok: true, requests, truncated });
     } catch {
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }
@@ -61,12 +65,13 @@ function createDecideRegistrationHandler(dependencies = {}) {
         const snap = await transaction.get(requestRef);
         if (!snap.exists) return { code: "not_found" };
         const data = snap.data();
-        // 다른 학교 요청이면 "없는 것"처럼 404로 응답한다 - 학교 소속을
-        // 넘어선 actorId 추측 시도로도 다른 학교 학생 정보가 새어나가지 않게.
-        if (data.schoolId !== teacher.schoolId) return { code: "not_found" };
+        // 다른 학교/다른 반 요청이면 "없는 것"처럼 404로 응답한다 - 학교/반
+        // 소속을 넘어선 actorId 추측 시도로도 다른 반 학생 정보가 새어나가지
+        // 않게.
+        if (data.schoolId !== teacher.schoolId || data.grade !== teacher.grade || data.classNum !== teacher.classNum) return { code: "not_found" };
         if (data.status !== "pending") return { code: "not_pending" };
         if (decision === "reject") {
-          // 2026-09-01 종합감사(B그룹 5번): 승인 경로(67행)는 요청 문서를
+          // 2026-09-01 종합감사(B그룹 5번): 승인 경로(아래)는 요청 문서를
           // 아예 삭제하는데 거절 경로만 ...data를 그대로 남겨서 학생
           // 실명+번호가 영구 잔존했다 - 재신청 가능 여부 판단(status)과
           // 교사 화면 표시(schoolId/schoolName/grade/classNum)에 필요한
@@ -97,7 +102,7 @@ function createDecideRegistrationHandler(dependencies = {}) {
     if (result.code === "not_found") return res.status(404).json({ ok: false, code: "request_not_found" });
     if (result.code === "not_pending") return res.status(409).json({ ok: false, code: "already_decided" });
     if (result.code === "already_registered") return res.status(409).json({ ok: false, code: "already_registered" });
-    logger({ severity: "INFO", message: "registration_decided", teacherActorId: teacher.actorId, schoolId: teacher.schoolId, targetActorId, decision: result.decision });
+    logger({ severity: "INFO", message: "registration_decided", teacherActorId: teacher.actorId, schoolId: teacher.schoolId, grade: teacher.grade, classNum: teacher.classNum, targetActorId, decision: result.decision });
     return res.status(200).json({ ok: true, decision: result.decision, targetActorId });
   };
 }

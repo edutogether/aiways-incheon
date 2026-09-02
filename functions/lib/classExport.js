@@ -10,7 +10,6 @@
 const { FieldPath, Timestamp } = require("firebase-admin/firestore");
 const { guardedTeacher } = require("./teacherAuth");
 
-const DIGITS = /^\d{1,2}$/;
 // 2026-09-01 종합감사(B그룹 5번): 예전엔 createdAt(ms) 단독 커서라 ①같은
 // 밀리초에 여러 기록이 있으면 페이지 경계에서 일부가 조용히 누락될 수
 // 있었고(startAfter(Date)는 그 값 "이하" 전부를 건너뜀), ②정확히
@@ -52,17 +51,18 @@ function createExportClassRecordsHandler(dependencies = {}) {
     const teacher = await guardedTeacher(req, res, "exportClassRecords", dependencies);
     if (!teacher) return;
     const body = req.body || {};
-    const allowed = new Set(["grade", "classNum", "cursor"]);
+    // 2026-09-02 재설계: teacherVerified가 이제 반 단위라(teacherAuth.js),
+    // 담임은 애초에 자기 반 하나만 있다 - 클라이언트가 grade/classNum을
+    // 보낼 필요도, 다른 반을 지정할 방법도 없앤다(guardedTeacher가 이미
+    // 확인한 값만 신뢰).
+    const allowed = new Set(["cursor"]);
     if (Object.keys(body).some((key) => !allowed.has(key))) return res.status(400).json({ ok: false, code: "unknown_field" });
-    const grade = typeof body.grade === "string" && DIGITS.test(body.grade) ? body.grade : "";
-    const classNum = typeof body.classNum === "string" && DIGITS.test(body.classNum) ? body.classNum : "";
-    if (!grade || !classNum) return res.status(400).json({ ok: false, code: "invalid_request" });
     if (body.cursor !== undefined && !CURSOR_PATTERN.test(String(body.cursor))) return res.status(400).json({ ok: false, code: "invalid_request" });
 
     let query = db.collectionGroup("records")
       .where("classContext.schoolId", "==", teacher.schoolId)
-      .where("classContext.grade", "==", grade)
-      .where("classContext.classNum", "==", classNum)
+      .where("classContext.grade", "==", teacher.grade)
+      .where("classContext.classNum", "==", teacher.classNum)
       .orderBy("createdAt", "asc")
       .orderBy(FieldPath.documentId(), "asc")
       .limit(MAX_PAGE_SIZE + 1); // +1 so we know if there's a next page without a trailing empty request
@@ -100,7 +100,7 @@ function createExportClassRecordsHandler(dependencies = {}) {
       // 2026-09-01 종합감사(B그룹 6번): 반 전체 실명+번호 CSV를 내보내면서
       // 아무 기록도 안 남기고 있었다 - "누가 언제 우리 반 명단을 뽑았나"에
       // 답할 수 있게 감사로그를 남긴다(개인정보 자체는 로그에 안 넣음).
-      logger({ severity: "INFO", message: "class_records_exported", teacherActorId: teacher.actorId, schoolId: teacher.schoolId, grade, classNum, recordCount: records.length });
+      logger({ severity: "INFO", message: "class_records_exported", teacherActorId: teacher.actorId, schoolId: teacher.schoolId, grade: teacher.grade, classNum: teacher.classNum, recordCount: records.length });
       return res.status(200).json({ ok: true, records, nextCursor, hasMore });
     } catch {
       return res.status(503).json({ ok: false, code: "protection_unavailable" });

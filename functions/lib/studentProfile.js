@@ -9,6 +9,7 @@
 // afterward, and it's cooldown-limited so a device can't hop classes freely.
 const { protectActorRequest } = require("./protectedActor");
 const { cleanText, applyCors } = require("./httpGuard");
+const { verifyTeacherCodeCore } = require("./teacherAuth");
 
 const MAX_BODY_BYTES = 2 * 1024;
 const DIGITS = /^\d{1,2}$/;
@@ -56,15 +57,24 @@ function createCheckStudentProfileHandler(dependencies = {}) {
   };
 }
 
+// 2026-09-02 재설계(대표님 지시): "가입 경로를 두 개나 만들지 말라 - 학생과
+// 교사 전부 하나의 가입 화면에서 학교/학년/반 + 역할을 선택"하는 단일
+// 플로우 요구사항에 맞춰, 이 핸들러 하나가 학생/담임 가입을 전부 처리한다.
+// role:"student"(기본값)는 기존과 동일하게 승인대기열로 간다. role:"homeroom"은
+// teacherCode를 같이 받아 그 자리에서 바로 교사 인증까지 끝낸다(별도 화면/
+// 별도 코드입력 다이얼로그 없음) - 승인이 필요 없는 이유는 코드 자체가
+// 이미 "교사만 아는 값"이라는 신원증명이기 때문(teacherAuth.js와 동일한 근거).
 function createRegisterStudentProfileHandler(dependencies = {}) {
   const db = dependencies.db;
   const serverTimestamp = dependencies.serverTimestamp || (() => new Date());
+  const logger = dependencies.logger || (() => {});
   return async (req, res) => {
     const protectedActor = await guardedActor(req, res, "registerStudentProfile", dependencies);
     if (!protectedActor) return;
     const body = req.body || {};
-    const allowed = new Set(["schoolId", "schoolName", "grade", "classNum", "studentNumber", "name", "confirm"]);
+    const allowed = new Set(["schoolId", "schoolName", "grade", "classNum", "studentNumber", "name", "role", "teacherCode", "confirm"]);
     if (Object.keys(body).some((key) => !allowed.has(key))) return res.status(400).json({ ok: false, code: "unknown_field" });
+    const role = body.role === "homeroom" ? "homeroom" : "student";
     // schoolId는 이제 사람이 친 학교 이름이 아니라 나이스(NEIS) 학교기본정보
     // API의 표준학교코드(SD_SCHUL_CODE, 숫자 문자열)다 - searchSchool로 검색해
     // 목록에서 고른 값만 여기로 들어오므로 오타로 다른 학교가 되는 일이 없다.
@@ -75,8 +85,22 @@ function createRegisterStudentProfileHandler(dependencies = {}) {
     const classNum = typeof body.classNum === "string" && DIGITS.test(body.classNum) ? body.classNum : "";
     const studentNumber = typeof body.studentNumber === "string" && DIGITS.test(body.studentNumber) ? body.studentNumber : "";
     const name = cleanText(body.name, 20);
-    if (!schoolId || !schoolName || !grade || !classNum || !studentNumber || !name) return res.status(400).json({ ok: false, code: "invalid_request" });
+    if (!schoolId || !schoolName || !grade || !classNum || !name) return res.status(400).json({ ok: false, code: "invalid_request" });
+    if (role === "student" && !studentNumber) return res.status(400).json({ ok: false, code: "invalid_request" });
     if (typeof body.confirm !== "boolean") return res.status(400).json({ ok: false, code: "invalid_request" });
+
+    if (role === "homeroom") {
+      const teacherCode = cleanText(body.teacherCode, 40);
+      if (!teacherCode) return res.status(400).json({ ok: false, code: "invalid_request" });
+      if (!body.confirm) return res.status(200).json({ ok: true, confirmed: false, role, preview: { schoolId, schoolName, grade, classNum, name } });
+      try {
+        const result = await verifyTeacherCodeCore({ db, serverTimestamp, actorId: protectedActor.actorId, schoolId, grade, classNum, code: teacherCode, logger });
+        if (!result.ok) return res.status(result.httpStatus).json({ ok: false, code: result.code });
+        return res.status(200).json({ ok: true, confirmed: true, role, verified: true, schoolId, grade, classNum });
+      } catch {
+        return res.status(503).json({ ok: false, code: "protection_unavailable" });
+      }
+    }
 
     try {
       const actorRef = db.collection("actors").doc(protectedActor.actorId);
@@ -88,7 +112,7 @@ function createRegisterStudentProfileHandler(dependencies = {}) {
         // Preview only -- nothing written yet. The client shows this back to
         // the student ("정말 OO초 5학년 1반 홍길동 맞나요?") before calling again
         // with confirm:true.
-        return res.status(200).json({ ok: true, confirmed: false, preview: { schoolId, schoolName, grade, classNum, studentNumber, name } });
+        return res.status(200).json({ ok: true, confirmed: false, role, preview: { schoolId, schoolName, grade, classNum, studentNumber, name } });
       }
 
       // 3단 권한체계 2단계(2026-08-31) - 여기서 바로 studentProfile을 쓰지 않고
@@ -109,7 +133,7 @@ function createRegisterStudentProfileHandler(dependencies = {}) {
       });
       if (result.code === "already_registered") return res.status(409).json({ ok: false, code: "already_registered", profile: publicProfile(result.profile) });
       if (result.code === "request_pending") return res.status(409).json({ ok: false, code: "request_pending" });
-      return res.status(202).json({ ok: true, confirmed: true, pending: true, preview: { schoolId, schoolName, grade, classNum, studentNumber, name } });
+      return res.status(202).json({ ok: true, confirmed: true, role, pending: true, preview: { schoolId, schoolName, grade, classNum, studentNumber, name } });
     } catch {
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }

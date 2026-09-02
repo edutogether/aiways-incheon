@@ -106,7 +106,7 @@ exports.checkStudentProfile = onRequest({ region: "asia-northeast3", memory: "25
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 exports.registerStudentProfile = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createRegisterStudentProfileHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
 }));
 exports.checkCampusLocation = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckCampusLocationHandler({
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()

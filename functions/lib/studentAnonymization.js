@@ -44,7 +44,7 @@ function createAnonymizeStudentHandler(dependencies = {}) {
         // 다른 학교 학생이면 "없는 것"처럼 404로 응답한다 - registrationApproval.js/
         // classExport.js와 같은 이유(학교 소속을 넘어선 actorId 추측으로도
         // 다른 학교 학생 정보가 새어나가지 않게).
-        if (profile.schoolId !== teacher.schoolId) return { code: "not_found" };
+        if (profile.schoolId !== teacher.schoolId || profile.grade !== teacher.grade || profile.classNum !== teacher.classNum) return { code: "not_found" };
         if (profile.anonymized === true) return { code: "already_anonymized" };
 
         const studentRef = db.collection("schools").doc(profile.schoolId)

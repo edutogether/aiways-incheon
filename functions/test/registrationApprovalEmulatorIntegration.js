@@ -1,8 +1,9 @@
 "use strict";
 // Demo emulators only. Confirms the approval queue itself: a teacher only
-// sees/decides pending requests for their OWN schoolId (cross-school
-// isolation), rejecting a request lets the student resubmit, deciding a
-// request twice fails cleanly, and a non-teacher actor is refused outright.
+// sees/decides pending requests for their OWN school+grade+class (cross-school
+// AND cross-class isolation, 2026-09-02 재설계로 반 단위까지 좁혀짐), rejecting
+// a request lets the student resubmit, deciding a request twice fails
+// cleanly, and a non-teacher actor is refused outright.
 const assert = require("node:assert/strict"), http = require("node:http");
 const { initializeApp, getApps } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
@@ -17,6 +18,7 @@ const authEmulator = new URL(`http://${process.env.FIREBASE_AUTH_EMULATOR_HOST |
 const STUDENT_ACTOR_ID = "registration_approval_test_student";
 const TEACHER_A_ID = "registration_approval_test_teacher_a";
 const TEACHER_B_ID = "registration_approval_test_teacher_b";
+const TEACHER_C_ID = "registration_approval_test_teacher_c";
 const SCHOOL_A = "7321071";
 const SCHOOL_B = "9999999";
 const student = { schoolId: SCHOOL_A, schoolName: "테스트초등학교", grade: "5", classNum: "1", studentNumber: "12", name: "홍길동" };
@@ -41,13 +43,14 @@ function call(handler, token, body) {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
-  let studentUid = "", teacherAUid = "", teacherBUid = "";
+  let studentUid = "", teacherAUid = "", teacherBUid = "", teacherCUid = "";
   try {
-    const studentSignup = await signup(), teacherASignup = await signup(), teacherBSignup = await signup();
-    const studentToken = studentSignup.idToken, teacherAToken = teacherASignup.idToken, teacherBToken = teacherBSignup.idToken;
+    const studentSignup = await signup(), teacherASignup = await signup(), teacherBSignup = await signup(), teacherCSignup = await signup();
+    const studentToken = studentSignup.idToken, teacherAToken = teacherASignup.idToken, teacherBToken = teacherBSignup.idToken, teacherCToken = teacherCSignup.idToken;
     studentUid = (await auth.verifyIdToken(studentToken)).uid;
     teacherAUid = (await auth.verifyIdToken(teacherAToken)).uid;
     teacherBUid = (await auth.verifyIdToken(teacherBToken)).uid;
+    teacherCUid = (await auth.verifyIdToken(teacherCToken)).uid;
 
     async function bind(actorId, uid) {
       await db.collection("actors").doc(actorId).collection("trustedDevices").doc(uid).set({ uid, status: "active", managementId: "123e4567-e89b-42d3-a456-426614174611" });
@@ -55,10 +58,14 @@ function call(handler, token, body) {
     }
     await db.collection("actors").doc(STUDENT_ACTOR_ID).set({ status: "active", plan: "closed_beta", dashboardSchoolId: SCHOOL_B });
     await bind(STUDENT_ACTOR_ID, studentUid);
-    await db.collection("actors").doc(TEACHER_A_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_A } });
+    await db.collection("actors").doc(TEACHER_A_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_A, grade: student.grade, classNum: student.classNum } });
     await bind(TEACHER_A_ID, teacherAUid);
-    await db.collection("actors").doc(TEACHER_B_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_B } });
+    await db.collection("actors").doc(TEACHER_B_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_B, grade: student.grade, classNum: student.classNum } });
     await bind(TEACHER_B_ID, teacherBUid);
+    // 같은 학교지만 다른 반 담임 - 2026-09-02 재설계 전에는 학교만 같으면
+    // 전체 반이 보였는데, 이제는 이 교사도 학생이 안 보여야 한다.
+    await db.collection("actors").doc(TEACHER_C_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_A, grade: student.grade, classNum: "2" } });
+    await bind(TEACHER_C_ID, teacherCUid);
 
     const access = createEdu2gDeviceAccess({ auth, db, serverTimestamp: () => FieldValue.serverTimestamp() });
     const rateLimiter = createGlobalRateLimiter({ db });
@@ -82,6 +89,14 @@ function call(handler, token, body) {
     const teacherBList = await call(list, teacherBToken, {});
     assert.equal(teacherBList.status, 200);
     assert.deepEqual(teacherBList.body.requests, []);
+
+    // 같은 학교, 다른 반 담임에게도 안 보인다(반 격리, 2026-09-02 재설계).
+    const teacherCList = await call(list, teacherCToken, {});
+    assert.equal(teacherCList.status, 200);
+    assert.deepEqual(teacherCList.body.requests, []);
+    const teacherCDecide = await call(decide, teacherCToken, { targetActorId: STUDENT_ACTOR_ID, decision: "approve" });
+    assert.equal(teacherCDecide.status, 404);
+    assert.equal(teacherCDecide.body.code, "request_not_found");
 
     // 학교B 교사가 actorId를 알아내 직접 승인/거절을 시도해도 "없는 요청"처럼
     // 404로 막힌다(다른 학교 학생 정보가 새어나가는 신호조차 안 줌).
@@ -132,7 +147,7 @@ function call(handler, token, body) {
     process.stdout.write(JSON.stringify({ registrationApprovalEmulatorIntegration: "passed" }) + "\n");
   } finally {
     const batch = db.batch();
-    for (const [actorId, uid] of [[STUDENT_ACTOR_ID, studentUid], [TEACHER_A_ID, teacherAUid], [TEACHER_B_ID, teacherBUid]]) {
+    for (const [actorId, uid] of [[STUDENT_ACTOR_ID, studentUid], [TEACHER_A_ID, teacherAUid], [TEACHER_B_ID, teacherBUid], [TEACHER_C_ID, teacherCUid]]) {
       if (uid) batch.delete(db.collection("edu2gDeviceBindings").doc(uid));
       const actorRoot = db.collection("actors").doc(actorId);
       const devices = await actorRoot.collection("trustedDevices").get();

@@ -62,7 +62,7 @@ function record(schoolId, grade, classNum, studentNumber, studentName, createdAt
 
     const teacherSignup = await signup();
     teacherUid = (await auth.verifyIdToken(teacherSignup.idToken)).uid;
-    await db.collection("actors").doc(TEACHER_ACTOR_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_A } });
+    await db.collection("actors").doc(TEACHER_ACTOR_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_A, grade: "5", classNum: "1" } });
     await db.collection("actors").doc(TEACHER_ACTOR_ID).collection("trustedDevices").doc(teacherUid).set({ uid: teacherUid, status: "active", managementId: "123e4567-e89b-42d3-a456-426614174631" });
     await db.collection("edu2gDeviceBindings").doc(teacherUid).set({ actorId: TEACHER_ACTOR_ID, status: "active" });
 
@@ -74,11 +74,11 @@ function record(schoolId, grade, classNum, studentNumber, studentName, createdAt
 
     // 인증 안 된 기기(teacherVerified 없는 별도 로그인)는 거절.
     const otherSignup = await signup();
-    const otherResponse = await call(exportHandler, otherSignup.idToken, { grade: "5", classNum: "1" });
+    const otherResponse = await call(exportHandler, otherSignup.idToken, {});
     assert.equal(otherResponse.status, 403);
     assert.equal(otherResponse.body.code, "teacher_verification_required");
 
-    const result = await call(exportHandler, teacherSignup.idToken, { grade: "5", classNum: "1" });
+    const result = await call(exportHandler, teacherSignup.idToken, {});
     assert.equal(result.status, 200);
     assert.equal(result.body.records.length, 2, "must include only this school+grade+class, not the other class or the other school");
     assert.deepEqual(result.body.records.map((r) => r.studentName), ["김민준", "이서연"], "must be ordered by createdAt ascending");
@@ -86,7 +86,10 @@ function record(schoolId, grade, classNum, studentNumber, studentName, createdAt
     assert.equal(result.body.records[0].selectedItemId, "pet-bottle");
     assert.equal(result.body.records[0].status, "completed");
 
-    const invalid = await call(exportHandler, teacherSignup.idToken, { grade: "", classNum: "1" });
+    // 2026-09-02 재설계: grade/classNum은 더 이상 클라이언트가 보내는 값이
+    // 아니다(teacherVerified가 반 단위라 담임에게는 애초에 반이 하나뿐) -
+    // 대신 잘못된 형식의 커서가 거절되는지 확인한다.
+    const invalid = await call(exportHandler, teacherSignup.idToken, { cursor: "not-a-valid-cursor" });
     assert.equal(invalid.status, 400);
     assert.equal(invalid.body.code, "invalid_request");
 
@@ -106,7 +109,7 @@ function record(schoolId, grade, classNum, studentNumber, studentName, createdAt
     const tieActorB = "class_export_test_tie_b";
     await db.collection("actors").doc(tieActorA).collection("records").add({ ...record(SCHOOL_A, "5", "1", "10", "동시각A", tieMs), createdAt: tieStamp });
     await db.collection("actors").doc(tieActorB).collection("records").add({ ...record(SCHOOL_A, "5", "1", "11", "동시각B", tieMs), createdAt: tieStamp });
-    const withTies = await call(exportHandler, teacherSignup.idToken, { grade: "5", classNum: "1" });
+    const withTies = await call(exportHandler, teacherSignup.idToken, {});
     assert.equal(withTies.status, 200);
     assert.equal(withTies.body.records.length, 4, "both same-millisecond records must be present, not just one");
     const tieRecords = withTies.body.records.filter((r) => r.createdAt === tieStamp.toDate().toISOString());
@@ -115,7 +118,7 @@ function record(schoolId, grade, classNum, studentNumber, studentName, createdAt
     const firstTieSnap = await db.collectionGroup("records").where("classContext.studentName", "==", "동시각A").limit(1).get();
     const firstTieDoc = firstTieSnap.docs[0];
     const cursor = `${tieStamp.seconds}-${tieStamp.nanoseconds}:${firstTieDoc.ref.parent.parent.id}:${firstTieDoc.id}`;
-    const afterCursor = await call(exportHandler, teacherSignup.idToken, { grade: "5", classNum: "1", cursor });
+    const afterCursor = await call(exportHandler, teacherSignup.idToken, { cursor });
     assert.equal(afterCursor.status, 200);
     assert.ok(afterCursor.body.records.some((r) => r.studentName === "동시각B"), "the second same-millisecond record must still appear after resuming from the first one's cursor");
     assert.equal(afterCursor.body.records.some((r) => r.studentName === "동시각A"), false, "the cursor's own record must not repeat on the next page");

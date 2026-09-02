@@ -60,7 +60,7 @@ const student = { schoolId: "7321071", schoolName: "테스트초등학교", grad
     const check = createCheckStudentProfileHandler(deps);
     const register = createRegisterStudentProfileHandler(deps);
     const TEACHER_ACTOR_ID = "student_profile_test_teacher";
-    await db.collection("actors").doc(TEACHER_ACTOR_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: student.schoolId } });
+    await db.collection("actors").doc(TEACHER_ACTOR_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: student.schoolId, grade: student.grade, classNum: student.classNum } });
     const decide = createDecideRegistrationHandler(deps);
     async function decideAs(decision, targetActorId = ACTOR_ID) {
       return call(decide, token, { targetActorId, decision });

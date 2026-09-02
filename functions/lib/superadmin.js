@@ -13,9 +13,11 @@
 const { cleanText, applyCors } = require("./httpGuard");
 const { observeAppCheck } = require("./appCheckProtection");
 const { hashTeacherCode } = require("./teacherCodeHash");
+const { teacherCodeDocId } = require("./teacherAuth");
 
 const MAX_BODY_BYTES = 2 * 1024;
 const SCHOOL_ID_PATTERN = /^\d{1,12}$/;
+const DIGITS = /^\d{1,2}$/;
 
 function extractBearer(req) {
   const header = req.headers?.authorization || req.headers?.Authorization || "";
@@ -52,17 +54,21 @@ function createManageTeacherCodeHandler(dependencies = {}) {
     const admin = await guardedSuperadmin(req, res, "manageTeacherCode", dependencies);
     if (!admin) return;
     const body = req.body || {};
-    const allowed = new Set(["schoolId", "code"]);
+    const allowed = new Set(["schoolId", "grade", "classNum", "code"]);
     if (Object.keys(body).some((key) => !allowed.has(key))) return res.status(400).json({ ok: false, code: "unknown_field" });
     const schoolId = typeof body.schoolId === "string" && SCHOOL_ID_PATTERN.test(body.schoolId) ? body.schoolId : "";
+    const grade = typeof body.grade === "string" && DIGITS.test(body.grade) ? body.grade : "";
+    const classNum = typeof body.classNum === "string" && DIGITS.test(body.classNum) ? body.classNum : "";
     const code = cleanText(body.code, 40);
-    if (!schoolId || !code || code.length < 6) return res.status(400).json({ ok: false, code: "invalid_request" });
-    // 2026-09-01 종합감사(B그룹 6번): sha256 단일해시 -> scrypt+솔트(teacherCodeHash.js) -
-    // 학교당 코드 1개를 공유하는 구조라 문서 유출 시 원문 역산 저항력이 중요하다.
+    if (!schoolId || !grade || !classNum || !code || code.length < 6) return res.status(400).json({ ok: false, code: "invalid_request" });
+    // 2026-09-01 종합감사(B그룹 6번): sha256 단일해시 -> scrypt+솔트(teacherCodeHash.js).
+    // 2026-09-02 재설계: 학교 공유코드 1개에서 반 단위 코드로 세분화(대표님
+    // 지시) - 담임마다 자기 반 코드를 따로 받아야 반별 학생정보 접근을
+    // 분리할 수 있다.
     const { codeHash, codeSalt } = hashTeacherCode(code);
-    await db.collection("teacherCodes").doc(schoolId).set({ codeHash, codeSalt, updatedAt: serverTimestamp(), updatedByUid: admin.uid }, { merge: true });
-    logger({ severity: "INFO", message: "teacher_code_rotated", schoolId, updatedByUid: admin.uid });
-    return res.status(200).json({ ok: true, schoolId });
+    await db.collection("teacherCodes").doc(teacherCodeDocId(schoolId, grade, classNum)).set({ codeHash, codeSalt, updatedAt: serverTimestamp(), updatedByUid: admin.uid }, { merge: true });
+    logger({ severity: "INFO", message: "teacher_code_rotated", schoolId, grade, classNum, updatedByUid: admin.uid });
+    return res.status(200).json({ ok: true, schoolId, grade, classNum });
   };
 }
 

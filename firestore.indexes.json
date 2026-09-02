@@ -13,6 +13,8 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "schoolId", "order": "ASCENDING" },
+        { "fieldPath": "grade", "order": "ASCENDING" },
+        { "fieldPath": "classNum", "order": "ASCENDING" },
         { "fieldPath": "status", "order": "ASCENDING" }
       ]
     },

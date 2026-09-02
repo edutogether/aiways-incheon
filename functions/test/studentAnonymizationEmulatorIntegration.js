@@ -59,9 +59,9 @@ function call(handler, token, body) {
       studentProfile: { schoolId: SCHOOL_A, schoolName: "테스트초등학교", grade: GRADE, classNum: CLASS_NUM, studentNumber: STUDENT_NUMBER, name: "홍길동", registeredAt: FieldValue.serverTimestamp() }
     });
     await bind(STUDENT_ACTOR_ID, studentUid);
-    await db.collection("actors").doc(TEACHER_A_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_A } });
+    await db.collection("actors").doc(TEACHER_A_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_A, grade: GRADE, classNum: CLASS_NUM } });
     await bind(TEACHER_A_ID, teacherAUid);
-    await db.collection("actors").doc(TEACHER_B_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_B } });
+    await db.collection("actors").doc(TEACHER_B_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_B, grade: GRADE, classNum: CLASS_NUM } });
     await bind(TEACHER_B_ID, teacherBUid);
 
     // 개인 랭킹 서브문서(이미 반영된 실적)와 반 집계 문서를 직접 심어서,

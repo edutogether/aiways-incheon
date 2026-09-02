@@ -9,12 +9,13 @@ const { getAuth } = require("firebase-admin/auth");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { createGlobalRateLimiter, createActorRateLimiter } = require("../lib/globalRateLimit");
 const { createManageTeacherCodeHandler } = require("../lib/superadmin");
-const { createVerifyTeacherCodeHandler } = require("../lib/teacherAuth");
+const { createVerifyTeacherCodeHandler, teacherCodeDocId } = require("../lib/teacherAuth");
 const { createEdu2gDeviceAccess } = require("../lib/edu2gDeviceAccess");
 
 const projectId = process.env.GCLOUD_PROJECT || "demo-aiways-incheon";
 const authEmulator = new URL(`http://${process.env.FIREBASE_AUTH_EMULATOR_HOST || "127.0.0.1:9099"}`);
 const SCHOOL_ID = "7321071";
+const GRADE = "5", CLASS_NUM = "1";
 const NEW_CODE = "rotated-teacher-code-2026";
 const TEACHER_ACTOR_ID = "superadmin_test_teacher_actor";
 
@@ -57,11 +58,11 @@ function call(handler, token, body) {
     const deps = { db, rateLimiter, appCheck, verifyIdToken: (token) => auth.verifyIdToken(token), serverTimestamp: () => FieldValue.serverTimestamp() };
     const manage = createManageTeacherCodeHandler(deps);
 
-    const forbidden = await call(manage, signed.idToken, { schoolId: SCHOOL_ID, code: NEW_CODE });
+    const forbidden = await call(manage, signed.idToken, { schoolId: SCHOOL_ID, grade: GRADE, classNum: CLASS_NUM, code: NEW_CODE });
     assert.equal(forbidden.status, 403);
     assert.equal(forbidden.body.code, "superadmin_required", "a logged-in user without the claim must not manage teacher codes");
 
-    const noToken = await call(manage, "", { schoolId: SCHOOL_ID, code: NEW_CODE });
+    const noToken = await call(manage, "", { schoolId: SCHOOL_ID, grade: GRADE, classNum: CLASS_NUM, code: NEW_CODE });
     assert.equal(noToken.status, 401);
     assert.equal(noToken.body.code, "auth_missing");
 
@@ -69,13 +70,15 @@ function call(handler, token, body) {
     const refreshed = await refreshIdToken(signed.refreshToken);
     const superadminToken = refreshed.id_token;
 
-    const invalidCode = await call(manage, superadminToken, { schoolId: SCHOOL_ID, code: "short" });
+    const invalidCode = await call(manage, superadminToken, { schoolId: SCHOOL_ID, grade: GRADE, classNum: CLASS_NUM, code: "short" });
     assert.equal(invalidCode.status, 400);
     assert.equal(invalidCode.body.code, "invalid_request", "codes under 6 chars are rejected");
 
-    const issued = await call(manage, superadminToken, { schoolId: SCHOOL_ID, code: NEW_CODE });
+    const issued = await call(manage, superadminToken, { schoolId: SCHOOL_ID, grade: GRADE, classNum: CLASS_NUM, code: NEW_CODE });
     assert.equal(issued.status, 200);
     assert.equal(issued.body.schoolId, SCHOOL_ID);
+    assert.equal(issued.body.grade, GRADE);
+    assert.equal(issued.body.classNum, CLASS_NUM);
 
     // 발급한 코드가 실제로 verifyTeacherCode에서 통하는지까지 끝까지
     // 확인한다 - Firestore에 해시가 써졌다는 것만으로는 부족하다.
@@ -87,7 +90,7 @@ function call(handler, token, body) {
     await db.collection("actors").doc(TEACHER_ACTOR_ID).set({ status: "active", plan: "closed_beta" });
     await db.collection("actors").doc(TEACHER_ACTOR_ID).collection("trustedDevices").doc(teacherUid).set({ uid: teacherUid, status: "active", managementId: "123e4567-e89b-42d3-a456-426614174621" });
     await db.collection("edu2gDeviceBindings").doc(teacherUid).set({ actorId: TEACHER_ACTOR_ID, status: "active" });
-    const verified = await call(verify, teacherSignup.idToken, { schoolId: SCHOOL_ID, code: NEW_CODE });
+    const verified = await call(verify, teacherSignup.idToken, { schoolId: SCHOOL_ID, grade: GRADE, classNum: CLASS_NUM, code: NEW_CODE });
     assert.equal(verified.status, 200);
     assert.equal(verified.body.verified, true, "a code issued via manageTeacherCode must actually work for verifyTeacherCode");
 
@@ -99,7 +102,7 @@ function call(handler, token, body) {
     const devices = await teacherRoot.collection("trustedDevices").get();
     devices.docs.forEach((d) => batch.delete(d.ref));
     batch.delete(teacherRoot);
-    batch.delete(db.collection("teacherCodes").doc(SCHOOL_ID));
+    batch.delete(db.collection("teacherCodes").doc(teacherCodeDocId(SCHOOL_ID, GRADE, CLASS_NUM)));
     await batch.commit();
     if (uid) await auth.deleteUser(uid).catch(() => {});
   }

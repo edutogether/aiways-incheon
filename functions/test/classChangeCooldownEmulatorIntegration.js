@@ -59,7 +59,7 @@ const student = { schoolId: "7321071", schoolName: "테스트초등학교", grad
     const teacherSigned = await signup();
     const teacherToken = teacherSigned.idToken;
     teacherUid = (await auth.verifyIdToken(teacherToken)).uid;
-    await db.collection("actors").doc(TEACHER_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: student.schoolId } });
+    await db.collection("actors").doc(TEACHER_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: student.schoolId, grade: student.grade, classNum: student.classNum } });
     await db.collection("actors").doc(TEACHER_ID).collection("trustedDevices").doc(teacherUid).set({ uid: teacherUid, status: "active", managementId: "123e4567-e89b-42d3-a456-426614175002" });
     await db.collection("edu2gDeviceBindings").doc(teacherUid).set({ actorId: TEACHER_ID, status: "active" });
 

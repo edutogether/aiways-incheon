@@ -3,7 +3,7 @@
 (() => {
   const REGION = "asia-northeast3";
   const EMULATOR_PROJECT = "demo-aiways-incheon";
-  const ALLOWED = new Set(["analyzeSortingImage", "analyzeSortingText", "analyzeSortingSafetyObserver", "saveSortingRecord", "listSortingRecords", "resolveSortingRecord", "getSchoolDashboard", "checkStudentProfile", "registerStudentProfile", "checkCampusLocation", "changeStudentClass", "getClassRanking", "searchSchool", "checkTeacherStatus", "verifyTeacherCode", "listPendingRegistrations", "decideRegistration", "exportClassRecords", "anonymizeStudent"]);
+  const ALLOWED = new Set(["analyzeSortingImage", "analyzeSortingText", "analyzeSortingSafetyObserver", "saveSortingRecord", "listSortingRecords", "resolveSortingRecord", "getSchoolDashboard", "checkStudentProfile", "registerStudentProfile", "checkCampusLocation", "changeStudentClass", "getClassRanking", "searchSchool", "checkTeacherStatus", "verifyTeacherCode", "listPendingRegistrations", "decideRegistration", "exportClassRecords", "anonymizeStudent", "logDashboardRealtimeEvent"]);
   const LOCAL = new Set(["localhost", "127.0.0.1"]);
 
   function usingEmulator() {
@@ -84,6 +84,7 @@
     listPendingRegistrations: () => request("listPendingRegistrations", {}),
     decideRegistration: ({ targetActorId, decision }) => request("decideRegistration", { targetActorId, decision }),
     exportClassRecords: ({ cursor = "" } = {}) => request("exportClassRecords", { ...(cursor ? { cursor } : {}) }),
-    anonymizeStudent: ({ targetActorId }) => request("anonymizeStudent", { targetActorId })
+    anonymizeStudent: ({ targetActorId }) => request("anonymizeStudent", { targetActorId }),
+    logDashboardRealtimeEvent: ({ event, code = "" }) => request("logDashboardRealtimeEvent", { event, ...(code ? { code } : {}) })
   };
 })();

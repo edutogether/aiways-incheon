@@ -110,6 +110,9 @@ jobs:
       - name: Dashboard school claim emulator integration test
         run: npm run emulator:test:dashboard-school-claim
 
+      - name: Dashboard realtime diagnostics emulator integration test
+        run: npm run emulator:test:dashboard-realtime-diagnostics
+
       # 2026-09-01 종합감사(B그룹 2번): 나머지 로컬-only 에뮬레이터 통합테스트
       # 20개 중 핵심 경로 7개를 CI에 새로 배선한다. 배선 과정에서 6개가
       # 실제로 깨져 있었다(2026-08-27/08-31 백엔드 변경 - closed-beta 게이트

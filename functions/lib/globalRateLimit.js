@@ -54,7 +54,9 @@ const READS_PER_REQUEST_WORST_CASE = Object.freeze({
   // 액터 체계 밖(슈퍼어드민 ID토큰) - 전역 리미터 트랜잭션 1회만.
   manageTeacherCode: 1,
   // Firestore 조회는 전혀 없다(외부 NEIS API만 호출) - 공통 전처리만 든다.
-  searchSchool: BASE_ACTOR_READS
+  searchSchool: BASE_ACTOR_READS,
+  // 비용절감 4번 ③단계 관찰용 - Firestore 조회 없이 Cloud Logging만 남긴다.
+  logDashboardRealtimeEvent: BASE_ACTOR_READS
 });
 // 결과 건수에 비례해 늘어나는 부분(전부 캐시 miss / 최대 페이지 기준).
 // N=그 학교의 반 수, K=그 학년의 반 수, M=그 반의 학생 수.
@@ -114,6 +116,9 @@ const RATE_LIMITS = Object.freeze({
   // 2026-09-02 - 학생 삭제·탈퇴 요청 대응(익명화). decideRegistration과
   // 같은 이유(교사 화면에서 드물게 쓰는 관리 작업)로 넉넉하게 잡는다.
   ,anonymizeStudent: { perMinute: 30 }
+  // 2026-09-03 - 비용절감 4번 ③단계 관찰용 신호. PC 대시보드 세션당 1회
+  // (구독 시작 또는 실패 시) 정도만 호출되는 저빈도 이벤트라 낮게 잡아도 된다.
+  ,logDashboardRealtimeEvent: { perMinute: 10 }
 });
 
 function getUtcBuckets(now = new Date()) {
@@ -254,7 +259,8 @@ const ACTOR_RATE_LIMITS = Object.freeze({
   checkTeacherStatus: { perMinute: 10, perDay: 200 }, verifyTeacherCode: { perMinute: 5, perDay: 20 },
   listPendingRegistrations: { perMinute: 20, perDay: 2000 }, decideRegistration: { perMinute: 30, perDay: 500 },
   exportClassRecords: { perMinute: 6, perDay: 100 },
-  anonymizeStudent: { perMinute: 20, perDay: 500 }
+  anonymizeStudent: { perMinute: 20, perDay: 500 },
+  logDashboardRealtimeEvent: { perMinute: 10, perDay: 200 }
 });
 function hashRateLimitScope(value) { return createHash("sha256").update(String(value)).digest("hex"); }
 function createActorRateLimiter({ db, now = () => new Date(), serverTimestamp = () => new Date(), limits = ACTOR_RATE_LIMITS, logger = () => {} }) {

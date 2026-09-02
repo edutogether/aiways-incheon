@@ -90,7 +90,17 @@
   // 바꿔도 재구독 없이 최신 선택을 반영하도록, 스냅샷이 올 때마다
   // onUpdate가 raw classDocs/schoolName만 받고 grade/classNum은 호출부가
   // 그 순간 다시 읽어서 computeDashboardData를 직접 부른다.
+  // 비용절감 4번 ③단계(2026-09-03 대표님 지시) - 폴링/실시간 병행 관찰을
+  // "민원 없으면 통과"가 아니라 실제 수치로 판단하기 위한 최소 신호.
+  // Firestore 읽기/쓰기 없이 Cloud Logging만 남기므로 세션당 1회 정도의
+  // 빈도에서는 비용에 영향이 없다. 관찰이 끝나면(④단계, 폴링 제거) 이
+  // 신호도 같이 정리한다.
+  function logRealtimeEvent(event, code) {
+    try { window.AIWaysEdu2gClient?.logDashboardRealtimeEvent?.({ event, code: code ? String(code).slice(0, 60) : "" }); } catch {}
+  }
+
   async function subscribeSchoolClasses({ schoolId, onUpdate, onError }) {
+    const reportError = (error) => { logRealtimeEvent("failed", error?.code || error?.message); onError?.(error); };
     try {
       const betaAuth = window.AIWaysBetaAuth;
       if (!betaAuth) throw new Error("beta_auth_unavailable");
@@ -104,15 +114,16 @@
       let schoolName = "";
       const unsubSchool = onSnapshot(doc(db, "schools", schoolId), (snap) => {
         schoolName = snap.exists() ? String(snap.data()?.schoolName || "") : "";
-      }, (error) => onError?.(error));
+      }, reportError);
 
       const unsubClasses = onSnapshot(collection(db, "schools", schoolId, "classes"), (snap) => {
         onUpdate({ classDocs: snap.docs.map((d) => d.data()), schoolName });
-      }, (error) => onError?.(error));
+      }, reportError);
 
+      logRealtimeEvent("subscribed");
       return () => { unsubSchool(); unsubClasses(); };
     } catch (error) {
-      onError?.(error);
+      reportError(error);
       return () => {};
     }
   }

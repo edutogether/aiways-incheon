@@ -71,6 +71,9 @@ test("blocked actor is rejected by every handler that wires blockedActors throug
   const { createAnonymizeStudentHandler } = require("../lib/studentAnonymization");
   await assertBlocked("anonymizeStudent", createAnonymizeStudentHandler(baseDeps));
 
+  const { createLogDashboardRealtimeEventHandler } = require("../lib/dashboardRealtimeDiagnostics");
+  await assertBlocked("logDashboardRealtimeEvent", createLogDashboardRealtimeEventHandler(baseDeps), { event: "subscribed" });
+
   const { createSaveSortingRecordHandler } = require("../lib/sortingRecord");
   await assertBlocked("saveSortingRecord", createSaveSortingRecordHandler(baseDeps));
 

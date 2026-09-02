@@ -12,6 +12,7 @@ const { createRecordQueryStore } = require("./lib/sortingRecordQueryStore");
 const { createListSortingRecordsHandler, createResolveSortingRecordHandler } = require("./lib/sortingRecordQuery");
 const { createSortingRecordAggregator } = require("./lib/schoolDashboardAggregate");
 const { createGetSchoolDashboardHandler } = require("./lib/schoolDashboard");
+const { createLogDashboardRealtimeEventHandler } = require("./lib/dashboardRealtimeDiagnostics");
 const { createCheckStudentProfileHandler, createRegisterStudentProfileHandler, createChangeStudentClassHandler } = require("./lib/studentProfile");
 const { createCheckCampusLocationHandler } = require("./lib/campusLocation");
 const { createGetClassRankingHandler } = require("./lib/classRanking");
@@ -101,6 +102,9 @@ exports.onSortingRecordWritten = onDocumentWritten({ region: "asia-northeast3", 
 });
 exports.getSchoolDashboard = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createGetSchoolDashboardHandler({
   db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, auth: getAuth(), logger: auditLog
+}));
+exports.logDashboardRealtimeEvent = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createLogDashboardRealtimeEventHandler({
+  access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: auditLog
 }));
 exports.checkStudentProfile = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckStudentProfileHandler({
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors

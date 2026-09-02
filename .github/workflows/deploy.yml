@@ -96,6 +96,33 @@ jobs:
       - name: Class export emulator integration test
         run: npm run emulator:test:class-export
 
+      # 2026-09-01 종합감사(B그룹 2번): 나머지 로컬-only 에뮬레이터 통합테스트
+      # 20개 중 핵심 경로 7개를 CI에 새로 배선한다. 배선 과정에서 6개가
+      # 실제로 깨져 있었다(2026-08-27/08-31 백엔드 변경 - closed-beta 게이트
+      # 퇴역, 3단 권한체계 registerStudentProfile 202화, NEIS 학교코드 전환,
+      # 90일 만료필드 제거 - 이후 갱신 안 된 채 로컬에서만 존재해 아무도
+      # 몰랐다). 전부 원인 확인 후 현재 동작에 맞게 갱신하고 통과 확인함.
+      - name: Student profile emulator integration test
+        run: npm run emulator:test:student-profile
+
+      - name: Campus location emulator integration test
+        run: npm run emulator:test:campus-location
+
+      - name: School dashboard aggregate emulator integration test
+        run: npm run emulator:test:school-dashboard
+
+      - name: Protected actor emulator integration test
+        run: npm run emulator:test:protected-actor
+
+      - name: Class change cooldown emulator integration test
+        run: npm run emulator:test:class-change-cooldown
+
+      - name: Protected records emulator integration test
+        run: npm run emulator:test:protected-records
+
+      - name: Mobile class context emulator integration test
+        run: npm run emulator:test:mobile-class-context
+
   # 2026-08-29 추가: functions/firestore.rules/firestore.indexes.json은
   # 지금까지 자동배포가 전혀 없었다 - 개발자가 로컬에서 매번 수동으로
   # `firebase deploy --only functions:<name>`을 쳐야만 실제로 반영됐다

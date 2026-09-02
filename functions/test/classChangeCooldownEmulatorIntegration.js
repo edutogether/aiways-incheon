@@ -13,10 +13,12 @@ const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { createEdu2gDeviceAccess } = require("../lib/edu2gDeviceAccess");
 const { createGlobalRateLimiter, createActorRateLimiter } = require("../lib/globalRateLimit");
 const { createRegisterStudentProfileHandler, createChangeStudentClassHandler, createCheckStudentProfileHandler } = require("../lib/studentProfile");
+const { createDecideRegistrationHandler } = require("../lib/registrationApproval");
 
 const projectId = process.env.GCLOUD_PROJECT || "demo-aiways-incheon";
 const authEmulator = new URL(`http://${process.env.FIREBASE_AUTH_EMULATOR_HOST || "127.0.0.1:9099"}`);
 const ACTOR_ID = "class_change_test_actor";
+const TEACHER_ID = "class_change_test_teacher";
 
 function signup() {
   return new Promise((resolve, reject) => {
@@ -40,7 +42,7 @@ const student = { schoolId: "7321071", schoolName: "테스트초등학교", grad
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
-  let uid = "";
+  let uid = "", teacherUid = "";
   try {
     const signed = await signup();
     const token = signed.idToken;
@@ -50,6 +52,17 @@ const student = { schoolId: "7321071", schoolName: "테스트초등학교", grad
     await db.collection("actors").doc(ACTOR_ID).collection("trustedDevices").doc(uid).set({ uid, status: "active", managementId: "123e4567-e89b-42d3-a456-426614175001" });
     await db.collection("edu2gDeviceBindings").doc(uid).set({ actorId: ACTOR_ID, status: "active" });
 
+    // 2026-08-31 3단 권한체계 도입 이후 registerStudentProfile은 즉시
+    // studentProfile을 만들지 않고 승인대기열에 넣는다(202) - 이 아래
+    // 쿨다운 테스트가 실제로 studentProfile을 가지고 동작하려면 교사
+    // 승인을 거쳐야 한다. 승인용 교사 actor를 별도로 준비한다.
+    const teacherSigned = await signup();
+    const teacherToken = teacherSigned.idToken;
+    teacherUid = (await auth.verifyIdToken(teacherToken)).uid;
+    await db.collection("actors").doc(TEACHER_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: student.schoolId } });
+    await db.collection("actors").doc(TEACHER_ID).collection("trustedDevices").doc(teacherUid).set({ uid: teacherUid, status: "active", managementId: "123e4567-e89b-42d3-a456-426614175002" });
+    await db.collection("edu2gDeviceBindings").doc(teacherUid).set({ actorId: TEACHER_ID, status: "active" });
+
     const access = createEdu2gDeviceAccess({ auth, db, serverTimestamp: () => FieldValue.serverTimestamp() });
     const rateLimiter = createGlobalRateLimiter({ db });
     const actorRateLimiter = createActorRateLimiter({ db });
@@ -58,6 +71,7 @@ const student = { schoolId: "7321071", schoolName: "테스트초등학교", grad
     const register = createRegisterStudentProfileHandler(deps);
     const change = createChangeStudentClassHandler(deps);
     const check = createCheckStudentProfileHandler(deps);
+    const decide = createDecideRegistrationHandler(deps);
 
     // Not registered yet -- a change attempt must fail distinctly from a cooldown rejection.
     const beforeSignup = await call(change, token, { grade: "5", classNum: "2", confirm: false });
@@ -65,7 +79,9 @@ const student = { schoolId: "7321071", schoolName: "테스트초등학교", grad
     assert.equal(beforeSignup.body.code, "not_registered");
 
     const registered = await call(register, token, { ...student, confirm: true });
-    assert.equal(registered.status, 201);
+    assert.equal(registered.status, 202);
+    const approved = await call(decide, teacherToken, { targetActorId: ACTOR_ID, decision: "approve" });
+    assert.equal(approved.status, 200);
 
     // Registration itself starts the cooldown clock -- an immediate change attempt is blocked.
     const immediatePreview = await call(change, token, { grade: "5", classNum: "2", confirm: false });
@@ -119,11 +135,14 @@ const student = { schoolId: "7321071", schoolName: "테스트초등학교", grad
     process.stdout.write(JSON.stringify({ classChangeCooldownEmulatorIntegration: "passed" }) + "\n");
   } finally {
     if (uid) await db.collection("edu2gDeviceBindings").doc(uid).delete();
-    const actorRoot = db.collection("actors").doc(ACTOR_ID);
-    const devicesSnap = await actorRoot.collection("trustedDevices").get();
+    if (teacherUid) await db.collection("edu2gDeviceBindings").doc(teacherUid).delete();
     const batch = db.batch();
-    devicesSnap.docs.forEach((d) => batch.delete(d.ref));
-    batch.delete(actorRoot);
+    for (const actorId of [ACTOR_ID, TEACHER_ID]) {
+      const actorRoot = db.collection("actors").doc(actorId);
+      const devicesSnap = await actorRoot.collection("trustedDevices").get();
+      devicesSnap.docs.forEach((d) => batch.delete(d.ref));
+      batch.delete(actorRoot);
+    }
     await batch.commit();
   }
 })().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });

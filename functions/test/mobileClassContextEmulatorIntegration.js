@@ -85,7 +85,13 @@ function mobileHeldPayload(key, classContext) {
     };
     const save = createSaveSortingRecordHandler({ access, rateLimiter, actorRateLimiter, appCheck: async () => ({ status: "valid" }), store, serverTimestamp: () => FieldValue.serverTimestamp() });
 
-    const classContext = { schoolId: "테스트초등학교", grade: "5", classNum: "1" };
+    // 2026-09-01: schoolId는 이 시점엔 이미 NEIS 표준학교코드(숫자)로
+    // 전환돼 있었다(CLAUDE.md "자유텍스트에서 NEIS 학교코드로 전환") -
+    // 이 테스트는 그 전 시절 그대로 학교명을 schoolId 자리에 넣고 있어서
+    // cleanSchoolId가 전부 거부해 CI에 걸면 항상 400으로 실패했다
+    // (2026-09-01 종합감사 중 발견, dependencies에 db가 없어 classContext
+    // 신뢰 재감사 수정과는 무관 - 순수 스키마 검증 단계에서만 걸림).
+    const classContext = { schoolId: "7321071", schoolName: "테스트초등학교", grade: "5", classNum: "1" };
 
     // 1. Manual quick-select confirmation, with classContext (the common case).
     const completed = await call(save, signedToken, mobileManualPayload("123e4567-e89b-42d3-a456-426614174301", classContext));
@@ -110,7 +116,7 @@ function mobileHeldPayload(key, classContext) {
     assert.equal("classContext" in noContextDoc.data(), false);
 
     // 4. Malformed classContext (missing a required field) is rejected outright.
-    const bad = await call(save, signedToken, mobileManualPayload("123e4567-e89b-42d3-a456-426614174304", { schoolId: "테스트초등학교", grade: "5" }));
+    const bad = await call(save, signedToken, mobileManualPayload("123e4567-e89b-42d3-a456-426614174304", { schoolId: "7321071", grade: "5" }));
     assert.equal(bad.status, 400);
     assert.equal(bad.body.code, "invalid_class_context");
 

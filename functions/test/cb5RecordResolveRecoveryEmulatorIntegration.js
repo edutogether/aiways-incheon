@@ -376,10 +376,14 @@ function pause(milliseconds) {
       ...dependencies,
       store: { createOrGet: async () => { throw new Error("transient_store_failure"); } },
     });
-    await assert.rejects(
-      () => saveRecord(1, 0, recordPayload(key(1, "transient-retry")), transientSave),
-      /transient_store_failure/,
-    );
+    // 2026-09-01 종합감사(B그룹 3번)로 saveSortingRecord에 try/catch를 추가한
+    // 뒤로는, store가 던지는 예외가 핸들러 밖으로 새지 않고 503
+    // protection_unavailable로 깔끔하게 응답한다(이 테스트는 그 이전의
+    // "예외가 그대로 reject된다"는 옛 동작을 전제로 하고 있었다 - 지금
+    // 동작이 정확히 그 감사가 의도한 개선이므로 기대값을 갱신한다).
+    const transientFailure = await saveRecord(1, 0, recordPayload(key(1, "transient-retry")), transientSave);
+    assert.equal(transientFailure.statusCode, 503);
+    assert.equal(transientFailure.body.code, "protection_unavailable");
     const transientRecovery = await saveRecord(1, 1, recordPayload(key(1, "transient-retry")));
     assert.equal(transientRecovery.statusCode, 201);
     metrics.retrySuccess += 1;

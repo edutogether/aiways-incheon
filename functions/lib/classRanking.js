@@ -12,6 +12,7 @@
 const { protectActorRequest } = require("./protectedActor");
 const { cleanSchoolId, cleanPathSegment } = require("./firestorePathSafety");
 const { applyCors } = require("./httpGuard");
+const { setDashboardSchoolClaim } = require("./dashboardSchoolClaim");
 
 const MAX_BODY_BYTES = 1 * 1024;
 
@@ -90,6 +91,7 @@ function createGetClassRankingHandler(dependencies = {}) {
       const lockRequestTime = now();
       let boundSchoolId = cache.get(lockCacheKey, lockRequestTime);
       if (boundSchoolId === null) {
+        let newlyBound = false;
         try {
           boundSchoolId = await db.runTransaction(async (transaction) => {
             const snap = await transaction.get(actorRef);
@@ -97,6 +99,7 @@ function createGetClassRankingHandler(dependencies = {}) {
             const existing = cleanSchoolId(data?.dashboardSchoolId || "");
             if (!existing) {
               transaction.set(actorRef, { dashboardSchoolId: schoolId }, { merge: true });
+              newlyBound = true;
               return schoolId;
             }
             return existing;
@@ -105,6 +108,8 @@ function createGetClassRankingHandler(dependencies = {}) {
           return res.status(503).json({ ok: false, code: "protection_unavailable" });
         }
         cache.set(lockCacheKey, boundSchoolId, lockRequestTime);
+        // schoolDashboard.js와 같은 이유 - 이번에 처음 확정된 경우에만 클레임을 설정한다.
+        if (newlyBound) await setDashboardSchoolClaim({ auth: dependencies.auth, uid: protectedActor.uid, schoolId: boundSchoolId, logger: dependencies.logger });
       }
       if (boundSchoolId !== schoolId) return res.status(403).json({ ok: false, code: "school_mismatch" });
     }

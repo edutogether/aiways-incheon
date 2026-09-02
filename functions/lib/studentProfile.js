@@ -94,7 +94,7 @@ function createRegisterStudentProfileHandler(dependencies = {}) {
       if (!teacherCode) return res.status(400).json({ ok: false, code: "invalid_request" });
       if (!body.confirm) return res.status(200).json({ ok: true, confirmed: false, role, preview: { schoolId, schoolName, grade, classNum, name } });
       try {
-        const result = await verifyTeacherCodeCore({ db, serverTimestamp, actorId: protectedActor.actorId, schoolId, grade, classNum, code: teacherCode, logger });
+        const result = await verifyTeacherCodeCore({ db, serverTimestamp, actorId: protectedActor.actorId, uid: protectedActor.uid, auth: dependencies.auth, schoolId, grade, classNum, code: teacherCode, logger });
         if (!result.ok) return res.status(result.httpStatus).json({ ok: false, code: result.code });
         return res.status(200).json({ ok: true, confirmed: true, role, verified: true, schoolId, grade, classNum });
       } catch {

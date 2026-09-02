@@ -2,5 +2,29 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} { allow read, write: if false; }
+
+    // 비용절감 4번(2026-09-02 대표님 승인) - 5초 폴링으로 Functions를
+    // 반복 호출하던 반 집계(schools/{schoolId}, schools/{schoolId}/classes/*)만
+    // 클라이언트가 직접 onSnapshot으로 구독하도록 예외를 연다. 이 두
+    // 경로엔 개인 실명이 전혀 없다(observedToday/completedTotal/heldTotal/
+    // itemCounts뿐) - 실명+번호가 들어가는 classes/{classId}/students/*는
+    // 위 기본거부(allow read, write: if false)가 그대로 적용되도록 절대
+    // 여기서 열지 않는다(명시적으로 match하지 않으면 계속 막힘).
+    //
+    // 학교 격리는 커스텀 클레임(request.auth.token.dashboardSchoolId)으로
+    // 검사한다 - get()으로 actors/{actorId} 문서를 대조하는 방식도
+    // 가능하지만, 실시간 리스너는 대상 문서가 바뀔 때마다 연결된 리스너
+    // 전부에 대해 규칙을 다시 평가하므로 get() 1회가 매번 추가 Firestore
+    // 읽기로 청구된다 - 지금 캐시로 줄여둔 비용이 되레 늘어날 위험이
+    // 있어 클레임 방식을 택했다(schoolDashboard.js의 락 확정 시점에
+    // setCustomUserClaims로 같이 심음, 추가 읽기 0). 클레임은 토큰
+    // 재발급 전까진 안 바뀌므로 클라이언트가 락 확정 직후 한 번
+    // getIdToken(true)로 강제 갱신해야 한다.
+    match /schools/{schoolId} {
+      allow get: if request.auth != null && request.auth.token.dashboardSchoolId == schoolId;
+      match /classes/{classId} {
+        allow get, list: if request.auth != null && request.auth.token.dashboardSchoolId == schoolId;
+      }
+    }
   }
 }

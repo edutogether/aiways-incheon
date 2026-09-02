@@ -18,7 +18,7 @@ async function protectActorRequest({ req, functionName, access, appCheck, global
     const limit = await limiter?.check?.(functionName, resolved.actorId);
     if (!limit?.allowed) return limit?.outcome === "unavailable" ? unavailable() : { ok: false, httpStatus: 429, code: "rate_limit_exceeded", retryAfterSeconds: limit.retryAfterSeconds || 1 };
   }
-  return { ok: true, actorId: resolved.actorId };
+  return { ok: true, actorId: resolved.actorId, uid: resolved.uid };
 }
 
 module.exports = { protectActorRequest };

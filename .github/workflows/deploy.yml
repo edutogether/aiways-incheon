@@ -102,6 +102,14 @@ jobs:
       - name: Class export emulator integration test
         run: npm run emulator:test:class-export
 
+      # 2026-09-02 추가: 비용절감 4번(실시간 리스너 마이그레이션) 1단계 -
+      # getSchoolDashboard의 school-lock 확정 시점에 dashboardSchoolId 커스텀
+      # 클레임이 실제로 심기는지, firestore.rules가 그 클레임만으로 반 집계
+      # (PII 없음)는 열고 개인 실명이 든 students 서브컬렉션은 계속 막는지를
+      # 실제 Auth+Firestore 에뮬레이터로 끝까지 검증한다.
+      - name: Dashboard school claim emulator integration test
+        run: npm run emulator:test:dashboard-school-claim
+
       # 2026-09-01 종합감사(B그룹 2번): 나머지 로컬-only 에뮬레이터 통합테스트
       # 20개 중 핵심 경로 7개를 CI에 새로 배선한다. 배선 과정에서 6개가
       # 실제로 깨져 있었다(2026-08-27/08-31 백엔드 변경 - closed-beta 게이트

@@ -15,6 +15,7 @@
 const { cleanText, applyCors } = require("./httpGuard");
 const { protectActorRequest } = require("./protectedActor");
 const { verifyTeacherCode: verifyStoredTeacherCode } = require("./teacherCodeHash");
+const { setDashboardSchoolClaim } = require("./dashboardSchoolClaim");
 
 const MAX_BODY_BYTES = 2 * 1024;
 const SCHOOL_ID_PATTERN = /^\d{1,12}$/;
@@ -81,7 +82,7 @@ function createCheckTeacherStatusHandler(dependencies = {}) {
 // import) - "가입 경로를 두 개 만들지 말라"는 지시대로 단일 가입 폼에서
 // 코드까지 같이 받으므로, HTTP 핸들러 계층이 아니라 여기 핵심 로직만
 // 공유 함수로 뺀다.
-async function verifyTeacherCodeCore({ db, serverTimestamp, actorId, schoolId, grade, classNum, code, logger }) {
+async function verifyTeacherCodeCore({ db, serverTimestamp, actorId, uid, auth, schoolId, grade, classNum, code, logger }) {
   const codeSnap = await db.collection("teacherCodes").doc(teacherCodeDocId(schoolId, grade, classNum)).get();
   if (!codeSnap.exists) return { ok: false, httpStatus: 404, code: "teacher_code_not_set" };
   if (!verifyStoredTeacherCode(code, codeSnap.data() || {})) {
@@ -96,6 +97,12 @@ async function verifyTeacherCodeCore({ db, serverTimestamp, actorId, schoolId, g
   // 여기서 바로잡는다(새 "관리자" 개념 없이도 가능한 교정).
   const actorRef = db.collection("actors").doc(actorId);
   await actorRef.set({ teacherVerified: { schoolId, grade, classNum, verifiedAt: serverTimestamp() }, dashboardSchoolId: schoolId }, { merge: true });
+  // 비용절감 4번 - school-lock을 여기서 고쳐쓰는 경우, dashboardSchoolClaim.js가
+  // 보장하는 "클레임 == dashboardSchoolId" 불변식이 깨지지 않도록 여기서도
+  // 클레임을 같이 맞춘다(schoolDashboard.js/classRanking.js는 "처음 확정" 때만
+  // 설정하지만, 이 교정 경로는 이미 확정된 값을 실제로 바꾸는 유일한 지점이라
+  // 매번 다시 설정해야 한다).
+  await setDashboardSchoolClaim({ auth, uid, schoolId, logger });
   return { ok: true };
 }
 
@@ -116,7 +123,7 @@ function createVerifyTeacherCodeHandler(dependencies = {}) {
     if (!schoolId || !grade || !classNum || !code) return res.status(400).json({ ok: false, code: "invalid_request" });
 
     try {
-      const result = await verifyTeacherCodeCore({ db, serverTimestamp, actorId: protectedActor.actorId, schoolId, grade, classNum, code, logger });
+      const result = await verifyTeacherCodeCore({ db, serverTimestamp, actorId: protectedActor.actorId, uid: protectedActor.uid, auth: dependencies.auth, schoolId, grade, classNum, code, logger });
       if (!result.ok) return res.status(result.httpStatus).json({ ok: false, code: result.code });
       return res.status(200).json({ ok: true, verified: true, schoolId, grade, classNum });
     } catch {

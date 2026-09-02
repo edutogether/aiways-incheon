@@ -31,6 +31,7 @@
     "emulator:test:registration-approval": "firebase emulators:exec --only auth,firestore --project demo-aiways-incheon \"node test/registrationApprovalEmulatorIntegration.js\"",
     "emulator:test:superadmin": "firebase emulators:exec --only auth,firestore --project demo-aiways-incheon \"node test/superadminEmulatorIntegration.js\"",
     "emulator:test:class-export": "firebase emulators:exec --only auth,firestore --project demo-aiways-incheon \"node test/classExportEmulatorIntegration.js\"",
+    "emulator:test:dashboard-school-claim": "firebase emulators:exec --only auth,firestore --project demo-aiways-incheon \"node test/dashboardSchoolClaimEmulatorIntegration.js\"",
     "gate1:final": "firebase emulators:exec --only auth,functions,firestore --project demo-aiways-incheon \"node test/gate1FinalSuite.js\"",
     "gate2a:final": "firebase emulators:exec --only auth,functions,firestore --project demo-aiways-incheon \"node test/gate2aFinalSuite.js\""
   },

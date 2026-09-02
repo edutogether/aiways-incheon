@@ -3,6 +3,7 @@
 const { protectActorRequest } = require("./protectedActor");
 const { cleanSchoolId, cleanPathSegment } = require("./firestorePathSafety");
 const { cleanText, applyCors } = require("./httpGuard");
+const { setDashboardSchoolClaim } = require("./dashboardSchoolClaim");
 
 const MAX_BODY_BYTES = 4 * 1024;
 
@@ -117,6 +118,7 @@ function createGetSchoolDashboardHandler(dependencies = {}) {
     const lockCacheKey = `lock:${protectedActor.actorId}`;
     let lockState = cache.get(lockCacheKey, requestTimeForLock);
     if (!lockState) {
+      let newlyBound = false;
       try {
         lockState = await db.runTransaction(async (transaction) => {
           const snap = await transaction.get(actorRef);
@@ -124,6 +126,7 @@ function createGetSchoolDashboardHandler(dependencies = {}) {
           const boundSchoolId = cleanText(data?.dashboardSchoolId, 80);
           if (!boundSchoolId) {
             transaction.set(actorRef, { dashboardSchoolId: schoolId }, { merge: true });
+            newlyBound = true;
             return { boundSchoolId: schoolId, profile: data?.studentProfile || null };
           }
           return { boundSchoolId, profile: data?.studentProfile || null };
@@ -132,6 +135,11 @@ function createGetSchoolDashboardHandler(dependencies = {}) {
         return res.status(503).json({ ok: false, code: "protection_unavailable" });
       }
       cache.set(lockCacheKey, lockState, requestTimeForLock);
+      // 클레임은 이 actor의 dashboardSchoolId가 "이번 트랜잭션에서 처음
+      // 확정된" 경우에만 설정한다 - 이미 확정돼 있던 값을 캐시가 식을
+      // 때마다(5.5초) 매번 다시 Admin Auth API로 재설정하면 활성 사용자
+      // 수만큼 불필요한 API 호출이 반복된다(값 자체는 안 바뀌므로).
+      if (newlyBound) await setDashboardSchoolClaim({ auth: dependencies.auth, uid: protectedActor.uid, schoolId: lockState.boundSchoolId, logger: dependencies.logger });
     }
     const binding = { ok: lockState.boundSchoolId === schoolId, profile: lockState.profile };
     if (!binding.ok) return res.status(403).json({ ok: false, code: "school_mismatch" });

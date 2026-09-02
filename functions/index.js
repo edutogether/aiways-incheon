@@ -100,13 +100,13 @@ exports.onSortingRecordWritten = onDocumentWritten({ region: "asia-northeast3", 
   }
 });
 exports.getSchoolDashboard = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createGetSchoolDashboardHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, auth: getAuth(), logger: auditLog
 }));
 exports.checkStudentProfile = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckStudentProfileHandler({
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 exports.registerStudentProfile = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createRegisterStudentProfileHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, auth: getAuth(), serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
 }));
 exports.checkCampusLocation = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckCampusLocationHandler({
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
@@ -115,7 +115,7 @@ exports.changeStudentClass = onRequest({ region: "asia-northeast3", memory: "256
   db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
 }));
 exports.getClassRanking = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createGetClassRankingHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, auth: getAuth(), logger: auditLog
 }));
 exports.searchSchool = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, secrets: [neisApiKey], cors: false }, createSearchSchoolHandler({
   getApiKey: () => neisApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: (metadata) => logger.error(metadata)
@@ -124,7 +124,7 @@ exports.checkTeacherStatus = onRequest({ region: "asia-northeast3", memory: "256
   db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 exports.verifyTeacherCode = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createVerifyTeacherCodeHandler({
-  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, auth: getAuth(), serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
 }));
 exports.listPendingRegistrations = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createListPendingRegistrationsHandler({
   db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors

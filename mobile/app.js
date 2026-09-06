@@ -259,7 +259,7 @@
     list.replaceChildren();
     const result = await client.getClassRanking({ schoolId, grade, classNum });
     if (!result.ok) {
-      status.textContent = client.errorMessageFor?.(result.data?.code) || "랭킹을 불러오지 못했어요. 다시 시도해 주세요.";
+      status.textContent = client.errorMessageFor?.(result.code) || "랭킹을 불러오지 못했어요. 다시 시도해 주세요.";
       return;
     }
     const classes = Array.isArray(result.data?.classes) ? result.data.classes : [];

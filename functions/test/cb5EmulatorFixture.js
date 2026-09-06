@@ -98,7 +98,7 @@ async function setupCb5DeviceMatrix() {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
-  const participants = actorKeys.map((key, index) => ({
+  const participants = actorKeys.map((key) => ({
     actorId: `cb5_actor_${key}`,
     displayName: `CB5 ${key}`,
   }));

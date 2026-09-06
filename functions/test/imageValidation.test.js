@@ -7,7 +7,7 @@
 // image_dimensions_too_large)를 전부 확인한다.
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { MAX_IMAGE_BYTES, MAX_EDGE, MAX_PIXELS, validateImage } = require("../lib/imageValidation");
+const { MAX_IMAGE_BYTES, MAX_EDGE, validateImage } = require("../lib/imageValidation");
 
 function b64(buffer) { return buffer.toString("base64"); }
 

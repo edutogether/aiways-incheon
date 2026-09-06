@@ -60,6 +60,11 @@ jobs:
       - name: Syntax check
         run: npm run check
 
+      # 2026-09-07 추가(D:\Projects\_shared\CONVENTIONS.md 5.2) - eslint
+      # 통일. 기존 "check"(node --check, 문법검사만)는 그대로 두고 별도 게이트로 추가.
+      - name: Lint
+        run: npm run lint
+
       - name: Run unit tests
         run: npm test
 

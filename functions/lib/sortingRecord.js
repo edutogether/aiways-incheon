@@ -6,7 +6,6 @@ const MAX_BODY_BYTES = 24 * 1024;
 // legitimate keys like classContext.schoolName would false-positive as PII
 // (schoolName isn't a student's real name, just a school's display label).
 const FORBIDDEN_KEY = /(?:image|base64|data:image|url|authorization|api[_-]?key|secret|prompt|raw.*response|email|\bname\b|access.*code)/i;
-const { observeAppCheck } = require("./appCheckProtection");
 const { protectActorRequest } = require("./protectedActor");
 const { cleanSchoolId, cleanPathSegment } = require("./firestorePathSafety");
 const { cleanText, applyCors } = require("./httpGuard");

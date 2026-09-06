@@ -50,7 +50,7 @@ function createFirestoreDeviceStore({ db, serverTimestamp = () => new Date(), cr
       const snap = await actorRef(actorId).collection("trustedDevices").get();
       const rows = snap.docs.map(doc => ({ currentDevice: doc.id === currentUid, ...doc.data() }));
       if (rows.some(row => !MANAGEMENT_ID.test(row.managementId || ""))) throw new Error("access_state_invalid");
-      return rows.map(({ uid, revokedByUid, ...row }) => row);
+      return rows.map(({ uid: _uid, revokedByUid: _revokedByUid, ...row }) => row);
     },
     async revoke(actorId, targetManagementId, revokedByUid) {
       if (!MANAGEMENT_ID.test(targetManagementId || "")) return { code: "not_found" };

@@ -4,7 +4,6 @@ const { GoogleGenAI } = require("@google/genai");
 const { logger } = require("firebase-functions");
 const { randomUUID } = require("node:crypto");
 const { SCHEMA, ITEM_TYPES, errorResponse, validateRequest, validateResponse } = require("./sortingVisionSchema");
-const { observeAppCheck } = require("./appCheckProtection");
 const { protectActorRequest } = require("./protectedActor");
 const { applyCors } = require("./httpGuard");
 
@@ -123,7 +122,6 @@ function createAnalyzeSortingHandler(dependencies = {}) {
   const createClient = dependencies.createClient || createGeminiClient;
   const logProviderError = dependencies.logProviderError || ((metadata) => logger.write({ severity: "ERROR", ...metadata }));
   const analysisRequests = dependencies.analysisRequests || { claimAnalysisRequest: async () => ({ state: "unavailable" }), completeAnalysisRequest: async () => false, failAnalysisRequest: async () => false };
-  const logRateLimit = dependencies.logRateLimit || ((metadata) => logger.write({ severity: "INFO", ...metadata }));
   return async (req, res) => {
     if (!applyCors(req, res)) return res.status(403).json(errorResponse("invalid_request"));
     if (req.method === "OPTIONS") return res.status(204).send("");

@@ -7,7 +7,7 @@
 // that saveSortingRecord later consumes to attach onCampus to a record.
 const { protectActorRequest } = require("./protectedActor");
 const { cleanSchoolId } = require("./firestorePathSafety");
-const { cleanText, applyCors } = require("./httpGuard");
+const { applyCors } = require("./httpGuard");
 
 const MAX_BODY_BYTES = 1 * 1024;
 const CHECK_TTL_MS = 2 * 60 * 1000;

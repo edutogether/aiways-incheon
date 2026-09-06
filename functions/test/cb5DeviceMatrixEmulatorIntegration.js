@@ -2,7 +2,6 @@
 
 const assert = require("node:assert/strict");
 const {
-  call,
   cleanupCb5Fixture,
   revokeAndReplaceDevice,
   setupCb5DeviceMatrix,

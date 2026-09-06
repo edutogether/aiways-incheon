@@ -20,7 +20,6 @@ const firestoreBase = `http://127.0.0.1:8080/v1/projects/${projectId}/databases/
 const ACTOR_A = "dashboard_claim_test_actor_a";
 const ACTOR_B = "dashboard_claim_test_actor_b";
 const SCHOOL_A = "7321071";
-const SCHOOL_B = "9999999";
 
 function signup() {
   return new Promise((resolve, reject) => {

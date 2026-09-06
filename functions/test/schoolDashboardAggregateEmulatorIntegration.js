@@ -59,7 +59,7 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
   }
 }
 
-(async () => {
+test("saveSortingRecord -> onSortingRecordWritten trigger -> aggregate doc -> getSchoolDashboard, including held->completed conversion via resolveSortingRecord", async () => {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -319,4 +319,4 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
     batch.delete(db.collection("schools").doc(SCHOOL_ID));
     await batch.commit();
   }
-})().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });
+});

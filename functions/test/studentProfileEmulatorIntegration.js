@@ -38,7 +38,7 @@ function call(handler, token, body) {
 
 const student = { schoolId: "7321071", schoolName: "테스트초등학교", grade: "5", classNum: "1", studentNumber: "12", name: "홍길동" };
 
-(async () => {
+test("registerStudentProfile double-confirm signup: preview/pending/approved flow, permanent lock after approval", async () => {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -173,4 +173,4 @@ const student = { schoolId: "7321071", schoolName: "테스트초등학교", grad
     batch.delete(teacherRoot);
     await batch.commit();
   }
-})().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });
+});

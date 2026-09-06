@@ -38,7 +38,7 @@ function call(handler, token, body) {
   return handler({ method: "POST", headers: { origin: "http://localhost:5173", "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) }, body }, res).then(() => out);
 }
 
-(async () => {
+test("anonymizeStudent: same-school teacher only, name/number erased but class aggregate untouched, personal ranking doc deleted, re-anonymize rejected", async () => {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -120,4 +120,4 @@ function call(handler, token, body) {
     batch.delete(classRef);
     await batch.commit();
   }
-})().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });
+});

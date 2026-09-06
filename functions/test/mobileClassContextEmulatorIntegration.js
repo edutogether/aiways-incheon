@@ -51,7 +51,7 @@ function mobileHeldPayload(key, classContext) {
   };
 }
 
-(async () => {
+test("mobile class context: classContext round-trips through checkStudentProfile/saveSortingRecord as the server sees it", async () => {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -132,4 +132,4 @@ function mobileHeldPayload(key, classContext) {
     batch.delete(root);
     await batch.commit();
   }
-})().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });
+});

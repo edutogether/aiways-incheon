@@ -72,7 +72,7 @@ async function call(appCheck) {
   return {r, provider, limit, claim};
 }
 
-(async () => {
+test("App Check enforcement: valid/missing/invalid/unavailable states map to the right status codes and never reach the provider before the check passes", async () => {
   for (const state of ["valid", "missing", "invalid", "unavailable"]) {
     const out = await call(async () => ({status: state}));
     assert.equal(out.r.s, 200);
@@ -85,7 +85,4 @@ async function call(appCheck) {
     assert.equal(out.claim, 0);
   }
   process.stdout.write("App Check emulator smoke test passed\n");
-})().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
 });

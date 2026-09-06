@@ -38,7 +38,7 @@ function call(handler, token, body) {
 
 const student = { schoolId: "7321071", schoolName: "테스트초등학교", grade: "5", classNum: "1", studentNumber: "12", name: "홍길동" };
 
-(async () => {
+test("changeStudentClass cooldown: 24h clock starts at registration, backdated cooldown allows a real change recorded in changeHistory, no-op and unregistered rejected distinctly", async () => {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -145,4 +145,4 @@ const student = { schoolId: "7321071", schoolName: "테스트초등학교", grad
     }
     await batch.commit();
   }
-})().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });
+});

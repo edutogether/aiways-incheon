@@ -30,7 +30,7 @@ function call(handler, token, body) {
   return handler({ method: "POST", headers: { origin: "http://localhost:5173", "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) }, body }, res).then(() => out);
 }
 
-(async () => {
+test("logDashboardRealtimeEvent: valid actor can log subscribed/failed events, invalid event value and unregistered device are refused", async () => {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -81,4 +81,4 @@ function call(handler, token, body) {
     batch.delete(actorRoot);
     await batch.commit();
   }
-})().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });
+});

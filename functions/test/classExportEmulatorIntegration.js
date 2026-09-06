@@ -43,7 +43,7 @@ function record(schoolId, grade, classNum, studentNumber, studentName, createdAt
   };
 }
 
-(async () => {
+test("exportClassRecords: teacherVerified required, results scoped to teacher's own school+grade+classNum, rows carry per-student CSV fields", async () => {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -137,4 +137,4 @@ function record(schoolId, grade, classNum, studentNumber, studentName, createdAt
     }
     await batch.commit();
   }
-})().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });
+});

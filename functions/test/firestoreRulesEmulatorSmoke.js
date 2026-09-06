@@ -10,7 +10,7 @@ const assert = require("node:assert/strict");
 const projectId = "demo-aiways-incheon";
 const base = `http://127.0.0.1:8080/v1/projects/${projectId}/databases/(default)/documents`;
 
-(async () => {
+test("firestore.rules default-deny: unauthenticated direct client read/write are rejected", async () => {
   const createResponse = await fetch(`${base}/rulesSmokeCheck`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -24,4 +24,4 @@ const base = `http://127.0.0.1:8080/v1/projects/${projectId}/databases/(default)
   assert.equal(readResponse.status, 403, "unauthenticated client read must be denied by firestore.rules");
 
   process.stdout.write("Firestore rules emulator smoke checks passed\n");
-})().catch((error) => { process.stderr.write(`${error.message}\n`); process.exitCode = 1; });
+});

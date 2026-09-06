@@ -111,9 +111,10 @@ function pause(milliseconds) {
 }
 
 // 액터 5개 x 기기 6개 회원가입 셋업 + 80개 이상의 순차 assert가 있는
-// 무거운 동시성 테스트 - 실측(node로 직접 실행, 에뮬레이터 기동 포함)
-// 1분 26초라 config의 기본 testTimeout(20초)로는 어림도 없다. 세 번째
-// 인자로 이 테스트만 넉넉히 2분을 준다.
+// 무거운 동시성 테스트 - config의 기본 testTimeout(20초)로는 어림도
+// 없다. 실측 결과 로컬 환경 부하에 따라 70~120초대까지 편차가 있었다
+// (120초로 처음 잡았다가 한 번 초과해서 실패하는 걸 직접 확인함) -
+// 세 번째 인자로 이 테스트만 3분을 준다.
 test("cb5 record/resolve recovery: idempotency, conflicts, timeout retry, revoked-device blocks, pagination stability, no PII leakage", async () => {
   const fixture = await setupCb5DeviceMatrix();
   const metrics = {
@@ -542,4 +543,4 @@ test("cb5 record/resolve recovery: idempotency, conflicts, timeout retry, revoke
   } finally {
     await cleanupCb5Fixture(fixture);
   }
-}, 120000);
+}, 180000);

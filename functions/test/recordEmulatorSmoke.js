@@ -29,4 +29,4 @@ async function main() {
   process.stdout.write("Firestore Emulator App Check enforcement smoke test passed\n");
 }
 
-main().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });
+test("App Check enforcement + firestore.rules default-deny over the real emulator HTTP surface", main);

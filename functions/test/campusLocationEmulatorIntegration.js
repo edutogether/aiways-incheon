@@ -63,7 +63,7 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
   }
 }
 
-(async () => {
+test("checkCampusLocation: coordinates never stored, on-campus counts toward class aggregate, off-campus/reused/expired checks don't, unconfigured school fails safe to off-campus", async () => {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -181,4 +181,4 @@ async function pollUntil(check, { timeoutMs = 8000, intervalMs = 250 } = {}) {
     batch.delete(db.collection("schools").doc(SCHOOL_ID));
     await batch.commit();
   }
-})().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });
+});

@@ -52,7 +52,7 @@ async function firestoreGet(path, token) {
   return res.status;
 }
 
-(async () => {
+test("dashboardSchoolId custom claim is set on first school-lock and firestore.rules gates schools/{schoolId}(+classes) by it, PII students subcollection stays closed", async () => {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -117,4 +117,4 @@ async function firestoreGet(path, token) {
     batch.delete(db.collection("schools").doc(SCHOOL_A));
     await batch.commit();
   }
-})().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });
+});

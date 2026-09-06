@@ -1,8 +1,8 @@
 "use strict";
 // D:\Projects\_shared\CONVENTIONS.md 5.1 - vitest 이전 B군(firebase
-// emulators:exec 기반). 각 파일은 여전히 emulators:exec가 매번 새로 띄우는
-// 별도 에뮬레이터 프로세스 안에서 "한 파일씩 단독 실행"돼야 한다 -
-// teacherAuthEmulatorIntegration.js와 superadminEmulatorIntegration.js는
+// emulators:exec 기반) 전체 21개. 각 파일은 여전히 emulators:exec가 매번
+// 새로 띄우는 별도 에뮬레이터 프로세스 안에서 "한 파일씩 단독 실행"돼야
+// 한다 - teacherAuthEmulatorIntegration.js와 superadminEmulatorIntegration.js는
 // 같은 SCHOOL_ID/GRADE/CLASS_NUM/teacherCodes 문서ID를, cb5 두 파일은
 // 같은 cb5_actor_* 액터 매트릭스를 쓰므로 한 vitest 프로세스에서 같이
 // 돌리면 문서 경합이 난다. 그래서 vitest.config.js(A군, npm test)와는
@@ -19,7 +19,23 @@ module.exports = defineConfig({
       "test/superadminEmulatorIntegration.js",
       "test/registrationApprovalEmulatorIntegration.js",
       "test/cb5DeviceMatrixEmulatorIntegration.js",
-      "test/cb5RecordResolveRecoveryEmulatorIntegration.js"
+      "test/cb5RecordResolveRecoveryEmulatorIntegration.js",
+      "test/recordEmulatorSmoke.js",
+      "test/analysisIdempotencyEmulatorSmoke.js",
+      "test/appCheckEmulatorSmoke.js",
+      "test/edu2gEmulatorSmoke.js",
+      "test/protectedRecordsEmulatorIntegration.js",
+      "test/mobileClassContextEmulatorIntegration.js",
+      "test/schoolDashboardAggregateEmulatorIntegration.js",
+      "test/studentProfileEmulatorIntegration.js",
+      "test/studentAnonymizationEmulatorIntegration.js",
+      "test/campusLocationEmulatorIntegration.js",
+      "test/classChangeCooldownEmulatorIntegration.js",
+      "test/protectedActorEmulatorIntegration.js",
+      "test/firestoreRulesEmulatorSmoke.js",
+      "test/classExportEmulatorIntegration.js",
+      "test/dashboardSchoolClaimEmulatorIntegration.js",
+      "test/dashboardRealtimeDiagnosticsEmulatorIntegration.js"
     ],
     environment: "node",
     globals: true,

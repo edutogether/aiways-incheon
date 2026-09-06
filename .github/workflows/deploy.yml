@@ -83,6 +83,12 @@ jobs:
       - name: Install firebase-tools
         run: npm install -g firebase-tools
 
+      # 2026-09-07 - vitest 이전 완료(D:\Projects\_shared\CONVENTIONS.md 5.1).
+      # 이 아래 emulator:test:* 21개(B군) 전부 내부 실행기가 node에서
+      # vitest로 바뀌었다 - npm 스크립트 이름/이 스텝들은 전부 그대로라
+      # 아래 각 스텝 자체는 변경 없음. gate1:final/gate2a:final과
+      # test:frontend:layout/visual/states는 이전 대상이 아니다(전자는
+      # 이미 깨진 죽은 코드, 후자는 CDP 기반 브라우저 스크립트).
       - name: Firestore rules emulator smoke test
         run: npm run emulator:test:firestore-rules
 

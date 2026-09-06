@@ -37,14 +37,31 @@ module.exports = [
     // 등이 실행 시점에 전역으로 주입된다(이 저장소는 CommonJS라
     // require("vitest")를 못 씀) - eslint는 그걸 모르므로 이 파일들에 한해
     // 같은 이름을 전역으로 알려준다. B군에서 vitest로 옮긴 파일들
-    // (*EmulatorIntegration.js, *.test.js 명명규칙이 아님)도 여기 추가.
+    // (*EmulatorIntegration.js/*EmulatorSmoke.js, *.test.js 명명규칙이
+    // 아님)도 여기 추가 - 이제 B군 21개 전부 포함.
     files: [
       "test/**/*.test.js",
       "test/teacherAuthEmulatorIntegration.js",
       "test/superadminEmulatorIntegration.js",
       "test/registrationApprovalEmulatorIntegration.js",
       "test/cb5DeviceMatrixEmulatorIntegration.js",
-      "test/cb5RecordResolveRecoveryEmulatorIntegration.js"
+      "test/cb5RecordResolveRecoveryEmulatorIntegration.js",
+      "test/recordEmulatorSmoke.js",
+      "test/analysisIdempotencyEmulatorSmoke.js",
+      "test/appCheckEmulatorSmoke.js",
+      "test/edu2gEmulatorSmoke.js",
+      "test/protectedRecordsEmulatorIntegration.js",
+      "test/mobileClassContextEmulatorIntegration.js",
+      "test/schoolDashboardAggregateEmulatorIntegration.js",
+      "test/studentProfileEmulatorIntegration.js",
+      "test/studentAnonymizationEmulatorIntegration.js",
+      "test/campusLocationEmulatorIntegration.js",
+      "test/classChangeCooldownEmulatorIntegration.js",
+      "test/protectedActorEmulatorIntegration.js",
+      "test/firestoreRulesEmulatorSmoke.js",
+      "test/classExportEmulatorIntegration.js",
+      "test/dashboardSchoolClaimEmulatorIntegration.js",
+      "test/dashboardRealtimeDiagnosticsEmulatorIntegration.js"
     ],
     languageOptions: {
       globals: {

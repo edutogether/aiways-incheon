@@ -1,5 +1,5 @@
 "use strict";
-const test=require("node:test"),assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
 const {OBSERVER_SCHEMA}=require("../lib/sortingSafetyObserver");const {evaluateAnalysisSafety}=require("../lib/sortingAnalysisSafety");
 const required=["requestId","observerVersion","targetVisibility","targetDominance","multiObject","occlusion","deformation","contamination","transparencyAmbiguity","compositeMaterial","imageQuality","backgroundClutter","candidateConflict","observerStatus"];
 test("observer contract is observation-only and retains all required enum fields",()=>{for(const key of required)assert.ok(OBSERVER_SCHEMA.required.includes(key));for(const forbidden of ["object","objectName","material","disposal","finalDecision","sortingAnswer"])assert.equal(Object.hasOwn(OBSERVER_SCHEMA.properties,forbidden),false);assert.deepEqual(OBSERVER_SCHEMA.properties.targetVisibility.enum,["clear","partial","poor"]);assert.deepEqual(OBSERVER_SCHEMA.properties.targetDominance.enum,["high","medium","low"]);assert.deepEqual(OBSERVER_SCHEMA.properties.imageQuality.enum,["good","usable","poor"]);});

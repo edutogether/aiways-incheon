@@ -1,6 +1,5 @@
 "use strict";
 
-const test = require("node:test");
 const assert = require("node:assert/strict");
 const { APP_CHECK_ENFORCEMENT, extractAppCheckToken, observeAppCheck } = require("../lib/appCheckProtection");
 const { createAnalyzeSortingHandler } = require("../lib/sortingVision");

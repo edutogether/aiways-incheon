@@ -3,7 +3,6 @@
 // 간접적으로 실행됐지 직접 require된 적은 없었다. validateRequest/
 // validateResponse는 Gemini 요청/응답 양쪽 다 신뢰 경계라 각자 실패
 // 경로를 직접 확인한다.
-const test = require("node:test");
 const assert = require("node:assert/strict");
 const { SCHEMA, validateRequest, normalizeResponse, validateResponse } = require("../lib/sortingVisionSchema");
 

@@ -1,5 +1,5 @@
 "use strict";
-const assert = require("node:assert/strict"), fs = require("node:fs"), path = require("node:path"), test = require("node:test"), vm = require("node:vm");
+const assert = require("node:assert/strict"), fs = require("node:fs"), path = require("node:path"), vm = require("node:vm");
 const root = path.resolve(__dirname, "..", ".."), html = fs.readFileSync(path.join(root, "index.html"), "utf8"), clientSource = fs.readFileSync(path.join(root, "edu2gBetaClient.js"), "utf8");
 function clientHarness({ fetchImpl, hostname = "localhost", search = "?auth-emulator=1", visualReview = false } = {}) { const location = { hostname, search }, window = { AIWaysAppCheck: { initializeAIWaysAppCheck: async () => ({ app: { options: { projectId: "ai-ways-incheon" } } }) }, AIWaysBetaAuth: { visualReviewRequested: () => visualReview, getEdu2gProtectedHeaders: async ({ forceRefresh } = {}) => ({ "X-Firebase-AppCheck": "app-check", Authorization: `Bearer token-${forceRefresh ? "fresh" : "cached"}` }) } }; vm.runInNewContext(clientSource, { window, location, navigator: { platform: "Win32" }, URLSearchParams, AbortController, fetch: fetchImpl, setTimeout, clearTimeout }, { filename: "edu2gBetaClient.js" }); return window.AIWaysEdu2gClient; }
 // 2026-09-02: 클로즈베타 시크릿코드 UI(edu2gBetaUi.js/edu2gBeta.css, 대표님

@@ -65,6 +65,12 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # 2026-09-07 - D:\Projects\_shared\CONVENTIONS.md 5.1 이전 1단계(A군).
+      # test/*.test.js 40개(에뮬레이터 없이 도는 순수 유닛테스트)를
+      # node --test에서 vitest로 전환 - "npm test"가 이제 vitest run을
+      # 돌린다(스크립트만 바뀜, 이 스텝 자체는 그대로). emulator:test:*
+      # 21개(B군)는 이 단계 대상이 아니라 아직 firebase emulators:exec +
+      # node --test 조합 그대로다.
       - name: Run unit tests
         run: npm test
 

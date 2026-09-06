@@ -1,6 +1,5 @@
 "use strict";
 const assert = require("node:assert/strict");
-const test = require("node:test");
 const { STORAGE_KEY, createClassProfileStore } = require("../../classProfileStore.js");
 
 function memoryStorage() { const values = new Map(); return { getItem: key => values.has(key) ? values.get(key) : null, setItem: (key, value) => values.set(key, String(value)), removeItem: key => values.delete(key), has: key => values.has(key) }; }

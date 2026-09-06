@@ -1,4 +1,4 @@
 "use strict";
-const test=require("node:test"),assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
 const source=fs.readFileSync(path.join(__dirname,"..","..","firebaseAppCheck.js"),"utf8"),app=fs.readFileSync(path.join(__dirname,"..","..","app.js"),"utf8");
 test("frontend App Check adapter uses enterprise, refresh and restricted debug mode",()=>{assert.match(source,/ReCaptchaEnterpriseProvider\(siteKey\)/);assert.match(source,/isTokenAutoRefreshEnabled:true/);assert.match(source,/host === "localhost" \|\| host === "127.0.0.1"/);assert.match(source,/appcheck-debug/);assert.match(source,/X-Firebase-AppCheck/);assert.doesNotMatch(source,/Math\.random|localStorage|sessionStorage|console\./);assert.match(app,/AIWaysEdu2gClient/);assert.match(app,/analyzeSortingImage/);assert.match(app,/getSortingVisionEndpoint/);});

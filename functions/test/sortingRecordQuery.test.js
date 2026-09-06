@@ -6,7 +6,6 @@
 // 새어나가지 않는지 - 는 별도로 확인된 적이 없었다). publicRecord와
 // 사소해 보이지만 실제로 요청을 걸러내는 guard()의 크기/컨텐츠타입
 // 체크를 직접 확인한다.
-const test = require("node:test");
 const assert = require("node:assert/strict");
 const { createListSortingRecordsHandler, createResolveSortingRecordHandler, publicRecord } = require("../lib/sortingRecordQuery");
 

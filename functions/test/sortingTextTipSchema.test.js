@@ -1,7 +1,6 @@
 "use strict";
 // 2026-09-01 종합감사(B그룹 4번): sortingVisionSchema.test.js와 같은 이유 -
 // sortingTextTip.js를 통해서만 간접 실행됐지 직접 require된 적 없었다.
-const test = require("node:test");
 const assert = require("node:assert/strict");
 const { SCHEMA, MAX_QUERY_LENGTH, validateRequest, normalizeResponse, validateResponse } = require("../lib/sortingTextTipSchema");
 

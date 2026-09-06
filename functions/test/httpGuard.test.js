@@ -1,5 +1,4 @@
 "use strict";
-const test = require("node:test");
 const assert = require("node:assert/strict");
 const { cleanText, isAllowedOrigin, applyCors } = require("../lib/httpGuard");
 

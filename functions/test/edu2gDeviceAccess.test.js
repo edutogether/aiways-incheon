@@ -1,5 +1,5 @@
 "use strict";
-const test = require("node:test"), assert = require("node:assert/strict");
+const assert = require("node:assert/strict");
 const { extractBearer, createEdu2gDeviceAccess } = require("../lib/edu2gDeviceAccess");
 function doc(data) { return { exists: data !== undefined, data: () => data }; }
 function fakeDb(values) { return { collection(name) { return { doc(id) { const key = `${name}/${id}`; return { get: async () => doc(values[key]), update: () => {}, collection(child) { return { doc(next) { return { get: async () => doc(values[`${key}/${child}/${next}`]), update: () => {} }; } }; } }; } }; } }; }

@@ -1,5 +1,4 @@
 "use strict";
-const test = require("node:test");
 const assert = require("node:assert/strict");
 const { createRecordStore } = require("../lib/sortingRecordStore");
 const { createSaveSortingRecordHandler } = require("../lib/sortingRecord");

@@ -1,5 +1,5 @@
 "use strict";
-const test=require("node:test"),assert=require("node:assert/strict");
+const assert=require("node:assert/strict");
 const {validateIdempotencyKey,hashIdempotencyKey,createAnalysisIdempotency}=require("../lib/analysisIdempotency");
 const {createAnalyzeSortingHandler}=require("../lib/sortingVision");
 function db(){const docs=new Map();return{docs,collection:n=>({doc:id=>({key:`${n}/${id}`})}),runTransaction:async f=>f({get:async r=>({exists:docs.has(r.key),data:()=>docs.get(r.key)}),create:(r,v)=>{if(docs.has(r.key))throw Error();docs.set(r.key,v);},update:(r,v)=>docs.set(r.key,{...docs.get(r.key),...v})})};}

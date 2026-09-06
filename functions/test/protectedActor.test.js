@@ -1,5 +1,4 @@
 "use strict";
-const test = require("node:test");
 const assert = require("node:assert/strict");
 const { protectActorRequest } = require("../lib/protectedActor");
 test("protected actor order stops before identity when App Check is rejected", async () => {

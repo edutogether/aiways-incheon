@@ -31,5 +31,23 @@ module.exports = [
       "no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" }],
       "no-undef": "error"
     }
+  },
+  {
+    // vitest.config.js의 globals:true로 test/describe 등이 실행 시점에
+    // 전역으로 주입된다(이 저장소는 CommonJS라 require("vitest")를 못 씀) -
+    // eslint는 그걸 모르므로 이 파일들에 한해 같은 이름을 전역으로 알려준다.
+    files: ["test/**/*.test.js"],
+    languageOptions: {
+      globals: {
+        test: "readonly",
+        describe: "readonly",
+        it: "readonly",
+        expect: "readonly",
+        beforeAll: "readonly",
+        afterAll: "readonly",
+        beforeEach: "readonly",
+        afterEach: "readonly"
+      }
+    }
   }
 ];

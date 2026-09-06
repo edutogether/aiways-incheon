@@ -5,7 +5,6 @@
 // 전달하는 걸 깜빡하면 아무 효과가 없었다(실제로 그랬던 버그).
 // 이 테스트는 각 실제 export된 핸들러를 blockedActors.isBlocked=true로
 // 직접 호출해서, 진짜 403 actor_blocked가 나오는지 하나씩 확인한다.
-const test = require("node:test");
 const assert = require("node:assert/strict");
 
 function res() {

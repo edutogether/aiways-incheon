@@ -5,7 +5,6 @@
 // 닿지 않았다 - sortingRecordStore.js가 같은 이유로 분리되면서 남겨둔 교훈이
 // 조회 쪽에는 적용이 안 돼 있었다. lib/sortingRecordQueryStore.js로 옮기고
 // 여기서 고정한다.
-const test = require("node:test");
 const assert = require("node:assert/strict");
 const { createRecordQueryStore } = require("../lib/sortingRecordQueryStore");
 

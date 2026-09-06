@@ -1,5 +1,5 @@
 "use strict";
-const test = require("node:test"), assert = require("node:assert/strict"), registry = require("../../classroomSkillRegistry.js");
+const assert = require("node:assert/strict"), registry = require("../../classroomSkillRegistry.js");
 global.AIWaysClassroomSkillRegistry = registry;
 const runtime = require("../../teachableSkillRuntime.js");
 const skill = (id, version = 1, overrides = {}) => ({ skillId: id, name: `Skill ${id}`, modelType: "teachable_machine_image", modelBaseUrl: `https://teachablemachine.withgoogle.com/models/${id}/`, version, classes: ["병", "캔", "종이"], status: "enabled", ...overrides });

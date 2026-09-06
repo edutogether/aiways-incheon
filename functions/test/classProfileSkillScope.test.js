@@ -1,6 +1,5 @@
 "use strict";
 const assert = require("node:assert/strict");
-const test = require("node:test");
 const { createRegistry } = require("../../classroomSkillRegistry.js");
 function storage() { let value = null; return { getItem: () => value, setItem: (_, next) => { value = next; } }; }
 function skill(name, scope, visibility = "class", enabled = true) { return { name, description: name, modelBaseUrl: `https://example.test/${name}/`, classes: ["PLASTIC"], visibility, enabled, ...scope }; }

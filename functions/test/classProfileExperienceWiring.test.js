@@ -3,7 +3,6 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const test = require("node:test");
 const { createClassProfileStore } = require("../../classProfileStore.js");
 const { createRegistry } = require("../../classroomSkillRegistry.js");
 

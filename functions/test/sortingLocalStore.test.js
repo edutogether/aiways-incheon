@@ -1,5 +1,5 @@
 "use strict";
-const test=require("node:test"),assert=require("node:assert/strict");
+const assert=require("node:assert/strict");
 const {createSortingLocalStore,buildSortingRecordsCsv}=require("../../sortingLocalStore.js");
 const adapter=()=>{const rows=new Map();return {async get(k){return rows.get(k)||null},async put(v){rows.set(v.clientRecordId,{...v});return v},async all(){return [...rows.values()]},async del(k){rows.delete(k)},async clear(){rows.clear()}}};
 test("local store whitelists the record schema and preserves idempotent identity",async()=>{const store=createSortingLocalStore(adapter());const first=await store.saveLocalSortingRecord({clientRecordId:"r1",createdAt:"2026-08-07T00:00:00.000Z",decision:"completed",category:"plastic",imageBase64:"no",token:"no"});const second=await store.saveLocalSortingRecord({clientRecordId:"r1",decision:"completed",syncStatus:"pending",actorId:"no"});assert.equal(first.createdAt,second.createdAt);assert.equal(second.clientRecordId,"r1");assert.equal("imageBase64" in second,false);assert.equal("token" in second,false);assert.equal("actorId" in second,false)});

@@ -2,7 +2,6 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const test = require("node:test");
 const app = fs.readFileSync(path.resolve(__dirname, "..", "..", "app.js"), "utf8");
 
 test("localhost E2E bridge gates and delegates to the full prepared-image flow", () => {

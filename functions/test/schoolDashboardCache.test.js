@@ -3,7 +3,6 @@
 // 전체 컬렉션을 캐시 없이 다시 읽고 있었다. 짧은 인스턴스 캐시가 실제로
 // Firestore 읽기 횟수를 줄이는지, 그리고 학교 간에 캐시가 섞이지 않는지
 // 확인한다.
-const test = require("node:test");
 const assert = require("node:assert/strict");
 const { createGetSchoolDashboardHandler } = require("../lib/schoolDashboard");
 

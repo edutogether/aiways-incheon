@@ -5,7 +5,6 @@
 // 브라우저 저장소만 지우면 매번 새 actor로 아무 학교/반이나 골라 실제
 // 학생 번호+이름을 무제한 조회할 수 있는 구멍이었다(실제 아이들 정보라
 // 심각도 최상단).
-const test = require("node:test");
 const assert = require("node:assert/strict");
 const { createGetSchoolDashboardHandler } = require("../lib/schoolDashboard");
 

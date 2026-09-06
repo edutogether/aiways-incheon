@@ -3,7 +3,6 @@
 // require된 적 없었다. 이 함수의 판정 결과(RETAKE/CAUTION/SAFE)가
 // 그대로 학생에게 "다시 찍어주세요"/"확인해주세요" UX로 노출되므로,
 // poor/caution 각 판정 조건 하나하나가 실제로 맞물려 동작하는지 확인한다.
-const test = require("node:test");
 const assert = require("node:assert/strict");
 const { evaluateAnalysisSafety } = require("../lib/sortingAnalysisSafety");
 

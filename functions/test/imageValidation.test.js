@@ -5,7 +5,6 @@
 // 직접 구성해서 dimensions() 파싱 경로와 validateImage()의 4가지 실패
 // 코드(invalid_base64/image_too_large/image_signature_mismatch/
 // image_dimensions_too_large)를 전부 확인한다.
-const test = require("node:test");
 const assert = require("node:assert/strict");
 const { MAX_IMAGE_BYTES, MAX_EDGE, validateImage } = require("../lib/imageValidation");
 

@@ -7,7 +7,7 @@ const {
   setupCb5DeviceMatrix,
 } = require("./cb5EmulatorFixture");
 
-(async () => {
+test("cb5 device matrix: 5 active devices per actor, 6th rejected, revoked device denied access", async () => {
   const fixture = await setupCb5DeviceMatrix();
   try {
     const { db, access } = fixture;
@@ -31,7 +31,4 @@ const {
   } finally {
     await cleanupCb5Fixture(fixture);
   }
-})().catch((error) => {
-  process.stderr.write(`${error.stack || error}\n`);
-  process.exitCode = 1;
 });

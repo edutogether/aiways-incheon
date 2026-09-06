@@ -110,7 +110,11 @@ function pause(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
-(async () => {
+// 액터 5개 x 기기 6개 회원가입 셋업 + 80개 이상의 순차 assert가 있는
+// 무거운 동시성 테스트 - 실측(node로 직접 실행, 에뮬레이터 기동 포함)
+// 1분 26초라 config의 기본 testTimeout(20초)로는 어림도 없다. 세 번째
+// 인자로 이 테스트만 넉넉히 2분을 준다.
+test("cb5 record/resolve recovery: idempotency, conflicts, timeout retry, revoked-device blocks, pagination stability, no PII leakage", async () => {
   const fixture = await setupCb5DeviceMatrix();
   const metrics = {
     actors: 5,
@@ -538,7 +542,4 @@ function pause(milliseconds) {
   } finally {
     await cleanupCb5Fixture(fixture);
   }
-})().catch((error) => {
-  process.stderr.write(`${error.stack || error}\n`);
-  process.exitCode = 1;
-});
+}, 120000);

@@ -144,8 +144,15 @@ test("cb5 record/resolve recovery: idempotency, conflicts, timeout retry, revoke
   try {
     const { db, access, users, actorKeys } = fixture;
     const { records, queries } = createRecordStores(db);
+    // 실제 벽시계로 분(minute) 버킷을 나누면, 이 아래 레이트리밋 채우기
+    // 루프(순차 Firestore 트랜잭션 4번 + 판정 1번)가 UTC 분 경계를 넘는
+    // 순간 카운트가 리셋되어 429가 나와야 할 5번째 호출이 201로 새는
+    // 간헐적 실패가 재현됐다(느린 CI일수록 더 잘 발생). 이 리미터
+    // 인스턴스만 시계를 고정해 분 경계 레이스를 원천 차단한다.
+    const rateLimiterClock = new Date();
     const actorRateLimiter = createActorRateLimiter({
       db,
+      now: () => rateLimiterClock,
       serverTimestamp: () => FieldValue.serverTimestamp(),
     });
     const dependencies = {

@@ -10,6 +10,7 @@
 const { protectActorRequest } = require("./protectedActor");
 const { cleanText, applyCors } = require("./httpGuard");
 const { verifyTeacherCodeCore } = require("./teacherAuth");
+const { studentNumberClaimRef } = require("./studentNumberClaim");
 
 const MAX_BODY_BYTES = 2 * 1024;
 const DIGITS = /^\d{1,2}$/;
@@ -193,6 +194,14 @@ function createChangeStudentClassHandler(dependencies = {}) {
         if (!current) return { code: "not_registered" };
         const currentLastChanged = timestampToDate(current.lastChangedAt) || timestampToDate(current.registeredAt) || now();
         if (now().getTime() - currentLastChanged.getTime() < CLASS_CHANGE_COOLDOWN_MS) return { code: "cooldown_active" };
+        // 학생 소속 자기신고 검증 구멍 좁히기 - 반을 옮기는 것도 그 반의
+        // 번호 하나를 새로 차지하는 것이므로, 승인(registrationApproval.js)과
+        // 같은 원자적 클레임 검사를 거친다(studentNumberClaim.js). 학교/번호는
+        // 안 바뀌므로 클레임은 grade/classNum만 옮기면 된다.
+        const oldClaimRef = studentNumberClaimRef(db, current.schoolId, current.grade, current.classNum, current.studentNumber);
+        const newClaimRef = studentNumberClaimRef(db, current.schoolId, grade, classNum, current.studentNumber);
+        const newClaimSnap = await transaction.get(newClaimRef);
+        if (newClaimSnap.exists) return { code: "student_number_taken" };
         // FieldValue.serverTimestamp() can't be used inside an array element,
         // so this one entry uses a plain client Date instead of the usual
         // server sentinel -- fine here since it's only an audit trail, not
@@ -200,10 +209,13 @@ function createChangeStudentClassHandler(dependencies = {}) {
         const historyEntry = { fromGrade: current.grade, fromClassNum: current.classNum, toGrade: grade, toClassNum: classNum, changedAt: now() };
         const history = [...(Array.isArray(current.changeHistory) ? current.changeHistory : []), historyEntry].slice(-MAX_CHANGE_HISTORY);
         transaction.set(actorRef, { studentProfile: { ...current, grade, classNum, lastChangedAt: serverTimestamp(), changeHistory: history } }, { merge: true });
+        transaction.delete(oldClaimRef);
+        transaction.create(newClaimRef, { actorId: protectedActor.actorId, claimedAt: serverTimestamp() });
         return { ok: true };
       });
       if (result.code === "not_registered") return res.status(409).json({ ok: false, code: "not_registered" });
       if (result.code === "cooldown_active") return res.status(429).json({ ok: false, code: "cooldown_active" });
+      if (result.code === "student_number_taken") return res.status(409).json({ ok: false, code: "student_number_taken" });
       return res.status(200).json({ ok: true, confirmed: true, profile: { schoolId: existingProfile.schoolId, schoolName: existingProfile.schoolName, grade, classNum, studentNumber: existingProfile.studentNumber, name: existingProfile.name } });
     } catch {
       return res.status(503).json({ ok: false, code: "protection_unavailable" });

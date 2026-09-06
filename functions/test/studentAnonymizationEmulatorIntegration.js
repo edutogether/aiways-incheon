@@ -70,6 +70,12 @@ test("anonymizeStudent: same-school teacher only, name/number erased but class a
     const studentRef = classRef.collection("students").doc(STUDENT_NUMBER);
     await classRef.set({ schoolId: SCHOOL_A, grade: GRADE, classNum: CLASS_NUM, completedTotal: 7, heldTotal: 0, itemCounts: {} });
     await studentRef.set({ studentNumber: STUDENT_NUMBER, studentName: "홍길동", completedTotal: 3 });
+    // 학생 소속 자기신고 검증 구멍 좁히기 - 실제 승인(registrationApproval.js)
+    // 경로였다면 여기 클레임 문서가 같이 생겼을 것이다. 재현을 위해 직접 심어두고,
+    // 익명화가 이 번호를 실제로 풀어주는지(다음 전학생이 같은 번호를 쓸 수 있게)
+    // 아래에서 확인한다.
+    const claimRef = db.collection("studentNumberClaims").doc(`${SCHOOL_A}_${GRADE}_${CLASS_NUM}_${STUDENT_NUMBER}`);
+    await claimRef.set({ actorId: STUDENT_ACTOR_ID, claimedAt: FieldValue.serverTimestamp() });
 
     const access = createEdu2gDeviceAccess({ auth, db, serverTimestamp: () => FieldValue.serverTimestamp() });
     const rateLimiter = createGlobalRateLimiter({ db });
@@ -100,6 +106,9 @@ test("anonymizeStudent: same-school teacher only, name/number erased but class a
     const classDocAfter = await classRef.get();
     assert.equal(classDocAfter.data().completedTotal, 7, "class-level aggregate must be untouched by anonymizing one student");
 
+    const claimAfter = await claimRef.get();
+    assert.equal(claimAfter.exists, false, "anonymizing must release the studentNumberClaim so a real new transfer student can take the same number");
+
     // 이미 익명화된 학생을 다시 익명화하면 깔끔히 막힌다.
     const redo = await call(anonymize, teacherAToken, { targetActorId: STUDENT_ACTOR_ID });
     assert.equal(redo.status, 409);
@@ -118,6 +127,7 @@ test("anonymizeStudent: same-school teacher only, name/number erased but class a
     const classRef = db.collection("schools").doc(SCHOOL_A).collection("classes").doc(classDocId);
     batch.delete(classRef.collection("students").doc(STUDENT_NUMBER));
     batch.delete(classRef);
+    batch.delete(db.collection("studentNumberClaims").doc(`${SCHOOL_A}_${GRADE}_${CLASS_NUM}_${STUDENT_NUMBER}`));
     await batch.commit();
   }
 });

@@ -10,6 +10,7 @@
 // 열린다 - 담임은 자기 반 학생만 승인/거절할 수 있다.
 const { cleanText } = require("./httpGuard");
 const { guardedTeacher } = require("./teacherAuth");
+const { studentNumberClaimRef } = require("./studentNumberClaim");
 
 const MAX_LIST_SIZE = 100;
 
@@ -82,6 +83,11 @@ function createDecideRegistrationHandler(dependencies = {}) {
         }
         const actorSnap = await transaction.get(actorRef);
         if (actorSnap.exists && actorSnap.data()?.studentProfile) return { code: "already_registered" };
+        // 학생 소속 자기신고 검증 구멍 좁히기 - 이 번호가 같은 반에서 이미
+        // 다른 actor에게 승인돼 있는지 확인한다(studentNumberClaim.js).
+        const claimRef = studentNumberClaimRef(db, data.schoolId, data.grade, data.classNum, data.studentNumber);
+        const claimSnap = await transaction.get(claimRef);
+        if (claimSnap.exists) return { code: "student_number_taken" };
         // 3단계(2026-08-31) - 승인은 교사가 사람이 눈으로 확인한 신원증명이므로,
         // 이 기기의 school-lock(dashboardSchoolId)도 승인된 학교로 같이
         // 바로잡는다(teacherAuth.js의 verifyTeacherCode와 같은 근거).
@@ -89,6 +95,7 @@ function createDecideRegistrationHandler(dependencies = {}) {
         // 요청 문서 자체를 지우기 때문에(바로 아래), 감사기록은 승인 결과인
         // studentProfile 안에 같이 남겨야만 나중에도 "누가 승인했나"를 알 수 있다.
         transaction.set(actorRef, { studentProfile: { schoolId: data.schoolId, schoolName: data.schoolName, grade: data.grade, classNum: data.classNum, studentNumber: data.studentNumber, name: data.name, registeredAt: serverTimestamp(), registeredByActorId: teacher.actorId }, dashboardSchoolId: data.schoolId }, { merge: true });
+        transaction.create(claimRef, { actorId: targetActorId, claimedAt: serverTimestamp() });
         transaction.delete(requestRef);
         return { ok: true, decision: "approved" };
       });
@@ -102,6 +109,7 @@ function createDecideRegistrationHandler(dependencies = {}) {
     if (result.code === "not_found") return res.status(404).json({ ok: false, code: "request_not_found" });
     if (result.code === "not_pending") return res.status(409).json({ ok: false, code: "already_decided" });
     if (result.code === "already_registered") return res.status(409).json({ ok: false, code: "already_registered" });
+    if (result.code === "student_number_taken") return res.status(409).json({ ok: false, code: "student_number_taken" });
     logger({ severity: "INFO", message: "registration_decided", teacherActorId: teacher.actorId, schoolId: teacher.schoolId, grade: teacher.grade, classNum: teacher.classNum, targetActorId, decision: result.decision });
     return res.status(200).json({ ok: true, decision: result.decision, targetActorId });
   };

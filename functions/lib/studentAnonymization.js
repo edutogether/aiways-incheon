@@ -21,6 +21,7 @@
 const { cleanText } = require("./httpGuard");
 const { guardedTeacher } = require("./teacherAuth");
 const { classDocId } = require("./schoolDashboardAggregate");
+const { studentNumberClaimRef } = require("./studentNumberClaim");
 
 function createAnonymizeStudentHandler(dependencies = {}) {
   const db = dependencies.db;
@@ -69,7 +70,13 @@ function createAnonymizeStudentHandler(dependencies = {}) {
         // 통째로 지운다. completedTotal은 원래도 반 집계 문서(classRef)에
         // 이미 합산 반영돼 있던 값이라(schoolDashboardAggregate.js), 이
         // 학생 문서를 지워도 반/학교 집계 숫자는 줄지 않는다.
-        if (profile.studentNumber) transaction.delete(studentRef);
+        if (profile.studentNumber) {
+          transaction.delete(studentRef);
+          // 이 번호를 익명화된 학생이 계속 붙들고 있으면 실제로 전학 온
+          // 새 학생이 같은 번호를 못 받는다 - studentNumberClaim.js의
+          // 클레임도 같이 풀어서 번호를 다시 쓸 수 있게 한다.
+          transaction.delete(studentNumberClaimRef(db, profile.schoolId, profile.grade, profile.classNum, profile.studentNumber));
+        }
 
         return { ok: true, schoolId: profile.schoolId, grade: profile.grade, classNum: profile.classNum };
       });

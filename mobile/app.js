@@ -312,7 +312,9 @@
           status.textContent = "변경하는 중입니다...";
           const result = await client.changeStudentClass({ grade, classNum });
           if (result.ok) { showSignupLocked(result.data.profile); showVisualAlert(`🔄 ${p.grade}학년 ${p.classNum}반으로 변경 완료!`, "emerald"); }
-          else status.textContent = result.data?.code === "cooldown_active" ? formatCooldownWait(result.data.retryAfterSeconds) : "변경에 실패했어요. 다시 시도해 주세요.";
+          else status.textContent = result.data?.code === "cooldown_active" ? formatCooldownWait(result.data.retryAfterSeconds)
+            : result.data?.code === "student_number_taken" ? "그 번호는 이미 다른 학생이 쓰고 있어요. 선생님께 확인해 주세요."
+            : "변경에 실패했어요. 다시 시도해 주세요.";
         }
       );
     });

@@ -16,6 +16,7 @@ const { createListPendingRegistrationsHandler, createDecideRegistrationHandler }
 const projectId = process.env.GCLOUD_PROJECT || "demo-aiways-incheon";
 const authEmulator = new URL(`http://${process.env.FIREBASE_AUTH_EMULATOR_HOST || "127.0.0.1:9099"}`);
 const STUDENT_ACTOR_ID = "registration_approval_test_student";
+const STUDENT2_ACTOR_ID = "registration_approval_test_student2";
 const TEACHER_A_ID = "registration_approval_test_teacher_a";
 const TEACHER_B_ID = "registration_approval_test_teacher_b";
 const TEACHER_C_ID = "registration_approval_test_teacher_c";
@@ -43,11 +44,12 @@ test("registration approval queue: school+class isolation, reject-then-resubmit,
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
-  let studentUid = "", teacherAUid = "", teacherBUid = "", teacherCUid = "";
+  let studentUid = "", student2Uid = "", teacherAUid = "", teacherBUid = "", teacherCUid = "";
   try {
-    const studentSignup = await signup(), teacherASignup = await signup(), teacherBSignup = await signup(), teacherCSignup = await signup();
-    const studentToken = studentSignup.idToken, teacherAToken = teacherASignup.idToken, teacherBToken = teacherBSignup.idToken, teacherCToken = teacherCSignup.idToken;
+    const studentSignup = await signup(), student2Signup = await signup(), teacherASignup = await signup(), teacherBSignup = await signup(), teacherCSignup = await signup();
+    const studentToken = studentSignup.idToken, student2Token = student2Signup.idToken, teacherAToken = teacherASignup.idToken, teacherBToken = teacherBSignup.idToken, teacherCToken = teacherCSignup.idToken;
     studentUid = (await auth.verifyIdToken(studentToken)).uid;
+    student2Uid = (await auth.verifyIdToken(student2Token)).uid;
     teacherAUid = (await auth.verifyIdToken(teacherAToken)).uid;
     teacherBUid = (await auth.verifyIdToken(teacherBToken)).uid;
     teacherCUid = (await auth.verifyIdToken(teacherCToken)).uid;
@@ -58,6 +60,8 @@ test("registration approval queue: school+class isolation, reject-then-resubmit,
     }
     await db.collection("actors").doc(STUDENT_ACTOR_ID).set({ status: "active", plan: "closed_beta", dashboardSchoolId: SCHOOL_B });
     await bind(STUDENT_ACTOR_ID, studentUid);
+    await db.collection("actors").doc(STUDENT2_ACTOR_ID).set({ status: "active", plan: "closed_beta" });
+    await bind(STUDENT2_ACTOR_ID, student2Uid);
     await db.collection("actors").doc(TEACHER_A_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_A, grade: student.grade, classNum: student.classNum } });
     await bind(TEACHER_A_ID, teacherAUid);
     await db.collection("actors").doc(TEACHER_B_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_B, grade: student.grade, classNum: student.classNum } });
@@ -144,10 +148,22 @@ test("registration approval queue: school+class isolation, reject-then-resubmit,
     const redecide = await call(decide, teacherAToken, { targetActorId: STUDENT_ACTOR_ID, decision: "approve" });
     assert.equal(redecide.status, 404, "the request document is gone once approved, so this looks the same as not_found");
 
+    // 학생 소속 자기신고 검증 구멍 좁히기 - 다른 기기가 같은 반의 같은
+    // 번호(이름은 다르게)로 신청해도, 교사가 승인을 시도하면 그 번호가
+    // 이미 다른 학생에게 붙어있어 거절돼야 한다(studentNumberClaim.js).
+    const duplicateNumber = await call(register, student2Token, { ...student, name: "김철수", confirm: true });
+    assert.equal(duplicateNumber.status, 202);
+    const duplicateDecide = await call(decide, teacherAToken, { targetActorId: STUDENT2_ACTOR_ID, decision: "approve" });
+    assert.equal(duplicateDecide.status, 409);
+    assert.equal(duplicateDecide.body.code, "student_number_taken");
+    const student2Check = await call(check, student2Token, {});
+    assert.equal(student2Check.body.hasProfile, false, "a rejected-by-collision request must not create a profile");
+    assert.equal(student2Check.body.pending, true, "the request stays pending -- the teacher can retry once the number frees up (e.g. via anonymizeStudent)");
+
     process.stdout.write(JSON.stringify({ registrationApprovalEmulatorIntegration: "passed" }) + "\n");
   } finally {
     const batch = db.batch();
-    for (const [actorId, uid] of [[STUDENT_ACTOR_ID, studentUid], [TEACHER_A_ID, teacherAUid], [TEACHER_B_ID, teacherBUid], [TEACHER_C_ID, teacherCUid]]) {
+    for (const [actorId, uid] of [[STUDENT_ACTOR_ID, studentUid], [STUDENT2_ACTOR_ID, student2Uid], [TEACHER_A_ID, teacherAUid], [TEACHER_B_ID, teacherBUid], [TEACHER_C_ID, teacherCUid]]) {
       if (uid) batch.delete(db.collection("edu2gDeviceBindings").doc(uid));
       const actorRoot = db.collection("actors").doc(actorId);
       const devices = await actorRoot.collection("trustedDevices").get();
@@ -155,6 +171,8 @@ test("registration approval queue: school+class isolation, reject-then-resubmit,
       batch.delete(actorRoot);
     }
     batch.delete(db.collection("registrationRequests").doc(STUDENT_ACTOR_ID));
+    batch.delete(db.collection("registrationRequests").doc(STUDENT2_ACTOR_ID));
+    batch.delete(db.collection("studentNumberClaims").doc(`${student.schoolId}_${student.grade}_${student.classNum}_${student.studentNumber}`));
     await batch.commit();
   }
 });

@@ -19,6 +19,8 @@ const projectId = process.env.GCLOUD_PROJECT || "demo-aiways-incheon";
 const authEmulator = new URL(`http://${process.env.FIREBASE_AUTH_EMULATOR_HOST || "127.0.0.1:9099"}`);
 const ACTOR_ID = "class_change_test_actor";
 const TEACHER_ID = "class_change_test_teacher";
+const ACTOR2_ID = "class_change_test_actor2";
+const TEACHER2_ID = "class_change_test_teacher2";
 
 function signup() {
   return new Promise((resolve, reject) => {
@@ -132,6 +134,49 @@ test("changeStudentClass cooldown: 24h clock starts at registration, backdated c
     assert.equal(secondImmediate.status, 429);
     assert.equal(secondImmediate.body.code, "cooldown_active");
 
+    // 학생 소속 자기신고 검증 구멍 좁히기 - changeStudentClass 자체도 그
+    // 반의 번호 하나를 새로 차지하는 것이므로, 이미 그 번호를 쓰는 학생이
+    // 있는 반으로는 못 옮겨야 한다(registrationApproval.js의 승인 시점
+    // 검사와는 별개 경로 - changeStudentClass의 자체 클레임 검사를 직접
+    // 검증한다). ACTOR2를 일단 다른 반(6학년 4반)에 12번으로 승인시킨 뒤,
+    // ACTOR_ID가 이미 차지한 6학년 3반 12번으로 옮기려 시도한다.
+    const signed2 = await signup();
+    const token2 = signed2.idToken;
+    const uid2 = (await auth.verifyIdToken(token2)).uid;
+    await db.collection("actors").doc(ACTOR2_ID).set({ status: "active", plan: "closed_beta" });
+    await db.collection("actors").doc(ACTOR2_ID).collection("trustedDevices").doc(uid2).set({ uid: uid2, status: "active", managementId: "123e4567-e89b-42d3-a456-426614175003" });
+    await db.collection("edu2gDeviceBindings").doc(uid2).set({ actorId: ACTOR2_ID, status: "active" });
+    const teacherSigned2 = await signup();
+    const teacherToken2 = teacherSigned2.idToken;
+    const teacherUid2 = (await auth.verifyIdToken(teacherToken2)).uid;
+    await db.collection("actors").doc(TEACHER2_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: student.schoolId, grade: "6", classNum: "4" } });
+    await db.collection("actors").doc(TEACHER2_ID).collection("trustedDevices").doc(teacherUid2).set({ uid: teacherUid2, status: "active", managementId: "123e4567-e89b-42d3-a456-426614175004" });
+    await db.collection("edu2gDeviceBindings").doc(teacherUid2).set({ actorId: TEACHER2_ID, status: "active" });
+    try {
+      const registered2 = await call(register, token2, { ...student, grade: "6", classNum: "4", confirm: true });
+      assert.equal(registered2.status, 202);
+      const approved2 = await call(decide, teacherToken2, { targetActorId: ACTOR2_ID, decision: "approve" });
+      assert.equal(approved2.status, 200);
+      await db.collection("actors").doc(ACTOR2_ID).update({ "studentProfile.lastChangedAt": new Date(Date.now() - 25 * 60 * 60 * 1000) });
+      const collision = await call(change, token2, { grade: "6", classNum: "3", confirm: true });
+      assert.equal(collision.status, 409);
+      assert.equal(collision.body.code, "student_number_taken");
+      const stillInOldClass = await call(check, token2, {});
+      assert.equal(stillInOldClass.body.profile.classNum, "4", "a collision must not move the student at all");
+    } finally {
+      await db.collection("edu2gDeviceBindings").doc(uid2).delete();
+      await db.collection("edu2gDeviceBindings").doc(teacherUid2).delete();
+      const batch2 = db.batch();
+      for (const actorId of [ACTOR2_ID, TEACHER2_ID]) {
+        const actorRoot = db.collection("actors").doc(actorId);
+        const devicesSnap = await actorRoot.collection("trustedDevices").get();
+        devicesSnap.docs.forEach((d) => batch2.delete(d.ref));
+        batch2.delete(actorRoot);
+      }
+      batch2.delete(db.collection("studentNumberClaims").doc(`${student.schoolId}_6_4_${student.studentNumber}`));
+      await batch2.commit();
+    }
+
     process.stdout.write(JSON.stringify({ classChangeCooldownEmulatorIntegration: "passed" }) + "\n");
   } finally {
     if (uid) await db.collection("edu2gDeviceBindings").doc(uid).delete();
@@ -143,6 +188,8 @@ test("changeStudentClass cooldown: 24h clock starts at registration, backdated c
       devicesSnap.docs.forEach((d) => batch.delete(d.ref));
       batch.delete(actorRoot);
     }
+    batch.delete(db.collection("studentNumberClaims").doc(`${student.schoolId}_${student.grade}_${student.classNum}_${student.studentNumber}`));
+    batch.delete(db.collection("studentNumberClaims").doc(`${student.schoolId}_6_3_${student.studentNumber}`));
     await batch.commit();
   }
 });

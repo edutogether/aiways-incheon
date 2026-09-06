@@ -86,9 +86,11 @@ jobs:
       # 2026-09-07 - vitest 이전 완료(D:\Projects\_shared\CONVENTIONS.md 5.1).
       # 이 아래 emulator:test:* 21개(B군) 전부 내부 실행기가 node에서
       # vitest로 바뀌었다 - npm 스크립트 이름/이 스텝들은 전부 그대로라
-      # 아래 각 스텝 자체는 변경 없음. gate1:final/gate2a:final과
-      # test:frontend:layout/visual/states는 이전 대상이 아니다(전자는
-      # 이미 깨진 죽은 코드, 후자는 CDP 기반 브라우저 스크립트).
+      # 아래 각 스텝 자체는 변경 없음. test:frontend:layout/visual/states는
+      # 이전 대상이 아니다(CDP 기반 브라우저 스크립트). gate1:final/
+      # gate2a:final(존재하지 않는 파일 참조 + npm.cmd 하드코딩으로 Windows
+      # 전용이라 이미 깨져 있던 죽은 코드, 역할은 이번 A/B군 vitest
+      # 테스트로 완전히 대체됨)은 삭제함.
       - name: Firestore rules emulator smoke test
         run: npm run emulator:test:firestore-rules
 

@@ -66,7 +66,15 @@ function createManageTeacherCodeHandler(dependencies = {}) {
     // 지시) - 담임마다 자기 반 코드를 따로 받아야 반별 학생정보 접근을
     // 분리할 수 있다.
     const { codeHash, codeSalt } = hashTeacherCode(code);
-    await db.collection("teacherCodes").doc(teacherCodeDocId(schoolId, grade, classNum)).set({ codeHash, codeSalt, updatedAt: serverTimestamp(), updatedByUid: admin.uid }, { merge: true });
+    // 이 프로젝트의 다른 모든 Firestore 쓰기 핸들러(registrationApproval.js/
+    // sortingRecord.js 등)와 달리 여기만 try/catch가 빠져 있어서, 일시적
+    // Firestore 장애 시 503 대신 처리되지 않은 예외로 빠져나갈 수 있었다 -
+    // 같은 컨벤션 적용.
+    try {
+      await db.collection("teacherCodes").doc(teacherCodeDocId(schoolId, grade, classNum)).set({ codeHash, codeSalt, updatedAt: serverTimestamp(), updatedByUid: admin.uid }, { merge: true });
+    } catch {
+      return res.status(503).json({ ok: false, code: "protection_unavailable" });
+    }
     logger({ severity: "INFO", message: "teacher_code_rotated", schoolId, grade, classNum, updatedByUid: admin.uid });
     return res.status(200).json({ ok: true, schoolId, grade, classNum });
   };

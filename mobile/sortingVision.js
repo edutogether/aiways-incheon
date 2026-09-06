@@ -89,20 +89,25 @@
   async function analyzePhoto(imageEl, { searchQuery = "" } = {}) {
     const client = window.AIWaysEdu2gClient;
     if (!client?.analyzeSortingImage) return { ok: false, code: "provider_unavailable" };
-    const imagePayload = await prepareImage(imageEl);
-    if (!imagePayload) return { ok: false, code: "image_prepare_failed" };
-    const reqId = requestId();
-    const requestMetadata = {
-      schemaVersion: SCHEMA_VERSION,
-      requestId: reqId,
-      sessionId: `session-${Date.now().toString(36)}`,
-      idempotencyKey: window.crypto?.randomUUID ? window.crypto.randomUUID() : reqId,
-      locale: "ko-KR",
-      source: PROVIDER,
-      imageMetadata: imagePayload.metadata,
-      userContext: { searchQuery: clean(searchQuery), selectedCorrectionType: "", locale: "ko-KR" }
-    };
     try {
+      // prepareImage(blobToBase64)는 FileReader 오류 시 reject할 수 있다 -
+      // 이 try 밖에 있으면 analyzePhoto 자체가 reject해버려서, 호출부
+      // (app.js runPhotoAnalysis)에 .catch가 없어 스캔 모달이 영원히
+      // "분석 중"에 멈추고 버튼도 계속 비활성 상태로 남는다(저사양 기기의
+      // 드문 인코딩 실패로 재현 가능) - 다른 실패와 동일하게 여기서 흡수한다.
+      const imagePayload = await prepareImage(imageEl);
+      if (!imagePayload) return { ok: false, code: "image_prepare_failed" };
+      const reqId = requestId();
+      const requestMetadata = {
+        schemaVersion: SCHEMA_VERSION,
+        requestId: reqId,
+        sessionId: `session-${Date.now().toString(36)}`,
+        idempotencyKey: window.crypto?.randomUUID ? window.crypto.randomUUID() : reqId,
+        locale: "ko-KR",
+        source: PROVIDER,
+        imageMetadata: imagePayload.metadata,
+        userContext: { searchQuery: clean(searchQuery), selectedCorrectionType: "", locale: "ko-KR" }
+      };
       const response = await client.analyzeSortingImage({ ...requestMetadata, image: imagePayload, imageMetadata: imagePayload.metadata });
       if (!response.ok) return { ok: false, code: clean(response.code) || "provider_unavailable" };
       const normalized = normalizeResponse(response.data, reqId);

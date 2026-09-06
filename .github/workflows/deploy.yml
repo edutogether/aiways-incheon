@@ -90,6 +90,12 @@ jobs:
       # 실제 트랜잭션 경로(코드 오답/미설정 학교/정답 시 teacherVerified 기록)를
       # 에뮬레이터로 검증한다 - 다른 단계 확인용 emulator:test:* 스크립트들과
       # 같은 이유(부품 단위 유닛테스트만으로는 안 잡히는 배선 오류 방지).
+      # 2026-09-07 - vitest 이전 2단계(B군, D:\Projects\_shared\CONVENTIONS.md
+      # 5.1). 이 아래 3개(teacher-auth/registration-approval/superadmin)는
+      # firebase emulators:exec가 매번 새로 띄우는 별도 에뮬레이터 프로세스
+      # 안에서 여전히 한 파일씩 단독 실행된다(vitest.emulator.config.js +
+      # CLI 파일 필터) - npm run 스크립트 이름/이 스텝은 그대로, 내부 실행기만
+      # node에서 vitest로 바뀜.
       - name: Teacher auth emulator integration test
         run: npm run emulator:test:teacher-auth
 

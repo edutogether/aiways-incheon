@@ -45,7 +45,7 @@ function call(handler, token, body) {
   return handler({ method: "POST", headers: { origin: "http://localhost:5173", "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) }, body }, res).then(() => out);
 }
 
-(async () => {
+test("manageTeacherCode: non-superadmin and missing-token are refused, and a code issued after granting the claim actually verifies through verifyTeacherCode", async () => {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -106,4 +106,4 @@ function call(handler, token, body) {
     await batch.commit();
     if (uid) await auth.deleteUser(uid).catch(() => {});
   }
-})().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });
+});

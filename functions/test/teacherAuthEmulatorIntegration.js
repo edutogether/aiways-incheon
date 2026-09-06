@@ -36,7 +36,7 @@ function call(handler, token, body) {
   return handler({ method: "POST", headers: { origin: "http://localhost:5173", "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) }, body }, res).then(() => out);
 }
 
-(async () => {
+test("verifyTeacherCode: wrong code rejected, unset class rejected distinctly, correct code verifies and corrects a mis-bound school-lock, checkTeacherStatus reflects it", async () => {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -109,4 +109,4 @@ function call(handler, token, body) {
     batch.delete(db.collection("teacherCodes").doc(teacherCodeDocId(SCHOOL_ID, GRADE, CLASS_NUM)));
     await batch.commit();
   }
-})().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });
+});

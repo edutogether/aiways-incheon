@@ -33,10 +33,17 @@ module.exports = [
     }
   },
   {
-    // vitest.config.js의 globals:true로 test/describe 등이 실행 시점에
-    // 전역으로 주입된다(이 저장소는 CommonJS라 require("vitest")를 못 씀) -
-    // eslint는 그걸 모르므로 이 파일들에 한해 같은 이름을 전역으로 알려준다.
-    files: ["test/**/*.test.js"],
+    // vitest.config.js/vitest.emulator.config.js의 globals:true로 test/describe
+    // 등이 실행 시점에 전역으로 주입된다(이 저장소는 CommonJS라
+    // require("vitest")를 못 씀) - eslint는 그걸 모르므로 이 파일들에 한해
+    // 같은 이름을 전역으로 알려준다. 2단계(B군)에서 vitest로 옮긴 3개
+    // (*EmulatorIntegration.js, *.test.js 명명규칙이 아님)도 여기 추가.
+    files: [
+      "test/**/*.test.js",
+      "test/teacherAuthEmulatorIntegration.js",
+      "test/superadminEmulatorIntegration.js",
+      "test/registrationApprovalEmulatorIntegration.js"
+    ],
     languageOptions: {
       globals: {
         test: "readonly",

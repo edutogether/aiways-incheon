@@ -39,7 +39,7 @@ function call(handler, token, body) {
   return handler({ method: "POST", headers: { origin: "http://localhost:5173", "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) }, body }, res).then(() => out);
 }
 
-(async () => {
+test("registration approval queue: school+class isolation, reject-then-resubmit, double-decide rejected, non-teacher refused", async () => {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -157,4 +157,4 @@ function call(handler, token, body) {
     batch.delete(db.collection("registrationRequests").doc(STUDENT_ACTOR_ID));
     await batch.commit();
   }
-})().catch((error) => { process.stderr.write(`${error.stack || error}\n`); process.exitCode = 1; });
+});

@@ -90,14 +90,27 @@ const RATE_LIMITS = Object.freeze({
   // 늘어난 걸 재감사에서 지적받아, 실제로 필요한 이 함수 하나에만 걸도록
   // 좁혔다(2026-08-27).
   getSchoolDashboard: { perMinute: 600, perDay: 500000, shards: 8 },
-  checkStudentProfile: { perMinute: 30 }, registerStudentProfile: { perMinute: 10 },
+  // 2026-09-07 종합감사 - checkStudentProfile/registerStudentProfile/
+  // searchSchool 셋 다 "한 반이 같은 순간에 몰려서 쓴다"는 이 앱의 실제
+  // 사용 패턴과 안 맞는 값이었다. checkStudentProfile은 학생이 앱을 열
+  // 때마다 무조건 1번 호출되는데(mobile/app.js initSignupForm), 학교
+  // 하나가 최대 9개 반(CLAUDE.md 기준)이고 반마다 30명이면 한 교시 시작과
+  // 함께 최대 270명이 동시에 앱을 켤 수 있다 - 옛 30/분은 한 반만 켜도
+  // 걸렸다. registerStudentProfile은 미리보기(confirm:false)+확정
+  // (confirm:true)으로 학생 1명이 이 엔드포인트를 2번 부르므로, 반 하나가
+  // 동시에 가입해도 옛 10/분으로는 어림도 없었다. searchSchool은 학교
+  // 이름 자동완성이라 디바운스가 있어도 학생 1명이 여러 번 호출한다.
+  // 학교 전체(9개 반) 동시 접속까지 커버하도록 여유 있게 올린다 - 이
+  // 세 함수는 saveSortingRecord/getSchoolDashboard보다 훨씬 가벼운
+  // 오퍼레이션이라 비용 영향은 미미하다.
+  checkStudentProfile: { perMinute: 400 }, registerStudentProfile: { perMinute: 300 },
   checkCampusLocation: { perMinute: 60 },
   changeStudentClass: { perMinute: 10 },
   // 전국 랭킹(collectionGroup 전수스캔)을 폐지하고 학교+학년 범위로 축소한
   // 뒤 이름도 그에 맞게 바꿈(2026-08-26) - 쿼리 자체가 훨씬 가벼워졌지만
   // perDay가 아예 없던 문제는 그대로 남아있어 같이 추가.
   getClassRanking: { perMinute: 60, perDay: 5000 },
-  searchSchool: { perMinute: 60 }
+  searchSchool: { perMinute: 300 }
   // 2026-08-31 - 교사 인증(1단계). verifyTeacherCode는 공유코드를 맞혀보는
   // 시도이므로 registerStudentProfile과 같은 수준(분당 10)으로 좁힌다.
   ,checkTeacherStatus: { perMinute: 30 }, verifyTeacherCode: { perMinute: 10 }

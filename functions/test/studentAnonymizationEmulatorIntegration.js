@@ -77,6 +77,20 @@ test("anonymizeStudent: same-school teacher only, name/number erased but class a
     const claimRef = db.collection("studentNumberClaims").doc(`${SCHOOL_A}_${GRADE}_${CLASS_NUM}_${STUDENT_NUMBER}`);
     await claimRef.set({ actorId: STUDENT_ACTOR_ID, claimedAt: FieldValue.serverTimestamp() });
 
+    // 2026-09-07 종합감사 - 익명화가 studentProfile/개인랭킹만 지우고
+    // 실제 기록(actors/*/records)의 classContext.studentNumber/studentName은
+    // 안 지우고 있었다 - exportClassRecords(CSV 반전체 내보내기)가 정확히
+    // 이 두 필드를 CSV에 싣기 때문에, 삭제 요청 후에도 실명·번호가 CSV로
+    // 계속 유출되는 실제 결함이었다. 실제 기록 한 건을 심어서 정리되는지
+    // 확인한다.
+    const recordRef = db.collection("actors").doc(STUDENT_ACTOR_ID).collection("records").doc("anonymize-test-record");
+    await recordRef.set({
+      schemaVersion: "sorting-record-v1", status: "completed", provider: "manual_select",
+      userDecision: { selectedItemId: "pet-bottle", action: "recorded", userConfirmed: true },
+      classContext: { schoolId: SCHOOL_A, grade: GRADE, classNum: CLASS_NUM, studentNumber: STUDENT_NUMBER, studentName: "홍길동" },
+      createdAt: FieldValue.serverTimestamp()
+    });
+
     const access = createEdu2gDeviceAccess({ auth, db, serverTimestamp: () => FieldValue.serverTimestamp() });
     const rateLimiter = createGlobalRateLimiter({ db });
     const actorRateLimiter = createActorRateLimiter({ db });
@@ -99,6 +113,13 @@ test("anonymizeStudent: same-school teacher only, name/number erased but class a
     assert.equal("studentNumber" in actorAfter.studentProfile, false, "studentNumber must actually be gone");
     assert.equal(actorAfter.studentProfile.schoolId, SCHOOL_A, "school/grade/class stay so the device can still contribute to class totals");
     assert.equal(actorAfter.studentProfile.grade, GRADE);
+    // 2026-09-07 종합감사 - transaction.set을 merge:false로 쓰면 actors/{actorId}
+    // 문서 "전체"가 { studentProfile: {...} } 하나로 교체돼서, status/plan이
+    // 사라져 그 기기가 edu2gDeviceAccess.js에서 영구히 actor_unavailable(403)에
+    // 갇히는 실제 회귀가 있었다 - 이 필드들이 익명화 후에도 그대로 남아있는지
+    // 직접 확인한다.
+    assert.equal(actorAfter.status, "active", "top-level actor fields (status) must survive anonymization, not just studentProfile");
+    assert.equal(actorAfter.plan, "closed_beta", "top-level actor fields (plan) must survive anonymization -- otherwise edu2gDeviceAccess.js locks this device out permanently");
 
     const studentDocAfter = await studentRef.get();
     assert.equal(studentDocAfter.exists, false, "the per-student ranking subdocument must be deleted entirely");
@@ -108,6 +129,11 @@ test("anonymizeStudent: same-school teacher only, name/number erased but class a
 
     const claimAfter = await claimRef.get();
     assert.equal(claimAfter.exists, false, "anonymizing must release the studentNumberClaim so a real new transfer student can take the same number");
+
+    const recordAfter = (await recordRef.get()).data();
+    assert.equal("studentNumber" in recordAfter.classContext, false, "past records must also lose studentNumber, or exportClassRecords keeps leaking it after a deletion request");
+    assert.equal("studentName" in recordAfter.classContext, false, "past records must also lose studentName, or exportClassRecords keeps leaking it after a deletion request");
+    assert.equal(recordAfter.classContext.schoolId, SCHOOL_A, "non-identifying classContext fields (schoolId/grade/classNum) stay so class aggregates remain consistent");
 
     // 이미 익명화된 학생을 다시 익명화하면 깔끔히 막힌다.
     const redo = await call(anonymize, teacherAToken, { targetActorId: STUDENT_ACTOR_ID });
@@ -122,6 +148,8 @@ test("anonymizeStudent: same-school teacher only, name/number erased but class a
       const actorRoot = db.collection("actors").doc(actorId);
       const devices = await actorRoot.collection("trustedDevices").get();
       devices.docs.forEach((d) => batch.delete(d.ref));
+      const records = await actorRoot.collection("records").get();
+      records.docs.forEach((d) => batch.delete(d.ref));
       batch.delete(actorRoot);
     }
     const classRef = db.collection("schools").doc(SCHOOL_A).collection("classes").doc(classDocId);

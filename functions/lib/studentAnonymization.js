@@ -18,10 +18,42 @@
 // 엔드포인트가 아니다(자기 자신을 익명화해서 반 집계를 조작할 수 있게 되는
 // 것을 막기 위함 - 삭제 요청은 현실에서도 보통 학부모가 담임에게 말해서
 // 처리되는 절차이므로 이 흐름이 실제 운영과도 맞는다).
+const { FieldValue } = require("firebase-admin/firestore");
 const { cleanText } = require("./httpGuard");
 const { guardedTeacher } = require("./teacherAuth");
 const { classDocId } = require("./schoolDashboardAggregate");
 const { studentNumberClaimRef } = require("./studentNumberClaim");
+
+// 2026-09-07 종합감사 - 익명화는 studentProfile/개인랭킹 문서만 지우고
+// actors/{actorId}/records/*.classContext에 남아있는 studentNumber/
+// studentName은 전혀 건드리지 않고 있었다. exportClassRecords(CSV 반전체
+// 내보내기)가 정확히 그 두 필드를 뽑아서 CSV에 싣기 때문에, 학부모가
+// 삭제를 요청해 교사가 익명화를 실행해도 다음 CSV 내보내기에는 그 학생의
+// 실명·번호가 전 기간 기록에 그대로 다시 나왔다 - 이 함수 자신이 스스로
+// 정의한 "번호도 식별자라 지워야 한다"는 원칙(위 studentRef 삭제 이유)이
+// records에는 적용 안 된 것. 기록 수가 학기 내내 쌓여 임의로 많을 수
+// 있어 트랜잭션(문서 수 상한 있음) 대신 배치 페이지네이션으로 지운다 -
+// "studentNumber가 아직 남아있는 문서"만 조건으로 걸어서, 이미 정리된
+// 문서는 자동으로 건너뛰므로 중간에 실패해도 재실행(재익명화 시도는
+// already_anonymized로 막히지만, 이 함수 자체는 별도로 재호출 가능하게
+// 독립 함수로 뺐다) 시 안전하다.
+async function anonymizeStudentRecords(db, actorId) {
+  const recordsRef = db.collection("actors").doc(actorId).collection("records");
+  const BATCH_SIZE = 400;
+  let total = 0;
+  for (;;) {
+    const snap = await recordsRef.where("classContext.studentNumber", ">", "").limit(BATCH_SIZE).get();
+    if (snap.empty) break;
+    const batch = db.batch();
+    for (const doc of snap.docs) {
+      batch.update(doc.ref, { "classContext.studentNumber": FieldValue.delete(), "classContext.studentName": FieldValue.delete() });
+    }
+    await batch.commit();
+    total += snap.docs.length;
+    if (snap.docs.length < BATCH_SIZE) break;
+  }
+  return total;
+}
 
 function createAnonymizeStudentHandler(dependencies = {}) {
   const db = dependencies.db;
@@ -57,13 +89,23 @@ function createAnonymizeStudentHandler(dependencies = {}) {
         // (반 집계에는 계속 기여), 개인 랭킹에는 더 이상 이름/번호로 안 뜬다
         // (saveSortingRecord가 studentNumber 없는 profile은 classContext에
         // studentNumber/studentName을 안 실으므로 - sortingRecord.js:140 참고).
+        // 2026-09-07 종합감사 - 여기가 merge:false였다. merge:false는
+        // actors/{actorId} 문서 "전체"를 { studentProfile: {...} } 하나로
+        // 통째로 교체하므로, edu2gDeviceAccess.js가 매 요청마다 검사하는
+        // status/plan/dashboardSchoolId/teacherVerified 등 다른 최상위
+        // 필드가 전부 사라졌다 - 그 결과 이 기기는 바로 다음 요청부터
+        // actor_unavailable(403)로 영구히 막히고(문서가 "없는" 게 아니라
+        // "있는데 필드가 없는" 상태라 자가치유 경로도 안 걸림), 새로고침/
+        // 재접속으로도 절대 안 풀렸다. merge:true + FieldValue.delete()로
+        // name/studentNumber 두 필드만 정확히 지운다.
         transaction.set(actorRef, {
           studentProfile: {
             schoolId: profile.schoolId, schoolName: profile.schoolName, grade: profile.grade, classNum: profile.classNum,
             registeredAt: profile.registeredAt || null,
+            name: FieldValue.delete(), studentNumber: FieldValue.delete(),
             anonymized: true, anonymizedAt: serverTimestamp(), anonymizedByActorId: teacher.actorId
           }
-        }, { merge: false });
+        }, { merge: true });
 
         // 개인 랭킹(schools/*/classes/*/students/{번호}) 문서는 번호 자체가
         // 그 학생을 가리키는 식별자라 이름만 지워서는 부족하다 - 문서를
@@ -82,7 +124,16 @@ function createAnonymizeStudentHandler(dependencies = {}) {
       });
       if (result.code === "not_found") return res.status(404).json({ ok: false, code: "student_not_found" });
       if (result.code === "already_anonymized") return res.status(409).json({ ok: false, code: "already_anonymized" });
-      logger({ severity: "INFO", message: "student_anonymized", teacherActorId: teacher.actorId, schoolId: teacher.schoolId, targetActorId });
+      // studentProfile/개인랭킹은 이미 위 트랜잭션으로 익명화됐다 - records
+      // 정리가 실패해도 그 성공을 되돌리지 않는다(트랜잭션 재시도 대상이
+      // 아님). 실패하면 ERROR로 남겨서 나중에 추적·재실행할 수 있게 한다.
+      let recordsUpdated = 0;
+      try {
+        recordsUpdated = await anonymizeStudentRecords(db, targetActorId);
+      } catch (error) {
+        logger({ severity: "ERROR", message: "anonymize_student_records_failed", teacherActorId: teacher.actorId, targetActorId, error: String(error?.message || error) });
+      }
+      logger({ severity: "INFO", message: "student_anonymized", teacherActorId: teacher.actorId, schoolId: teacher.schoolId, targetActorId, recordsUpdated });
       return res.status(200).json({ ok: true, targetActorId });
     } catch (error) {
       logger({ severity: "ERROR", message: "anonymize_student_failed", teacherActorId: teacher.actorId, targetActorId, error: String(error?.message || error) });
@@ -91,4 +142,4 @@ function createAnonymizeStudentHandler(dependencies = {}) {
   };
 }
 
-module.exports = { createAnonymizeStudentHandler };
+module.exports = { createAnonymizeStudentHandler, anonymizeStudentRecords };

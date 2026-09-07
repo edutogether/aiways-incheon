@@ -489,9 +489,16 @@
     }
   }
 
-  async function submitSortingRecord({ status, selectedItemId, provider, objectCandidates = [], holdReasons = [] }) {
+  // idempotencyKey는 옵션으로 받는다 - 보류함(addHoldItem/resolveHoldItem)이
+  // "최초 등록 실패 시 같은 키로 안전하게 재시도"하려면 이 키를 미리 고정해
+  // 호출부가 들고 있어야 한다(createOrGet은 같은 idempotencyKey 재호출을
+  // 중복 생성 없이 그대로 흡수한다). 반환값도 {ok,recordId,idempotencyKey}로
+  // 넘겨서 호출부가 성공한 저장의 recordId를 알 수 있게 한다 - logPractice처럼
+  // 결과를 신경 쓰지 않는 기존 호출부는 그냥 무시하면 되므로 이 변경으로
+  // 깨지지 않는다.
+  async function submitSortingRecord({ status, selectedItemId, provider, objectCandidates = [], holdReasons = [], idempotencyKey = createRecordIdempotencyKey() }) {
     const client = window.AIWaysEdu2gClient;
-    if (!client?.saveSortingRecord || !selectedItemId) return;
+    if (!client?.saveSortingRecord || !selectedItemId) return { ok: false, recordId: null, idempotencyKey };
     const classContext = loadClassContext();
     const campusCheckId = await resolveCampusCheckId();
     const payload = {
@@ -504,9 +511,15 @@
       hold: status === "held" ? { recommended: true, reasons: holdReasons.slice(0, 5) } : null,
       ...(classContext ? { classContext } : {}),
       ...(campusCheckId ? { campusCheckId } : {}),
-      idempotencyKey: createRecordIdempotencyKey()
+      idempotencyKey
     };
-    try { await client.saveSortingRecord(payload); } catch { /* best-effort; local UI already reflects the action */ }
+    try {
+      const result = await client.saveSortingRecord(payload);
+      return { ok: result.ok === true, recordId: result.ok ? (result.data?.recordId || null) : null, idempotencyKey };
+    } catch {
+      /* best-effort; local UI already reflects the action */
+      return { ok: false, recordId: null, idempotencyKey };
+    }
   }
 
   function switchTab(tabId) {
@@ -911,11 +924,23 @@
   // -----------------------------------------------------------------
   function addHoldItem(name) {
     const today = new Date();
-    holdBoxList.unshift({ id: crypto.randomUUID(), name, date: `${today.getMonth() + 1}월 ${today.getDate()}일` });
+    const holdId = crypto.randomUUID();
+    const idempotencyKey = createRecordIdempotencyKey();
+    holdBoxList.unshift({ id: holdId, name, date: `${today.getMonth() + 1}월 ${today.getDate()}일`, recordId: null, idempotencyKey });
     try { localStorage.setItem(HOLD_KEY, JSON.stringify(holdBoxList)); } catch {}
-    submitSortingRecord({ status: "held", selectedItemId: name, provider: "manual_hold", holdReasons: ["학생 직접 등록"] });
     updateHoldUI();
     showVisualAlert(`❓ "${name}"이(가) 회의 안건 목록에 등록되었습니다.`, "amber");
+    // idempotencyKey를 미리 고정해 뒀으므로, 여기서 저장이 실패해도(오프라인 등)
+    // 나중에 "해결완료" 시점에 같은 키로 안전하게 재시도할 수 있다(아래
+    // resolveHoldItem). 성공하면 recordId를 이 항목에 뒤늦게 채워 넣어야
+    // resolveSortingRecord를 부를 수 있다.
+    submitSortingRecord({ status: "held", selectedItemId: name, provider: "manual_hold", holdReasons: ["학생 직접 등록"], idempotencyKey }).then(result => {
+      if (!result.recordId) return;
+      const item = holdBoxList.find(entry => entry.id === holdId);
+      if (!item) return; // already resolved/cleared locally before this returned
+      item.recordId = result.recordId;
+      try { localStorage.setItem(HOLD_KEY, JSON.stringify(holdBoxList)); } catch {}
+    });
   }
 
   function updateHoldUI() {
@@ -944,14 +969,57 @@
         </div>`;
       div.querySelector(".hold-item-name").textContent = item.name;
       div.querySelector(".hold-item-date").textContent = item.date;
-      div.querySelector(".resolve-hold-btn").addEventListener("click", () => resolveHoldItem(item.id, item.name));
+      div.querySelector(".resolve-hold-btn").addEventListener("click", (event) => resolveHoldItem(item.id, item.name, event.currentTarget));
       container.append(div);
     });
   }
 
-  function resolveHoldItem(id, name) {
-    openCustomModal("분류 기준 수립 및 보류 해결", `"${name}" 품목의 세부 분리배출 기준이 확정되었나요? 확인을 누르면 보류 목록에서 정리됩니다.`, "🎉", "bg-emerald-600 hover:bg-emerald-700", () => {
-      holdBoxList = holdBoxList.filter(item => item.id !== id);
+  // 2026-09-07(대표님 지시, docs/intents/2026-09-07-hold-resolve-server-sync) -
+  // "해결완료"가 로컬 목록만 지우고 서버 기록(status:"held")은 그대로 두고
+  // 있어서, 학급 대시보드의 heldTotal/completedTotal이 실제 해결 여부와
+  // 항상 어긋났다. resolveSortingRecord를 실제로 호출해 서버 상태를
+  // completed로 전환한 뒤에만 로컬에서 지운다 - 서버 호출이 실패하면
+  // (실적 유실 방지를 위해) 로컬 목록에 그대로 남기고 실패를 알려 재시도할
+  // 수 있게 한다.
+  async function resolveHoldItem(id, name, buttonEl) {
+    openCustomModal("분류 기준 수립 및 보류 해결", `"${name}" 품목의 세부 분리배출 기준이 확정되었나요? 확인을 누르면 보류 목록에서 정리됩니다.`, "🎉", "bg-emerald-600 hover:bg-emerald-700", async () => {
+      if (buttonEl) buttonEl.disabled = true;
+      const client = window.AIWaysEdu2gClient;
+      const item = holdBoxList.find(entry => entry.id === id);
+      if (!item) { if (buttonEl) buttonEl.disabled = false; return; }
+
+      let recordId = item.recordId;
+      if (!recordId && client?.saveSortingRecord) {
+        // 최초 등록이 아직 서버에 반영되지 못한 경우(오프라인 등) - 같은
+        // idempotencyKey로 안전하게 재시도해서 recordId를 확보한다(중복
+        // 생성 없음, submitSortingRecord 주석 참고).
+        const retryKey = item.idempotencyKey || createRecordIdempotencyKey();
+        item.idempotencyKey = retryKey;
+        const retry = await submitSortingRecord({ status: "held", selectedItemId: item.name, provider: "manual_hold", holdReasons: ["학생 직접 등록"], idempotencyKey: retryKey });
+        recordId = retry.recordId;
+        if (recordId) item.recordId = recordId;
+        try { localStorage.setItem(HOLD_KEY, JSON.stringify(holdBoxList)); } catch {}
+      }
+      if (!recordId || !client?.resolveSortingRecord) {
+        showVisualAlert("⚠️ 아직 서버에 등록되지 않은 항목이에요. 네트워크 연결을 확인하고 다시 시도해 주세요.", "amber");
+        if (buttonEl) buttonEl.disabled = false;
+        return;
+      }
+
+      const result = await client.resolveSortingRecord({
+        recordId,
+        idempotencyKey: createRecordIdempotencyKey(),
+        resolutionType: "confirmed_after_review",
+        userDecision: { userConfirmed: true },
+        checklist: [{ id: "hold_resolved", label: "보류함에서 해결 완료 처리", checked: true }]
+      });
+      if (!result.ok) {
+        showVisualAlert(client.errorMessageFor?.(result.code) || "해결 처리에 실패했어요. 다시 시도해 주세요.", "amber");
+        if (buttonEl) buttonEl.disabled = false;
+        return;
+      }
+
+      holdBoxList = holdBoxList.filter(entry => entry.id !== id);
       try { localStorage.setItem(HOLD_KEY, JSON.stringify(holdBoxList)); } catch {}
       updateHoldUI();
       showVisualAlert(`💡 "${name}" 품목이 보류함에서 정리되었습니다.`, "emerald");

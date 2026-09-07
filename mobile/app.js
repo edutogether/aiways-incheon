@@ -328,9 +328,11 @@
       <div class="flex items-center gap-1.5 text-xs font-bold text-blue-800">
         <span>🍎</span><span>담임 인증 완료</span>
       </div>
-      <p class="text-xs font-semibold text-blue-700">${schoolName || schoolId} ${grade}학년 ${classNum}반 담임 ${name}</p>
+      <p class="text-xs font-semibold text-blue-700" data-role="teacherVerifiedSummary"></p>
       <p class="text-[10px] text-blue-500 leading-snug">우리 반 학생들의 가입 승인은 PC 대시보드에서 처리할 수 있어요.</p>
     `;
+    const summary = card.querySelector('[data-role="teacherVerifiedSummary"]');
+    if (summary) summary.textContent = `${schoolName || schoolId} ${grade}학년 ${classNum}반 담임 ${name}`;
     $("interimClassCard")?.classList.add("hidden");
   }
 

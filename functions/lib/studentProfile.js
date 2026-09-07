@@ -98,7 +98,10 @@ function createRegisterStudentProfileHandler(dependencies = {}) {
       if (!body.confirm) return res.status(200).json({ ok: true, confirmed: false, role, preview: { schoolId, schoolName, grade, classNum, name } });
       try {
         const result = await verifyTeacherCodeCore({ db, serverTimestamp, actorId: protectedActor.actorId, uid: protectedActor.uid, auth: dependencies.auth, schoolId, grade, classNum, code: teacherCode, logger });
-        if (!result.ok) return res.status(result.httpStatus).json({ ok: false, code: result.code });
+        if (!result.ok) {
+          if (result.retryAfterSeconds) res.set("Retry-After", String(result.retryAfterSeconds));
+          return res.status(result.httpStatus).json({ ok: false, code: result.code, ...(result.retryAfterSeconds ? { retryAfterSeconds: result.retryAfterSeconds } : {}) });
+        }
         return res.status(200).json({ ok: true, confirmed: true, role, verified: true, schoolId, grade, classNum });
       } catch (error) {
         logger({ severity: "ERROR", message: "register_student_profile_homeroom_failed", actorId: protectedActor.actorId, error: String(error?.message || error) });

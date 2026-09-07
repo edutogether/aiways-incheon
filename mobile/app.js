@@ -410,7 +410,9 @@
           showVisualAlert(`🍎 ${grade}학년 ${classNum}반 담임 인증 완료!`, "emerald");
         } else {
           status.textContent = result.data?.code === "teacher_code_not_set" ? "이 반은 아직 인증코드가 준비되지 않았어요. 관리자에게 문의해 주세요."
-            : result.data?.code === "invalid_code" ? "인증코드를 다시 확인해 주세요." : "인증에 실패했어요. 다시 시도해 주세요.";
+            : result.data?.code === "invalid_code" ? "인증코드를 다시 확인해 주세요."
+            : result.data?.code === "teacher_code_locked" ? "시도가 너무 많아 이 반은 잠시 잠겼어요. 15분 뒤 다시 시도해 주세요."
+            : "인증에 실패했어요. 다시 시도해 주세요.";
         }
         return;
       }

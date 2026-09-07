@@ -42,6 +42,7 @@ module.exports = [
     files: [
       "test/**/*.test.js",
       "test/teacherAuthEmulatorIntegration.js",
+      "test/teacherCodeLockoutEmulatorIntegration.js",
       "test/superadminEmulatorIntegration.js",
       "test/registrationApprovalEmulatorIntegration.js",
       "test/cb5DeviceMatrixEmulatorIntegration.js",

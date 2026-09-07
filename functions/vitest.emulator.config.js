@@ -16,6 +16,7 @@ module.exports = defineConfig({
   test: {
     include: [
       "test/teacherAuthEmulatorIntegration.js",
+      "test/teacherCodeLockoutEmulatorIntegration.js",
       "test/superadminEmulatorIntegration.js",
       "test/registrationApprovalEmulatorIntegration.js",
       "test/cb5DeviceMatrixEmulatorIntegration.js",

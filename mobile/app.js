@@ -196,8 +196,8 @@
       <button id="classChangeToggleButton" type="button" class="text-[10px] font-bold text-blue-600 underline">반이 바뀌었어요</button>
       <div id="classChangeForm" class="hidden space-y-2 pt-1">
         <div class="grid grid-cols-2 gap-2">
-          <input type="text" inputmode="numeric" id="classChangeGradeInput" placeholder="새 학년" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
-          <input type="text" inputmode="numeric" id="classChangeClassInput" placeholder="새 반" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+          <input type="text" inputmode="numeric" maxlength="2" id="classChangeGradeInput" placeholder="새 학년" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+          <input type="text" inputmode="numeric" maxlength="2" id="classChangeClassInput" placeholder="새 반" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
         </div>
         <button id="classChangeSubmitButton" type="button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 rounded-xl transition-all">반 변경 요청</button>
         <p id="classChangeStatus" class="text-[10px] font-semibold text-blue-500"></p>

@@ -232,11 +232,11 @@
                         <input type="hidden" id="signupSchoolCode" />
                         <div id="signupSchoolResults" class="hidden absolute left-0 right-0 mt-1 bg-white border border-blue-200 rounded-xl shadow-lg z-20 max-h-40 overflow-y-auto text-xs"></div>
                     </div>
-                    <input type="text" inputmode="numeric" id="signupGradeInput" placeholder="학년" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
-                    <input type="text" inputmode="numeric" id="signupClassInput" placeholder="반" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                    <input type="text" inputmode="numeric" maxlength="2" id="signupGradeInput" placeholder="학년" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                    <input type="text" inputmode="numeric" maxlength="2" id="signupClassInput" placeholder="반" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 </div>
                 <div id="signupStudentFields" class="grid grid-cols-3 gap-2">
-                    <input type="text" inputmode="numeric" id="signupNumberInput" placeholder="번호" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                    <input type="text" inputmode="numeric" maxlength="2" id="signupNumberInput" placeholder="번호" class="bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
                     <input type="text" id="signupNameInput" placeholder="이름" class="col-span-2 bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 </div>
                 <div id="signupHomeroomFields" class="hidden grid grid-cols-3 gap-2">

@@ -67,12 +67,20 @@ exports.analyzeSortingText = onRequest({
 }, createAnalyzeSortingTextHandler({ getApiKey: () => geminiApiKey.value(), access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, analysisRequests, logAppCheck, blockedActors }));
 exports.analyzeSortingSafetyObserver = onRequest({ region:"asia-northeast3", memory:"256MiB", timeoutSeconds:30, minInstances:0, maxInstances:2, concurrency:1, secrets:[geminiApiKey], cors:false }, createSortingSafetyObserverHandler({getApiKey:()=>geminiApiKey.value(),access:deviceAccess,appCheck:emulatorAppCheck,rateLimiter,actorRateLimiter,analysisRequests,logAppCheck,blockedActors}));
 const recordStore = createRecordStore({ db });
+// 2026-09-07 - saveSortingRecord/listSortingRecords/resolveSortingRecord
+// 이 세 함수만은 emulatorAppCheck를 붙이지 않는다. test/recordEmulatorSmoke.js가
+// 바로 이 세 함수에 대해 "인증 헤더가 전혀 없으면 실제로 app_check_missing으로
+// 거부되는지"를 실제 에뮬레이터 HTTP 표면으로 검증하는 유일한 통합
+// 스모크테스트인데, emulatorAppCheck를 붙이면 에뮬레이터 환경(FUNCTIONS_EMULATOR=true,
+// CI 포함)에서 App Check 단계 자체가 통과돼버려 그 테스트가 검증하려던
+// 보안 강제 자체를 확인할 수 없게 된다(로컬 브라우저 클릭 편의성 때문에
+// 이 검증을 깨는 건 우선순위가 거꾸로 됨).
 exports.saveSortingRecord = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createSaveSortingRecordHandler({
-  serverTimestamp: () => FieldValue.serverTimestamp(), store: recordStore, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, db
+  serverTimestamp: () => FieldValue.serverTimestamp(), store: recordStore, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, db
 }));
 const queryStore = createRecordQueryStore({ db });
-exports.listSortingRecords=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createListSortingRecordsHandler({store:queryStore,access:deviceAccess,appCheck:emulatorAppCheck,rateLimiter,actorRateLimiter,logAppCheck,blockedActors}));
-exports.resolveSortingRecord=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createResolveSortingRecordHandler({store:queryStore,access:deviceAccess,appCheck:emulatorAppCheck,serverTimestamp:()=>FieldValue.serverTimestamp(),rateLimiter,actorRateLimiter,logAppCheck,blockedActors}));
+exports.listSortingRecords=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createListSortingRecordsHandler({store:queryStore,access:deviceAccess,rateLimiter,actorRateLimiter,logAppCheck,blockedActors}));
+exports.resolveSortingRecord=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createResolveSortingRecordHandler({store:queryStore,access:deviceAccess,serverTimestamp:()=>FieldValue.serverTimestamp(),rateLimiter,actorRateLimiter,logAppCheck,blockedActors}));
 // Keeps schools/{schoolId}/classes/{grade_classNum} aggregate docs in sync
 // with every sorting record create (saveSortingRecord) and held->completed
 // transition (resolveSortingRecord) -- the PC dashboard reads only these
@@ -106,8 +114,12 @@ exports.getSchoolDashboard = onRequest({ region: "asia-northeast3", memory: "256
 exports.logDashboardRealtimeEvent = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createLogDashboardRealtimeEventHandler({
   access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: auditLog
 }));
+// 2026-09-07 - checkStudentProfile도 saveSortingRecord류와 같은 이유로
+// emulatorAppCheck를 붙이지 않는다. test/edu2gEmulatorSmoke.js가 바로 이
+// 함수를 대상으로 "인증 헤더 없이 호출하면 실제로 app_check_missing으로
+// 거부되는지"를 실제 에뮬레이터 HTTP 표면으로 검증한다.
 exports.checkStudentProfile = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckStudentProfileHandler({
-  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 exports.registerStudentProfile = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createRegisterStudentProfileHandler({
   db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, auth: getAuth(), serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog

@@ -39,6 +39,7 @@ async function guardedActor(req, res, functionName, dependencies) {
 
 function createCheckStudentProfileHandler(dependencies = {}) {
   const db = dependencies.db;
+  const logger = dependencies.logger || (() => {});
   return async (req, res) => {
     const protectedActor = await guardedActor(req, res, "checkStudentProfile", dependencies);
     if (!protectedActor) return;
@@ -52,7 +53,8 @@ function createCheckStudentProfileHandler(dependencies = {}) {
       const request = requestSnap.exists ? requestSnap.data() : null;
       const isPending = request?.status === "pending";
       return res.status(200).json({ ok: true, hasProfile: false, pending: isPending, rejected: request?.status === "rejected", profile: null, pendingProfile: isPending ? publicProfile(request) : null });
-    } catch {
+    } catch (error) {
+      logger({ severity: "ERROR", message: "check_student_profile_failed", actorId: protectedActor.actorId, error: String(error?.message || error) });
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }
   };
@@ -98,7 +100,8 @@ function createRegisterStudentProfileHandler(dependencies = {}) {
         const result = await verifyTeacherCodeCore({ db, serverTimestamp, actorId: protectedActor.actorId, uid: protectedActor.uid, auth: dependencies.auth, schoolId, grade, classNum, code: teacherCode, logger });
         if (!result.ok) return res.status(result.httpStatus).json({ ok: false, code: result.code });
         return res.status(200).json({ ok: true, confirmed: true, role, verified: true, schoolId, grade, classNum });
-      } catch {
+      } catch (error) {
+        logger({ severity: "ERROR", message: "register_student_profile_homeroom_failed", actorId: protectedActor.actorId, error: String(error?.message || error) });
         return res.status(503).json({ ok: false, code: "protection_unavailable" });
       }
     }
@@ -135,7 +138,8 @@ function createRegisterStudentProfileHandler(dependencies = {}) {
       if (result.code === "already_registered") return res.status(409).json({ ok: false, code: "already_registered", profile: publicProfile(result.profile) });
       if (result.code === "request_pending") return res.status(409).json({ ok: false, code: "request_pending" });
       return res.status(202).json({ ok: true, confirmed: true, role, pending: true, preview: { schoolId, schoolName, grade, classNum, studentNumber, name } });
-    } catch {
+    } catch (error) {
+      logger({ severity: "ERROR", message: "register_student_profile_failed", actorId: protectedActor.actorId, error: String(error?.message || error) });
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }
   };
@@ -158,6 +162,7 @@ function createChangeStudentClassHandler(dependencies = {}) {
   const db = dependencies.db;
   const serverTimestamp = dependencies.serverTimestamp || (() => new Date());
   const now = dependencies.now || (() => new Date());
+  const logger = dependencies.logger || (() => {});
   return async (req, res) => {
     const protectedActor = await guardedActor(req, res, "changeStudentClass", dependencies);
     if (!protectedActor) return;
@@ -217,7 +222,8 @@ function createChangeStudentClassHandler(dependencies = {}) {
       if (result.code === "cooldown_active") return res.status(429).json({ ok: false, code: "cooldown_active" });
       if (result.code === "student_number_taken") return res.status(409).json({ ok: false, code: "student_number_taken" });
       return res.status(200).json({ ok: true, confirmed: true, profile: { schoolId: existingProfile.schoolId, schoolName: existingProfile.schoolName, grade, classNum, studentNumber: existingProfile.studentNumber, name: existingProfile.name } });
-    } catch {
+    } catch (error) {
+      logger({ severity: "ERROR", message: "change_student_class_failed", actorId: protectedActor.actorId, error: String(error?.message || error) });
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }
   };

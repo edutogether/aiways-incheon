@@ -174,7 +174,8 @@ function createSaveSortingRecordHandler(dependencies = {}) {
       const result = await store.createOrGet(actorId, checked.value.idempotencyKey, record, { createdAt: createdAt.toISOString() });
       logger({ recordId: result.recordId, status: result.status, provider: record.provider, schemaVersion: SCHEMA_VERSION, duplicate: result.duplicate === true });
       return res.status(result.duplicate ? 200 : 201).json({ recordId: result.recordId, status: result.status, createdAt: result.createdAt, schemaVersion: SCHEMA_VERSION, duplicate: result.duplicate === true });
-    } catch {
+    } catch (error) {
+      logger({ severity: "ERROR", message: "save_sorting_record_failed", error: String(error?.message || error) });
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }
   };

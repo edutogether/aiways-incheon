@@ -72,7 +72,8 @@ function createManageTeacherCodeHandler(dependencies = {}) {
     // 같은 컨벤션 적용.
     try {
       await db.collection("teacherCodes").doc(teacherCodeDocId(schoolId, grade, classNum)).set({ codeHash, codeSalt, updatedAt: serverTimestamp(), updatedByUid: admin.uid }, { merge: true });
-    } catch {
+    } catch (error) {
+      logger({ severity: "ERROR", message: "manage_teacher_code_failed", schoolId, grade, classNum, updatedByUid: admin.uid, error: String(error?.message || error) });
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }
     logger({ severity: "INFO", message: "teacher_code_rotated", schoolId, grade, classNum, updatedByUid: admin.uid });

@@ -49,6 +49,7 @@ function createGetClassRankingHandler(dependencies = {}) {
   const db = dependencies.db;
   const now = dependencies.now || (() => Date.now());
   const cache = dependencies.cache || createClassRankingCache();
+  const logger = dependencies.logger || (() => {});
   return async (req, res) => {
     if (!applyCors(req, res)) return res.status(403).json({ ok: false, code: "invalid_origin" });
     if (req.method === "OPTIONS") return res.status(204).send("");
@@ -104,7 +105,8 @@ function createGetClassRankingHandler(dependencies = {}) {
             }
             return existing;
           });
-        } catch {
+        } catch (error) {
+          logger({ severity: "ERROR", message: "get_class_ranking_lock_failed", error: String(error?.message || error) });
           return res.status(503).json({ ok: false, code: "protection_unavailable" });
         }
         cache.set(lockCacheKey, boundSchoolId, lockRequestTime);
@@ -131,7 +133,8 @@ function createGetClassRankingHandler(dependencies = {}) {
           const heldTotal = Number(data.heldTotal) || 0;
           return { classNum: data.classNum || "", score: completedTotal, observedTotal: completedTotal + heldTotal };
         });
-      } catch {
+      } catch (error) {
+        logger({ severity: "ERROR", message: "get_class_ranking_query_failed", schoolId, grade, error: String(error?.message || error) });
         return res.status(503).json({ ok: false, code: "protection_unavailable" });
       }
       cache.set(cacheKey, classes, requestTime);

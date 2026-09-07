@@ -1,9 +1,11 @@
 "use strict";
 
 const { GoogleGenAI } = require("@google/genai");
+const { logger } = require("firebase-functions");
 const { validateRequest, errorResponse } = require("./sortingVisionSchema");
 const { protectActorRequest } = require("./protectedActor");
 const { applyCors } = require("./httpGuard");
+const { createSafeProviderErrorMeta } = require("./sortingVision");
 
 const OBSERVER_SCHEMA = {
   type: "object",
@@ -40,6 +42,7 @@ function createSortingSafetyObserverHandler(d = {}) {
     completeAnalysisRequest: async () => false,
     failAnalysisRequest: async () => false
   };
+  const logProviderError = d.logProviderError || ((metadata) => logger.write({ severity: "ERROR", ...metadata }));
   return async (req, res) => {
     if (!applyCors(req, res)) return res.status(403).json(errorResponse("invalid_origin"));
     if (req.method === "OPTIONS") return res.status(204).send("");
@@ -85,7 +88,8 @@ function createSortingSafetyObserverHandler(d = {}) {
       }
       if (!await analysisRequests.completeAnalysisRequest(protectedActor.actorId, idKey, value)) return res.status(503).json(errorResponse("protection_unavailable", check.requestId));
       return res.status(200).json(value);
-    } catch {
+    } catch (error) {
+      logProviderError({ ...createSafeProviderErrorMeta(error, check.requestId), functionName: "analyzeSortingSafetyObserver" });
       await analysisRequests.failAnalysisRequest(protectedActor.actorId, idKey, "analysis_failed", 502);
       return res.status(502).json(errorResponse("analysis_failed", check.requestId));
     }

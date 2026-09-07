@@ -82,7 +82,8 @@ function createListSortingRecordsHandler(dependencies = {}) {
     try {
       const page = await dependencies.store.list(active.actorId, size, b.cursor || "", b.statusFilter || "all");
       return send(res, 200, { records: page.records.map((r) => publicRecord(r.id, r.data)), nextCursor: page.nextCursor || null, hasMore: !!page.nextCursor, schemaVersion: SCHEMA_VERSION });
-    } catch {
+    } catch (error) {
+      (dependencies.logger || (() => {}))({ severity: "ERROR", message: "list_sorting_records_failed", error: String(error?.message || error) });
       return send(res, 503, { ok: false, code: "protection_unavailable" });
     }
   };
@@ -104,7 +105,8 @@ function createResolveSortingRecordHandler(dependencies = {}) {
     try {
       const result = await dependencies.store.resolve(active.actorId, b, dependencies.serverTimestamp?.());
       return send(res, result.code === "not_found" ? 404 : result.code === "conflict" ? 409 : 200, result);
-    } catch {
+    } catch (error) {
+      (dependencies.logger || (() => {}))({ severity: "ERROR", message: "resolve_sorting_record_failed", error: String(error?.message || error) });
       return send(res, 503, { ok: false, code: "protection_unavailable" });
     }
   };

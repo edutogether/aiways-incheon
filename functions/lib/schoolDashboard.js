@@ -71,6 +71,7 @@ function createGetSchoolDashboardHandler(dependencies = {}) {
   const db = dependencies.db;
   const now = dependencies.now || (() => Date.now());
   const cache = dependencies.cache || createSchoolDashboardCache();
+  const logger = dependencies.logger || (() => {});
   return async (req, res) => {
     if (!applyCors(req, res)) return res.status(403).json({ ok: false, code: "invalid_origin" });
     if (req.method === "OPTIONS") return res.status(204).send("");
@@ -131,7 +132,8 @@ function createGetSchoolDashboardHandler(dependencies = {}) {
           }
           return { boundSchoolId, profile: data?.studentProfile || null };
         });
-      } catch {
+      } catch (error) {
+        logger({ severity: "ERROR", message: "get_school_dashboard_lock_failed", schoolId, error: String(error?.message || error) });
         return res.status(503).json({ ok: false, code: "protection_unavailable" });
       }
       cache.set(lockCacheKey, lockState, requestTimeForLock);
@@ -159,7 +161,8 @@ function createGetSchoolDashboardHandler(dependencies = {}) {
         const [classesSnap, schoolSnap] = await Promise.all([schoolRef.collection("classes").get(), schoolRef.get()]);
         classes = classesSnap.docs.map(classSummary);
         schoolName = cleanText(schoolSnap.exists ? schoolSnap.data()?.schoolName : "", 80);
-      } catch {
+      } catch (error) {
+        logger({ severity: "ERROR", message: "get_school_dashboard_query_failed", schoolId, error: String(error?.message || error) });
         return res.status(503).json({ ok: false, code: "protection_unavailable" });
       }
       cache.set(schoolId, { classes, schoolName }, requestTime);
@@ -212,7 +215,8 @@ function createGetSchoolDashboardHandler(dependencies = {}) {
         let studentsSnap = null;
         try {
           studentsSnap = profileMatches ? await schoolRef.collection("classes").doc(`${grade}_${classNum}`).collection("students").get() : null;
-        } catch {
+        } catch (error) {
+          logger({ severity: "ERROR", message: "get_school_dashboard_top_students_failed", schoolId, grade, classNum, error: String(error?.message || error) });
           return res.status(503).json({ ok: false, code: "protection_unavailable" });
         }
         topStudents = !studentsSnap ? [] : studentsSnap.docs

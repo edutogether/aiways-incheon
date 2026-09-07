@@ -14,7 +14,7 @@ function extractBearer(req) {
 
 function failure(code, httpStatus) { return { ok: false, code, httpStatus }; }
 
-function createEdu2gDeviceAccess({ auth, db, serverTimestamp = () => new Date() } = {}) {
+function createEdu2gDeviceAccess({ auth, db, serverTimestamp = () => new Date(), logger = () => {} } = {}) {
   async function authenticate(req) {
       const token = extractBearer(req);
       if (!token) return failure("auth_missing", 401);
@@ -60,7 +60,10 @@ function createEdu2gDeviceAccess({ auth, db, serverTimestamp = () => new Date() 
         transaction.set(bindingRef, { actorId: uid, status: "active", createdAt: now, lastSeenAt: now });
         return { ok: true, actorId: uid, uid, actor, device };
       });
-    } catch { return failure("access_state_invalid", 503); }
+    } catch (error) {
+      logger({ severity: "ERROR", message: "provision_open_access_actor_failed", uid, error: String(error?.message || error) });
+      return failure("access_state_invalid", 503);
+    }
   }
   return {
     authenticate,
@@ -107,7 +110,10 @@ function createEdu2gDeviceAccess({ auth, db, serverTimestamp = () => new Date() 
         // 해제 시점의 lastSeenAt은 edu2gPassHandlers.js에 그대로 남아있고,
         // 그건 일회성 이벤트라 이 항목과는 무관하다.)
         return { ok: true, actorId: binding.actorId, uid, actor: actorSnap.data(), device };
-      } catch { return failure("access_state_invalid", 503); }
+      } catch (error) {
+        logger({ severity: "ERROR", message: "edu2g_device_access_resolve_failed", uid, error: String(error?.message || error) });
+        return failure("access_state_invalid", 503);
+      }
     }
   };
 }

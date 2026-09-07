@@ -54,7 +54,8 @@ async function guardedTeacher(req, res, functionName, dependencies) {
     const teacherVerified = teacherSnap.exists ? teacherSnap.data()?.teacherVerified : null;
     if (!teacherVerified?.schoolId || !teacherVerified?.grade || !teacherVerified?.classNum) { res.status(403).json({ ok: false, code: "teacher_verification_required" }); return null; }
     return { actorId: protectedActor.actorId, schoolId: teacherVerified.schoolId, grade: teacherVerified.grade, classNum: teacherVerified.classNum };
-  } catch {
+  } catch (error) {
+    (dependencies.logger || (() => {}))({ severity: "ERROR", message: "guarded_teacher_failed", functionName, actorId: protectedActor.actorId, error: String(error?.message || error) });
     res.status(503).json({ ok: false, code: "protection_unavailable" });
     return null;
   }
@@ -62,6 +63,7 @@ async function guardedTeacher(req, res, functionName, dependencies) {
 
 function createCheckTeacherStatusHandler(dependencies = {}) {
   const db = dependencies.db;
+  const logger = dependencies.logger || (() => {});
   return async (req, res) => {
     const protectedActor = await guardedActor(req, res, "checkTeacherStatus", dependencies);
     if (!protectedActor) return;
@@ -71,7 +73,8 @@ function createCheckTeacherStatusHandler(dependencies = {}) {
       const snap = await db.collection("actors").doc(protectedActor.actorId).get();
       const teacherVerified = snap.exists ? snap.data()?.teacherVerified : null;
       return res.status(200).json({ ok: true, verified: !!teacherVerified, schoolId: teacherVerified?.schoolId || null, grade: teacherVerified?.grade || null, classNum: teacherVerified?.classNum || null });
-    } catch {
+    } catch (error) {
+      logger({ severity: "ERROR", message: "check_teacher_status_failed", actorId: protectedActor.actorId, error: String(error?.message || error) });
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }
   };
@@ -126,7 +129,8 @@ function createVerifyTeacherCodeHandler(dependencies = {}) {
       const result = await verifyTeacherCodeCore({ db, serverTimestamp, actorId: protectedActor.actorId, uid: protectedActor.uid, auth: dependencies.auth, schoolId, grade, classNum, code, logger });
       if (!result.ok) return res.status(result.httpStatus).json({ ok: false, code: result.code });
       return res.status(200).json({ ok: true, verified: true, schoolId, grade, classNum });
-    } catch {
+    } catch (error) {
+      logger({ severity: "ERROR", message: "verify_teacher_code_failed", actorId: protectedActor.actorId, schoolId, grade, classNum, error: String(error?.message || error) });
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }
   };

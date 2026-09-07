@@ -102,7 +102,8 @@ function createExportClassRecordsHandler(dependencies = {}) {
       // 답할 수 있게 감사로그를 남긴다(개인정보 자체는 로그에 안 넣음).
       logger({ severity: "INFO", message: "class_records_exported", teacherActorId: teacher.actorId, schoolId: teacher.schoolId, grade: teacher.grade, classNum: teacher.classNum, recordCount: records.length });
       return res.status(200).json({ ok: true, records, nextCursor, hasMore });
-    } catch {
+    } catch (error) {
+      logger({ severity: "ERROR", message: "export_class_records_failed", teacherActorId: teacher.actorId, error: String(error?.message || error) });
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }
   };

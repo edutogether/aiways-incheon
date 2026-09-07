@@ -22,6 +22,7 @@ function publicProfile(profile) {
 
 function createListPendingRegistrationsHandler(dependencies = {}) {
   const db = dependencies.db;
+  const logger = dependencies.logger || (() => {});
   return async (req, res) => {
     const teacher = await guardedTeacher(req, res, "listPendingRegistrations", dependencies);
     if (!teacher) return;
@@ -38,7 +39,8 @@ function createListPendingRegistrationsHandler(dependencies = {}) {
       const truncated = snap.docs.length > MAX_LIST_SIZE;
       const requests = snap.docs.slice(0, MAX_LIST_SIZE).map((doc) => ({ actorId: doc.id, ...publicProfile(doc.data()) }));
       return res.status(200).json({ ok: true, requests, truncated });
-    } catch {
+    } catch (error) {
+      logger({ severity: "ERROR", message: "list_pending_registrations_failed", teacherActorId: teacher.actorId, error: String(error?.message || error) });
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }
   };
@@ -99,11 +101,12 @@ function createDecideRegistrationHandler(dependencies = {}) {
         transaction.delete(requestRef);
         return { ok: true, decision: "approved" };
       });
-    } catch {
+    } catch (error) {
       // 재감사 지적사항(2026-09-01) - 이 트랜잭션만 이 프로젝트의 다른 모든
       // runTransaction(schoolDashboard.js/classRanking.js)과 달리 try/catch가
       // 빠져있어서, 두 교사가 같은 요청을 동시에 승인/거절하는 경합이나
       // 일시적 장애 시 15초 타임아웃까지 조용히 걸리는 문제가 있었다.
+      logger({ severity: "ERROR", message: "decide_registration_failed", teacherActorId: teacher.actorId, targetActorId, error: String(error?.message || error) });
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }
     if (result.code === "not_found") return res.status(404).json({ ok: false, code: "request_not_found" });

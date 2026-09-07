@@ -84,7 +84,8 @@ function createAnonymizeStudentHandler(dependencies = {}) {
       if (result.code === "already_anonymized") return res.status(409).json({ ok: false, code: "already_anonymized" });
       logger({ severity: "INFO", message: "student_anonymized", teacherActorId: teacher.actorId, schoolId: teacher.schoolId, targetActorId });
       return res.status(200).json({ ok: true, targetActorId });
-    } catch {
+    } catch (error) {
+      logger({ severity: "ERROR", message: "anonymize_student_failed", teacherActorId: teacher.actorId, targetActorId, error: String(error?.message || error) });
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }
   };

@@ -35,14 +35,14 @@ const db = getFirestore();
 const rateLimiterFailureLogger = (metadata) => logger.error(metadata);
 const rateLimiter = createGlobalRateLimiter({ db, serverTimestamp: () => FieldValue.serverTimestamp(), logger: rateLimiterFailureLogger });
 const actorRateLimiter = createActorRateLimiter({ db, serverTimestamp: () => FieldValue.serverTimestamp(), logger: rateLimiterFailureLogger });
-const deviceAccess = createEdu2gDeviceAccess({ auth: getAuth(), db, serverTimestamp: () => FieldValue.serverTimestamp() });
-const analysisRequests = createAnalysisIdempotency({ db, serverTimestamp: () => FieldValue.serverTimestamp(), model: "gemini-3.5-flash-lite" });
-const logAppCheck = (metadata) => logger.write({ severity: metadata?.status === "invalid" || metadata?.status === "unavailable" ? "WARNING" : "INFO", ...metadata });
 // 2026-09-01 종합감사(B그룹 6번): 교사코드 실패시도/CSV 반전체 내보내기/
 // 가입승인·거절에 감사로그가 전혀 없었다 - "누가 언제 우리 반 명단을
 // 뽑았나"에 답할 수 없던 문제를 닫는다. 호출부가 metadata.severity로
 // WARNING(실패시도)/INFO(정상 감사기록)를 직접 고른다.
 const auditLog = (metadata) => logger.write({ severity: metadata?.severity || "INFO", ...metadata });
+const deviceAccess = createEdu2gDeviceAccess({ auth: getAuth(), db, serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog });
+const analysisRequests = createAnalysisIdempotency({ db, serverTimestamp: () => FieldValue.serverTimestamp(), model: "gemini-3.5-flash-lite" });
+const logAppCheck = (metadata) => logger.write({ severity: metadata?.status === "invalid" || metadata?.status === "unavailable" ? "WARNING" : "INFO", ...metadata });
 // FUNCTIONS_EMULATOR는 firebase emulators:start가 Functions 에뮬레이터
 // 프로세스에만 자동으로 심어주는 값이라(프로덕션 Cloud Functions 런타임에는
 // 절대 안 생김 - recordEmulatorSmoke.js/edu2gEmulatorSmoke.js에서도 이미
@@ -76,11 +76,11 @@ const recordStore = createRecordStore({ db });
 // 보안 강제 자체를 확인할 수 없게 된다(로컬 브라우저 클릭 편의성 때문에
 // 이 검증을 깨는 건 우선순위가 거꾸로 됨).
 exports.saveSortingRecord = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createSaveSortingRecordHandler({
-  serverTimestamp: () => FieldValue.serverTimestamp(), store: recordStore, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, db
+  serverTimestamp: () => FieldValue.serverTimestamp(), store: recordStore, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, db, logger: auditLog
 }));
 const queryStore = createRecordQueryStore({ db });
-exports.listSortingRecords=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createListSortingRecordsHandler({store:queryStore,access:deviceAccess,rateLimiter,actorRateLimiter,logAppCheck,blockedActors}));
-exports.resolveSortingRecord=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createResolveSortingRecordHandler({store:queryStore,access:deviceAccess,serverTimestamp:()=>FieldValue.serverTimestamp(),rateLimiter,actorRateLimiter,logAppCheck,blockedActors}));
+exports.listSortingRecords=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createListSortingRecordsHandler({store:queryStore,access:deviceAccess,rateLimiter,actorRateLimiter,logAppCheck,blockedActors,logger:auditLog}));
+exports.resolveSortingRecord=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createResolveSortingRecordHandler({store:queryStore,access:deviceAccess,serverTimestamp:()=>FieldValue.serverTimestamp(),rateLimiter,actorRateLimiter,logAppCheck,blockedActors,logger:auditLog}));
 // Keeps schools/{schoolId}/classes/{grade_classNum} aggregate docs in sync
 // with every sorting record create (saveSortingRecord) and held->completed
 // transition (resolveSortingRecord) -- the PC dashboard reads only these
@@ -119,16 +119,16 @@ exports.logDashboardRealtimeEvent = onRequest({ region: "asia-northeast3", memor
 // 함수를 대상으로 "인증 헤더 없이 호출하면 실제로 app_check_missing으로
 // 거부되는지"를 실제 에뮬레이터 HTTP 표면으로 검증한다.
 exports.checkStudentProfile = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckStudentProfileHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
+  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: auditLog
 }));
 exports.registerStudentProfile = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createRegisterStudentProfileHandler({
   db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, auth: getAuth(), serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
 }));
 exports.checkCampusLocation = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckCampusLocationHandler({
-  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
 }));
 exports.changeStudentClass = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createChangeStudentClassHandler({
-  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
 }));
 exports.getClassRanking = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createGetClassRankingHandler({
   db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, auth: getAuth(), logger: auditLog
@@ -137,13 +137,13 @@ exports.searchSchool = onRequest({ region: "asia-northeast3", memory: "256MiB", 
   getApiKey: () => neisApiKey.value(), access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: (metadata) => logger.error(metadata)
 }));
 exports.checkTeacherStatus = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckTeacherStatusHandler({
-  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: auditLog
 }));
 exports.verifyTeacherCode = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createVerifyTeacherCodeHandler({
   db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, auth: getAuth(), serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
 }));
 exports.listPendingRegistrations = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createListPendingRegistrationsHandler({
-  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: auditLog
 }));
 exports.decideRegistration = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createDecideRegistrationHandler({
   db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog

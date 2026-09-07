@@ -28,6 +28,7 @@ function createCheckCampusLocationHandler(dependencies = {}) {
   const db = dependencies.db;
   const serverTimestamp = dependencies.serverTimestamp || (() => new Date());
   const now = dependencies.now || (() => new Date());
+  const logger = dependencies.logger || (() => {});
   return async (req, res) => {
     if (!applyCors(req, res)) return res.status(403).json({ ok: false, code: "invalid_origin" });
     if (req.method === "OPTIONS") return res.status(204).send("");
@@ -76,7 +77,8 @@ function createCheckCampusLocationHandler(dependencies = {}) {
       // 정책을 설정하면 이 컬렉션만 삭제 대상에서 조용히 빠진다. 통일.
       await checkRef.set({ schoolId, onCampus, consumed: false, createdAt: serverTimestamp(), expireAt: new Date(now().getTime() + CHECK_TTL_MS) });
       return res.status(200).json({ ok: true, onCampus, campusCheckId: checkRef.id });
-    } catch {
+    } catch (error) {
+      logger({ severity: "ERROR", message: "check_campus_location_failed", error: String(error?.message || error) });
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
     }
   };

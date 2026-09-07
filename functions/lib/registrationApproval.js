@@ -11,6 +11,7 @@
 const { cleanText } = require("./httpGuard");
 const { guardedTeacher } = require("./teacherAuth");
 const { studentNumberClaimRef } = require("./studentNumberClaim");
+const { setDashboardSchoolClaim } = require("./dashboardSchoolClaim");
 
 const MAX_LIST_SIZE = 100;
 
@@ -113,6 +114,19 @@ function createDecideRegistrationHandler(dependencies = {}) {
     if (result.code === "not_pending") return res.status(409).json({ ok: false, code: "already_decided" });
     if (result.code === "already_registered") return res.status(409).json({ ok: false, code: "already_registered" });
     if (result.code === "student_number_taken") return res.status(409).json({ ok: false, code: "student_number_taken" });
+    // 2026-09-07 종합감사 - dashboardSchoolClaim.js가 "actors/{actorId}.dashboardSchoolId가
+    // 정해지거나 바뀌는 모든 지점에서 커스텀 클레임도 같이 맞춘다"는 불변식을
+    // 명시하는데, 승인 경로만 그 호출이 빠져 있었다(schoolDashboard.js/
+    // classRanking.js/teacherAuth.js 셋은 전부 호출함). 승인은 위 트랜잭션에서
+    // 대상 기기의 dashboardSchoolId를 실제로 덮어쓰는 지점이므로, 클레임을
+    // 안 맞추면 firestore.rules가 보는 값(옛 학교)과 서버가 아는 값(승인된
+    // 학교)이 어긋난 채로 남는다 - 잘못 고정됐던 기기가 그 옛 학교의 반
+    // 집계를 실시간 구독으로 계속 읽을 수 있다. anonymous actorId는 곧 uid다
+    // (edu2gDeviceAccess.js의 provisionOpenAccessActor). 클레임 설정 실패는
+    // 폴링 경로에 영향이 없으므로 setDashboardSchoolClaim이 로그만 남기고 삼킨다.
+    if (result.decision === "approved") {
+      await setDashboardSchoolClaim({ auth: dependencies.auth, uid: targetActorId, schoolId: teacher.schoolId, logger });
+    }
     logger({ severity: "INFO", message: "registration_decided", teacherActorId: teacher.actorId, schoolId: teacher.schoolId, grade: teacher.grade, classNum: teacher.classNum, targetActorId, decision: result.decision });
     return res.status(200).json({ ok: true, decision: result.decision, targetActorId });
   };

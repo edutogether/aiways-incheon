@@ -13,6 +13,7 @@ const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { createEdu2gDeviceAccess } = require("../lib/edu2gDeviceAccess");
 const { createGlobalRateLimiter, createActorRateLimiter } = require("../lib/globalRateLimit");
 const { createGetSchoolDashboardHandler } = require("../lib/schoolDashboard");
+const { createDecideRegistrationHandler } = require("../lib/registrationApproval");
 
 const projectId = process.env.GCLOUD_PROJECT || "demo-aiways-incheon";
 const authEmulator = new URL(`http://${process.env.FIREBASE_AUTH_EMULATOR_HOST || "127.0.0.1:9099"}`);
@@ -20,6 +21,7 @@ const firestoreBase = `http://127.0.0.1:8080/v1/projects/${projectId}/databases/
 const ACTOR_A = "dashboard_claim_test_actor_a";
 const ACTOR_B = "dashboard_claim_test_actor_b";
 const SCHOOL_A = "7321071";
+const SCHOOL_OTHER = "7321072";
 
 function signup() {
   return new Promise((resolve, reject) => {
@@ -56,7 +58,7 @@ test("dashboardSchoolId custom claim is set on first school-lock and firestore.r
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
-  let uidA = "", uidB = "";
+  let uidA = "", uidB = "", uidC = "", teacherUid = "";
   try {
     const signedA = await signup(), signedB = await signup();
     uidA = (await auth.verifyIdToken(signedA.idToken)).uid;
@@ -101,10 +103,41 @@ test("dashboardSchoolId custom claim is set on first school-lock and firestore.r
     assert.equal(await firestoreGet(`schools/${SCHOOL_A}`, signedB.idToken), 403, "a token with no/other dashboardSchoolId claim must be denied");
     assert.equal(await firestoreGet(`schools/${SCHOOL_A}`), 403, "unauthenticated read must still be denied");
 
+    // 2026-09-07 종합감사 - dashboardSchoolClaim.js는 "dashboardSchoolId가
+    // 정해지거나 바뀌는 모든 지점에서 클레임도 같이 맞춘다"를 불변식으로
+    // 명시하는데, 가입 승인(registrationApproval.js)만 그 호출이 빠져 있었다.
+    // 잘못된 학교로 먼저 고정(+클레임까지 발급)된 기기가 다른 학교의 담임
+    // 승인을 받으면, 문서는 새 학교로 교정되는데 클레임은 옛 학교로 남아
+    // 그 옛 학교의 반 집계를 계속 실시간 구독으로 읽을 수 있었다.
+    // 클레임을 실제로 심으려면 actorId가 곧 uid여야 하므로(open_access
+    // 프로비저닝과 동일) 이 시나리오만 actorId=uid로 만든다.
+    const signedC = await signup();
+    uidC = (await auth.verifyIdToken(signedC.idToken)).uid;
+    const teacherSigned = await signup();
+    teacherUid = (await auth.verifyIdToken(teacherSigned.idToken)).uid;
+    await bind(uidC, uidC);
+    await bind(teacherUid, teacherUid);
+    await db.collection("actors").doc(uidC).set({ status: "active", plan: "closed_beta", dashboardSchoolId: SCHOOL_OTHER }, { merge: true });
+    await auth.setCustomUserClaims(uidC, { dashboardSchoolId: SCHOOL_OTHER });
+    await db.collection("actors").doc(teacherUid).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_A, grade: "5", classNum: "1" } }, { merge: true });
+    await db.collection("registrationRequests").doc(uidC).set({ schoolId: SCHOOL_A, schoolName: "테스트초등학교", grade: "5", classNum: "1", studentNumber: "21", name: "김철수", status: "pending" });
+
+    const decide = createDecideRegistrationHandler({ db, access, rateLimiter, actorRateLimiter, appCheck, auth, serverTimestamp: () => FieldValue.serverTimestamp(), logger: () => {} });
+    const approved = await call(decide, teacherSigned.idToken, { targetActorId: uidC, decision: "approve" });
+    assert.equal(approved.status, 200);
+    const afterApproval = await auth.getUser(uidC);
+    assert.equal(afterApproval.customClaims?.dashboardSchoolId, SCHOOL_A, "approval must move the custom claim to the approved school, not leave it on the mis-bound one");
+
     process.stdout.write(JSON.stringify({ dashboardSchoolClaimEmulatorIntegration: "passed" }) + "\n");
   } finally {
+    const cleanupBatch = db.batch();
+    if (uidC) {
+      cleanupBatch.delete(db.collection("registrationRequests").doc(uidC));
+      cleanupBatch.delete(db.collection("studentNumberClaims").doc(`${SCHOOL_A}_5_1_21`));
+    }
+    await cleanupBatch.commit();
     const batch = db.batch();
-    for (const [actorId, uid] of [[ACTOR_A, uidA], [ACTOR_B, uidB]]) {
+    for (const [actorId, uid] of [[ACTOR_A, uidA], [ACTOR_B, uidB], [uidC || "_none_c", uidC], [teacherUid || "_none_t", teacherUid]]) {
       if (uid) batch.delete(db.collection("edu2gDeviceBindings").doc(uid));
       const actorRoot = db.collection("actors").doc(actorId);
       const devices = await actorRoot.collection("trustedDevices").get();

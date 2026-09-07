@@ -11,6 +11,7 @@ const { protectActorRequest } = require("./protectedActor");
 const { cleanText, applyCors } = require("./httpGuard");
 const { verifyTeacherCodeCore } = require("./teacherAuth");
 const { studentNumberClaimRef } = require("./studentNumberClaim");
+const { classDocId } = require("./schoolDashboardAggregate");
 
 const MAX_BODY_BYTES = 2 * 1024;
 const DIGITS = /^\d{1,2}$/;
@@ -217,6 +218,22 @@ function createChangeStudentClassHandler(dependencies = {}) {
         const historyEntry = { fromGrade: current.grade, fromClassNum: current.classNum, toGrade: grade, toClassNum: classNum, changedAt: now() };
         const history = [...(Array.isArray(current.changeHistory) ? current.changeHistory : []), historyEntry].slice(-MAX_CHANGE_HISTORY);
         transaction.set(actorRef, { studentProfile: { ...current, grade, classNum, lastChangedAt: serverTimestamp(), changeHistory: history } }, { merge: true });
+        // 2026-09-07 종합감사 - 반을 옮겨도 옛 반의 개인랭킹 문서
+        // (schools/{schoolId}/classes/{옛 학년_반}/students/{번호})는 그대로
+        // 남아 있었다. 그 문서에는 studentNumber+studentName이 들어 있어서
+        // ①떠난 반의 "우리반 실천왕"에 그 학생 이름이 계속 뜨고,
+        // ②studentAnonymization.js는 "지금 소속된 반"의 문서 하나만 지우도록
+        // 돼 있어(profile.grade/classNum 기준) 학부모가 삭제를 요청해도
+        // 옛 반에 남은 실명·번호는 영원히 안 지워졌다 - 이 함수 자신이
+        // studentNumberClaim을 옮기는 것과 같은 이유로, 개인랭킹 문서도
+        // 같이 정리해야 "그 반에 없는 학생"의 흔적이 안 남는다. 반/학교
+        // 집계 숫자(classRef.completedTotal 등)는 별도 문서라 영향 없다
+        // (studentAnonymization.js가 같은 근거로 이미 삭제하고 있음).
+        if (current.studentNumber) {
+          transaction.delete(db.collection("schools").doc(current.schoolId)
+            .collection("classes").doc(classDocId(current.grade, current.classNum))
+            .collection("students").doc(current.studentNumber));
+        }
         transaction.delete(oldClaimRef);
         transaction.create(newClaimRef, { actorId: protectedActor.actorId, claimedAt: serverTimestamp() });
         return { ok: true };

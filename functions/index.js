@@ -146,7 +146,7 @@ exports.listPendingRegistrations = onRequest({ region: "asia-northeast3", memory
   db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: auditLog
 }));
 exports.decideRegistration = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createDecideRegistrationHandler({
-  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, auth: getAuth(), serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
 }));
 exports.manageTeacherCode = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createManageTeacherCodeHandler({
   db, appCheck: emulatorAppCheck, rateLimiter, logAppCheck, verifyIdToken: (token) => getAuth().verifyIdToken(token), serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog

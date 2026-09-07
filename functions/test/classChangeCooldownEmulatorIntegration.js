@@ -111,10 +111,20 @@ test("changeStudentClass cooldown: 24h clock starts at registration, backdated c
     const stillPreChange = await call(check, token, {});
     assert.deepEqual(stillPreChange.body.profile, student, "preview must not write anything");
 
+    // 2026-09-07 종합감사 - 반을 옮기면 옛 반의 개인랭킹 문서(실명+번호가
+    // 그대로 들어있는 schools/*/classes/{옛 학년_반}/students/{번호})도 같이
+    // 지워져야 한다. 안 지우면 ①떠난 반의 "우리반 실천왕"에 그 학생 이름이
+    // 계속 뜨고 ②studentAnonymization.js는 "지금 소속된 반"만 지우므로
+    // 삭제 요청을 받아도 옛 반의 실명·번호는 영원히 남는다.
+    const oldStudentRef = db.collection("schools").doc(student.schoolId).collection("classes").doc(`${student.grade}_${student.classNum}`).collection("students").doc(student.studentNumber);
+    await oldStudentRef.set({ studentNumber: student.studentNumber, studentName: student.name, completedTotal: 3 });
+
     const committed = await call(change, token, { grade: "6", classNum: "3", confirm: true });
     assert.equal(committed.status, 200);
     assert.equal(committed.body.confirmed, true);
     assert.deepEqual(committed.body.profile, { schoolId: student.schoolId, schoolName: student.schoolName, grade: "6", classNum: "3", studentNumber: student.studentNumber, name: student.name });
+
+    assert.equal((await oldStudentRef.get()).exists, false, "옛 반의 개인랭킹 문서(실명+번호)는 반 이동과 함께 삭제돼야 한다");
 
     const afterChange = await call(check, token, {});
     assert.equal(afterChange.body.profile.grade, "6");
@@ -190,6 +200,7 @@ test("changeStudentClass cooldown: 24h clock starts at registration, backdated c
     }
     batch.delete(db.collection("studentNumberClaims").doc(`${student.schoolId}_${student.grade}_${student.classNum}_${student.studentNumber}`));
     batch.delete(db.collection("studentNumberClaims").doc(`${student.schoolId}_6_3_${student.studentNumber}`));
+    batch.delete(db.collection("schools").doc(student.schoolId).collection("classes").doc(`${student.grade}_${student.classNum}`).collection("students").doc(student.studentNumber));
     await batch.commit();
   }
 });

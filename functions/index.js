@@ -60,19 +60,19 @@ const blockedActors = { async isBlocked(actorId) { const snap = await db.collect
 exports.analyzeSortingImage = onRequest({
   region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 30, minInstances: 0, maxInstances: 2, concurrency: 1,
   secrets: [geminiApiKey], cors: false
-}, createAnalyzeSortingHandler({ getApiKey: () => geminiApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, analysisRequests, logAppCheck, blockedActors }));
+}, createAnalyzeSortingHandler({ getApiKey: () => geminiApiKey.value(), access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, analysisRequests, logAppCheck, blockedActors }));
 exports.analyzeSortingText = onRequest({
   region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 20, minInstances: 0, maxInstances: 2, concurrency: 2,
   secrets: [geminiApiKey], cors: false
-}, createAnalyzeSortingTextHandler({ getApiKey: () => geminiApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, analysisRequests, logAppCheck, blockedActors }));
-exports.analyzeSortingSafetyObserver = onRequest({ region:"asia-northeast3", memory:"256MiB", timeoutSeconds:30, minInstances:0, maxInstances:2, concurrency:1, secrets:[geminiApiKey], cors:false }, createSortingSafetyObserverHandler({getApiKey:()=>geminiApiKey.value(),access:deviceAccess,rateLimiter,actorRateLimiter,analysisRequests,logAppCheck,blockedActors}));
+}, createAnalyzeSortingTextHandler({ getApiKey: () => geminiApiKey.value(), access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, analysisRequests, logAppCheck, blockedActors }));
+exports.analyzeSortingSafetyObserver = onRequest({ region:"asia-northeast3", memory:"256MiB", timeoutSeconds:30, minInstances:0, maxInstances:2, concurrency:1, secrets:[geminiApiKey], cors:false }, createSortingSafetyObserverHandler({getApiKey:()=>geminiApiKey.value(),access:deviceAccess,appCheck:emulatorAppCheck,rateLimiter,actorRateLimiter,analysisRequests,logAppCheck,blockedActors}));
 const recordStore = createRecordStore({ db });
 exports.saveSortingRecord = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createSaveSortingRecordHandler({
-  serverTimestamp: () => FieldValue.serverTimestamp(), store: recordStore, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, db
+  serverTimestamp: () => FieldValue.serverTimestamp(), store: recordStore, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, db
 }));
 const queryStore = createRecordQueryStore({ db });
-exports.listSortingRecords=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createListSortingRecordsHandler({store:queryStore,access:deviceAccess,rateLimiter,actorRateLimiter,logAppCheck,blockedActors}));
-exports.resolveSortingRecord=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createResolveSortingRecordHandler({store:queryStore,access:deviceAccess,serverTimestamp:()=>FieldValue.serverTimestamp(),rateLimiter,actorRateLimiter,logAppCheck,blockedActors}));
+exports.listSortingRecords=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createListSortingRecordsHandler({store:queryStore,access:deviceAccess,appCheck:emulatorAppCheck,rateLimiter,actorRateLimiter,logAppCheck,blockedActors}));
+exports.resolveSortingRecord=onRequest({region:"asia-northeast3",memory:"256MiB",timeoutSeconds:15,minInstances:0,maxInstances:2,concurrency:5,cors:false},createResolveSortingRecordHandler({store:queryStore,access:deviceAccess,appCheck:emulatorAppCheck,serverTimestamp:()=>FieldValue.serverTimestamp(),rateLimiter,actorRateLimiter,logAppCheck,blockedActors}));
 // Keeps schools/{schoolId}/classes/{grade_classNum} aggregate docs in sync
 // with every sorting record create (saveSortingRecord) and held->completed
 // transition (resolveSortingRecord) -- the PC dashboard reads only these
@@ -107,22 +107,22 @@ exports.logDashboardRealtimeEvent = onRequest({ region: "asia-northeast3", memor
   access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: auditLog
 }));
 exports.checkStudentProfile = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckStudentProfileHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors
 }));
 exports.registerStudentProfile = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createRegisterStudentProfileHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, auth: getAuth(), serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, auth: getAuth(), serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog
 }));
 exports.checkCampusLocation = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckCampusLocationHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
 }));
 exports.changeStudentClass = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createChangeStudentClassHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, serverTimestamp: () => FieldValue.serverTimestamp()
 }));
 exports.getClassRanking = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createGetClassRankingHandler({
-  db, access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, auth: getAuth(), logger: auditLog
+  db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, auth: getAuth(), logger: auditLog
 }));
 exports.searchSchool = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, secrets: [neisApiKey], cors: false }, createSearchSchoolHandler({
-  getApiKey: () => neisApiKey.value(), access: deviceAccess, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: (metadata) => logger.error(metadata)
+  getApiKey: () => neisApiKey.value(), access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: (metadata) => logger.error(metadata)
 }));
 exports.checkTeacherStatus = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createCheckTeacherStatusHandler({
   db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors

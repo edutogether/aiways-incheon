@@ -1,6 +1,14 @@
 "use strict";
 const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
-const {OBSERVER_SCHEMA}=require("../lib/sortingSafetyObserver");const {evaluateAnalysisSafety}=require("../lib/sortingAnalysisSafety");
+const {OBSERVER_SCHEMA}=require("../lib/sortingSafetyObserver");
+const appSource=fs.readFileSync(path.join(__dirname,"..","..","app.js"),"utf8");
+// 2026-09-07 종합감사: 이 판정 로직의 유일한 실제 구현은 app.js의
+// computeSafetyFromObservation이다(예전엔 functions/lib/sortingAnalysisSafety.js에
+// 똑같은 사본이 있었는데, 그건 서버 어디에서도 호출되지 않는 죽은 코드였다 -
+// 사본이 아니라 진짜 프로덕션 함수를 추출해서 실행 검증한다).
+const fnMatch=appSource.match(/function computeSafetyFromObservation\(o\) \{[\s\S]*?\n  \}/);
+assert.ok(fnMatch,"computeSafetyFromObservation must still exist in app.js");
+const evaluateAnalysisSafety=new Function(`"use strict"; return (${fnMatch[0].replace(/^function computeSafetyFromObservation/,"function")});`)();
 const required=["requestId","observerVersion","targetVisibility","targetDominance","multiObject","occlusion","deformation","contamination","transparencyAmbiguity","compositeMaterial","imageQuality","backgroundClutter","candidateConflict","observerStatus"];
 test("observer contract is observation-only and retains all required enum fields",()=>{for(const key of required)assert.ok(OBSERVER_SCHEMA.required.includes(key));for(const forbidden of ["object","objectName","material","disposal","finalDecision","sortingAnswer"])assert.equal(Object.hasOwn(OBSERVER_SCHEMA.properties,forbidden),false);assert.deepEqual(OBSERVER_SCHEMA.properties.targetVisibility.enum,["clear","partial","poor"]);assert.deepEqual(OBSERVER_SCHEMA.properties.targetDominance.enum,["high","medium","low"]);assert.deepEqual(OBSERVER_SCHEMA.properties.imageQuality.enum,["good","usable","poor"]);});
 test("safety gate is deterministic, retakes only strong ambiguity, and always preserves direct selection",()=>{const cases=[[{targetVisibility:"clear",imageQuality:"good",targetDominance:"high"},"SAFE"],[{deformation:true},"CAUTION"],[{contamination:true},"CAUTION"],[{multiObject:true},"CAUTION"],[{backgroundClutter:"medium"},"CAUTION"],[{targetVisibility:"partial"},"CAUTION"],[{targetVisibility:"poor"},"RETAKE"],[{imageQuality:"poor"},"RETAKE"],[{occlusion:"severe"},"RETAKE"],[{targetDominance:"low",multiObject:true},"RETAKE"],[{backgroundClutter:"high",targetVisibility:"partial"},"RETAKE"]];for(const [input,level] of cases){const r=evaluateAnalysisSafety(input);assert.equal(r.safetyLevel,level);assert.equal(r.retakeRecommended,level==="RETAKE");assert.equal(r.directSelectionRecommended,true);assert.ok(Array.isArray(r.reasons));assert.ok(r.uxState);}});

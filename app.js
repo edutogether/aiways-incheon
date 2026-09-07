@@ -3951,10 +3951,21 @@
     } catch { return { ok: false, state: SORTING_VISION_STATES.UNAVAILABLE, code: "analysis_failed", requestId: requestMetadata.requestId }; }
   }
 
+  // 2026-09-07 종합감사: 이 판정 로직이 functions/lib/sortingAnalysisSafety.js에도
+  // 그대로 복사돼 있었는데, 그쪽은 실제 서버 어디에서도 호출되지 않는 죽은
+  // 사본이었다(sortingRecordStore.js 주석에 적힌 "진짜 구현이 아니라 사본을
+  // 검증하고 있었다"는 것과 같은 함정). 죽은 사본은 지우고, 여기 이 함수를
+  // 순수 함수로 분리해 실제 프로덕션 로직을 테스트가 직접 검증할 수 있게 한다.
+  function computeSafetyFromObservation(o) {
+    const retake = o.targetVisibility==="poor"||o.imageQuality==="poor"||o.occlusion==="severe"||(o.multiObject&&o.targetDominance==="low")||(o.backgroundClutter==="high"&&o.targetVisibility!=="clear");
+    const caution = !retake&&(o.targetVisibility==="partial"||o.backgroundClutter==="medium"||o.deformation||o.contamination||o.multiObject||o.occlusion==="mild");
+    return {safetyLevel:retake?"RETAKE":caution?"CAUTION":"SAFE",retakeRecommended:retake,directSelectionRecommended:true,reasons:retake?["image_ambiguity"]:caution?["check_visible_condition"]:[],uxState:retake?"retake":caution?"caution":"safe"};
+  }
+
   async function requestSortingSafetyObserver({ requestMetadata, imagePayload }) {
     const client = window.AIWaysEdu2gClient;
     if (!client?.analyzeSortingSafetyObserver || !imagePayload) return { ok:false, safety:{ safetyLevel:"CAUTION", retakeRecommended:false, directSelectionRecommended:true, reasons:["observer_unavailable"], uxState:"caution" } };
-    try { const response=await client.analyzeSortingSafetyObserver({ ...requestMetadata, image:{mimeType:imagePayload.mimeType,data:imagePayload.data,metadata:imagePayload.metadata},imageMetadata:imagePayload.metadata }); if(!response.ok)return {ok:false}; const o=response.data||{}; const retake=o.targetVisibility==="poor"||o.imageQuality==="poor"||o.occlusion==="severe"||(o.multiObject&&o.targetDominance==="low")||(o.backgroundClutter==="high"&&o.targetVisibility!=="clear"); const caution=!retake&&(o.targetVisibility==="partial"||o.backgroundClutter==="medium"||o.deformation||o.contamination||o.multiObject||o.occlusion==="mild"); return {ok:true,value:o,safety:{safetyLevel:retake?"RETAKE":caution?"CAUTION":"SAFE",retakeRecommended:retake,directSelectionRecommended:true,reasons:retake?["image_ambiguity"]:caution?["check_visible_condition"]:[],uxState:retake?"retake":caution?"caution":"safe"}}; } catch { return {ok:false}; }
+    try { const response=await client.analyzeSortingSafetyObserver({ ...requestMetadata, image:{mimeType:imagePayload.mimeType,data:imagePayload.data,metadata:imagePayload.metadata},imageMetadata:imagePayload.metadata }); if(!response.ok)return {ok:false}; const o=response.data||{}; return {ok:true,value:o,safety:computeSafetyFromObservation(o)}; } catch { return {ok:false}; }
   }
 
   const sortingVisionProviders = Object.freeze({

@@ -1418,43 +1418,59 @@
     const bom = String.fromCharCode(0xfeff);
     return bom + [header, ...rows].map((row) => row.map(csvQuote).join(",")).join("\r\n");
   }
-  const CLASS_CSV_MAX_PAGES = 10; // 페이지당 최대 200건 x 10 = 2000건까지 한 번에 모음
+  // 2026-09-07 종합감사 - 옛 10페이지(2000건) 상한에 걸리면 hasMore가
+  // 여전히 true인데도 아무 표시 없이 완성본처럼 CSV를 내려줬다(한 반
+  // 30명 x 하루 1건 x 학년도 200일 = 연 6000건으로, 한 학년도 안에
+  // 반드시 도달함). 페이지 상한을 10000건(50페이지)으로 올리고, 그래도
+  // 남은 기록이 있으면 파일명·안내에 명시한다. 또한 예전엔 429 등으로
+  // 중간에 실패하면 이미 받아온 기록까지 전부 버렸는데, 이제 그때까지
+  // 모은 것만이라도 그대로 내려준다.
+  const CLASS_CSV_MAX_PAGES = 50; // 페이지당 최대 200건 x 50 = 10000건까지 한 번에 모음
   async function runClassCsvExport(grade, classNum) {
     const client = window.AIWaysEdu2gClient;
     if (!client?.exportClassRecords) return;
     showDashboardToast("반 전체 기록을 모으고 있어요...");
     const records = [];
     let cursor;
+    let truncated = false;
+    let failed = false;
     try {
       for (let page = 0; page < CLASS_CSV_MAX_PAGES; page += 1) {
         const response = await client.exportClassRecords({ cursor });
         if (!response.ok || !response.data) {
+          failed = true;
           showDashboardToast(response.code === "teacher_verification_required"
             ? "이 기기는 아직 선생님 인증이 안 됐어요. 먼저 '선생님 인증하기'를 해주세요."
             : client?.errorMessageFor?.(response?.code) || "기록을 불러오지 못했어요. 다시 시도해주세요.");
-          return;
+          break;
         }
         records.push(...(response.data.records || []));
         if (!response.data.hasMore || !response.data.nextCursor) break;
         cursor = response.data.nextCursor;
+        if (page === CLASS_CSV_MAX_PAGES - 1) truncated = true;
       }
     } catch {
+      failed = true;
       showDashboardToast("기록을 불러오지 못했어요. 다시 시도해주세요.");
-      return;
     }
     if (!records.length) {
-      showDashboardToast("아직 저장된 기록이 없어요.");
+      if (!failed) showDashboardToast("아직 저장된 기록이 없어요.");
       return;
     }
+    // 실패했거나 페이지 상한에 걸렸어도, 이미 모은 기록은 버리지 않고
+    // 그대로 내려준다 - 파일명에 표시해서 "완성본"으로 오인하지 않게 한다.
     const csv = buildClassRecordsCsv(records);
     const stamp = new Date().toISOString().replace(/[-:]/g, "").replace("T", "-").slice(0, 13);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `aiways-class-${grade}-${classNum}-records-${stamp}.csv`;
+    const partial = failed || truncated;
+    a.download = `aiways-class-${grade}-${classNum}-records-${stamp}${partial ? "-partial" : ""}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+    if (failed) showDashboardToast(`일부(${records.length}건)만 받아졌어요(파일명에 "partial" 표시) - 다시 시도해 주세요.`);
+    else if (truncated) showDashboardToast(`오래된 기록 ${records.length}건까지만 포함됐어요(파일명에 "partial" 표시) - 최근 기록은 이 파일에 없어요.`);
   }
   // UX 재감사 지적사항(2026-09-01) 대응 - 학년/반을 window.prompt() 2번이
   // 아니라, 학교설정 모달의 class-picker-selects와 같은 디자인의 드롭다운

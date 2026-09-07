@@ -125,7 +125,12 @@ const RATE_LIMITS = Object.freeze({
   // 2026-08-31 - CSV 반전체 내보내기(5단계). collectionGroup 쿼리라
   // 페이지당 최대 200건을 읽을 수 있어(classExport.js MAX_PAGE_SIZE) 다른
   // 조회보다 상한을 좁게 잡는다.
-  ,exportClassRecords: { perMinute: 10 }
+  // 2026-09-07 종합감사 - CSV 내보내기 "1회"가 app.js의 페이지네이션
+  // 루프 때문에 최대 50번(CLASS_CSV_MAX_PAGES) 연속 호출을 만드는데,
+  // 옛 10/분은 정상적인 내보내기 한 번도 다 못 끝내는 상한이었다(같은
+  // 분 안에 교사 두 명이 내보내면 무조건 한쪽은 429). 최소 2건의
+  // 완전한 내보내기를 같은 분에 커버하도록 올린다.
+  ,exportClassRecords: { perMinute: 100 }
   // 2026-09-02 - 학생 삭제·탈퇴 요청 대응(익명화). decideRegistration과
   // 같은 이유(교사 화면에서 드물게 쓰는 관리 작업)로 넉넉하게 잡는다.
   ,anonymizeStudent: { perMinute: 30 }

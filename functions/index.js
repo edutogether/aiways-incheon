@@ -41,7 +41,7 @@ const actorRateLimiter = createActorRateLimiter({ db, serverTimestamp: () => Fie
 // WARNING(실패시도)/INFO(정상 감사기록)를 직접 고른다.
 const auditLog = (metadata) => logger.write({ severity: metadata?.severity || "INFO", ...metadata });
 const deviceAccess = createEdu2gDeviceAccess({ auth: getAuth(), db, serverTimestamp: () => FieldValue.serverTimestamp(), logger: auditLog });
-const analysisRequests = createAnalysisIdempotency({ db, serverTimestamp: () => FieldValue.serverTimestamp(), model: "gemini-3.5-flash-lite" });
+const analysisRequests = createAnalysisIdempotency({ db, serverTimestamp: () => FieldValue.serverTimestamp(), model: "gemini-3.5-flash-lite", logger: auditLog });
 const logAppCheck = (metadata) => logger.write({ severity: metadata?.status === "invalid" || metadata?.status === "unavailable" ? "WARNING" : "INFO", ...metadata });
 // FUNCTIONS_EMULATOR는 firebase emulators:start가 Functions 에뮬레이터
 // 프로세스에만 자동으로 심어주는 값이라(프로덕션 Cloud Functions 런타임에는

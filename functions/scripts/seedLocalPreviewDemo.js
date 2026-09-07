@@ -8,10 +8,11 @@
 process.env.FIRESTORE_EMULATOR_HOST = "127.0.0.1:8080";
 process.env.FIREBASE_AUTH_EMULATOR_HOST = "127.0.0.1:9099";
 const http = require("node:http");
-const { createHash } = require("node:crypto");
 const { initializeApp } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+const { hashTeacherCode } = require("../lib/teacherCodeHash");
+const { teacherCodeDocId } = require("../lib/teacherAuth");
 
 const app = initializeApp({ projectId: "demo-aiways-incheon" });
 const auth = getAuth(app);
@@ -36,7 +37,14 @@ function signUp(email, password) {
 }
 
 (async () => {
-  await db.collection("teacherCodes").doc(SCHOOL_ID).set({ codeHash: createHash("sha256").update(TEACHER_CODE).digest("hex"), updatedAt: FieldValue.serverTimestamp() });
+  // 2026-09-07 - 이 스크립트가 2026-09-02 반 단위 교사코드 세분화(schoolId
+  // 하나가 아니라 schoolId_grade_classNum 문서) + 2026-09-01 scrypt+솔트
+  // 전환(teacherCodeHash.js) 이전 스키마 그대로 남아 있어서, 실제로
+  // verifyTeacherCode를 호출하면 "teacher_code_not_set"으로 항상 실패했다
+  // (문서 자체가 다른 ID에, 다른 해시 형식으로 저장돼 있었음) - 현재 스키마와
+  // 맞춘다.
+  const { codeHash, codeSalt } = hashTeacherCode(TEACHER_CODE);
+  await db.collection("teacherCodes").doc(teacherCodeDocId(SCHOOL_ID, "5", "1")).set({ codeHash, codeSalt, updatedAt: FieldValue.serverTimestamp() });
 
   await db.collection("registrationRequests").doc(STUDENT_ACTOR_ID).set({
     schoolId: SCHOOL_ID, schoolName: SCHOOL_NAME, grade: "5", classNum: "1", studentNumber: "3", name: "김민준",
@@ -60,7 +68,7 @@ function signUp(email, password) {
 
   console.log("데모 데이터 준비 완료:");
   console.log(`  학교코드(schoolId): ${SCHOOL_ID} (${SCHOOL_NAME})`);
-  console.log(`  교사 인증코드: ${TEACHER_CODE}`);
+  console.log(`  교사 인증코드(5학년 1반 전용): ${TEACHER_CODE}`);
   console.log(`  가입 승인대기: 5학년 1반 3번 김민준`);
   console.log(`  이미 승인된 학생(CSV 확인용): 5학년 1반 7번 이서연, 저장기록 1건`);
   console.log(`  슈퍼어드민 데모 계정: ${SUPERADMIN_EMAIL} / ${SUPERADMIN_PASSWORD}`);

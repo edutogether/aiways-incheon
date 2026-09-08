@@ -1,0 +1,518 @@
+{
+  "#authGate": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#authGateContent": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#appRoot": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:🔍 판단": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:🎮 퀴즈": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:🌱 통계": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:❓ 보류함": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#tab-judge": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupBanner": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupBannerGoBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupBannerDismissBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#judge-stat-count": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#judge-stat-carbon": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#judge-stat-hold": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#photoInput": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#photoTriggerBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#searchEmojiIcon": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#searchInput": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#searchTriggerBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#search-suggestions": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#quickSelectGrid": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:🥛우유갑종이팩류 검토": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:📦택배상자종이류 검토": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:🥤플라스틱컵플라스틱류": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:🍜컵라면 용기재질·오": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:🍪과자 봉지비닐류 또": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:🥫캔류캔류 검토": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:🧴페트병플라스틱류 검": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:🍾유리병유리류 검토": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:☕종이컵종이류 확정 금": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:🛍️비닐 봉투비닐류 ": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:🧾영수증일반폐기물 검": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:🔋건전지폐건전지 전용": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#holdQuickBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#tab-quiz": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#quizRankLadder": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#quiz-box": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#quiz-progress": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#quiz-score": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#quiz-progress-bar": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#quiz-emoji": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#quiz-question": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#quiz-buttons": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:O": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "button:X": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#quiz-explanation-panel": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#explanation-box-color": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#explanation-emoji": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#explanation-title": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#explanation-desc": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#nextQuizBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#quiz-result-summary": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#quiz-result-title": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#quiz-result-message": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#quiz-result-score-text": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#restartQuizBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#tab-stats": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupCard": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupRoleGroup": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupRoleHomeroomBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupRoleStudentBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupSchoolInput": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupSchoolCode": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupSchoolResults": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupGradeInput": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupClassInput": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupStudentFields": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupNumberInput": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupNameInput": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupHomeroomFields": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupHomeroomNameInput": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupTeacherCodeInput": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupSubmitButton": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupStatus": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#interimClassCard": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#classSchoolInput": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#classSchoolCode": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#classSchoolResults": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#classGradeInput": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#classNumInput": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#classContextStatus": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#classRankingCard": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#classRankingRefreshBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#classRankingStatus": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#classRankingList": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#stat-count": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#stat-carbon": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#stat-hold": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#resetStatsBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#practice-logs-container": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#no-logs-msg": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#tab-hold": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#directHoldInput": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#addHoldDirectBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#hold-count-badge": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#resetHoldBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#hold-list-container": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#no-hold-items-msg": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#gemGradBanner": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#judgeModal": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#judgeModalBox": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#judgeModalClose": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#judgeScanState": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#judgeScanImage": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#gemGradScan": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#judgeTextScanState": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#judgeTextScanQuery": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#gemGradTextScan": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#judgeResultState": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#resCategory": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#resTitle": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#resActionTag": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#resBody": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#resCandidates": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#resTip": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#hold-registration-form": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#holdItemName": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#registerHoldBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#practiceActionRow": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#btnLogPractice": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#customModal": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#modalBox": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#modalIcon": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#modalTitle": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#modalDesc": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#modalCancelBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#modalConfirmBtn": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#fire_app_check_[DEFAULT]": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#g-recaptcha-response": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  }
+}

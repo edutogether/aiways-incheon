@@ -1,0 +1,522 @@
+{
+  "#authGate": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#authGateContent": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:다시 시도": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#appRoot": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:🔍 판단": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:🎮 퀴즈": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:🌱 통계": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:❓ 보류함": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#tab-judge": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupBanner": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupBannerGoBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupBannerDismissBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#judge-stat-count": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#judge-stat-carbon": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#judge-stat-hold": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#photoInput": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#photoTriggerBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#searchEmojiIcon": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#searchInput": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#searchTriggerBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#search-suggestions": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#quickSelectGrid": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:🥛우유갑종이팩류 검토": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:📦택배상자종이류 검토": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:🥤플라스틱컵플라스틱류": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:🍜컵라면 용기재질·오": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:🍪과자 봉지비닐류 또": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:🥫캔류캔류 검토": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:🧴페트병플라스틱류 검": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:🍾유리병유리류 검토": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:☕종이컵종이류 확정 금": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:🛍️비닐 봉투비닐류 ": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:🧾영수증일반폐기물 검": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:🔋건전지폐건전지 전용": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#holdQuickBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#tab-quiz": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#quizRankLadder": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#quiz-box": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#quiz-progress": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#quiz-score": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#quiz-progress-bar": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#quiz-emoji": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#quiz-question": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#quiz-buttons": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:O": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "button:X": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#quiz-explanation-panel": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#explanation-box-color": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#explanation-emoji": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#explanation-title": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#explanation-desc": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#nextQuizBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#quiz-result-summary": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#quiz-result-title": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#quiz-result-message": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#quiz-result-score-text": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#restartQuizBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#tab-stats": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupCard": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupRoleGroup": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupRoleHomeroomBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupRoleStudentBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupSchoolInput": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupSchoolCode": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupSchoolResults": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupGradeInput": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupClassInput": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupStudentFields": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupNumberInput": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupNameInput": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupHomeroomFields": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupHomeroomNameInput": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupTeacherCodeInput": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupSubmitButton": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupStatus": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#interimClassCard": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#classSchoolInput": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#classSchoolCode": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#classSchoolResults": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#classGradeInput": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#classNumInput": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#classContextStatus": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#classRankingCard": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#classRankingRefreshBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#classRankingStatus": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#classRankingList": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#stat-count": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#stat-carbon": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#stat-hold": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#resetStatsBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#practice-logs-container": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#no-logs-msg": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#tab-hold": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#directHoldInput": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#addHoldDirectBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#hold-count-badge": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#resetHoldBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#hold-list-container": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#no-hold-items-msg": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#gemGradBanner": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#judgeModal": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#judgeModalBox": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#judgeModalClose": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#judgeScanState": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#judgeScanImage": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#gemGradScan": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#judgeTextScanState": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#judgeTextScanQuery": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#gemGradTextScan": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#judgeResultState": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#resCategory": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#resTitle": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#resActionTag": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#resBody": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#resCandidates": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#resTip": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#hold-registration-form": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#holdItemName": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#registerHoldBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#practiceActionRow": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#btnLogPractice": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#customModal": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#modalBox": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#modalIcon": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#modalTitle": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#modalDesc": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#modalCancelBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#modalConfirmBtn": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#fire_app_check_[DEFAULT]": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#g-recaptcha-response": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  }
+}

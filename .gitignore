@@ -17,3 +17,7 @@ build/
 *.log
 .env
 .cache/
+
+# Playwright 실행 산출물(실패 시 생기는 actual/diff 이미지 등)
+test-results/
+playwright-report/

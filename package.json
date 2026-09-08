@@ -1,0 +1,13 @@
+{
+  "name": "aiways-incheon",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "baseline:capture": "playwright test tests/baseline/capture.spec.js --update-snapshots",
+    "static": "node functions/test/localStaticServer.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0"
+  }
+}

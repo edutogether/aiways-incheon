@@ -59,7 +59,15 @@
     name: "AI Ways Seed 분리수거 Skill",
     description: "PLASTIC, METAL, PAPER 분류를 참고 정보로 제공하는 Seed Teachable Machine Skill입니다.",
     modelType: "teachable_machine_image",
-    modelBaseUrl: "https://edutogether.github.io/aiways-incheon/assets/models/aiways-seed-recycling-v1/",
+    // 2026-09-09: 폐기된 GitHub Pages 주소가 하드코딩돼 있었다. 모델 파일은
+    // 이 저장소 assets/models/ 안에 있고 같이 배포되는데 외부 도메인을 거치고
+    // 있었고, CSP connect-src에 그 도메인이 없어서 라이브에서는 이미 fetch가
+    // 차단된 상태였다(구 도메인이 아직 200을 주는 탓에 코드만 봐서는 멀쩡해
+    // 보였다). 지금 페이지가 서빙되는 오리진에서 파생시켜 항상 동일 출처가
+    // 되게 한다 - CSP 'self'로 통과하고, 도메인이 바뀌어도 따라간다.
+    // canonicalModelBaseUrl이 절대 https URL만 받고 localhost를 금지하므로
+    // 상대경로 문자열로는 둘 수 없다.
+    modelBaseUrl: new URL("./assets/models/aiways-seed-recycling-v1/", window.location.href).href,
     modelVersion: "layers-model",
     version: 1,
     classes: ["PLASTIC", "METAL", "PAPER"],

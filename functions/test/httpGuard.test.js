@@ -18,6 +18,10 @@ test("isAllowedOrigin accepts the production origins and localhost dev ports onl
   assert.equal(isAllowedOrigin("https://ai-ways-incheon.web.app"), true);
   assert.equal(isAllowedOrigin("https://ai-ways-incheon.firebaseapp.com"), true);
   assert.equal(isAllowedOrigin("https://edutogether.kr"), true);
+  // 아직 도메인이 안 붙었지만 붙는 순간 바로 통해야 해서 미리 넣어둔 출처.
+  assert.equal(isAllowedOrigin("https://aiways.edutogether.kr"), true);
+  // 서브도메인이라고 아무거나 통과하면 안 된다.
+  assert.equal(isAllowedOrigin("https://evil.edutogether.kr"), false);
   assert.equal(isAllowedOrigin("http://localhost:5173"), true);
   assert.equal(isAllowedOrigin("http://127.0.0.1:8080"), true);
   assert.equal(isAllowedOrigin("https://evil.example.com"), false);

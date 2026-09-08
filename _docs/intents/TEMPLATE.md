@@ -1,5 +1,5 @@
 <!--
-새 intent를 쓸 때 이 파일을 docs/intents/YYYY-MM-DD-슬러그/intent.md로 복사해서
+새 intent를 쓸 때 이 파일을 _docs/intents/YYYY-MM-DD-슬러그/intent.md로 복사해서
 채운다. 등급 1이면 문제/원하는 결과/제약만 채우고 나머지는 지워도 된다. 등급
 2면 전부 채운다. 확인 못 한 값은 "[확인]"으로 표시하거나 미결 질문으로 옮긴다 —
 추측해서 채우지 않는다. (규칙 원본: ../../_shared/intent-kit/intent-workflow.md)

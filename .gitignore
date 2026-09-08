@@ -4,6 +4,11 @@ _hosting_site/
 functions/firestore-debug.log
 .aiways-secrets.local
 .claude/settings.local.json
+# 아래 두 줄은 .git/info/exclude에만 있었다(로컬 전용이라 클론·타 도구에
+# 안 따라감) - 다른 PC나 Codex에서 열었을 때 에이전트 worktree가 통째로
+# 커밋되는 것을 막으려고 CONVENTIONS §7 표준대로 여기로 올렸다.
+.claude/worktrees/
+.claude/scheduled_tasks.lock
 
 # COMMON_STANDARDS.md §2 baseline
 node_modules/

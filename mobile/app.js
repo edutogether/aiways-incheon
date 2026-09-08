@@ -978,7 +978,7 @@
     });
   }
 
-  // 2026-09-07(대표님 지시, docs/intents/2026-09-07-hold-resolve-server-sync) -
+  // 2026-09-07(대표님 지시, _docs/intents/2026-09-07-hold-resolve-server-sync) -
   // "해결완료"가 로컬 목록만 지우고 서버 기록(status:"held")은 그대로 두고
   // 있어서, 학급 대시보드의 heldTotal/completedTotal이 실제 해결 여부와
   // 항상 어긋났다. resolveSortingRecord를 실제로 호출해 서버 상태를

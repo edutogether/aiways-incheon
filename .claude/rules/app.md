@@ -1,0 +1,43 @@
+# aiways-incheon 개별 규칙
+헌법(D:\Projects\CLAUDE.md → _shared/CONVENTIONS.md)에 없는 것만.
+
+## 앱
+- 무엇: 인천 지역 초등학교 자원순환(분리배출) 교육용 웹앱. 학생이 모바일로 물건을 찍으면 Gemini가 분리배출 방법을 판정하고, 교사는 PC 대시보드에서 반 현황·랭킹을 본다.
+- 사용자: 파일럿 참여 학교의 실제 초등학생과 담임교사. 상시 운영(행사용 아님). 교원연구회 출품작이며 참여 반 동의서·가정통신문 발송을 마친 상태에서 시작됐다.
+- 배포: Firebase Hosting + Functions. 라이브 <https://ai-ways-incheon.web.app> (2026-09-01에 GitHub Pages에서 이전, 구 주소는 갱신 안 됨)
+
+## 배포 폴더
+- `firebase.json` public = `_hosting_site`. `scripts/stageHostingSite.js`가 **화이트리스트로** 골라 담는 스테이징 디렉터리라 `_docs/`, `docs/`, `.claude/`, `functions/`, `scripts/`는 애초에 들어갈 수 없다 — 블랙리스트가 아니라 화이트리스트라는 점이 이 저장소의 안전장치다(확인일 9/8)
+- 그래서 **새 정적 파일을 추가했는데 배포에 안 올라가면** 그 화이트리스트에 없어서다. 파일 추가 시 `scripts/stageHostingSite.js`도 같이 볼 것
+
+## 데이터
+- 개인정보·미성년자 데이터: **있음.** 초등학생의 학교(NEIS 코드)/학년/반/번호 + 자율입력 이름. GPS는 교내·교외 판정 결과(boolean)만 저장하고 좌표 자체는 저장하지 않는다
+- 보관·삭제 정책: 90일 자동삭제는 폐지된 결정(자동삭제 없음). 삭제 요청 대응 경로는 교사가 실행하는 익명화(`anonymizeStudent`)이며, 현재 소속 반 개인랭킹 문서와 과거 기록의 `classContext` PII까지 함께 정리한다
+- rules: `firestore.rules` 있음 + 에뮬레이터 rules 테스트(`test/firestoreRulesEmulatorSmoke.js`) 있음. 클라이언트가 반 집계를 실시간 구독하므로 rules가 실제 방어선이다 — `students` 서브컬렉션은 커스텀 클레임이 맞아도 계속 차단한다
+
+## 이 앱에서 절대 하면 안 되는 것
+- **PC 화면의 시각적 레이아웃·디자인을 건드리지 않는다.** `index.html` / `style.css` / `styles/` / `app.js`의 렌더링·배치·폰트·반응형 CSS는 Bumm님이 직접 관리하는 영역이다. 백엔드·기능 작업 중 화면이 깨져 보여도 고치지 말고 목록으로 보고만 한다. 화면 모양을 바꾸지 않는 동작 수정(로깅 추가, 버그 수정)은 정상 진행한다
+- **개인랭킹("우리반 실천왕")의 자율입력 이름 노출을 재논의하지 않는다** — 실명검증 없이 허용하기로 이미 확정된 제품결정
+- **`google-apps-script/`를 되살리지 않는다** — 2026-08-26에 Firestore 단일 백엔드로 이전 완료, 참고용 보존일 뿐
+- **`mobile-freeze-20260812` 태그를 "모바일은 동결"이라는 뜻으로 읽지 않는다.** 이 태그는 2026-08-19~25 백엔드 전면 재설계 **이전**의 낡은 롤백 지점일 뿐이고, 그 뒤로도 `mobile/`에는 정상적으로 개발·승인이 계속됐다(3단 권한체계 8/31, 가입경로 통합 9/2 등). `mobile/`은 다른 폴더와 똑같이 작업 대상이다 — 2026-09-07에 팀장 세션이 이 혼동을 명시적으로 정정했다. 단 태그 자체는 삭제·이동하지 않는다(pre-push 훅이 막는다)
+
+## 명령
+루트에 `package.json`이 없다. 전부 `functions/`에서 실행한다.
+- 테스트: `cd functions && npm test` (vitest)
+- 린트: `cd functions && npm run lint`
+- 문법 검사: `cd functions && npm run check`
+- 에뮬레이터: `cd functions && npm run emulator:test:<이름>` — 파일 하나당 스크립트 하나(전체 목록은 `functions/package.json`)
+- 로컬 데모 데이터: `node functions/scripts/seedLocalPreviewDemo.js` 후 `?auth-emulator=1`로 접속
+- 배포 후 라이브 확인: `node scripts/postDeploySmoke.js` (코드가 아니라 실제 라이브 응답을 보는 유일한 층)
+
+## 자주 틀리는 것
+- **`functions/package.json`의 `check`는 하드코딩 목록이다.** 새 파일을 추가하고 여기 안 넣으면 문법 게이트에서 조용히 빠진다. eslint는 `functions/` 안만 보므로 루트 `.js`는 어느 게이트에도 안 걸린다 — 2026-09-07 감사에서 실제로 9개가 빠져 있었다
+- **새 에뮬레이터 테스트는 네 군데에 등록해야 한다**: `vitest.emulator.config.js`의 `include`(빠지면 "No test files found") / `eslint.config.js`의 globals 오버라이드(빠지면 `'test' is not defined`) / `functions/package.json`(`check` + 새 `emulator:test:*` 스크립트) / `.github/workflows/deploy.yml` 스텝
+- **에뮬레이터 테스트는 파일당 별도 프로세스로 격리한다** — 여러 파일이 같은 `teacherCodes` 문서 ID나 같은 `cb5_actor_*` 매트릭스를 써서 한 프로세스에 몰면 문서 경합으로 깨진다
+- **무거운 테스트의 타임아웃은 실측으로 정한다** — 기본 20초인데 `cb5RecordResolveRecoveryEmulatorIntegration.js`만 실측 1분 26초라 파일 안에서 개별 타임아웃을 준다. 추측으로 늘리지 말 것
+- **`saveSortingRecord`/`listSortingRecords`/`resolveSortingRecord`/`checkStudentProfile` 네 개는 일부러 `emulatorAppCheck`에서 빠져 있다** — 스모크 테스트가 실제 App Check 강제를 검증하기 때문이다. "일관성이 없어 보인다"고 우회를 추가하면 CI가 깨진다(실제로 한 번 깨뜨렸다)
+- **레이트리밋이 전역/액터별 두 층이다.** 테스트에 가짜 시계를 주입할 땐 두 리미터와 대상 핸들러 **전부**에 같은 시계를 넣어야 한다 — 하나라도 실제 시계면 엉뚱한 리미터에 먼저 걸려 정작 검증하려던 로직에 도달하지 못한다
+- **`transaction.set(ref, data, { merge: false })`는 문서를 통째로 갈아엎는다** — 나열 안 한 `status`/`plan`이 날아가 기기가 영구 잠긴 사고가 있었다. 필드 몇 개만 지우려면 `{ merge: true }` + `FieldValue.delete()`
+- **폴링 주기를 줄일 땐 반드시 `perMinute`/`perDay` 상한과 같이 계산한다** — 계산 없이 줄였다가 등교시간에 켠 대시보드가 점심 전에 조용히 멈춘 장애가 있었다
+- **실패한 CI를 그냥 재실행하지 않는다** — `gh run view --log-failed`로 원인부터 확인한다
+- **새 클론·새 worktree에서는 `git config core.hooksPath .githooks`를 한 번 실행해야** freeze 태그 보호 훅이 켜진다(루트에 package.json이 없어 자동 설치가 안 됨)

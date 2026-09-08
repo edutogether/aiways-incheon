@@ -3,7 +3,7 @@ name: Deploy
 # 2026-09-01: GitHub Pages에서 Firebase Hosting으로 이전(Bumm님 지시) -
 # 예전 .github/workflows/deploy-pages.yml을 대체한다. GitHub Pages 시절
 # 겪었던 "레거시 브랜치 배포가 저장소 전체를 공개했던" 사고(functions/
-# 백엔드 소스, HANDOFF.md 등이 실제로 노출됐음 - CLAUDE.md 참고)를
+# 백엔드 소스, 인수인계 문서 등이 실제로 노출됐음 - CLAUDE.md 참고)를
 # 반복하지 않도록, Firebase Hosting도 여전히 scripts/stageHostingSite.js로
 # 화이트리스트 스테이징한 파일만 배포한다(firebase.json의
 # hosting.public이 그 스테이징 결과물만 가리킴).
@@ -273,7 +273,7 @@ jobs:
       # _hosting_site로 골라 담는다(scripts/stageHostingSite.js, 로컬
       # 수동 배포와 같은 스크립트 재사용 - 화이트리스트가 CI/로컬에서
       # 갈라지지 않게). functions/(백엔드 소스), docs/, scripts/,
-      # google-apps-script/, HANDOFF.md/CLAUDE.md/README.md,
+      # google-apps-script/, _docs/, CLAUDE.md/AGENTS.md/README.md,
       # firebase*.json/firestore.*는 여기 없으면 배포물에 안 들어간다.
       - name: Stage public files only
         run: node scripts/stageHostingSite.js

@@ -2,7 +2,7 @@
 // Firebase Hosting은 "public" 디렉토리 안의 파일을 전부(ignore 패턴 제외)
 // 공개하는 블랙리스트 모델이다 - 이 저장소는 과거 GitHub Pages legacy
 // 브랜치 배포에서 이 실수(path:.로 저장소 전체가 공개됨, functions/lib
-// 소스·HANDOFF.md 등 유출)를 이미 한 번 겪었다(CLAUDE.md 참고). 그래서
+// 소스·인수인계 문서 등 유출)를 이미 한 번 겪었다(CLAUDE.md 참고). 그래서
 // Firebase Hosting으로 옮기면서도 같은 실수를 반복하지 않도록, 실제
 // 배포 대상만 화이트리스트로 골라 별도 스테이징 디렉토리(_hosting_site)에
 // 모으고, firebase.json의 "public"은 그 스테이징 디렉토리만 가리키게

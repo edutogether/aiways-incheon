@@ -464,7 +464,7 @@
     return Array.from(bytes, value => Number(value >>> 0).toString(36)).join("-");
   }
 
-  // Fire-and-forget: this is the actual network call HANDOFF.md flagged as
+  // Fire-and-forget: this is the actual network call _docs/ops/HANDOFF.md flagged as
   // missing ("mobile/에 fetch가 단 한 줄도 없다"). It never blocks the UI --
   // the student's confirmation is already reflected locally before this
   // resolves, matching the "사진찍는 것도 귀찮은데" no-friction requirement.

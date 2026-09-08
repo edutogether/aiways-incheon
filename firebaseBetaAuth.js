@@ -24,7 +24,7 @@
   }
   async function getEdu2gDeviceSession({ forceRefresh = false } = {}) { const { auth } = await getBetaAuth(); const user = auth.currentUser; if (!user) throw new Error("anonymous_auth_unavailable"); return { uid: user.uid, idToken: await user.getIdToken(!!forceRefresh) }; }
   // 로컬 에뮬레이터 검증 시엔 실제 App Check 토큰을 못 딴다(localhost가
-  // reCAPTCHA를 막음, HANDOFF.md에 이미 기록된 제약) - 서버쪽도
+  // reCAPTCHA를 막음, _docs/ops/HANDOFF.md에 이미 기록된 제약) - 서버쪽도
   // functions/index.js의 emulatorAppCheck가 같은 조건(FUNCTIONS_EMULATOR)
   // 으로 검증을 건너뛰므로, 클라이언트도 여기서만 App Check 헤더 없이
   // 요청을 보낸다. 프로덕션(emulatorRequested()===false)에서는 기존과

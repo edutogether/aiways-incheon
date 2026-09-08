@@ -19,4 +19,11 @@ AI와 데이터로 학교 자원순환 UX를 개선하는 H-A-H 기반 수업 �
 
 ## 배포
 
-GitHub Pages는 `main` 브랜치의 root 기준으로 배포합니다. `.nojekyll`을 유지해 정적 파일이 그대로 배포되게 합니다.
+**Firebase Hosting** — 라이브 주소는 <https://ai-ways-incheon.web.app>입니다(2026-09-01에 GitHub Pages에서 이전했고, 구 주소 `edutogether.github.io/aiways-incheon/`은 더 이상 갱신되지 않습니다). `main` 브랜치에 푸시하면 `.github/workflows/deploy.yml`이 test → deploy-backend(Firestore rules/indexes/Functions) → deploy-hosting 순서로 배포합니다. 배포에 올라가는 파일은 `scripts/stageHostingSite.js`가 화이트리스트로 골라 담습니다.
+
+## 문서
+
+- `CLAUDE.md` — 저장소 전역 규칙과 정착된 결정(클로드 세션이 자동으로 읽음)
+- `AGENTS.md` — 도구 종류와 무관하게 알아야 할 명령·함정(Codex 등 타 도구용)
+- `_docs/ops/` — 운영 문서(인수인계 일지, 배포 준비 패키지)
+- `docs/intents/` — 작업 전에 쓰는 intent 문서

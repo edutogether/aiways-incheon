@@ -31,6 +31,9 @@
 - 배포 후 라이브 확인: `node scripts/postDeploySmoke.js` (코드가 아니라 실제 라이브 응답을 보는 유일한 층)
 
 ## 자주 틀리는 것
+- **App Check가 ENFORCED라 자동화 브라우저(Playwright 등)는 라이브에서 403 `App attestation failed`를 받는다. 이건 라이브 장애가 아니라 정상 동작이다.** reCAPTCHA Enterprise가 사람/봇 점수를 매기는데 자동화 브라우저는 `navigator.webdriver === true`라 낮은 점수를 받고 App Check가 그 토큰을 거부한다 — **헤드풀(`channel:"chrome"`)로 띄워도 똑같다. 헤드리스 여부가 아니라 자동화 여부가 감지된다.** 2026-09-09에 이 세션이 "라이브 다운"으로 오판해 보고했고, 같은 날 CLASSCADE도 같은 함정에 걸렸다. 라이브가 실제로 살아 있는지는 **사람이 실제 휴대폰으로 열어보는 것**이 유일하게 확실한 확인이다
+- **자동화로 인증 이후 흐름을 보려면 디버그 토큰이 필요하고, 그건 localhost에서만 켜진다.** `firebaseAppCheck.js`의 `debugMode()`는 hostname이 `localhost`/`127.0.0.1`이고 쿼리에 `appcheck-debug=1`이 있을 때만 참이다(라이브 주소에서는 절대 안 켜진다). 그 상태로 열면 콘솔에 새 UUID가 찍히는데, **그 UUID를 Firebase 콘솔 > App Check > 앱 > 디버그 토큰 관리에 등록해야** 통과한다. Playwright는 실행마다 새 프로필이라 UUID가 매번 바뀌므로, 고정 토큰을 쓰려면 `?appcheck-debug=1` 없이 `addInitScript`로 `self.FIREBASE_APPCHECK_DEBUG_TOKEN = "<등록한 UUID>"`를 앱 스크립트보다 먼저 심는다(쿼리를 주면 코드가 `= true`로 덮어써서 매번 새로 생성된다). **등록된 디버그 토큰은 App Check를 우회하는 값이라 저장소에 커밋하지 않는다**
+
 - **`functions/package.json`의 `check`는 하드코딩 목록이다.** 새 파일을 추가하고 여기 안 넣으면 문법 게이트에서 조용히 빠진다. eslint는 `functions/` 안만 보므로 루트 `.js`는 어느 게이트에도 안 걸린다 — 2026-09-07 감사에서 실제로 9개가 빠져 있었다
 - **새 에뮬레이터 테스트는 네 군데에 등록해야 한다**: `vitest.emulator.config.js`의 `include`(빠지면 "No test files found") / `eslint.config.js`의 globals 오버라이드(빠지면 `'test' is not defined`) / `functions/package.json`(`check` + 새 `emulator:test:*` 스크립트) / `.github/workflows/deploy.yml` 스텝
 - **에뮬레이터 테스트는 파일당 별도 프로세스로 격리한다** — 여러 파일이 같은 `teacherCodes` 문서 ID나 같은 `cb5_actor_*` 매트릭스를 써서 한 프로세스에 몰면 문서 경합으로 깨진다

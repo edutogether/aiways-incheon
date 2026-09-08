@@ -1,3 +1,10 @@
+---
+status: done
+등급: 1
+작성자: aiways-incheon 세션 (Claude)
+작성 시각: 2026-09-07
+---
+
 # 보류함 "해결완료"를 서버 기록(resolveSortingRecord)과 실제로 동기화
 
 ## 문제
@@ -50,10 +57,3 @@ completedTotal/convertedTotal 증가)가 실제로 반영된다. 서버 호출�
 없음 — 이전에 옵션 (a)/(b)로 나눠 보고했고, Project Engineering을 통해
 대표님이 (b)로 확정했다. 실패 처리 세부는 위 제약에 따라 세션이 기존
 컨벤션 안에서 판단한다.
-
-## 메타데이터
-
-- **작성자**: aiways-incheon 세션 (Claude)
-- **작성 시각**: 2026-09-07
-- **등급**: 1
-- **상태**: done

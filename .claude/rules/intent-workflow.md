@@ -1,6 +1,6 @@
 # Intent 워크플로
 
-이 문서는 `docs/intents/`를 쓰는 모든 저장소가 공유하는 규칙 원본이다. 원본은
+이 문서는 `_docs/intents/`를 쓰는 모든 저장소가 공유하는 규칙 원본이다. 원본은
 `D:\Projects\_shared\intent-kit\intent-workflow.md` 하나뿐이고, 각 저장소는
 `.claude/rules/intent-workflow.md`에 이 파일의 사본을 둔다(그래야 git에 들어가고,
 그 저장소만 따로 클론해도 규칙이 같이 딸려온다). 사본을 고칠 일이 생기면 원본을
@@ -42,7 +42,7 @@ CLAUDE.md는 "이 저장소는 항상 이렇게 동작한다"는 **상시 규칙
 ## 폴더 구조
 
 ```
-docs/intents/
+_docs/intents/
   README.md              (등급표 + 인덱스 표 — README-template.md에서 복사)
   TEMPLATE.md             (TEMPLATE.md에서 복사, 새 intent 쓸 때 이걸 복사해서 시작)
   00-charter.md            (선택 — 초기 개발 단계에서 건별 intent 대신 쓰는 전체 헌장)
@@ -52,7 +52,17 @@ docs/intents/
 
 ## 상태
 
-intent.md의 메타데이터에 상태를 적는다: `draft`(작성 중) → `active`(이 방향으로
-작업 중) → `done`(반영 완료) / `abandoned`(안 하기로 함, 이유를 한 줄 남김).
+intent.md의 frontmatter `status`에 상태를 적는다(폴더 이동으로 표시하지 않는다):
+
+`draft`(작성 중) → `accepted`(이 방향으로 하기로 승인됨) → `in-progress`(작업 중)
+→ `done`(반영 완료) | `dropped`(안 하기로 함, 이유를 한 줄 남김)
+
+**상태를 바꾸는 것은 Bumm님이다.** 세션이 임의로 `draft`를 `accepted`로 올리지 않는다 —
+승인을 기록하는 자리이기 때문이다. 상태가 바뀔 때마다 별도 커밋으로 남긴다
+(예: `docs: intent(슬러그) accepted (승인 Bumm 9/6)`).
+
 `done`이 됐다고 폴더를 지우지 않는다 — 나중에 "왜 그때 이렇게 안 했지"를 다시
 물었을 때 답할 수 있는 기록이 그 자체로 가치가 있다.
+
+(이 상태값은 `_shared/CONVENTIONS.md` §1.6과 같아야 한다. 2026-09-08에 두 문서가
+서로 다른 상태값을 쓰고 있던 것을 발견해 헌법 쪽으로 맞췄다.)

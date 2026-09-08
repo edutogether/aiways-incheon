@@ -51,6 +51,42 @@ const MOTION_PROPS = [
   "animation-iteration-count", "transform"
 ];
 
+// 화면에 안 보이지만 사라지면 기능이 죽거나 접근성이 무너지는 값들.
+// 스크린샷·computed style로는 절대 안 잡힌다 - 다른 저장소(Voice Cinema)가
+// 전환 과정에서 요소 id 20여 개를 잃은 것을 이 대조로 잡았다. 이 앱은
+// app.js/mobile/app.js가 getElementById로 DOM을 직접 붙잡는 구조라
+// **id 하나만 사라져도 그 기능이 조용히 죽는다** - 더 취약하다.
+function dumpSemantics() {
+  const attrsOf = (el, names) => {
+    const out = {};
+    for (const n of names) if (el.hasAttribute(n)) out[n] = el.getAttribute(n);
+    for (const a of el.attributes) if (a.name.startsWith("aria-")) out[a.name] = a.value;
+    return out;
+  };
+  return {
+    // id는 정렬해서 전체를 통째로 비교한다 - 하나라도 없어지면 diff에 뜬다.
+    ids: [...document.querySelectorAll("[id]")].map((e) => e.id).sort(),
+    meta: [...document.querySelectorAll("meta")]
+      .map((m) => `${m.getAttribute("name") || m.getAttribute("property") || m.getAttribute("charset") || "?"}=${(m.getAttribute("content") || "").slice(0, 120)}`)
+      .sort(),
+    title: document.title,
+    lang: document.documentElement.lang,
+    images: [...document.querySelectorAll("img")]
+      .map((i) => `${(i.getAttribute("src") || "").split("/").pop()} | alt=${i.getAttribute("alt")}`)
+      .sort(),
+    links: [...document.querySelectorAll("a[href]")]
+      .map((a) => `${a.getAttribute("href")} | ${(a.textContent || "").trim().slice(0, 30)} | rel=${a.getAttribute("rel") || ""} | target=${a.getAttribute("target") || ""}`)
+      .sort(),
+    inputs: [...document.querySelectorAll("input, select, textarea")]
+      .map((el) => `${el.id || el.name || el.tagName}: ${JSON.stringify(attrsOf(el, ["type", "name", "placeholder", "maxlength", "minlength", "required", "inputmode", "pattern", "autocomplete", "min", "max", "step", "disabled", "readonly"]))}`)
+      .sort(),
+    // 버튼은 접근 가능한 이름이 사라지면 스크린리더에서 "버튼"으로만 읽힌다.
+    buttons: [...document.querySelectorAll("button")]
+      .map((b) => `${b.id || "(무id)"}: ${(b.textContent || "").trim().slice(0, 24)} | ${JSON.stringify(attrsOf(b, ["type", "disabled"]))}`)
+      .sort()
+  };
+}
+
 function keyFor(el) {
   if (el.id) return `#${el.id}`;
   if (el.dataset && el.dataset.role) return `[data-role=${el.dataset.role}]`;
@@ -133,6 +169,10 @@ for (const vp of VIEWPORTS) {
           await button.click();
           await page.waitForTimeout(400);
         }
+
+        // 0) 화면에 안 보이는 값 - id/meta/alt/aria/링크/입력 속성.
+        const semantics = await page.evaluate(dumpSemantics);
+        expect(JSON.stringify(semantics, null, 2)).toMatchSnapshot(`${vp.name}-${tab}.semantics.json`);
 
         // 1) 모션 명세 - 재생을 멈추기 "전"에 선언값을 읽는다.
         const motion = await page.evaluate(dumpStyles, [MOTION_PROPS, false]);

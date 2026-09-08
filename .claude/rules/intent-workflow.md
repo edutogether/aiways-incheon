@@ -1,3 +1,5 @@
+<!-- 원본 최종 수정: 2026-09-08 · 원본 위치: D:\Projects\_shared\intent-kit\intent-workflow.md
+     사본을 가진 저장소는 이 날짜가 자기 사본과 다르면 재복사할 것. 사본에서 직접 고치지 않는다. -->
 # Intent 워크플로
 
 이 문서는 `_docs/intents/`를 쓰는 모든 저장소가 공유하는 규칙 원본이다. 원본은

@@ -53,10 +53,30 @@ npm test
 
 **Firebase Hosting** — 라이브 주소는 <https://incheon.edutogether.kr>입니다(2026-09-01에 GitHub Pages에서 이전했고, 구 주소 `edutogether.github.io/aiways-incheon/`은 더 이상 갱신되지 않습니다). `main` 브랜치에 푸시하면 `.github/workflows/deploy.yml`이 test·frontend → deploy-backend(Firestore rules/indexes/Functions) → deploy-hosting 순서로 배포합니다. `deploy-hosting`은 `mobile-app`을 빌드해 `mobile/`을 만든 뒤 배포하고, 배포에 올라가는 파일은 `scripts/stageHostingSite.js`가 화이트리스트로 골라 담습니다(빌드를 잊으면 여기서 멈춥니다).
 
+## 어떻게 만들어졌는가
+
+이 저장소는 **화면이 안 바뀐 것을 증명하는 방식**으로 큰 변경을 처리한다.
+2026-09-09의 모바일 앱 React 전환이 그 예다.
+
+- **옮기기 전에 기준선을 만들어 고정한다.** 4개 뷰포트 × 13개 화면 상태에서
+  좌표·크기·색·타이포, 애니메이션 **선언값**, 그리고 화면에 안 보이는 값
+  (id 집합·`meta`·`alt`·`aria`·입력 속성)까지 잰다
+- **옮긴 뒤 그 파일을 그대로 두고 통과시킨다.** 통과시키려고 다시 찍으면
+  증명이 아니다
+- **검사가 실제로 무언가를 봤는지 확인한다.** 일부러 훼손해 빨간불이 뜨는 것을
+  본 뒤에 그 검사를 믿는다. 실제로 이 방식으로 "3주 동안 아무 값도 재지 않던
+  기준선"을 찾아낸 적이 있다
+- **되돌리는 길을 먼저 만든다.** 복구 지점 태그를 찍고, 되돌리는 명령을 적고,
+  **실제로 되돌려 같은 화면이 나오는지 확인한 뒤**에 바꾼다
+
+무엇이 언제 왜 바뀌었는지는 [`_docs/CHANGELOG.md`](_docs/CHANGELOG.md)에,
+작업 전에 세운 계획과 제약은 [`_docs/intents/`](_docs/intents/)에 있다.
+
 ## 문서
 
 - `CLAUDE.md` — 저장소 전역 규칙과 정착된 결정(클로드 세션이 자동으로 읽음)
 - `AGENTS.md` — 도구 종류와 무관하게 알아야 할 명령·함정(Codex 등 타 도구용)
-- `_docs/ops/` — 운영 문서(인수인계 일지, 배포 준비 패키지)
+- `_docs/CHANGELOG.md` — 무엇이 언제 왜 바뀌었는가(연대기)
+- `_docs/ops/` — 사람이 손으로 따라 하는 절차(인수인계 일지, 배포 준비, 보안 운영 종료)
 - `_docs/intents/` — 작업 전에 쓰는 intent 문서
 - `_docs/archive/` — 지나간 시점의 기록(스테이지 산출물, 과거 감사)

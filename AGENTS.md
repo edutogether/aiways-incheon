@@ -64,6 +64,11 @@ npm run build:mobile  # 전환 산출물만 빌드 -> mobile-next/ (git에 안 �
 로컬에서 실제 화면을 클릭해 보려면 `node functions/scripts/seedLocalPreviewDemo.js`로 데모
 데이터를 심고 `?auth-emulator=1` 쿼리를 붙여 접속한다.
 
+## 이력
+
+무엇이 언제 왜 바뀌었는지는 `_docs/CHANGELOG.md`에 있다. **배포·수정이 나갈 때마다
+여기에 한 줄씩 남긴다** — 커밋 메시지는 근거를, CHANGELOG는 연대기를 담는다.
+
 ## 배포
 
 `main`에 푸시하면 `.github/workflows/deploy.yml`이 test → deploy-backend(rules/indexes/Functions)

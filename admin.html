@@ -11,6 +11,13 @@
     <!-- CSP는 2026-09-01 Firebase Hosting 이전과 함께 firebase.json의
          hosting.headers로 옮겼다(index.html과 동일한 이유). -->
     <style>
+      /* 🔴 이 한 줄이 없으면 hidden 속성이 무력화된다(2026-09-09 Bumm님이 화면을
+         열어보고 지적하셨다 - 로그인 전인데 발급 화면이 그대로 보였다).
+         브라우저 기본 스타일의 [hidden]{display:none}은 **작성자 스타일에 진다.**
+         아래 section 규칙이 display:grid를 걸어 두었으므로, hidden 속성이 붙어
+         있어도 계속 그려졌다. admin.js가 로그인 성공 시 hidden=false로 바꾸지만
+         애초에 숨겨진 적이 없었다. tests/adminAuthGate.spec.js가 이걸 지킨다. */
+      [hidden] { display: none !important; }
       body { font-family: -apple-system, "Pretendard", sans-serif; background: #0f172a; color: #e2e8f0; display: grid; place-items: center; min-height: 100vh; margin: 0; }
       main { width: min(420px, 92vw); display: grid; gap: 1.25rem; }
       h1 { font-size: 1.1rem; margin: 0; }

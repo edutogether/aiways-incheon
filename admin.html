@@ -26,6 +26,11 @@
       input { padding: .6rem .7rem; border-radius: .5rem; border: 1px solid #334155; background: #0f172a; color: #e2e8f0; font-size: .9rem; }
       button { padding: .6rem .8rem; border-radius: .5rem; border: none; background: #2563eb; color: #fff; font-weight: 700; font-size: .85rem; cursor: pointer; }
       button:hover { background: #1d4ed8; }
+      label { font-size: .78rem; color: #94a3b8; margin-bottom: -.35rem; }
+      label[for="teacherCodeAddMode"] { display: flex; align-items: center; gap: .4rem; color: #e2e8f0; font-size: .85rem; margin: .35rem 0 0; }
+      .step { font-size: .82rem; font-weight: 700; color: #93c5fd; margin: .75rem 0 .15rem; border-top: 1px solid #334155; padding-top: .75rem; }
+      .step:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+      input[readonly] { opacity: .55; cursor: not-allowed; }
       p[role="status"] { font-size: .8rem; color: #94a3b8; margin: 0; min-height: 1em; }
     </style>
   </head>
@@ -40,33 +45,60 @@
         <p id="adminLoginStatus" role="status" aria-live="polite"></p>
       </section>
       <section id="teacherCodeSection" hidden>
-        <h2>교사 인증코드 발급/회전</h2>
+        <h2>교사 인증코드</h2>
+        <!-- 2026-09-09(Bumm님 지시): 화면을 처음 여는 사람이 "어디서부터 뭘
+             써야 되냐"고 물으셨다. 만든 사람만 아는 순서로 되어 있었다는
+             뜻이라, 단계에 번호를 붙이고 각 칸이 무엇을 받는지를 라벨로
+             드러낸다. 화려할 필요는 없고 위에서 아래로 따라갈 수 있으면 된다. -->
+        <p class="step">① 학교 고르기</p>
+        <!-- 첫 칸이 "학교 코드(NEIS 표준학교코드, 숫자)"였다. 그 숫자를 아는
+             사람은 없다. 등록된 학교가 4개뿐이니 고르는 방식으로 바꾸고,
+             다른 학교를 다뤄야 할 때를 위해 "직접 입력"을 남긴다. -->
+        <label for="teacherCodeSchoolPreset">학교</label>
+        <select id="teacherCodeSchoolPreset">
+          <option value="">학교를 고르세요</option>
+        </select>
+        <label for="teacherCodeSchoolId" id="teacherCodeSchoolIdLabel" hidden>학교 코드 (NEIS 표준학교코드, 숫자)</label>
+        <input type="text" id="teacherCodeSchoolId" placeholder="예: 7321030" hidden />
+
+        <p class="step">② 학년·반 고르기</p>
         <!-- 2026-09-09(Bumm님 지시): 학년·반을 숫자로 직접 치던 것을 고르는
              방식으로 바꿨다. 없는 반의 코드가 발급되면 아무도 쓸 수 없는
              코드가 생기고, 현장에서 왜 안 되는지 아무도 모른다.
              학급 수 출처는 NEIS 학급정보(schoolClassCounts.js). -->
-        <select id="teacherCodeSchoolPreset">
-          <option value="">학교를 고르세요</option>
-        </select>
-        <input type="text" id="teacherCodeSchoolId" placeholder="학교 코드 (NEIS 표준학교코드, 숫자)" />
+        <label for="teacherCodeGrade">학년</label>
         <select id="teacherCodeGrade"><option value="">학년</option></select>
+        <label for="teacherCodeClassNum">반</label>
         <select id="teacherCodeClassNum"><option value="">반</option></select>
         <p id="teacherCodeClassSource"></p>
-        <input type="text" id="teacherCodeValue" placeholder="새 인증코드 (학교·학년·반을 넣으면 자동으로 채워집니다)" />
+
+        <p class="step">③ 코드 확인하고 발급</p>
+        <label for="teacherCodeValue" id="teacherCodeValueLabel">이 반의 인증코드</label>
+        <input type="text" id="teacherCodeValue" placeholder="학교·학년·반을 고르면 자동으로 채워집니다" />
         <p id="teacherCodeHint"></p>
+        <p id="teacherCodeReplaceNote"></p>
         <!-- 2026-09-09(Bumm님 결정): 한 반이 코드를 여러 개 받는다.
              다른 반 선생님들은 규칙 코드(SEOHEUNG103)를 쓰고, 네 분은
              개인 코드(EDU2G SANGHYUN)를 쓰는데 **둘 다 통해야 한다.**
-             체크하면 기존 코드를 두고 하나 더 붙인다. -->
+             체크하면 기존 코드를 두고 하나 더 붙인다.
+             🔴 체크박스 바로 아래 칸이 "추가할 코드를 적는 칸"으로 읽힌다는
+             지적을 받아, 실제로 그렇게 만들었다 - 위 칸에 개인 코드를 적고
+             아래 칸에 이름을 적는 구조는 만든 사람만 안다. 칸이 아예 다르니
+             "추가 모드에서 코드 칸을 덮어쓰지 않는다"도 구조로 보장된다. -->
         <label for="teacherCodeAddMode">
           <input type="checkbox" id="teacherCodeAddMode" />
-          기존 코드를 두고 <strong>추가</strong>로 등록 (예: 담임 개인 코드 <code>EDU2G SANGHYUN</code>)
+          추가 코드 등록
         </label>
-        <input type="text" id="teacherCodeLabel" placeholder="추가 코드를 누구 것으로 적어둘지 (예: 박상현) — 추가 등록일 때만" />
-        <button type="button" id="teacherCodeSubmitBtn">발급/회전</button>
+        <label for="teacherCodeExtra" id="teacherCodeExtraLabel" hidden>등록할 추가 코드</label>
+        <input type="text" id="teacherCodeExtra" placeholder="예: EDU2G SANGHYUN" hidden />
+        <label for="teacherCodeLabel" id="teacherCodeLabelLabel" hidden>누구 것인지 (예: 박상현)</label>
+        <input type="text" id="teacherCodeLabel" placeholder="박상현" hidden />
+        <!-- 버튼 글자가 상황에 따라 바뀐다. "발급/회전"처럼 두 개를 빗금으로
+             붙여두면 지금 무엇을 하는 건지가 여전히 안 보이고, "회전"은
+             rotate를 그대로 옮긴 개발 용어라 아무도 모른다. -->
+        <button type="button" id="teacherCodeSubmitBtn">코드 발급</button>
         <p id="teacherCodeStatus" role="status" aria-live="polite"></p>
-      </section>
-    </main>
+      </section>    </main>
     <!-- 학급 수 자료. admin.js보다 먼저 와야 한다. -->
     <script defer src="./schoolClassCounts.js"></script>
     <script defer src="./firebaseAppCheck.js"></script>

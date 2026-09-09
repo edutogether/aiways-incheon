@@ -40,7 +40,7 @@
       } catch { return { ok: false, code: "network_error" }; }
       let body = null;
       try { body = await response.json(); } catch {}
-      return { ok: response.ok && body?.ok !== false, code: body?.code || (response.ok ? "ok" : "invalid_response") };
+      return { ok: response.ok && body?.ok !== false, code: body?.code || (response.ok ? "ok" : "invalid_response"), body };
     }
     const appCheckHeaders = await window.AIWaysAppCheck?.getAIWaysAppCheckHeaders?.();
     if (!appCheckHeaders) return { ok: false, code: "app_check_unavailable" };
@@ -52,7 +52,7 @@
     } catch { return { ok: false, code: "network_error" }; }
     let body = null;
     try { body = await response.json(); } catch {}
-    return { ok: response.ok && body?.ok !== false, code: body?.code || (response.ok ? "ok" : "invalid_response") };
+    return { ok: response.ok && body?.ok !== false, code: body?.code || (response.ok ? "ok" : "invalid_response"), body };
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -70,6 +70,7 @@
         await signInWithEmailAndPassword(auth, email, password);
         loginStatus.textContent = "로그인 완료.";
         teacherCodeSection.hidden = false;
+        onLogin();
       } catch {
         loginStatus.textContent = "로그인에 실패했어요. 이메일/비밀번호를 확인해주세요.";
       }
@@ -100,6 +101,15 @@
       // 오히려 낯설다는 이유로 그대로 둔다.
       return `${prefix}${g}${c.padStart(2, "0")}`;
     }
+    const addModeOn = () => $("teacherCodeAddMode")?.checked === true;
+    // 한 요소와 그 라벨을 같이 보이거나 감춘다.
+    function show(id, visible) {
+      const el = $(id);
+      const label = $(`${id}Label`);
+      if (el) el.hidden = !visible;
+      if (label) label.hidden = !visible;
+    }
+
     function refreshDerivedCode() {
       const schoolId = $("teacherCodeSchoolId")?.value;
       const grade = $("teacherCodeGrade")?.value;
@@ -108,27 +118,92 @@
       const hint = $("teacherCodeHint");
       if (!field) return;
       const derived = deriveTeacherCode(schoolId, grade, classNum);
-      // 추가 등록 중에는 코드 칸을 건드리지 않는다.
+      // 2026-09-09(Bumm님 지적) - 추가 코드는 **아예 다른 칸**에 적는다.
       //
-      // 개인 코드(EDU2G SANGHYUN)를 적어 놓고 학년·반을 다시 만지면, 자동
-      // 채움이 그 자리를 규칙 코드로 덮어쓴다. 손으로 발급하는 화면이라
-      // 그 순간을 못 보고 그대로 눌러버리면 **엉뚱한 코드가 추가 등록된다.**
-      const addMode = $("teacherCodeAddMode")?.checked === true;
-      if (addMode) {
-        if (hint) hint.textContent = derived
-          ? `추가 등록 중입니다 - 코드 칸은 그대로 둡니다. 이 반의 규칙 코드는 «${derived}»입니다.`
-          : "추가 등록 중입니다 - 코드 칸은 그대로 둡니다.";
-        return;
-      }
-      if (derived) {
-        field.value = derived;
-        if (hint) hint.textContent = `이 반의 인증코드는 «${derived}»입니다. 그대로 발급하거나 직접 고쳐도 됩니다.`;
-      } else if (hint) {
-        hint.textContent = String(schoolId || "").trim()
-          ? "등록된 4개 학교(서흥·청라·동방·마전)가 아니면 코드를 자동으로 만들지 않습니다. 직접 입력해 주세요."
-          : "";
+      // 예전에는 위쪽 코드 칸에 개인 코드(EDU2G SANGHYUN)를 적고 아래 칸에
+      // 이름을 적는 구조였는데, 화면 배치상 체크박스 바로 아래 칸이 "추가할
+      // 코드를 적는 칸"으로 읽힌다. 만든 사람만 아는 순서였다. 칸을 나누면
+      // "추가 등록 중에는 코드 칸을 덮어쓰지 않는다"도 구조로 보장된다 -
+      // 애초에 자동 채움이 건드리는 칸이 아니다.
+      const addMode = addModeOn();
+      show("teacherCodeExtra", addMode);
+      show("teacherCodeLabel", addMode);
+      // 추가 모드에서 위 칸은 "그 반의 규칙 코드가 무엇인지" 보여주는 용도로만.
+      field.readOnly = addMode;
+      const valueLabel = $("teacherCodeValueLabel");
+      if (valueLabel) valueLabel.textContent = addMode ? "이 반의 규칙 코드 (참고용)" : "이 반의 인증코드";
+      if (derived) field.value = derived;
+      if (hint) {
+        hint.textContent = addMode
+          ? (derived
+            ? `«${derived}»는 그대로 둡니다. 아래 칸에 적은 코드가 하나 더 붙습니다 - 둘 다 통합니다.`
+            : "아래 칸에 적은 코드가 이 반에 하나 더 붙습니다 - 기존 코드도 그대로 통합니다.")
+          : derived
+            ? `이 반의 인증코드는 «${derived}»입니다. 그대로 발급하거나 직접 고쳐도 됩니다.`
+            : String(schoolId || "").trim()
+              ? "등록된 4개 학교(서흥·청라·동방·마전)가 아니면 코드를 자동으로 만들지 않습니다. 직접 입력해 주세요."
+              : "";
       }
     }
+    // 2026-09-09(Bumm님 지시) - 버튼이 "발급/회전"이었다. **"회전"은 rotate를
+    // 그대로 옮긴 개발 용어라 아무도 모르고**, 두 개를 빗금으로 붙여두면 지금
+    // 무엇을 하는 건지가 여전히 안 보인다. 그 반에 코드가 있는지를 서버에
+    // 물어보고 버튼이 그때그때 맞는 말을 하게 한다.
+    //
+    // 서버에 묻는 이유: teacherCodes 문서는 firestore.rules 기본거부에 걸려
+    // 클라이언트가 못 읽는다(해시와 솔트가 든 문서다 - 읽을 수 있으면 안 된다).
+    // teacherCodeStatus는 **있는지 없는지와 개수만** 돌려준다.
+    const MANUAL_SCHOOL = "__manual__";
+    // "확인 못 했다"를 "코드가 없다"와 섞지 않는다(COMMON_STANDARDS §21).
+    let codeExists = null; // true | false | null(모름)
+    let loggedIn = false;
+    let statusToken = 0;
+
+    function refreshSubmitLabel() {
+      const submit = $("teacherCodeSubmitBtn");
+      const note = $("teacherCodeReplaceNote");
+      if (!submit) return;
+      const ready = !!($("teacherCodeSchoolId")?.value.trim() && $("teacherCodeGrade")?.value.trim() && $("teacherCodeClassNum")?.value.trim());
+      if (addModeOn()) {
+        submit.textContent = "추가 코드 등록";
+        if (note) note.textContent = "";
+        return;
+      }
+      submit.textContent = codeExists === true ? "코드 교체" : codeExists === false ? "코드 발급" : "코드 발급 또는 교체";
+      if (!note) return;
+      // 무슨 일이 일어나는지를 그 자리에서 말해주는 것이, 용어를 가르치는
+      // 것보다 낫다(Bumm님).
+      note.textContent = codeExists === true
+        ? "이 반에는 이미 코드가 있습니다. 교체하면 새 코드로 바뀌고 이전 코드는 쓸 수 없습니다."
+        // 🔴 못 물어봤을 때 "발급"이라고 단정하지 않는다. 단정하면 버튼은
+        // 발급이라고 말하는데 실제로는 있던 코드가 교체된다(§21 - 모르는 것을
+        // 아는 것처럼 말하지 않는다).
+        : codeExists === null && ready && loggedIn
+          ? "⚠️ 이 반에 코드가 있는지 확인하지 못했습니다 — 이미 있으면 교체됩니다."
+          : "";
+    }
+
+    async function refreshCodeExistence() {
+      const schoolId = $("teacherCodeSchoolId")?.value.trim();
+      const grade = $("teacherCodeGrade")?.value.trim();
+      const classNum = $("teacherCodeClassNum")?.value.trim();
+      codeExists = null;
+      refreshSubmitLabel();
+      // 로그인 전에는 물어볼 수 없다(서버가 401로 거절한다). 인증 SDK를
+      // 불러오지도 않는다 - 로그인 화면에서 바깥으로 나가는 요청을 만들지 않는다.
+      if (!loggedIn || !schoolId || !grade || !classNum) return;
+      const mine = ++statusToken;
+      const { auth } = await getAuthRef();
+      const user = auth.currentUser;
+      if (!user) return;
+      const idToken = await user.getIdToken();
+      const result = await callSuperadminFunction("teacherCodeStatus", idToken, { schoolId, grade, classNum });
+      // 고르는 사이에 답이 늦게 오면 엉뚱한 반의 결과가 버튼에 붙는다.
+      if (mine !== statusToken) return;
+      codeExists = result.ok ? result.body?.exists === true : null;
+      refreshSubmitLabel();
+    }
+
     // 2026-09-09(Bumm님 지시) - 학년·반을 숫자로 직접 치던 것을 고르는 방식으로.
     //
     // 없는 반의 코드가 발급되면 **아무도 쓸 수 없는 코드**가 생기고, 현장에서
@@ -202,17 +277,27 @@
       const submit = $("teacherCodeSubmitBtn");
       if (submit) submit.disabled = true;
     } else {
+      // 2026-09-09(Bumm님 지적) - 첫 칸이 "학교 코드(NEIS 표준학교코드,
+      // 숫자)"였다. 그 숫자를 아는 사람은 없다. 등록된 학교가 4개뿐이니
+      // 고르는 방식으로 바꾸고, **목록에 없는 학교를 다뤄야 할 때를 위해
+      // 직접 입력하는 길은 없애지 않고 마지막 항목으로 남긴다.**
       fillSelect(
         "teacherCodeSchoolPreset",
-        CLASS_DATA.schools.map((school) => ({ value: school.schoolId, label: `${school.name} (${school.schoolId})` })),
-        "학교를 고르세요 (목록에 없으면 아래에 코드를 직접 입력)",
+        [
+          ...CLASS_DATA.schools.map((school) => ({ value: school.schoolId, label: `${school.short} (${school.schoolId})` })),
+          { value: MANUAL_SCHOOL, label: "직접 입력 (목록에 없는 학교)" }
+        ],
+        "학교를 고르세요",
         ""
       );
       $("teacherCodeSchoolPreset")?.addEventListener("change", (event) => {
+        const manual = event.target.value === MANUAL_SCHOOL;
+        show("teacherCodeSchoolId", manual);
         const field = $("teacherCodeSchoolId");
-        if (field) field.value = event.target.value;
+        if (field) field.value = manual ? "" : event.target.value;
         renderGradeOptions();
         refreshDerivedCode();
+        refreshCodeExistence();
       });
       renderGradeOptions();
     }
@@ -220,39 +305,66 @@
     $("teacherCodeSchoolId")?.addEventListener("input", () => {
       renderGradeOptions();
       refreshDerivedCode();
+      refreshCodeExistence();
     });
     $("teacherCodeGrade")?.addEventListener("change", () => {
       renderClassOptions();
       refreshDerivedCode();
+      refreshCodeExistence();
     });
-    $("teacherCodeClassNum")?.addEventListener("change", refreshDerivedCode);
-    // 체크를 껐다 켤 때도 안내 문구가 따라와야 한다.
-    $("teacherCodeAddMode")?.addEventListener("change", refreshDerivedCode);
+    $("teacherCodeClassNum")?.addEventListener("change", () => {
+      refreshDerivedCode();
+      refreshCodeExistence();
+    });
+    // 체크를 껐다 켤 때도 안내 문구와 버튼 글자가 따라와야 한다.
+    $("teacherCodeAddMode")?.addEventListener("change", () => {
+      refreshDerivedCode();
+      refreshCodeExistence();
+    });
+    // 로그인해야 그 반에 코드가 있는지 물어볼 수 있다(서버가 401로 막는다).
+    // 로그인 직후 지금 고른 반의 상태를 한 번 확인해 버튼 글자를 맞춘다.
+    function onLogin() {
+      loggedIn = true;
+      refreshCodeExistence();
+    }
+    // 첫 화면의 버튼 글자와 칸 보임 여부를 한 번 맞춰 둔다.
+    refreshDerivedCode();
+    refreshSubmitLabel();
+
     $("teacherCodeSubmitBtn")?.addEventListener("click", async () => {
       const status = $("teacherCodeStatus");
       const schoolId = $("teacherCodeSchoolId")?.value.trim();
       const grade = $("teacherCodeGrade")?.value.trim();
       const classNum = $("teacherCodeClassNum")?.value.trim();
-      const code = $("teacherCodeValue")?.value.trim();
+      // 추가 모드면 기존 코드를 두고 하나 더 붙인다(공존). 서버가 대표
+      // 코드가 없는 반에는 추가를 거부하므로, 규칙 코드를 먼저 발급한 뒤에
+      // 개인 코드를 붙이는 순서가 된다.
+      //
+      // 🔴 추가할 코드는 위쪽 칸이 아니라 체크박스 아래 칸에서 온다 -
+      // 그래야 자동 채움이 그 자리를 덮어쓸 길이 애초에 없다.
+      const addMode = addModeOn();
+      const code = (addMode ? $("teacherCodeExtra") : $("teacherCodeValue"))?.value.trim();
       // 버튼을 막아두긴 했지만, 자료 없이 발급이 나가는 길을 하나도 남기지 않는다.
       if (!classDataReady()) { status.textContent = "학급 수 자료를 읽지 못해 발급할 수 없어요."; return; }
-      if (!schoolId || !grade || !classNum || !code) { status.textContent = "학교, 학년, 반, 새 인증코드를 모두 고르거나 입력해주세요."; return; }
+      if (!schoolId || !grade || !classNum) { status.textContent = "학교, 학년, 반을 모두 고르세요."; return; }
+      if (!code) { status.textContent = addMode ? "등록할 추가 코드를 입력해주세요." : "인증코드를 입력해주세요."; return; }
       status.textContent = "처리 중...";
       const { auth } = await getAuthRef();
       const user = auth.currentUser;
       if (!user) { status.textContent = "먼저 로그인해주세요."; return; }
       const idToken = await user.getIdToken();
-      // 추가 모드면 기존 코드를 두고 하나 더 붙인다(공존). 서버가 대표
-      // 코드가 없는 반에는 추가를 거부하므로, 규칙 코드를 먼저 발급한 뒤에
-      // 개인 코드를 붙이는 순서가 된다.
-      const addMode = $("teacherCodeAddMode")?.checked === true;
+      const replacing = codeExists === true;
       const label = $("teacherCodeLabel")?.value.trim() || "";
       const result = await callSuperadminFunction("manageTeacherCode", idToken, {
         schoolId, grade, classNum, code,
         mode: addMode ? "add" : "replace",
         ...(addMode && label ? { label } : {})
       });
-      status.textContent = result.ok ? (addMode ? "추가 코드로 등록했어요. 기존 코드도 그대로 통합니다." : "발급/회전 완료했어요.")
+      // 무엇을 했는지 그대로 말한다. "발급/회전 완료"는 둘 중 무엇이
+      // 일어났는지를 여전히 안 알려준다.
+      if (result.ok) refreshCodeExistence();
+      status.textContent = result.ok
+        ? (addMode ? "추가 코드로 등록했어요. 기존 코드도 그대로 통합니다." : replacing ? "교체했어요. 이전 코드는 이제 쓸 수 없습니다." : "발급했어요.")
         : result.code === "superadmin_required" ? "이 계정은 관리자 권한이 없어요."
         : result.code === "teacher_code_not_set" ? "이 반에는 아직 기본 코드가 없어요. 먼저 체크를 풀고 규칙 코드를 발급해주세요."
         : result.code === "too_many_codes" ? "추가 코드는 한 반에 3개까지만 등록할 수 있어요."

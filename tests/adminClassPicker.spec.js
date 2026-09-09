@@ -76,6 +76,10 @@ test("반을 고르면 인증코드가 규칙대로 채워진다", async ({ page
 
 test("자료에 없는 학교는 넓게 보여주되 확인되지 않았다고 알린다", async ({ page }) => {
   await openAdmin(page);
+  // 목록에 없는 학교를 다루는 길("직접 입력")은 없애지 않았다 - 4개교 말고
+  // 다른 학교의 코드를 발급할 일이 생길 수 있다.
+  await page.selectOption("#teacherCodeSchoolPreset", "__manual__");
+  await expect(page.locator("#teacherCodeSchoolId")).toBeVisible();
   await page.locator("#teacherCodeSchoolId").fill("9999999");
   await page.selectOption("#teacherCodeGrade", "2");
   const classes = await optionValues(page, "teacherCodeClassNum");

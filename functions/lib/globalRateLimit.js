@@ -54,6 +54,8 @@ const READS_PER_REQUEST_WORST_CASE = Object.freeze({
   analyzeSortingSafetyObserver: BASE_ACTOR_READS + 1,
   // 액터 체계 밖(슈퍼어드민 ID토큰) - 전역 리미터 트랜잭션 1회만.
   manageTeacherCode: 1,
+  // 그 반에 코드가 있는지만 보는 조회 - 리미터 tx 1 + 문서 1.
+  teacherCodeStatus: 2,
   // Firestore 조회는 전혀 없다(외부 NEIS API만 호출) - 공통 전처리만 든다.
   searchSchool: BASE_ACTOR_READS,
   // 비용절감 4번 ③단계 관찰용 - Firestore 조회 없이 Cloud Logging만 남긴다.
@@ -126,6 +128,11 @@ const RATE_LIMITS = Object.freeze({
   // 액터별 상한은 의미가 없고(anonymous actorId 체계 밖에 있음), 전역
   // 상한만 방어적으로 낮게 건다.
   ,manageTeacherCode: { perMinute: 10, perDay: 100 }
+  // 2026-09-09 - 발급 화면이 학년·반을 고를 때마다 부른다(버튼이 "발급"인지
+  // "교체"인지를 정직하게 말하려면 필요하다). 발급보다 훨씬 자주 불리므로
+  // 상한을 넉넉히 둔다 - 좁게 잡으면 조합을 몇 번 눌러보다 429가 나고,
+  // 그때 버튼 글자가 멈춰서 오히려 사람을 헷갈리게 한다.
+  ,teacherCodeStatus: { perMinute: 60, perDay: 600 }
   // 2026-08-31 - CSV 반전체 내보내기(5단계). collectionGroup 쿼리라
   // 페이지당 최대 200건을 읽을 수 있어(classExport.js MAX_PAGE_SIZE) 다른
   // 조회보다 상한을 좁게 잡는다.

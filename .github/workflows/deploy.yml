@@ -126,6 +126,13 @@ jobs:
       - name: Superadmin emulator integration test
         run: npm run emulator:test:superadmin
 
+      # 2026-09-09 추가: 발급 화면의 버튼이 "발급"인지 "교체"인지를 정하는
+      # 값이라, 틀리면 화면이 "발급"이라 말하면서 있던 코드를 교체한다.
+      # 발급 전/후로 답이 실제로 갈리는지와, 코드·해시·솔트가 응답에
+      # 섞이지 않는지를 확인한다.
+      - name: Teacher code status emulator integration test
+        run: npm run emulator:test:teacherCodeStatus
+
       # 2026-08-31 추가: CSV 반전체 내보내기(5단계, exportClassRecords) -
       # 학교+학년+반 스코프 격리(다른 반/다른 학교 기록이 안 섞이는지)를
       # collectionGroup 쿼리 실제 실행으로 검증한다.

@@ -113,4 +113,45 @@ function createManageTeacherCodeHandler(dependencies = {}) {
   };
 }
 
-module.exports = { createManageTeacherCodeHandler };
+// 그 반에 이미 코드가 있는지만 알려준다(2026-09-09 Bumm님 지시).
+//
+// 화면의 버튼이 "발급"인지 "교체"인지를 정직하게 말하려면 이 값이
+// 필요한데, teacherCodes 컬렉션은 firestore.rules의 기본거부에 걸려 있어
+// 클라이언트가 직접 읽을 수 없다(읽을 수 있으면 안 된다 - 해시와 솔트가
+// 들어 있는 문서다). 그래서 서버가 **있는지 없는지와 개수만** 돌려준다.
+//
+// 🔴 코드도, 해시도, 솔트도 돌려주지 않는다. 발급한 사람이 코드를 다시 볼
+// 방법은 여전히 없고(그래서 규칙으로 파생시키는 것이다), 이 함수는 그
+// 성질을 바꾸지 않는다.
+function createTeacherCodeStatusHandler(dependencies = {}) {
+  const db = dependencies.db;
+  return async (req, res) => {
+    const admin = await guardedSuperadmin(req, res, "teacherCodeStatus", dependencies);
+    if (!admin) return;
+    const body = req.body || {};
+    const allowed = new Set(["schoolId", "grade", "classNum"]);
+    if (Object.keys(body).some((key) => !allowed.has(key))) return res.status(400).json({ ok: false, code: "unknown_field" });
+    const schoolId = typeof body.schoolId === "string" && SCHOOL_ID_PATTERN.test(body.schoolId) ? body.schoolId : "";
+    const grade = typeof body.grade === "string" && DIGITS.test(body.grade) ? body.grade : "";
+    const classNum = typeof body.classNum === "string" && DIGITS.test(body.classNum) ? body.classNum : "";
+    if (!schoolId || !grade || !classNum) return res.status(400).json({ ok: false, code: "invalid_request" });
+    let snap;
+    try {
+      snap = await db.collection("teacherCodes").doc(teacherCodeDocId(schoolId, grade, classNum)).get();
+    } catch {
+      // 🔴 못 읽었을 때 "코드가 없다"고 답하지 않는다(COMMON_STANDARDS §21).
+      // 그러면 버튼이 "발급"이라고 말하는데 실제로는 교체가 일어난다.
+      return res.status(503).json({ ok: false, code: "protection_unavailable" });
+    }
+    const data = snap.exists ? snap.data() : null;
+    return res.status(200).json({
+      ok: true,
+      exists: !!data?.codeHash,
+      extraCount: Array.isArray(data?.extraCodes) ? data.extraCodes.length : 0,
+      extraLabels: Array.isArray(data?.extraCodes) ? data.extraCodes.map((entry) => String(entry?.label || "")).filter(Boolean) : [],
+      maxExtraCodes: MAX_EXTRA_CODES
+    });
+  };
+}
+
+module.exports = { createManageTeacherCodeHandler, createTeacherCodeStatusHandler };

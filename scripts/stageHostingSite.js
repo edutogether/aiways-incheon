@@ -37,7 +37,7 @@ fs.mkdirSync(OUT_DIR, { recursive: true });
 // copyFile/copyDir은 없는 대상을 조용히 건너뛴다. 그래서 화면을 이루는
 // 파일이 통째로 사라져도 배포는 성공하고 빈 사이트가 나간다. 반드시
 // 있어야 하는 것들을 먼저 확인한다(COMMON_STANDARDS §21).
-const REQUIRED = ["index.html", "admin.html", "style.css", "assets", "styles", "mobile"];
+const REQUIRED = ["index.html", "admin.html", "style.css", "assets", "styles", "mobile", "schoolClassCounts.js"];
 const missing = REQUIRED.filter((name) => !fs.existsSync(path.join(ROOT, name)));
 if (missing.length) {
   console.error(`배포에 반드시 있어야 하는 것이 없습니다: ${missing.join(", ")}`);

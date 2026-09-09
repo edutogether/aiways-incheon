@@ -129,9 +129,103 @@
           : "";
       }
     }
-    ["teacherCodeSchoolId", "teacherCodeGrade", "teacherCodeClassNum"].forEach((id) => {
-      $(id)?.addEventListener("input", refreshDerivedCode);
+    // 2026-09-09(Bumm님 지시) - 학년·반을 숫자로 직접 치던 것을 고르는 방식으로.
+    //
+    // 없는 반의 코드가 발급되면 **아무도 쓸 수 없는 코드**가 생기고, 현장에서
+    // 왜 안 되는지 아무도 모른다(코드가 틀린 것도 서버가 고장난 것도 아니고
+    // 그냥 그 반이 없다). 학급 수는 NEIS 학급정보에서 받아 파일로 굳혀 둔다
+    // - schoolClassCounts.js, 만드는 것은 scripts/fetchSchoolClassCounts.js.
+    const CLASS_DATA = window.AIWaysSchoolClassCounts;
+    // 자료가 없는 학교도 계속 다뤄야 한다(4개교 말고 다른 학교의 코드를 발급할
+    // 일이 생길 수 있다). 그때는 넓게 보여주되 **확인되지 않았다는 것을 화면에
+    // 드러낸다** - 조용히 그럴듯한 목록을 보여주는 것이 제일 나쁘다.
+    const UNKNOWN_MAX_GRADE = 6, UNKNOWN_MAX_CLASS = 15;
+
+    function classDataReady() {
+      return !!CLASS_DATA && Array.isArray(CLASS_DATA.schools) && CLASS_DATA.schools.length > 0;
+    }
+    function schoolEntry(schoolId) {
+      return CLASS_DATA?.schools?.find((school) => school.schoolId === String(schoolId || "").trim());
+    }
+    function fillSelect(id, values, placeholder, selected) {
+      const el = $(id);
+      if (!el) return;
+      el.replaceChildren();
+      const first = document.createElement("option");
+      first.value = "";
+      first.textContent = placeholder;
+      el.append(first);
+      for (const value of values) {
+        const option = document.createElement("option");
+        option.value = String(value.value);
+        option.textContent = value.label;
+        el.append(option);
+      }
+      el.value = values.some((v) => String(v.value) === String(selected)) ? String(selected) : "";
+    }
+
+    function renderClassOptions() {
+      const school = schoolEntry($("teacherCodeSchoolId")?.value);
+      const grade = $("teacherCodeGrade")?.value || "";
+      const source = $("teacherCodeClassSource");
+      const keep = $("teacherCodeClassNum")?.value;
+      if (!grade) {
+        fillSelect("teacherCodeClassNum", [], "먼저 학년을 고르세요", "");
+        return;
+      }
+      const known = school?.classesByGrade?.[grade];
+      const total = typeof known === "number" && known > 0 ? known : UNKNOWN_MAX_CLASS;
+      const options = Array.from({ length: total }, (_, i) => ({ value: i + 1, label: `${i + 1}반` }));
+      fillSelect("teacherCodeClassNum", options, "반을 고르세요", keep);
+      if (source) {
+        source.textContent = typeof known === "number" && known > 0
+          ? `학급 수 출처: ${CLASS_DATA.source} (${CLASS_DATA.schoolYear}학년도, ${String(CLASS_DATA.fetchedAt).slice(0, 10)} 받음). ${school.short} ${grade}학년은 ${known}개 반입니다.`
+          : "⚠️ 이 학교·학년의 학급 수 자료가 없습니다. 1~15반을 전부 보여주니, 실제로 있는 반인지 확인하고 고르세요.";
+      }
+    }
+
+    function renderGradeOptions() {
+      const school = schoolEntry($("teacherCodeSchoolId")?.value);
+      const keep = $("teacherCodeGrade")?.value;
+      const grades = school
+        ? Object.entries(school.classesByGrade).filter(([, count]) => count > 0).map(([grade]) => ({ value: grade, label: `${grade}학년` }))
+        : Array.from({ length: UNKNOWN_MAX_GRADE }, (_, i) => ({ value: i + 1, label: `${i + 1}학년` }));
+      fillSelect("teacherCodeGrade", grades, "학년을 고르세요", keep);
+      renderClassOptions();
+    }
+
+    // 🔴 자료를 못 읽었을 때 조용히 빈 목록을 보여주지 않는다(COMMON_STANDARDS §21).
+    // 빈 목록은 "이 학교엔 반이 없다"처럼 보이는데, 실제로는 파일이 안 실린 것이다.
+    if (!classDataReady()) {
+      const source = $("teacherCodeClassSource");
+      if (source) source.textContent = "🔴 학급 수 자료(schoolClassCounts.js)를 읽지 못했습니다. 발급을 막습니다 — scripts/fetchSchoolClassCounts.js로 파일을 만든 뒤 다시 여세요.";
+      const submit = $("teacherCodeSubmitBtn");
+      if (submit) submit.disabled = true;
+    } else {
+      fillSelect(
+        "teacherCodeSchoolPreset",
+        CLASS_DATA.schools.map((school) => ({ value: school.schoolId, label: `${school.name} (${school.schoolId})` })),
+        "학교를 고르세요 (목록에 없으면 아래에 코드를 직접 입력)",
+        ""
+      );
+      $("teacherCodeSchoolPreset")?.addEventListener("change", (event) => {
+        const field = $("teacherCodeSchoolId");
+        if (field) field.value = event.target.value;
+        renderGradeOptions();
+        refreshDerivedCode();
+      });
+      renderGradeOptions();
+    }
+
+    $("teacherCodeSchoolId")?.addEventListener("input", () => {
+      renderGradeOptions();
+      refreshDerivedCode();
     });
+    $("teacherCodeGrade")?.addEventListener("change", () => {
+      renderClassOptions();
+      refreshDerivedCode();
+    });
+    $("teacherCodeClassNum")?.addEventListener("change", refreshDerivedCode);
     // 체크를 껐다 켤 때도 안내 문구가 따라와야 한다.
     $("teacherCodeAddMode")?.addEventListener("change", refreshDerivedCode);
     $("teacherCodeSubmitBtn")?.addEventListener("click", async () => {
@@ -140,7 +234,9 @@
       const grade = $("teacherCodeGrade")?.value.trim();
       const classNum = $("teacherCodeClassNum")?.value.trim();
       const code = $("teacherCodeValue")?.value.trim();
-      if (!schoolId || !grade || !classNum || !code) { status.textContent = "학교 코드, 학년/반, 새 인증코드를 모두 입력해주세요."; return; }
+      // 버튼을 막아두긴 했지만, 자료 없이 발급이 나가는 길을 하나도 남기지 않는다.
+      if (!classDataReady()) { status.textContent = "학급 수 자료를 읽지 못해 발급할 수 없어요."; return; }
+      if (!schoolId || !grade || !classNum || !code) { status.textContent = "학교, 학년, 반, 새 인증코드를 모두 고르거나 입력해주세요."; return; }
       status.textContent = "처리 중...";
       const { auth } = await getAuthRef();
       const user = auth.currentUser;

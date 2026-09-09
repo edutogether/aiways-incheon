@@ -13,7 +13,7 @@ const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { createEdu2gDeviceAccess } = require("../lib/edu2gDeviceAccess");
 const { createGlobalRateLimiter, createActorRateLimiter } = require("../lib/globalRateLimit");
 const { createRegisterStudentProfileHandler, createChangeStudentClassHandler, createCheckStudentProfileHandler } = require("../lib/studentProfile");
-const { createDecideRegistrationHandler } = require("../lib/registrationApproval");
+
 
 const projectId = process.env.GCLOUD_PROJECT || "demo-aiways-incheon";
 const authEmulator = new URL(`http://${process.env.FIREBASE_AUTH_EMULATOR_HOST || "127.0.0.1:9099"}`);
@@ -54,10 +54,9 @@ test("changeStudentClass cooldown: 24h clock starts at registration, backdated c
     await db.collection("actors").doc(ACTOR_ID).collection("trustedDevices").doc(uid).set({ uid, status: "active", managementId: "123e4567-e89b-42d3-a456-426614175001" });
     await db.collection("edu2gDeviceBindings").doc(uid).set({ actorId: ACTOR_ID, status: "active" });
 
-    // 2026-08-31 3단 권한체계 도입 이후 registerStudentProfile은 즉시
-    // studentProfile을 만들지 않고 승인대기열에 넣는다(202) - 이 아래
-    // 쿨다운 테스트가 실제로 studentProfile을 가지고 동작하려면 교사
-    // 승인을 거쳐야 한다. 승인용 교사 actor를 별도로 준비한다.
+    // 2026-09-09 - 승인 대기열이 없어져 registerStudentProfile이 그 자리에서
+    // studentProfile을 만든다. 아래 교사 actor는 이제 승인용이 아니라
+    // 반 스코프가 필요한 다른 단정에 쓰인다.
     const teacherSigned = await signup();
     const teacherToken = teacherSigned.idToken;
     teacherUid = (await auth.verifyIdToken(teacherToken)).uid;
@@ -73,7 +72,6 @@ test("changeStudentClass cooldown: 24h clock starts at registration, backdated c
     const register = createRegisterStudentProfileHandler(deps);
     const change = createChangeStudentClassHandler(deps);
     const check = createCheckStudentProfileHandler(deps);
-    const decide = createDecideRegistrationHandler(deps);
 
     // Not registered yet -- a change attempt must fail distinctly from a cooldown rejection.
     const beforeSignup = await call(change, token, { grade: "5", classNum: "2", confirm: false });
@@ -81,9 +79,8 @@ test("changeStudentClass cooldown: 24h clock starts at registration, backdated c
     assert.equal(beforeSignup.body.code, "not_registered");
 
     const registered = await call(register, token, { ...student, confirm: true });
-    assert.equal(registered.status, 202);
-    const approved = await call(decide, teacherToken, { targetActorId: ACTOR_ID, decision: "approve" });
-    assert.equal(approved.status, 200);
+    // 2026-09-09 - 승인 대기열이 없어져 가입 즉시 등록된다.
+    assert.equal(registered.status, 200);
 
     // Registration itself starts the cooldown clock -- an immediate change attempt is blocked.
     const immediatePreview = await call(change, token, { grade: "5", classNum: "2", confirm: false });
@@ -164,9 +161,7 @@ test("changeStudentClass cooldown: 24h clock starts at registration, backdated c
     await db.collection("edu2gDeviceBindings").doc(teacherUid2).set({ actorId: TEACHER2_ID, status: "active" });
     try {
       const registered2 = await call(register, token2, { ...student, grade: "6", classNum: "4", confirm: true });
-      assert.equal(registered2.status, 202);
-      const approved2 = await call(decide, teacherToken2, { targetActorId: ACTOR2_ID, decision: "approve" });
-      assert.equal(approved2.status, 200);
+      assert.equal(registered2.status, 200);
       await db.collection("actors").doc(ACTOR2_ID).update({ "studentProfile.lastChangedAt": new Date(Date.now() - 25 * 60 * 60 * 1000) });
       const collision = await call(change, token2, { grade: "6", classNum: "3", confirm: true });
       assert.equal(collision.status, 409);

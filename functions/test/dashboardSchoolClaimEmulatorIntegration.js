@@ -13,7 +13,7 @@ const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { createEdu2gDeviceAccess } = require("../lib/edu2gDeviceAccess");
 const { createGlobalRateLimiter, createActorRateLimiter } = require("../lib/globalRateLimit");
 const { createGetSchoolDashboardHandler } = require("../lib/schoolDashboard");
-const { createDecideRegistrationHandler } = require("../lib/registrationApproval");
+const { createRegisterStudentProfileHandler } = require("../lib/studentProfile");
 
 const projectId = process.env.GCLOUD_PROJECT || "demo-aiways-incheon";
 const authEmulator = new URL(`http://${process.env.FIREBASE_AUTH_EMULATOR_HOST || "127.0.0.1:9099"}`);
@@ -103,30 +103,27 @@ test("dashboardSchoolId custom claim is set on first school-lock and firestore.r
     assert.equal(await firestoreGet(`schools/${SCHOOL_A}`, signedB.idToken), 403, "a token with no/other dashboardSchoolId claim must be denied");
     assert.equal(await firestoreGet(`schools/${SCHOOL_A}`), 403, "unauthenticated read must still be denied");
 
-    // 2026-09-07 종합감사 - dashboardSchoolClaim.js는 "dashboardSchoolId가
-    // 정해지거나 바뀌는 모든 지점에서 클레임도 같이 맞춘다"를 불변식으로
-    // 명시하는데, 가입 승인(registrationApproval.js)만 그 호출이 빠져 있었다.
-    // 잘못된 학교로 먼저 고정(+클레임까지 발급)된 기기가 다른 학교의 담임
-    // 승인을 받으면, 문서는 새 학교로 교정되는데 클레임은 옛 학교로 남아
-    // 그 옛 학교의 반 집계를 계속 실시간 구독으로 읽을 수 있었다.
+    // dashboardSchoolClaim.js는 "dashboardSchoolId가 정해지거나 바뀌는 모든
+    // 지점에서 클레임도 같이 맞춘다"를 불변식으로 명시한다. 2026-09-07
+    // 종합감사가 가입 승인 경로에서 이 호출이 빠진 것을 잡았는데,
+    // 2026-09-09에 승인 대기열을 없애고 가입 즉시 등록으로 바꾸면서 그
+    // 자리가 registerStudentProfile로 옮겨왔다 - 같은 불변식을 새 자리에서
+    // 다시 확인한다. 잘못된 학교로 먼저 고정(+클레임까지 발급)된 기기가
+    // 다른 학교로 가입하면, 문서만 새 학교로 바뀌고 클레임은 옛 학교로
+    // 남아 그 옛 학교의 반 집계를 계속 실시간 구독으로 읽을 수 있다.
     // 클레임을 실제로 심으려면 actorId가 곧 uid여야 하므로(open_access
     // 프로비저닝과 동일) 이 시나리오만 actorId=uid로 만든다.
     const signedC = await signup();
     uidC = (await auth.verifyIdToken(signedC.idToken)).uid;
-    const teacherSigned = await signup();
-    teacherUid = (await auth.verifyIdToken(teacherSigned.idToken)).uid;
     await bind(uidC, uidC);
-    await bind(teacherUid, teacherUid);
     await db.collection("actors").doc(uidC).set({ status: "active", plan: "closed_beta", dashboardSchoolId: SCHOOL_OTHER }, { merge: true });
     await auth.setCustomUserClaims(uidC, { dashboardSchoolId: SCHOOL_OTHER });
-    await db.collection("actors").doc(teacherUid).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: SCHOOL_A, grade: "5", classNum: "1" } }, { merge: true });
-    await db.collection("registrationRequests").doc(uidC).set({ schoolId: SCHOOL_A, schoolName: "테스트초등학교", grade: "5", classNum: "1", studentNumber: "21", name: "김철수", status: "pending" });
 
-    const decide = createDecideRegistrationHandler({ db, access, rateLimiter, actorRateLimiter, appCheck, auth, serverTimestamp: () => FieldValue.serverTimestamp(), logger: () => {} });
-    const approved = await call(decide, teacherSigned.idToken, { targetActorId: uidC, decision: "approve" });
-    assert.equal(approved.status, 200);
-    const afterApproval = await auth.getUser(uidC);
-    assert.equal(afterApproval.customClaims?.dashboardSchoolId, SCHOOL_A, "approval must move the custom claim to the approved school, not leave it on the mis-bound one");
+    const register = createRegisterStudentProfileHandler({ db, access, rateLimiter, actorRateLimiter, appCheck, auth, serverTimestamp: () => FieldValue.serverTimestamp(), logger: () => {}, searchSchool: async () => ({ ok: true, schoolName: "테스트초등학교" }) });
+    const registered = await call(register, signedC.idToken, { schoolId: SCHOOL_A, schoolName: "테스트초등학교", grade: "5", classNum: "1", studentNumber: "21", name: "김철수", confirm: true });
+    assert.equal(registered.status, 200, `가입이 성공해야 한다 (실제: ${JSON.stringify(registered.body)})`);
+    const afterRegister = await auth.getUser(uidC);
+    assert.equal(afterRegister.customClaims?.dashboardSchoolId, SCHOOL_A, "가입이 커스텀 클레임을 새 학교로 옮겨야 한다 - 옛 학교로 남으면 그 학교 집계를 계속 읽을 수 있다");
 
     process.stdout.write(JSON.stringify({ dashboardSchoolClaimEmulatorIntegration: "passed" }) + "\n");
   } finally {

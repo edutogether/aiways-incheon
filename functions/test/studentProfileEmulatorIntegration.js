@@ -13,7 +13,6 @@ const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { createEdu2gDeviceAccess } = require("../lib/edu2gDeviceAccess");
 const { createGlobalRateLimiter, createActorRateLimiter } = require("../lib/globalRateLimit");
 const { createCheckStudentProfileHandler, createRegisterStudentProfileHandler } = require("../lib/studentProfile");
-const { createDecideRegistrationHandler } = require("../lib/registrationApproval");
 const { createSaveSortingRecordHandler } = require("../lib/sortingRecord");
 
 const projectId = process.env.GCLOUD_PROJECT || "demo-aiways-incheon";
@@ -38,7 +37,7 @@ function call(handler, token, body) {
 
 const student = { schoolId: "7321071", schoolName: "테스트초등학교", grade: "5", classNum: "1", studentNumber: "12", name: "홍길동" };
 
-test("registerStudentProfile double-confirm signup: preview/pending/approved flow, permanent lock after approval", async () => {
+test("registerStudentProfile double-confirm signup: preview then immediate registration, permanent lock afterward", async () => {
   const app = getApps()[0] || initializeApp({ projectId });
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -59,25 +58,6 @@ test("registerStudentProfile double-confirm signup: preview/pending/approved flo
     const deps = { access, rateLimiter, actorRateLimiter, appCheck, db, serverTimestamp: () => FieldValue.serverTimestamp() };
     const check = createCheckStudentProfileHandler(deps);
     const register = createRegisterStudentProfileHandler(deps);
-    const TEACHER_ACTOR_ID = "student_profile_test_teacher";
-    await db.collection("actors").doc(TEACHER_ACTOR_ID).set({ status: "active", plan: "closed_beta", teacherVerified: { schoolId: student.schoolId, grade: student.grade, classNum: student.classNum } });
-    const decide = createDecideRegistrationHandler(deps);
-    async function decideAs(decision, targetActorId = ACTOR_ID) {
-      return call(decide, token, { targetActorId, decision });
-    }
-    // decide() 호출은 teacherVerified가 붙은 "동일 토큰"의 actorId만
-    // 신경 쓰므로, 실제로는 별도 로그인이 필요하지만 이 테스트에서는
-    // deviceAccess.resolve가 trustedDevices 매핑으로 actorId를 정하는
-    // 구조를 그대로 이용해 같은 uid를 TEACHER_ACTOR_ID에도 잠깐
-    // 연결해 교사 요청을 흉내낸다.
-    async function asTeacher(fn) {
-      await db.collection("actors").doc(TEACHER_ACTOR_ID).collection("trustedDevices").doc(uid).set({ uid, status: "active", managementId: "123e4567-e89b-42d3-a456-426614174602" });
-      await db.collection("edu2gDeviceBindings").doc(uid).set({ actorId: TEACHER_ACTOR_ID, status: "active" });
-      try { return await fn(); } finally {
-        await db.collection("edu2gDeviceBindings").doc(uid).set({ actorId: ACTOR_ID, status: "active" });
-      }
-    }
-
     const before = await call(check, token, {});
     assert.equal(before.status, 200);
     assert.equal(before.body.hasProfile, false);
@@ -91,22 +71,19 @@ test("registerStudentProfile double-confirm signup: preview/pending/approved flo
     assert.equal(stillEmpty.body.hasProfile, false, "preview (confirm:false) must not write anything");
 
     const committed = await call(register, token, { ...student, confirm: true });
-    assert.equal(committed.status, 202, "submitting no longer registers immediately -- it queues for teacher approval");
+    // 2026-09-09 - 승인 대기열을 없앴다. confirm:true면 그 자리에서 등록된다.
+    assert.equal(committed.status, 200, "confirm:true registers immediately -- there is no approval queue any more");
     assert.equal(committed.body.confirmed, true);
-    assert.equal(committed.body.pending, true);
-    assert.deepEqual(committed.body.preview, student);
+    assert.deepEqual(committed.body.profile, student);
 
-    const pendingCheck = await call(check, token, {});
-    assert.equal(pendingCheck.body.hasProfile, false);
-    assert.equal(pendingCheck.body.pending, true, "check must reflect the pending request while awaiting approval");
+    const afterCheck = await call(check, token, {});
+    assert.equal(afterCheck.body.hasProfile, true, "가입 직후 바로 프로필이 있어야 한다");
+    assert.equal(afterCheck.body.pending, false, "대기 상태 자체가 없어졌다");
 
     const resubmit = await call(register, token, { ...student, confirm: true });
     assert.equal(resubmit.status, 409);
-    assert.equal(resubmit.body.code, "request_pending", "a second submission while pending is rejected, not silently re-queued");
+    assert.equal(resubmit.body.code, "already_registered", "이미 등록된 기기가 다시 가입하려 하면 거절된다");
 
-    const approved = await asTeacher(() => decideAs("approve"));
-    assert.equal(approved.status, 200);
-    assert.equal(approved.body.decision, "approved");
 
     // The whole point of signup: once a verified profile exists, a student
     // can no longer just edit the interim form to fake a different class --

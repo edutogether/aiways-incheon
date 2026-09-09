@@ -99,7 +99,7 @@ jobs:
       # 에뮬레이터로 검증한다 - 다른 단계 확인용 emulator:test:* 스크립트들과
       # 같은 이유(부품 단위 유닛테스트만으로는 안 잡히는 배선 오류 방지).
       # 2026-09-07 - vitest 이전 2단계(B군, D:\Projects\_shared\CONVENTIONS.md
-      # 5.1). 이 아래 3개(teacher-auth/registration-approval/superadmin)는
+      # 5.1). 이 아래 스텝들은
       # firebase emulators:exec가 매번 새로 띄우는 별도 에뮬레이터 프로세스
       # 안에서 여전히 한 파일씩 단독 실행된다(vitest.emulator.config.js +
       # CLI 파일 필터) - npm run 스크립트 이름/이 스텝은 그대로, 내부 실행기만
@@ -112,13 +112,9 @@ jobs:
       # 시간이 지나면 풀리고, 성공하면 카운터가 리셋되는지 실제로 검증한다.
       - name: Teacher code lockout emulator integration test
         run: npm run emulator:test:teacher-code-lockout
-
-      # 2026-08-31 추가: 가입승인대기열(2단계, listPendingRegistrations/
-      # decideRegistration) - 스쿨 격리(다른 학교 요청은 404로 숨김),
-      # 거절 후 재신청 허용, 이미 결정된 요청 재결정 방지를 실제
-      # 트랜잭션으로 검증한다.
-      - name: Registration approval emulator integration test
-        run: npm run emulator:test:registration-approval
+      # 2026-09-09: 가입 승인 대기열을 없애고 교사 사후정리로 대체했다 -
+      # 반 스코프 강제, 차단이 실제 403을 내는지, 차단 시 번호 점유가 풀려
+      # 다시 가입되는지, 삭제 건수가 실제와 맞는지를 검증한다.
 
       - name: Teacher moderation emulator integration test
         run: npm run emulator:test:teacher-moderation

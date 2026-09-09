@@ -11,6 +11,7 @@ const { protectActorRequest } = require("./protectedActor");
 const { cleanText, applyCors } = require("./httpGuard");
 const { verifyTeacherCodeCore } = require("./teacherAuth");
 const { studentNumberClaimRef } = require("./studentNumberClaim");
+const { setDashboardSchoolClaim } = require("./dashboardSchoolClaim");
 const { classDocId } = require("./schoolDashboardAggregate");
 
 const MAX_BODY_BYTES = 2 * 1024;
@@ -146,6 +147,14 @@ function createRegisterStudentProfileHandler(dependencies = {}) {
       });
       if (result.code === "already_registered") return res.status(409).json({ ok: false, code: "already_registered", profile: publicProfile(result.profile) });
       if (result.code === "student_number_taken") return res.status(409).json({ ok: false, code: "student_number_taken" });
+      // dashboardSchoolClaim.js가 선언한 불변식 - actors/{actorId}.dashboardSchoolId가
+      // 정해지는 "모든 지점"에서 커스텀 클레임도 같이 맞춰야 한다. 안 그러면
+      // firestore.rules가 보는 값과 실제 값이 어긋나 그 기기의 실시간 구독이
+      // 계속 거절되고 폴링으로만 돌아간다. 예전엔 승인(registrationApproval.js)이
+      // 이걸 했는데, 즉시 등록으로 옮기면서 이 자리로 같이 와야 한다
+      // (2026-09-07 종합감사가 승인 경로에서 잡았던 것과 같은 결함이다).
+      // 실패해도 폴링은 살아 있으므로 로그만 남기고 삼킨다.
+      await setDashboardSchoolClaim({ auth: dependencies.auth, uid: protectedActor.uid, schoolId, logger });
       logger({ severity: "INFO", message: "student_registered", actorId: protectedActor.actorId, schoolId, grade, classNum });
       return res.status(200).json({ ok: true, confirmed: true, role, profile: { schoolId, schoolName, grade, classNum, studentNumber, name } });
     } catch (error) {

@@ -4,44 +4,46 @@
 // 모든 API가 403"인 상태로 그대로 나갔는데도 CI는 초록불이었다. 이 스크립트는
 // deploy-hosting 배포 직후 실행되어, 배포된 코드가 아니라 배포된 "결과"(실제
 // 라이브 응답)를 확인한다 - 로컬 유닛테스트로는 못 잡는 층이다.
-const PROD_ORIGIN = "https://ai-ways-incheon.web.app";
+// 2026-09-09: 정식 주소가 incheon.edutogether.kr로 붙었다. 옛 주소를 빼지
+// 않고 둘 다 확인하는 이유는, Firebase Hosting이 커스텀 도메인을 "추가"하는
+// 것이지 기본 도메인을 대체하지 않아서 양쪽 다 살아 있고, 실제로 둘 중
+// 하나만 깨지는 상황(예: 새 도메인만 CORS 허용목록에서 빠짐)이 이 스크립트가
+// 잡아야 할 바로 그 사고이기 때문이다.
+const PROD_ORIGINS = ["https://incheon.edutogether.kr", "https://ai-ways-incheon.web.app"];
 const FUNCTIONS_BASE = "https://asia-northeast3-ai-ways-incheon.cloudfunctions.net";
-const HOSTING_BASE = "https://ai-ways-incheon.web.app";
 
-async function checkCorsNotBlocked(functionName) {
+async function checkCorsNotBlocked(functionName, origin) {
   const res = await fetch(`${FUNCTIONS_BASE}/${functionName}`, {
     method: "POST",
-    headers: { Origin: PROD_ORIGIN, "Content-Type": "application/json" },
+    headers: { Origin: origin, "Content-Type": "application/json" },
     body: "{}",
   });
   const body = await res.json().catch(() => ({}));
   if (res.status === 403 && body.code === "invalid_origin") {
-    throw new Error(`${functionName}: 프로덕션 오리진(${PROD_ORIGIN})이 CORS에서 거부됨 (invalid_origin) - 허용목록 확인 필요`);
+    throw new Error(`${functionName}: 프로덕션 오리진(${origin})이 CORS에서 거부됨 (invalid_origin) - 허용목록 확인 필요`);
   }
   const acao = res.headers.get("access-control-allow-origin");
-  if (acao !== PROD_ORIGIN) {
-    throw new Error(`${functionName}: Access-Control-Allow-Origin 헤더가 "${acao}"로, 기대값 "${PROD_ORIGIN}"과 다름`);
+  if (acao !== origin) {
+    throw new Error(`${functionName}: Access-Control-Allow-Origin 헤더가 "${acao}"로, 기대값 "${origin}"과 다름`);
   }
-  console.log(`OK  ${functionName}: CORS 통과 (status ${res.status})`);
+  console.log(`OK  ${functionName} @ ${origin}: CORS 통과 (status ${res.status})`);
 }
 
-async function checkHostingHeaders() {
-  const res = await fetch(`${HOSTING_BASE}/index.html`);
-  if (res.status !== 200) throw new Error(`index.html이 200이 아님 (${res.status})`);
+async function checkHostingHeaders(base) {
+  const res = await fetch(`${base}/index.html`);
+  if (res.status !== 200) throw new Error(`${base}/index.html이 200이 아님 (${res.status})`);
   const required = ["x-frame-options", "x-content-type-options", "content-security-policy"];
   for (const header of required) {
-    if (!res.headers.get(header)) throw new Error(`index.html에 ${header} 헤더가 없음 - firebase.json hosting.headers 확인 필요`);
+    if (!res.headers.get(header)) throw new Error(`${base}/index.html에 ${header} 헤더가 없음 - firebase.json hosting.headers 확인 필요`);
   }
-  console.log("OK  index.html: 보안 헤더 정상 부착");
+  console.log(`OK  ${base}/index.html: 보안 헤더 정상 부착`);
 }
 
 async function main() {
+  const functionNames = ["checkStudentProfile", "listSortingRecords", "analyzeSortingSafetyObserver", "checkTeacherStatus"];
   const checks = [
-    () => checkCorsNotBlocked("checkStudentProfile"),
-    () => checkCorsNotBlocked("listSortingRecords"),
-    () => checkCorsNotBlocked("analyzeSortingSafetyObserver"),
-    () => checkCorsNotBlocked("checkTeacherStatus"),
-    () => checkHostingHeaders(),
+    ...PROD_ORIGINS.flatMap(origin => functionNames.map(name => () => checkCorsNotBlocked(name, origin))),
+    ...PROD_ORIGINS.map(base => () => checkHostingHeaders(base)),
   ];
   const failures = [];
   for (const check of checks) {

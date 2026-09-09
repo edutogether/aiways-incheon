@@ -31,14 +31,16 @@ const ALLOWED_STATIC_ORIGINS = new Set([
   "https://ai-ways-incheon.web.app",
   "https://ai-ways-incheon.firebaseapp.com",
   "https://edutogether.kr",
-  // 2026-09-09: 이 앱 주소를 aiways.edutogether.kr로 통일하기로 확정됐다
-  // (Firebase 주소를 노출하지 않기 위함). 아직 도메인이 안 붙었지만 미리
-  // 넣어둔다 - 추가일 뿐이라 기존 출처는 그대로 동작하고, 도메인이 붙는
-  // 순간 배포를 기다리지 않고 바로 API가 통한다. Firebase Hosting은 커스텀
-  // 도메인을 "추가"하는 것이지 기본 도메인을 대체하지 않으므로
-  // (ai-ways-incheon.web.app과 .firebaseapp.com이 지금도 동시에 200을
-  // 준다) 아래 넷은 전부 계속 유효하다.
-  "https://aiways.edutogether.kr",
+  // 2026-09-09: 이 앱 주소가 incheon.edutogether.kr로 확정·연결됐다
+  // (Firebase 주소를 노출하지 않기 위함). 실측으로 200 확인했고, 응답
+  // 본문 해시가 ai-ways-incheon.web.app과 동일하다 - 같은 호스팅에 도메인만
+  // 붙은 것이라 "주소는 열리는데 내용은 옛 빌드"인 상황이 아니다.
+  // 위 출처들을 지우지 않는 이유: Firebase Hosting은 커스텀 도메인을
+  // "추가"하는 것이지 기본 도메인을 대체하지 않아서 옛 주소도 계속 살아
+  // 있고, 그쪽으로 들어오는 기존 사용자를 끊을 이유가 없다.
+  // (처음엔 aiways.edutogether.kr로 미리 넣었는데 실제로는 가비아에서
+  //  incheon으로 정해져서 그 이름은 DNS에 존재하지 않는다 - 바로잡음)
+  "https://incheon.edutogether.kr",
 ]);
 
 function isAllowedOrigin(origin) {

@@ -197,6 +197,16 @@ export async function openApp(page, target = TARGET) {
     window.__aiwaysBaselineResetRandom = () => { seed = START; };
   });
   await page.goto(`/${target}/index.html`);
+  // 앱이 화면을 그린 뒤에 게이트를 연다.
+  //
+  // 순서가 중요하다. 실제 서비스에서는 authGate.js가 **인증이 끝난 뒤**
+  // #appRoot를 드러내므로, 그 시점에는 앱이 이미 초기화를 마친 상태다.
+  // 그런데 하네스가 로드 직후 곧바로 열어버리면, 번들이 늦게 도착하는
+  // 환경(원격 주소 대조 등)에서는 앱이 '이미 보이는 화면'에서 초기화를
+  // 시작하게 되어 탭 높이 측정 결과가 달라진다 - 실제로 라이브 주소로
+  // 대조했을 때 탭 공유 높이가 710px/857px로 갈렸다. 그릴 것을 다 그린
+  // 뒤에 여는 쪽이 실제 동작에 가깝고, 환경에 따라 흔들리지도 않는다.
+  await page.waitForFunction(() => (document.getElementById("appRoot")?.childElementCount ?? 0) > 0, null, { timeout: 15000 });
   await page.evaluate(() => {
     const gate = document.getElementById("authGate");
     const root = document.getElementById("appRoot");

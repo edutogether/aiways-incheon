@@ -45,7 +45,7 @@ npm run emulator:test:teacher-code-lockout
 ## 배포
 
 `main`에 푸시하면 `.github/workflows/deploy.yml`이 test → deploy-backend(rules/indexes/Functions)
-→ deploy-hosting 순으로 돈다. 라이브: <https://ai-ways-incheon.web.app>
+→ deploy-hosting 순으로 돈다. 라이브: <https://incheon.edutogether.kr>
 
 배포되는 정적 파일은 `scripts/stageHostingSite.js`가 **화이트리스트로** 골라 `_hosting_site/`에
 모으고 `firebase.json`의 `hosting.public`이 그것만 가리킨다. 과거 GitHub Pages를 저장소 루트

@@ -19,7 +19,7 @@ AI와 데이터로 학교 자원순환 UX를 개선하는 H-A-H 기반 수업 �
 
 ## 배포
 
-**Firebase Hosting** — 라이브 주소는 <https://ai-ways-incheon.web.app>입니다(2026-09-01에 GitHub Pages에서 이전했고, 구 주소 `edutogether.github.io/aiways-incheon/`은 더 이상 갱신되지 않습니다). `main` 브랜치에 푸시하면 `.github/workflows/deploy.yml`이 test → deploy-backend(Firestore rules/indexes/Functions) → deploy-hosting 순서로 배포합니다. 배포에 올라가는 파일은 `scripts/stageHostingSite.js`가 화이트리스트로 골라 담습니다.
+**Firebase Hosting** — 라이브 주소는 <https://incheon.edutogether.kr>입니다(2026-09-01에 GitHub Pages에서 이전했고, 구 주소 `edutogether.github.io/aiways-incheon/`은 더 이상 갱신되지 않습니다). `main` 브랜치에 푸시하면 `.github/workflows/deploy.yml`이 test → deploy-backend(Firestore rules/indexes/Functions) → deploy-hosting 순서로 배포합니다. 배포에 올라가는 파일은 `scripts/stageHostingSite.js`가 화이트리스트로 골라 담습니다.
 
 ## 문서
 

@@ -25,6 +25,46 @@ function toSchool(row) {
   };
 }
 
+// 문지기를 통과한 뒤의 본문 - 요청 검사, NEIS 호출, 응답 정리.
+//
+// 2026-09-10에 관리자 화면도 학교를 이름으로 검색하게 되면서 갈라 뒀다.
+// 학생 앱은 actor(익명 인증)로, 관리자 화면은 superadmin ID토큰으로 들어와
+// **문지기가 서로 다르다.** 그렇다고 NEIS 호출을 두 벌 쓰면 한쪽만 고쳐지는
+// 날이 반드시 온다 - 문지기만 다르고 그 뒤는 같은 코드를 쓴다.
+async function respondWithSchoolSearch({ req, res, getApiKey, fetchImpl, logger }) {
+  const bodyBytes = req.rawBody?.length ?? Buffer.byteLength(JSON.stringify(req.body || {}));
+  if (bodyBytes > MAX_BODY_BYTES) return res.status(413).json({ ok: false, code: "request_too_large" });
+
+  const body = req.body || {};
+  const allowed = new Set(["query"]);
+  if (Object.keys(body).some((key) => !allowed.has(key))) return res.status(400).json({ ok: false, code: "unknown_field" });
+  const query = cleanText(body.query, 60);
+  if (!query || query.length < 2) return res.status(400).json({ ok: false, code: "invalid_query" });
+
+  const apiKey = getApiKey?.();
+  if (!apiKey) return res.status(503).json({ ok: false, code: "provider_unavailable" });
+
+  const url = `${NEIS_URL}?KEY=${encodeURIComponent(apiKey)}&Type=json&pIndex=1&pSize=20&SCHUL_NM=${encodeURIComponent(query)}`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), NEIS_TIMEOUT_MS);
+  try {
+    const response = await fetchImpl(url, { signal: controller.signal });
+    if (!response.ok) return res.status(502).json({ ok: false, code: "provider_unavailable" });
+    const data = await response.json();
+    const rows = data?.schoolInfo?.[1]?.row;
+    const schools = Array.isArray(rows) ? rows.map(toSchool).filter((school) => school.schoolCode && school.schoolName) : [];
+    return res.status(200).json({ ok: true, schools });
+  } catch (error) {
+    // 2026-08-27 재감사 지적: 이 catch가 조용해서, NEIS가 장애나면
+    // 모든 학생의 학교검색이 실패하는데 Cloud Logging엔 아무 흔적도
+    // 안 남았다.
+    logger({ message: "search_school_provider_failed", error: String(error && error.message ? error.message : error) });
+    return res.status(502).json({ ok: false, code: "provider_unavailable" });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function createSearchSchoolHandler(dependencies = {}) {
   const getApiKey = dependencies.getApiKey;
   const fetchImpl = dependencies.fetch || fetch;
@@ -40,38 +80,8 @@ function createSearchSchoolHandler(dependencies = {}) {
       return res.status(protectedActor.httpStatus).json({ ok: false, code: protectedActor.code, ...(protectedActor.retryAfterSeconds ? { retryAfterSeconds: protectedActor.retryAfterSeconds } : {}) });
     }
 
-    const bodyBytes = req.rawBody?.length ?? Buffer.byteLength(JSON.stringify(req.body || {}));
-    if (bodyBytes > MAX_BODY_BYTES) return res.status(413).json({ ok: false, code: "request_too_large" });
-
-    const body = req.body || {};
-    const allowed = new Set(["query"]);
-    if (Object.keys(body).some((key) => !allowed.has(key))) return res.status(400).json({ ok: false, code: "unknown_field" });
-    const query = cleanText(body.query, 60);
-    if (!query || query.length < 2) return res.status(400).json({ ok: false, code: "invalid_query" });
-
-    const apiKey = getApiKey?.();
-    if (!apiKey) return res.status(503).json({ ok: false, code: "provider_unavailable" });
-
-    const url = `${NEIS_URL}?KEY=${encodeURIComponent(apiKey)}&Type=json&pIndex=1&pSize=20&SCHUL_NM=${encodeURIComponent(query)}`;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), NEIS_TIMEOUT_MS);
-    try {
-      const response = await fetchImpl(url, { signal: controller.signal });
-      if (!response.ok) return res.status(502).json({ ok: false, code: "provider_unavailable" });
-      const data = await response.json();
-      const rows = data?.schoolInfo?.[1]?.row;
-      const schools = Array.isArray(rows) ? rows.map(toSchool).filter((school) => school.schoolCode && school.schoolName) : [];
-      return res.status(200).json({ ok: true, schools });
-    } catch (error) {
-      // 2026-08-27 재감사 지적: 이 catch가 조용해서, NEIS가 장애나면
-      // 모든 학생의 학교검색이 실패하는데 Cloud Logging엔 아무 흔적도
-      // 안 남았다.
-      logger({ message: "search_school_provider_failed", error: String(error && error.message ? error.message : error) });
-      return res.status(502).json({ ok: false, code: "provider_unavailable" });
-    } finally {
-      clearTimeout(timer);
-    }
+    return respondWithSchoolSearch({ req, res, getApiKey, fetchImpl, logger });
   };
 }
 
-module.exports = { createSearchSchoolHandler };
+module.exports = { createSearchSchoolHandler, respondWithSchoolSearch };

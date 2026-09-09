@@ -21,7 +21,7 @@ test("로그인 전에는 교사 인증코드 발급 화면이 보이지 않는�
   await page.goto("/admin.html");
   // 스크립트가 다 붙은 뒤를 본다 - admin.js가 DOMContentLoaded에서 화면을
   // 만지므로, 그보다 먼저 재면 "아직 안 그려서" 통과할 수 있다.
-  await expect(page.locator("#teacherCodeSchoolPreset")).toHaveCount(1);
+  await expect(page.locator("#teacherCodeSchoolQuery")).toHaveCount(1);
 
   // 로그인 화면은 반대로 반드시 보여야 한다. 이게 없으면 "페이지가 통째로
   // 안 떴다"와 "잘 숨겼다"를 구분하지 못한다.
@@ -37,7 +37,7 @@ test("hidden 속성이 붙은 요소는 전부 실제로 display:none이다", as
   // 같은 병에 걸린 자리가 더 있는지 화면 전체로 훑는다. 지금은 하나뿐이지만,
   // 앞으로 hidden을 쓰는 요소가 늘어날 때 같은 실수가 반복되는 것을 막는다.
   await page.goto("/admin.html");
-  await expect(page.locator("#teacherCodeSchoolPreset")).toHaveCount(1);
+  await expect(page.locator("#teacherCodeSchoolQuery")).toHaveCount(1);
 
   const shown = await page.evaluate(() =>
     Array.from(document.querySelectorAll("[hidden]"))

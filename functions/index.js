@@ -19,7 +19,7 @@ const { createGetClassRankingHandler } = require("./lib/classRanking");
 const { createSearchSchoolHandler } = require("./lib/schoolSearch");
 const { createCheckTeacherStatusHandler, createVerifyTeacherCodeHandler } = require("./lib/teacherAuth");
 const { createListClassStudentsHandler, createDescribeStudentHandler, createModerateStudentHandler } = require("./lib/teacherModeration");
-const { createManageTeacherCodeHandler, createTeacherCodeStatusHandler } = require("./lib/superadmin");
+const { createManageTeacherCodeHandler, createTeacherCodeStatusHandler, createAdminSchoolSearchHandler } = require("./lib/superadmin");
 const { createExportClassRecordsHandler } = require("./lib/classExport");
 const { createAnonymizeStudentHandler } = require("./lib/studentAnonymization");
 const { getApps, initializeApp } = require("firebase-admin/app");
@@ -156,6 +156,9 @@ exports.manageTeacherCode = onRequest({ region: "asia-northeast3", memory: "256M
 }));
 exports.teacherCodeStatus = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createTeacherCodeStatusHandler({
   db, appCheck: emulatorAppCheck, rateLimiter, logAppCheck, verifyIdToken: (token) => getAuth().verifyIdToken(token), logger: auditLog
+}));
+exports.adminSearchSchool = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 15, minInstances: 0, maxInstances: 2, concurrency: 5, secrets: [neisApiKey], cors: false }, createAdminSchoolSearchHandler({
+  getApiKey: () => neisApiKey.value(), appCheck: emulatorAppCheck, rateLimiter, logAppCheck, verifyIdToken: (token) => getAuth().verifyIdToken(token), logger: (metadata) => logger.error(metadata)
 }));
 exports.exportClassRecords = onRequest({ region: "asia-northeast3", memory: "256MiB", timeoutSeconds: 30, minInstances: 0, maxInstances: 2, concurrency: 5, cors: false }, createExportClassRecordsHandler({
   db, access: deviceAccess, appCheck: emulatorAppCheck, rateLimiter, actorRateLimiter, logAppCheck, blockedActors, logger: auditLog

@@ -32,6 +32,15 @@
     return authRef;
   }
 
+  // 로그인 상태의 ID 토큰. 인증 SDK를 못 불러오거나 로그인 전이면 빈 문자열.
+  // **여기서 "권한 있음/없음"을 판단하지 않는다** - 판단은 서버가 한다.
+  async function currentIdToken() {
+    try {
+      const { auth } = await getAuthRef();
+      return auth.currentUser ? await auth.currentUser.getIdToken() : "";
+    } catch { return ""; }
+  }
+
   async function callSuperadminFunction(name, idToken, payload) {
     if (emulatorRequested()) {
       let response;
@@ -141,19 +150,17 @@
           : derived
             ? `이 반의 인증코드는 «${derived}»입니다. 그대로 발급하거나 직접 고쳐도 됩니다.`
             : String(schoolId || "").trim()
-              ? "등록된 4개 학교(서흥·청라·동방·마전)가 아니면 코드를 자동으로 만들지 않습니다. 직접 입력해 주세요."
+              ? "등록된 4개 학교(서흥·청라·동방·마전)가 아니면 코드를 자동으로 만들어 드리지 못합니다. 위 칸에 코드를 직접 적어주세요."
               : "";
       }
     }
-    // 2026-09-09(Bumm님 지시) - 버튼이 "발급/회전"이었다. **"회전"은 rotate를
-    // 그대로 옮긴 개발 용어라 아무도 모르고**, 두 개를 빗금으로 붙여두면 지금
-    // 무엇을 하는 건지가 여전히 안 보인다. 그 반에 코드가 있는지를 서버에
-    // 물어보고 버튼이 그때그때 맞는 말을 하게 한다.
+    // 2026-09-09(Bumm님 지시) - 버튼 글자가 예전에는 개발 용어였고, 두 경우를
+    // 빗금으로 붙여둔 탓에 지금 무엇을 하는 건지가 안 보였다. 그 반에 코드가
+    // 있는지를 서버에 물어보고 버튼이 그때그때 맞는 말을 하게 한다.
     //
     // 서버에 묻는 이유: teacherCodes 문서는 firestore.rules 기본거부에 걸려
     // 클라이언트가 못 읽는다(해시와 솔트가 든 문서다 - 읽을 수 있으면 안 된다).
     // teacherCodeStatus는 **있는지 없는지와 개수만** 돌려준다.
-    const MANUAL_SCHOOL = "__manual__";
     // "확인 못 했다"를 "코드가 없다"와 섞지 않는다(COMMON_STANDARDS §21).
     let codeExists = null; // true | false | null(모름)
     let loggedIn = false;
@@ -277,36 +284,92 @@
       const submit = $("teacherCodeSubmitBtn");
       if (submit) submit.disabled = true;
     } else {
-      // 2026-09-09(Bumm님 지적) - 첫 칸이 "학교 코드(NEIS 표준학교코드,
-      // 숫자)"였다. 그 숫자를 아는 사람은 없다. 등록된 학교가 4개뿐이니
-      // 고르는 방식으로 바꾸고, **목록에 없는 학교를 다뤄야 할 때를 위해
-      // 직접 입력하는 길은 없애지 않고 마지막 항목으로 남긴다.**
-      fillSelect(
-        "teacherCodeSchoolPreset",
-        [
-          ...CLASS_DATA.schools.map((school) => ({ value: school.schoolId, label: `${school.short} (${school.schoolId})` })),
-          { value: MANUAL_SCHOOL, label: "직접 입력 (목록에 없는 학교)" }
-        ],
-        "학교를 고르세요",
-        ""
-      );
-      $("teacherCodeSchoolPreset")?.addEventListener("change", (event) => {
-        const manual = event.target.value === MANUAL_SCHOOL;
-        show("teacherCodeSchoolId", manual);
-        const field = $("teacherCodeSchoolId");
-        if (field) field.value = manual ? "" : event.target.value;
-        renderGradeOptions();
-        refreshDerivedCode();
-        refreshCodeExistence();
-      });
       renderGradeOptions();
     }
 
-    $("teacherCodeSchoolId")?.addEventListener("input", () => {
+    // 2026-09-10(Bumm님 지시) - 학교는 **이름으로 찾는다.**
+    //
+    // 첫 칸이 "학교 코드(NEIS 표준학교코드, 숫자)"였는데 그 숫자를 아는
+    // 사람은 없다. 학생 앱이 쓰는 것과 같은 방식(NEIS 학교기본정보 검색 →
+    // 목록에서 고르기)으로 맞추고, 숫자 칸은 화면에서 없앴다. 고른 학교의
+    // 코드는 hidden 칸에만 담긴다 - 사람이 볼 값이 아니다.
+    //
+    // 학생 앱의 searchSchool은 actor(익명 인증)를 요구해서 이 화면에서는
+    // 못 쓴다(여기는 superadmin 이메일 계정이다). 서버에 문지기만 다른
+    // adminSearchSchool을 뒀고, NEIS 호출은 같은 코드를 쓴다.
+    const SEARCH_DEBOUNCE_MS = 300, MIN_QUERY = 2, MAX_RESULTS = 15;
+    let searchTimer = null, searchToken = 0;
+
+    function chooseSchool(schoolCode, schoolName) {
+      const field = $("teacherCodeSchoolId");
+      if (field) field.value = schoolCode || "";
+      const chosenName = $("teacherCodeSchoolChosenName");
+      if (chosenName) chosenName.textContent = schoolName || "";
+      $("teacherCodeSchoolChosen").hidden = !schoolCode;
+      show("teacherCodeSchoolQuery", !schoolCode);
+      $("teacherCodeSchoolResults")?.replaceChildren();
+      const status = $("teacherCodeSchoolStatus");
+      if (status) status.textContent = "";
       renderGradeOptions();
       refreshDerivedCode();
       refreshCodeExistence();
+    }
+
+    function renderSearchResults(schools) {
+      const list = $("teacherCodeSchoolResults");
+      const status = $("teacherCodeSchoolStatus");
+      if (!list) return;
+      list.replaceChildren();
+      // 🔴 결과가 없을 때 조용히 빈 목록만 두지 않는다 - "검색이 안 되는 것"과
+      // "그런 학교가 없는 것"이 화면에서 똑같아 보이면 안 된다.
+      if (!schools.length) {
+        if (status) status.textContent = "그 이름으로 찾은 학교가 없어요. 학교 이름을 다시 확인해 주세요.";
+        return;
+      }
+      if (status) status.textContent = "";
+      for (const school of schools.slice(0, MAX_RESULTS)) {
+        const item = document.createElement("li");
+        const button = document.createElement("button");
+        button.type = "button";
+        // 같은 이름의 학교가 여러 지역에 있어서 주소까지 보여줘야 고를 수 있다.
+        const name = document.createElement("strong");
+        name.textContent = school.schoolName;
+        const where = document.createElement("small");
+        where.textContent = [school.region, school.address].filter(Boolean).join(" · ");
+        button.append(name, where);
+        button.addEventListener("click", () => chooseSchool(school.schoolCode, school.schoolName));
+        item.append(button);
+        list.append(item);
+      }
+    }
+
+    $("teacherCodeSchoolQuery")?.addEventListener("input", (event) => {
+      const trimmed = String(event.target.value || "").trim();
+      if (searchTimer !== null) window.clearTimeout(searchTimer);
+      $("teacherCodeSchoolResults")?.replaceChildren();
+      const status = $("teacherCodeSchoolStatus");
+      if (trimmed.length < MIN_QUERY) { if (status) status.textContent = ""; return; }
+      searchTimer = window.setTimeout(async () => {
+        if (status) status.textContent = "찾는 중...";
+        const mine = ++searchToken;
+        const result = await callSuperadminFunction("adminSearchSchool", await currentIdToken(), { query: trimmed });
+        if (mine !== searchToken) return;
+        if (!result.ok) {
+          // 못 찾은 것과 못 물어본 것을 섞지 않는다.
+          if (status) status.textContent = result.code === "superadmin_required" ? "이 계정은 관리자 권한이 없어요."
+            : result.code === "auth_missing" || result.code === "auth_invalid" ? "먼저 로그인해주세요."
+            : "학교를 찾지 못했어요. 잠시 뒤 다시 시도해주세요.";
+          return;
+        }
+        renderSearchResults(Array.isArray(result.body?.schools) ? result.body.schools : []);
+      }, SEARCH_DEBOUNCE_MS);
     });
+    $("teacherCodeSchoolReset")?.addEventListener("click", () => {
+      const query = $("teacherCodeSchoolQuery");
+      if (query) query.value = "";
+      chooseSchool("", "");
+    });
+
     $("teacherCodeGrade")?.addEventListener("change", () => {
       renderClassOptions();
       refreshDerivedCode();
@@ -360,8 +423,8 @@
         mode: addMode ? "add" : "replace",
         ...(addMode && label ? { label } : {})
       });
-      // 무엇을 했는지 그대로 말한다. "발급/회전 완료"는 둘 중 무엇이
-      // 일어났는지를 여전히 안 알려준다.
+      // 무엇을 했는지 그대로 말한다. 예전 문구는 둘 중 무엇이 일어났는지를
+      // 알려주지 않았다.
       if (result.ok) refreshCodeExistence();
       status.textContent = result.ok
         ? (addMode ? "추가 코드로 등록했어요. 기존 코드도 그대로 통합니다." : replacing ? "교체했어요. 이전 코드는 이제 쓸 수 없습니다." : "발급했어요.")

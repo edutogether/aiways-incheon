@@ -7,13 +7,14 @@
 // 직접 만들고(비밀번호를 대신 만들어주지 않음), scripts/grantSuperadmin.js로
 // 그 uid에 클레임을 부여해야 이 함수들을 실제로 쓸 수 있다.
 //
-// 지금 유일한 기능은 교사 인증코드 발급/회전(manageTeacherCode) - 지금까지
+// 첫 기능은 교사 인증코드 발급·교체(manageTeacherCode) - 지금까지
 // scripts/setTeacherCode.js를 개발자가 로컬에서 수동 실행해야만 했던 걸
 // 대표님이 admin.html에서 직접 할 수 있게 대체한다.
 const { cleanText, applyCors } = require("./httpGuard");
 const { observeAppCheck } = require("./appCheckProtection");
 const { MAX_EXTRA_CODES, hashTeacherCode } = require("./teacherCodeHash");
 const { teacherCodeDocId } = require("./teacherAuth");
+const { respondWithSchoolSearch } = require("./schoolSearch");
 
 const MAX_BODY_BYTES = 2 * 1024;
 const SCHOOL_ID_PATTERN = /^\d{1,12}$/;
@@ -84,7 +85,7 @@ function createManageTeacherCodeHandler(dependencies = {}) {
     const docRef = db.collection("teacherCodes").doc(teacherCodeDocId(schoolId, grade, classNum));
     try {
       if (mode === "add") {
-        // 같은 라벨이 이미 있으면 그 자리를 갈아끼운다(코드 회전). 라벨이
+        // 같은 라벨이 이미 있으면 그 자리를 갈아끼운다(코드 교체). 라벨이
         // 없으면 새로 붙인다. 트랜잭션으로 읽고 쓰는 이유: 두 코드를
         // 거의 동시에 등록하면 나중 쓰기가 앞선 것을 덮어쓸 수 있다.
         await db.runTransaction(async (transaction) => {
@@ -154,4 +155,25 @@ function createTeacherCodeStatusHandler(dependencies = {}) {
   };
 }
 
-module.exports = { createManageTeacherCodeHandler, createTeacherCodeStatusHandler };
+// 관리자 화면의 학교 검색(2026-09-10 Bumm님 지시).
+//
+// 첫 칸이 "학교 코드(NEIS 표준학교코드, 숫자)"였는데 그 숫자를 아는 사람은
+// 없다. **학생 앱이 쓰는 것과 같은 학교 검색**을 관리자 화면에도 붙인다.
+//
+// 학생 앱의 searchSchool을 그대로 부를 수는 없다 - 그쪽 문지기는 actor(익명
+// 인증)를 요구하는데, 이 화면은 superadmin 이메일 계정으로 로그인한 상태라
+// actor가 없다. 관리자 화면이 익명 인증까지 하게 만들면 같은 auth 인스턴스에
+// 두 신원이 얽혀 슈퍼어드민 세션이 깨진다. **그래서 문지기만 바꾸고 NEIS
+// 호출은 같은 코드를 쓴다**(schoolSearch.js의 respondWithSchoolSearch).
+function createAdminSchoolSearchHandler(dependencies = {}) {
+  const getApiKey = dependencies.getApiKey;
+  const fetchImpl = dependencies.fetch || fetch;
+  const logger = dependencies.logger || (() => {});
+  return async (req, res) => {
+    const admin = await guardedSuperadmin(req, res, "adminSearchSchool", dependencies);
+    if (!admin) return;
+    return respondWithSchoolSearch({ req, res, getApiKey, fetchImpl, logger });
+  };
+}
+
+module.exports = { createManageTeacherCodeHandler, createTeacherCodeStatusHandler, createAdminSchoolSearchHandler };

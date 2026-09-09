@@ -9,6 +9,7 @@
 // (만드는 것은 scripts/fetchSchoolClassCounts.js).
 import { readFileSync } from "node:fs";
 import { test, expect } from "@playwright/test";
+import { openAdmin, pickSchool } from "./adminHarness.js";
 
 // 데이터 파일을 노드 쪽에서도 읽어 기대값으로 쓴다. 화면이 스스로 만든 값을
 // 화면에서 확인하면 아무것도 검증하지 못한다(COMMON_STANDARDS §21-7 - 기대치는
@@ -18,16 +19,6 @@ function loadClassCounts() {
   const source = readFileSync("schoolClassCounts.js", "utf8");
   const start = source.indexOf("{", source.indexOf("window.AIWaysSchoolClassCounts"));
   return JSON.parse(source.slice(start, source.lastIndexOf("}") + 1));
-}
-
-async function openAdmin(page) {
-  const errors = [];
-  page.on("pageerror", (error) => errors.push(String(error)));
-  await page.goto("/admin.html");
-  // 이 구역은 로그인해야 보인다. 화면상으로만 열어서 확인한다 - 실제 권한은
-  // 전부 서버의 superadmin 클레임 검증으로 강제되므로 우회가 아니다.
-  await page.evaluate(() => document.getElementById("teacherCodeSection")?.removeAttribute("hidden"));
-  return errors;
 }
 
 const optionValues = (page, id) =>
@@ -52,7 +43,7 @@ test("학교와 학년을 고르면 그 학년에 실제로 있는 반만 뜬다
   const errors = await openAdmin(page);
 
   for (const school of data.schools) {
-    await page.selectOption("#teacherCodeSchoolPreset", school.schoolId);
+    await pickSchool(page, school.name);
     for (const [grade, count] of Object.entries(school.classesByGrade)) {
       if (!count) continue;
       await page.selectOption("#teacherCodeGrade", grade);
@@ -67,7 +58,7 @@ test("학교와 학년을 고르면 그 학년에 실제로 있는 반만 뜬다
 
 test("반을 고르면 인증코드가 규칙대로 채워진다", async ({ page }) => {
   await openAdmin(page);
-  await page.selectOption("#teacherCodeSchoolPreset", "7361073"); // 인천청라초
+  await pickSchool(page, "인천청라초등학교");
   await page.selectOption("#teacherCodeGrade", "2");
   await page.selectOption("#teacherCodeClassNum", "7");
   // <학교영문><학년><반 두 자리>. 청라는 [청나]로 소리나므로 CHEONGNA다.
@@ -76,11 +67,9 @@ test("반을 고르면 인증코드가 규칙대로 채워진다", async ({ page
 
 test("자료에 없는 학교는 넓게 보여주되 확인되지 않았다고 알린다", async ({ page }) => {
   await openAdmin(page);
-  // 목록에 없는 학교를 다루는 길("직접 입력")은 없애지 않았다 - 4개교 말고
-  // 다른 학교의 코드를 발급할 일이 생길 수 있다.
-  await page.selectOption("#teacherCodeSchoolPreset", "__manual__");
-  await expect(page.locator("#teacherCodeSchoolId")).toBeVisible();
-  await page.locator("#teacherCodeSchoolId").fill("9999999");
+  // 자료에 없는 학교도 계속 다뤄야 한다 - 4개교 말고 다른 학교의 코드를
+  // 발급할 일이 생길 수 있다. 학교 검색은 전국을 찾으므로 그런 학교도 골라진다.
+  await pickSchool(page, "서울대도초등학교");
   await page.selectOption("#teacherCodeGrade", "2");
   const classes = await optionValues(page, "teacherCodeClassNum");
   expect(classes.length, "자료 없는 학교도 고를 수는 있어야 한다").toBe(15);

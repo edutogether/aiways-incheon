@@ -56,6 +56,8 @@ const READS_PER_REQUEST_WORST_CASE = Object.freeze({
   manageTeacherCode: 1,
   // 그 반에 코드가 있는지만 보는 조회 - 리미터 tx 1 + 문서 1.
   teacherCodeStatus: 2,
+  // 학교 검색은 Firestore를 안 본다(NEIS만 부른다) - 리미터 tx 1회.
+  adminSearchSchool: 1,
   // Firestore 조회는 전혀 없다(외부 NEIS API만 호출) - 공통 전처리만 든다.
   searchSchool: BASE_ACTOR_READS,
   // 비용절감 4번 ③단계 관찰용 - Firestore 조회 없이 Cloud Logging만 남긴다.
@@ -133,6 +135,8 @@ const RATE_LIMITS = Object.freeze({
   // 상한을 넉넉히 둔다 - 좁게 잡으면 조합을 몇 번 눌러보다 429가 나고,
   // 그때 버튼 글자가 멈춰서 오히려 사람을 헷갈리게 한다.
   ,teacherCodeStatus: { perMinute: 60, perDay: 600 }
+  // 자동완성이라 글자를 칠 때마다 부른다. 학생 앱의 searchSchool과 같은 성격.
+  ,adminSearchSchool: { perMinute: 60, perDay: 600 }
   // 2026-08-31 - CSV 반전체 내보내기(5단계). collectionGroup 쿼리라
   // 페이지당 최대 200건을 읽을 수 있어(classExport.js MAX_PAGE_SIZE) 다른
   // 조회보다 상한을 좁게 잡는다.

@@ -58,4 +58,7 @@
 - **`transaction.set(ref, data, { merge: false })`는 문서를 통째로 갈아엎는다** — 나열 안 한 `status`/`plan`이 날아가 기기가 영구 잠긴 사고가 있었다. 필드 몇 개만 지우려면 `{ merge: true }` + `FieldValue.delete()`
 - **폴링 주기를 줄일 땐 반드시 `perMinute`/`perDay` 상한과 같이 계산한다** — 계산 없이 줄였다가 등교시간에 켠 대시보드가 점심 전에 조용히 멈춘 장애가 있었다
 - **실패한 CI를 그냥 재실행하지 않는다** — `gh run view --log-failed`로 원인부터 확인한다
+- **배포는 push가 아니라 `success`를 눈으로 확인해야 끝난 것이다.** push 직후 "배포 중"이라고 보고하지 말고 `gh run list --branch main --limit 1`로 결과를 확인한 뒤 보고한다. 2026-09-09 하루에만 같은 유형이 두 번 났다 — ①긴급 CORS 수정을 push한 직후 문서 커밋을 밀어 넣어 **대기 중이던 그 배포가 취소**됐고(이 워크플로는 새 실행이 오면 대기 중 실행을 취소한다), ②승인 게이트 제거와 교사 관리 기능 두 커밋이 **연속으로 실패**했는데 세션은 "배포 중"으로 알고 시연 시나리오 작업으로 넘어가려 했다. 둘 다 팀장이 직접 CI를 확인해서 드러났다
+- **긴급 수정을 push했으면 그 배포가 끝날 때까지 다른 것을 push하지 않는다** — 위 ①이 정확히 그 사고다
+- **`functions/index.js`에서 함수 export를 지우면 CI 배포가 중단된다. 이건 고장이 아니라 안전장치다.** Firebase는 "프로젝트에는 있는데 소스에는 없는 함수"를 발견하면 삭제 여부를 물어야 하는데 CI는 비대화형이라 물을 수 없어서 `Aborting because deletion cannot proceed in non-interactive mode`로 멈춘다. **`--force`로 뚫지 마라** — 그러면 앞으로 누가 실수로 export를 지워도 프로덕션 함수가 조용히 삭제된다. 2026-09-09에 이 장치가 실제로 작동해 세션을 멈춰 세웠다. 올바른 절차는 ①`firebase functions:list`로 삭제 대상이 정확히 무엇인지 확인 ②팀장 승인 ③`firebase functions:delete <이름> --region asia-northeast3 --project ai-ways-incheon`으로 명시 삭제 ④재배포
 - **새 클론·새 worktree에서는 `git config core.hooksPath .githooks`를 한 번 실행해야** freeze 태그 보호 훅이 켜진다(루트에 package.json이 없어 자동 설치가 안 됨)

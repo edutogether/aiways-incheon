@@ -31,6 +31,10 @@ export interface SchoolSelection {
 export function useSchoolSearch() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SchoolResult[] | null>(null);
+  // 🔴 검색이 실패한 것과 그런 학교가 없는 것은 다르다. 예전에는 둘 다 빈
+  // 배열이라 화면이 "검색 결과가 없어요"라고 말했다 - 2026-09-10에 실제로
+  // 그 화면을 보고 원인을 못 찾았다(COMMON_STANDARDS §21).
+  const [error, setError] = useState<string | null>(null);
   const [schoolId, setSchoolId] = useState("");
   const selectedLabel = useRef("");
   const debounce = useRef<number | null>(null);
@@ -46,6 +50,7 @@ export function useSchoolSearch() {
     // 고른 뒤에 글자를 고치면 그 선택은 무효다 - 코드를 비워서 "고르지 않은
     // 상태"로 되돌린다.
     if (value.trim() !== selectedLabel.current) setSchoolId("");
+    setError(null);
     if (debounce.current !== null) window.clearTimeout(debounce.current);
     const trimmed = value.trim();
     if (trimmed.length < MIN_QUERY_LENGTH) {
@@ -54,9 +59,11 @@ export function useSchoolSearch() {
     }
     debounce.current = window.setTimeout(() => {
       void edu2gClient()?.searchSchool?.({ query: trimmed }).then((response) => {
-        const schools = response.ok ? ((response.data as { schools?: SchoolResult[] } | undefined)?.schools ?? []) : [];
+        if (!response.ok) { setError(response.code || "unknown"); setResults([]); return; }
+        setError(null);
+        const schools = (response.data as { schools?: SchoolResult[] } | undefined)?.schools ?? [];
         setResults(schools.slice(0, MAX_RESULTS));
-      }).catch(() => setResults([]));
+      }).catch(() => { setError("network_error"); setResults([]); });
     }, DEBOUNCE_MS);
   }, []);
 
@@ -82,5 +89,5 @@ export function useSchoolSearch() {
 
   const selection: SchoolSelection | null = schoolId ? { schoolId, schoolName: query.trim() } : null;
 
-  return { query, results, selection, onQueryChange, onBlur, select, setValue };
+  return { query, results, error, selection, onQueryChange, onBlur, select, setValue };
 }

@@ -1,4 +1,5 @@
 import type { useSignup } from "./useSignup";
+import { edu2gClient } from "../legacy/globals";
 
 // 가입 카드. 상태에 따라 네 가지 중 하나로 그려진다.
 //   form            아직 가입 전 - 입력 폼
@@ -98,7 +99,19 @@ export function SignupCard({ signup }: { signup: ReturnType<typeof useSignup> })
                  value={school.query} onChange={(event) => school.onQueryChange(event.target.value)} onBlur={school.onBlur} />
           <input type="hidden" id="signupSchoolCode" value={school.selection?.schoolId ?? ""} />
           <div id="signupSchoolResults" className={`${school.results ? "" : "hidden "}absolute left-0 right-0 mt-1 bg-white border border-blue-200 rounded-xl shadow-lg z-20 max-h-40 overflow-y-auto text-xs`}>
-            {school.results?.length === 0 && <div className="px-3 py-2 text-slate-400">검색 결과가 없어요.</div>}
+            {/* 🔴 검색이 실패한 것을 "그런 학교가 없다"로 말하지 않는다.
+                2026-09-10에 실제로 이 화면이 "검색 결과가 없어요"라고만 말해서,
+                보안 확인이 막힌 것인지 학교가 없는 것인지 아무도 몰랐다.
+                코드까지 작게 붙인다 - 휴대폰에서는 콘솔을 못 열기 때문에,
+                알려줄 때 같이 읽어줄 한 줄이 없으면 원인을 영영 못 찾는다. */}
+            {school.error && (
+              <div className="px-3 py-2 text-amber-700 bg-amber-50">
+                <span className="block font-semibold">검색하지 못했어요.</span>
+                <span className="block text-[11px] mt-0.5">{edu2gClient()?.errorMessageFor?.(school.error) ?? "잠시 후 다시 시도해 주세요."}</span>
+                <span className="block text-[10px] text-amber-600 font-mono mt-1">{[school.error, window.AIWaysAppCheck?.lastFailureSummary?.()].filter(Boolean).join(" · ")}</span>
+              </div>
+            )}
+            {!school.error && school.results?.length === 0 && <div className="px-3 py-2 text-slate-400">검색 결과가 없어요.</div>}
             {school.results?.map((result) => (
               // 같은 이름의 학교가 여러 지역에 있어 급별만으로는 구분이 안 될
               // 때가 있다 - 주소를 같이 보여줘야 정확히 고를 수 있다.

@@ -107,7 +107,13 @@ package.json이 셋이다 — `functions/`(백엔드·테스트), 루트(Playwri
 - `mobile-app/`이 전환 프로젝트다. **루트 package.json에 `"type": "module"`을 넣지 않는다** — 루트 .js는 브라우저가 `<script>`로 읽는 고전 스크립트이고 functions/test가 `require()`한다(이것 때문에 CI가 한 번 죽었다). 그래서 하위 폴더에 자기 package.json을 뒀다
 - **`mobile/tailwind.generated.css`를 다시 만들지 않는다.** 빌드 파이프라인 없이 만들어져 커밋된 24KB 사전 생성 번들이다. 다시 만들면 purge 범위·버전 차이로 화면이 미세하게 달라지는데 발견이 어렵다. 빌드가 바이트 그대로 복사하고, `reactShell.spec.js`가 해시를 대조한다
 - **Vite가 넣는 번들 `<script type="module">`은 반드시 공유 스크립트 뒤에 와야 한다.** 앞에 오면 리액트가 `window.AIWaysEdu2gClient`보다 먼저 돌아 저장·로그인이 "가끔" 안 되는 형태로 깨진다 — 화면 스냅샷으로는 안 잡힌다. `vite.config.ts`의 `transformIndexHtml(order:"post")`가 순서를 잡고, `reactShell.spec.js`가 문서 순서를 검사한다
-- 산출물은 S5 전까지 `mobile-next/`(gitignore)로 나간다. **라이브 `mobile/`은 S5에서만 바뀐다**
+- 🔴 **`mobile/`은 더 이상 손으로 쓰는 폴더가 아니다. `mobile-app`의 빌드 산출물이고 git에 안 들어간다**(2026-09-09 S5). 소스는 `mobile-app/src`(화면·로직)와 `mobile-app/public`(빌드를 안 거치는 파일 - `authGate.js`, 스타일시트 둘). **`mobile/` 안의 파일을 고치면 다음 빌드에 지워진다**
+- 배포 전에 반드시 `npm run build:mobile`. 잊으면 `scripts/stageHostingSite.js`가 "mobile/index.html 이 없습니다"로 멈춘다(조용히 빈 화면을 배포하지 않게 하는 장치다). CI는 `deploy-hosting`에서 직접 빌드한다
+- 전환 전 원본(손으로 쓴 `mobile/` 전체)은 **`mobile-react-freeze-20260909`** 태그에 있다
+
+### 아직 안 한 것 (전환이 안정된 뒤 별건으로)
+- **`authGate.js`는 옮기지 않았다.** App Check 실패 화면·재시도가 들어 있고 리액트 밖의 `#authGate`를 다시 그리는 구조라 성격이 다르다. 전환과 같이 건드리면 문제가 났을 때 원인 구분이 안 된다
+- **후보 검증의 프로토타입 속성 통과**: `normalizeAnalysis`가 `db[itemId]`로만 확인해서 `itemId: "constructor"`가 통과한다(값이 함수라 truthy). 원본에 있던 성질이라 전환 중에는 고치지 않았다. 고칠 때는 `Object.hasOwn`으로 바꾸고 `sortingAnalysis.test.ts`의 해당 케이스도 같이 고친다
 
 ### 전환하면서 실제로 당한 것들 (같은 실수를 또 하지 않으려고 남긴다)
 - **`{값}글자`로 쓰면 텍스트 노드가 둘로 쪼개지고 글자 폭이 소수점 아래에서 달라진다.** `현재 점수: {score}점`이 원본보다 0.03px 넓게 나왔다. 원본이 한 덩어리 문자열이면 전환본도 한 덩어리(`{`현재 점수: ${score}점`}`)로 써야 한다

@@ -28,5 +28,13 @@ export default tseslint.config(
   {
     files: ["eslint.config.js"],
     languageOptions: { globals: globals.node }
+  },
+  {
+    // public/ 은 빌드를 거치지 않고 산출물로 그대로 복사되는 파일들이다.
+    // authGate.js는 브라우저가 <script>로 읽는 고전 스크립트라 타입 검사
+    // 대상이 아니지만, 여기 들어오면서 처음으로 린트를 받게 됐다
+    // (예전에는 eslint가 functions/ 안만 봐서 어느 게이트에도 안 걸렸다).
+    files: ["public/**/*.js"],
+    languageOptions: { globals: globals.browser, sourceType: "script" }
   }
 );

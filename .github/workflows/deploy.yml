@@ -301,8 +301,14 @@ jobs:
       - name: Deploy Firestore rules, indexes, and Cloud Functions
         run: firebase deploy --only firestore:rules,firestore:indexes,functions --project ai-ways-incheon --non-interactive
 
+  # 2026-09-09 리액트 전환 S5: mobile/은 이제 저장소에 없다(빌드 산출물).
+  # 그래서 여기서 mobile-app을 빌드해야 스테이징에 담을 것이 생긴다 -
+  # 빌드를 빼먹으면 학생 화면이 통째로 사라지므로, stageHostingSite.js가
+  # 산출물이 없으면 아예 멈추게 해 뒀다.
+  # frontend job(lint/typecheck/test/build)도 needs에 넣었다. 이제 이 빌드가
+  # 실제 배포물이라, 그 검사가 실패하면 배포가 나가면 안 된다.
   deploy-hosting:
-    needs: deploy-backend
+    needs: [deploy-backend, frontend]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -312,6 +318,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: "npm"
+          cache-dependency-path: mobile-app/package-lock.json
+
+      - name: Install mobile-app dependencies
+        run: npm ci
+        working-directory: mobile-app
+
+      - name: Build mobile app
+        run: npm run build
+        working-directory: mobile-app
 
       # 화이트리스트: 실제 사이트가 브라우저에서 fetch/import하는 파일만
       # _hosting_site로 골라 담는다(scripts/stageHostingSite.js, 로컬

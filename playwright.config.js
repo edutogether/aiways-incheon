@@ -18,7 +18,10 @@ module.exports = defineConfig({
   retries: 0,
   reporter: [["list"]],
   use: {
-    baseURL: "http://127.0.0.1:8001",
+    // 기본은 로컬 정적 서버다. 배포된 주소(프리뷰 채널 등)를 그대로 재고
+    // 싶을 때만 AIWAYS_BASELINE_BASE_URL로 바꾼다 - 롤백이 실제로 같은
+    // 화면을 되살리는지 확인할 때 쓴다.
+    baseURL: process.env.AIWAYS_BASELINE_BASE_URL || "http://127.0.0.1:8001",
     // 스크린샷 비교의 기준. 폰트 안티에일리어싱 차이로 전체가 실패하는
     // 것을 막되, 실제 레이아웃 변화는 반드시 잡히도록 좁게 잡는다.
     screenshot: "off"

@@ -41,6 +41,14 @@ copyGlobExt(".css");
 copyFile("base-data-seed.tsv");
 copyDir("assets");
 copyDir("styles");
+// mobile/은 빌드 산출물이다(2026-09-09 리액트 전환). 빌드를 잊고 배포하면
+// 학생 화면이 통째로 사라지므로, 조용히 빈 폴더를 담아가지 않고 여기서
+// 멈춘다. `npm run build:mobile`이 만든다.
+const mobileEntry = path.join(ROOT, "mobile", "index.html");
+if (!fs.existsSync(mobileEntry)) {
+  console.error("mobile/index.html 이 없습니다 - 먼저 `npm run build:mobile`을 실행하세요.");
+  process.exit(1);
+}
 copyDir("mobile");
 copyDir("miniapp");
 

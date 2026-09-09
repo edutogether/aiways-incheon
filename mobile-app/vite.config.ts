@@ -5,7 +5,6 @@
 // <script>로 읽는 고전 스크립트)이 ESM으로 해석되면서 functions/test의
 // require()가 깨진다 - 실제로 CI가 한 번 이것 때문에 죽었다. 자기
 // package.json을 가진 하위 폴더로 두면 그 문제 자체가 생기지 않는다.
-import { copyFileSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
@@ -14,16 +13,21 @@ import { defineConfig, type Plugin } from "vite";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(HERE, "..");
 
-// 전환이 끝날 때까지 산출물은 여기로 나간다. 라이브인 mobile/은 S5까지
-// 손대지 않는다 - 어느 단계에서 멈춰도 학생들이 쓰는 화면은 그대로다.
-const OUT_DIR = resolve(REPO_ROOT, "mobile-next");
+// 산출물이 곧 배포되는 화면이다(2026-09-09 S5에서 교체). mobile/은 이제
+// 손으로 쓰는 폴더가 아니라 **빌드 결과물**이라 git에 들어가지 않는다
+// (.gitignore). 배포 스테이징(scripts/stageHostingSite.js)이 이 폴더를
+// 통째로 담아가므로, 빌드하지 않고 배포하면 화면이 통째로 사라진다 -
+// 그래서 스테이징 스크립트가 산출물 유무를 먼저 확인한다.
+const OUT_DIR = resolve(REPO_ROOT, "mobile");
 
-// 스타일시트를 Vite에 맡기지 않고 "있는 그대로" 복사하는 이유:
+// 스타일시트를 Vite에 맡기지 않고 "있는 그대로" 내보내는 이유:
 // tailwind.generated.css는 빌드 파이프라인 없이 만들어져 커밋된 24KB짜리
 // 사전 생성 번들이다. 여기서 다시 만들거나 Vite에 통과시키면 purge 범위나
 // 미니파이 방식 차이로 화면이 미세하게 달라질 수 있는데, 그 차이는
-// "체감까지 동일"을 깨뜨리면서 눈으로 찾기는 어렵다. 그래서 바이트 그대로
-// 옮긴다(빌드마다 해시를 대조한다 - tests/baseline/reactShell.spec.js).
+// "체감까지 동일"을 깨뜨리면서 눈으로 찾기는 어렵다.
+//
+// public/에 두면 Vite가 손대지 않고 산출물로 그대로 복사한다. 해시가
+// 정말 같은지는 reactShell.spec.js가 매번 대조한다.
 const VERBATIM_STYLESHEETS = ["tailwind.generated.css", "mobile.css"];
 
 // 상위 폴더의 공유 스크립트는 PC 앱과 같이 쓰는 것이라 이번 전환에서
@@ -34,10 +38,12 @@ const LEGACY_SCRIPTS = [
   "../firebaseAppCheck.js",
   "../firebaseBetaAuth.js",
   "../edu2gBetaClient.js",
-  // 인증 게이트는 아직 옮기지 않았다(S5에서 정리한다). App Check 실패 화면과
-  // 재시도까지 들어 있고, 리액트 밖의 #authGate를 다시 그리는 구조라 화면
-  // 이식과는 성격이 다르다.
-  "../mobile/authGate.js"
+  // 인증 게이트는 **일부러 옮기지 않았다.** App Check 실패 화면과 재시도가
+  // 들어 있고 리액트 밖의 #authGate를 다시 그리는 구조라 화면 이식과 성격이
+  // 다르다. 같이 건드리면 문제가 났을 때 전환 때문인지 게이트 때문인지
+  // 구분이 안 된다 - 전환이 안정된 뒤 별건으로 한다(app.md 남은 항목).
+  // public/에 있으므로 산출물에서는 같은 폴더에 놓인다.
+  "./authGate.js"
 ];
 
 function aiwaysLegacyAssets(): Plugin {
@@ -72,12 +78,6 @@ function aiwaysLegacyAssets(): Plugin {
         return html.replace("</head>", `${injected}\n</head>`);
       }
     },
-    closeBundle() {
-      mkdirSync(OUT_DIR, { recursive: true });
-      for (const name of VERBATIM_STYLESHEETS) {
-        copyFileSync(resolve(REPO_ROOT, "mobile", name), resolve(OUT_DIR, name));
-      }
-    }
   };
 }
 

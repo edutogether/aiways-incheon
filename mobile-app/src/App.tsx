@@ -1,9 +1,33 @@
-// S1(토대) 단계의 App.
-//
-// 이 단계의 목표는 "빌드가 서고, 산출물이 원본과 같은 <head>로 뜨고, PC 앱과
-// 공유하는 전역 스크립트가 같은 순서로 로드된다"까지다. 화면 마크업은 S2에서
-// index.html을 1:1로 옮겨오면서 채운다 - 지금 대충 만들어 두면 나중에 "이미
-// 있는 것"에 맞추게 되어, 원본과 대조한다는 목적이 흐려진다.
+import { AppHeader } from "./components/AppHeader";
+import { PoweredByBanner } from "./components/PoweredByBanner";
+import { TabNav } from "./components/TabNav";
+import { ConfirmModal } from "./modals/ConfirmModal";
+import { JudgeModal } from "./modals/JudgeModal";
+import { HoldTab } from "./tabs/HoldTab";
+import { JudgeTab } from "./tabs/JudgeTab";
+import { QuizTab } from "./tabs/QuizTab";
+import { StatsTab } from "./tabs/StatsTab";
+
+// #appRoot 안쪽 전체. 원본 index.html의 구조를 그대로 옮긴 것이라, 여기
+// 순서를 바꾸면 화면이 바뀐다 - 모달 두 개가 <main> 바깥, 탭들 뒤에 오는
+// 것도 원본 그대로다(fixed 오버레이라 위치 자체는 화면에 안 나타나지만,
+// DOM 순서는 겹침 순서에 영향을 준다).
 export function App() {
-  return null;
+  return (
+    <>
+      <AppHeader />
+
+      <main className="relative max-w-lg w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-4 sm:p-6 space-y-6">
+        <TabNav />
+        <JudgeTab />
+        <QuizTab />
+        <StatsTab />
+        <HoldTab />
+        <PoweredByBanner />
+      </main>
+
+      <JudgeModal />
+      <ConfirmModal />
+    </>
+  );
 }

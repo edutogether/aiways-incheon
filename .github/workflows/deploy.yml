@@ -237,6 +237,11 @@ jobs:
       - name: Type check
         run: npm run typecheck
 
+      # 이식 정합성 테스트가 여기 걸린다 - 원본 파일을 실제로 실행해서
+      # 옮긴 모듈과 값을 대조하는 테스트라, 전사 오류를 여기서 잡는다.
+      - name: Unit tests
+        run: npm test
+
       # 빌드까지 돌리는 이유: 타입검사가 통과해도 index.html 주입이나
       # 스타일시트 복사가 깨질 수 있고, 그건 빌드해야만 드러난다.
       - name: Build

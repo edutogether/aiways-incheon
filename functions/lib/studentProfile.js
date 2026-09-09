@@ -50,10 +50,11 @@ function createCheckStudentProfileHandler(dependencies = {}) {
       const snap = await db.collection("actors").doc(protectedActor.actorId).get();
       const profile = snap.exists ? snap.data()?.studentProfile : null;
       if (profile) return res.status(200).json({ ok: true, hasProfile: true, pending: false, rejected: false, profile: publicProfile(profile) });
-      const requestSnap = await db.collection("registrationRequests").doc(protectedActor.actorId).get();
-      const request = requestSnap.exists ? requestSnap.data() : null;
-      const isPending = request?.status === "pending";
-      return res.status(200).json({ ok: true, hasProfile: false, pending: isPending, rejected: request?.status === "rejected", profile: null, pendingProfile: isPending ? publicProfile(request) : null });
+      // 2026-09-09 - 승인 대기열을 없앴으므로 "대기중"이라는 상태 자체가
+      // 없다. 가입하면 studentProfile이 바로 생기고, 없으면 아직 안 한
+      // 것뿐이다. pending/rejected는 클라이언트가 아직 읽고 있어서 형태만
+      // 유지하고 항상 false로 답한다(응답 스키마를 깨지 않기 위함).
+      return res.status(200).json({ ok: true, hasProfile: false, pending: false, rejected: false, profile: null, pendingProfile: null });
     } catch (error) {
       logger({ severity: "ERROR", message: "check_student_profile_failed", actorId: protectedActor.actorId, error: String(error?.message || error) });
       return res.status(503).json({ ok: false, code: "protection_unavailable" });
@@ -123,25 +124,30 @@ function createRegisterStudentProfileHandler(dependencies = {}) {
         return res.status(200).json({ ok: true, confirmed: false, role, preview: { schoolId, schoolName, grade, classNum, studentNumber, name } });
       }
 
-      // 3단 권한체계 2단계(2026-08-31) - 여기서 바로 studentProfile을 쓰지 않고
-      // registrationRequests/{actorId}에 대기 상태로만 남긴다. teacherVerified된
-      // actor(registrationApproval.js)가 승인해야 실제로 studentProfile이
-      // 생긴다 - 코드만 알면 자기신고로 실명+번호를 무제한 조회할 수 있던
-      // LOCKED 문제를 여기서 닫는다.
-      const requestRef = db.collection("registrationRequests").doc(protectedActor.actorId);
+      // 2026-09-09(Bumm님 결정) - 가입 승인 대기열을 없앴다. 예전에는 여기서
+      // registrationRequests/{actorId}에 대기 상태로만 남기고 교사가 승인해야
+      // studentProfile이 생겼는데(3단 권한체계 2단계), 그 사이에 수집한 기록은
+      // classContext가 안 붙고 승인해도 소급되지 않아서(sortingRecord.js) 실제
+      // 사용에서 수집분이 통째로 사라졌다. 검증을 "사전 차단"에서 "사후 정리"로
+      // 바꾼 것이라, 대신 교사가 자기 반 학생의 계정 차단·기록 삭제를 할 수
+      // 있다(teacherModeration.js).
+      // 번호 중복 확인(studentNumberClaim)은 승인 경로에 있던 것을 그대로
+      // 옮겨왔다 - 같은 반에서 한 번호를 두 기기가 동시에 쓰는 것은 여전히 막는다.
+      const claimRef = studentNumberClaimRef(db, schoolId, grade, classNum, studentNumber);
       const result = await db.runTransaction(async (transaction) => {
         const actorSnap = await transaction.get(actorRef);
         const already = actorSnap.exists ? actorSnap.data()?.studentProfile : null;
         if (already) return { code: "already_registered", profile: already };
-        const requestSnap = await transaction.get(requestRef);
-        const existingRequest = requestSnap.exists ? requestSnap.data() : null;
-        if (existingRequest?.status === "pending") return { code: "request_pending" };
-        transaction.set(requestRef, { schoolId, schoolName, grade, classNum, studentNumber, name, status: "pending", submittedAt: serverTimestamp() });
+        const claimSnap = await transaction.get(claimRef);
+        if (claimSnap.exists) return { code: "student_number_taken" };
+        transaction.set(actorRef, { studentProfile: { schoolId, schoolName, grade, classNum, studentNumber, name, registeredAt: serverTimestamp() }, dashboardSchoolId: schoolId }, { merge: true });
+        transaction.create(claimRef, { actorId: protectedActor.actorId, claimedAt: serverTimestamp() });
         return { ok: true };
       });
       if (result.code === "already_registered") return res.status(409).json({ ok: false, code: "already_registered", profile: publicProfile(result.profile) });
-      if (result.code === "request_pending") return res.status(409).json({ ok: false, code: "request_pending" });
-      return res.status(202).json({ ok: true, confirmed: true, role, pending: true, preview: { schoolId, schoolName, grade, classNum, studentNumber, name } });
+      if (result.code === "student_number_taken") return res.status(409).json({ ok: false, code: "student_number_taken" });
+      logger({ severity: "INFO", message: "student_registered", actorId: protectedActor.actorId, schoolId, grade, classNum });
+      return res.status(200).json({ ok: true, confirmed: true, role, profile: { schoolId, schoolName, grade, classNum, studentNumber, name } });
     } catch (error) {
       logger({ severity: "ERROR", message: "register_student_profile_failed", actorId: protectedActor.actorId, error: String(error?.message || error) });
       return res.status(503).json({ ok: false, code: "protection_unavailable" });

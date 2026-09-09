@@ -446,7 +446,7 @@
           if (result.ok && result.data?.pending) { showSignupPending(result.data.preview); showVisualAlert(`⏳ "${name}" 학생 가입 신청 완료! 선생님 승인을 기다려 주세요.`, "amber"); }
           else {
             status.textContent = result.data?.code === "already_registered" ? "이미 가입된 기기예요."
-              : result.data?.code === "request_pending" ? "이미 승인 대기중이에요." : "가입에 실패했어요. 다시 시도해 주세요.";
+              : result.data?.code === "student_number_taken" ? "그 번호는 우리 반에서 이미 쓰고 있어요. 번호를 다시 확인해 주세요." : "가입에 실패했어요. 다시 시도해 주세요.";
             if (result.data?.profile) showSignupLocked(result.data.profile);
           }
         }

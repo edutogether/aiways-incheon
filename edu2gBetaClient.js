@@ -3,7 +3,7 @@
 (() => {
   const REGION = "asia-northeast3";
   const EMULATOR_PROJECT = "demo-aiways-incheon";
-  const ALLOWED = new Set(["analyzeSortingImage", "analyzeSortingText", "analyzeSortingSafetyObserver", "saveSortingRecord", "listSortingRecords", "resolveSortingRecord", "getSchoolDashboard", "checkStudentProfile", "registerStudentProfile", "checkCampusLocation", "changeStudentClass", "getClassRanking", "searchSchool", "checkTeacherStatus", "verifyTeacherCode", "listPendingRegistrations", "decideRegistration", "exportClassRecords", "anonymizeStudent", "logDashboardRealtimeEvent"]);
+  const ALLOWED = new Set(["analyzeSortingImage", "analyzeSortingText", "analyzeSortingSafetyObserver", "saveSortingRecord", "listSortingRecords", "resolveSortingRecord", "getSchoolDashboard", "checkStudentProfile", "registerStudentProfile", "checkCampusLocation", "changeStudentClass", "getClassRanking", "searchSchool", "checkTeacherStatus", "verifyTeacherCode", "listClassStudents", "describeStudent", "moderateStudent", "exportClassRecords", "anonymizeStudent", "logDashboardRealtimeEvent"]);
   const LOCAL = new Set(["localhost", "127.0.0.1"]);
 
   function usingEmulator() {
@@ -81,8 +81,9 @@
     searchSchool: ({ query }) => request("searchSchool", { query }),
     checkTeacherStatus: () => request("checkTeacherStatus", {}),
     verifyTeacherCode: ({ schoolId, grade, classNum, code }) => request("verifyTeacherCode", { schoolId, grade, classNum, code }),
-    listPendingRegistrations: () => request("listPendingRegistrations", {}),
-    decideRegistration: ({ targetActorId, decision }) => request("decideRegistration", { targetActorId, decision }),
+    listClassStudents: () => request("listClassStudents", {}),
+    describeStudent: ({ targetActorId }) => request("describeStudent", { targetActorId }),
+    moderateStudent: ({ targetActorId, blockAccount, deleteRecords }) => request("moderateStudent", { targetActorId, blockAccount, deleteRecords }),
     exportClassRecords: ({ cursor = "" } = {}) => request("exportClassRecords", { ...(cursor ? { cursor } : {}) }),
     anonymizeStudent: ({ targetActorId }) => request("anonymizeStudent", { targetActorId }),
     logDashboardRealtimeEvent: ({ event, code = "" }) => request("logDashboardRealtimeEvent", { event, ...(code ? { code } : {}) })

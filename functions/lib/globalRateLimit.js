@@ -33,14 +33,15 @@ const READS_PER_REQUEST_WORST_CASE = Object.freeze({
   getSchoolDashboard: BASE_ACTOR_READS_SHARDED + 2, // 락tx 1 + school 문서 1
   getClassRanking: BASE_ACTOR_READS + 1, // 락tx 1
   exportClassRecords: BASE_ACTOR_READS + 1, // 교사확인 1
-  listPendingRegistrations: BASE_ACTOR_READS + 1, // 교사확인 1
+  listClassStudents: BASE_ACTOR_READS + 1, // 교사확인 1 (+ 명부 조회는 아래 가변표)
   listSortingRecords: BASE_ACTOR_READS + 1, // 커서 문서 1
   // 핸들러 자체(액터 1 + campusCheck tx 1 + 기록 tx 1)에 더해
   // onSortingRecordWritten 트리거가 별도 호출로 반집계 1 + 학교 1 + 학생 1을
   // 더 읽는다(트리거는 리미터 밖이라 요청 상한엔 안 잡히지만 과금은 된다).
   saveSortingRecord: BASE_ACTOR_READS + 3 + 3,
   registerStudentProfile: BASE_ACTOR_READS + 3,
-  decideRegistration: BASE_ACTOR_READS + 3, // 교사확인 1 + tx 2
+  describeStudent: BASE_ACTOR_READS + 3, // 교사확인 1 + 대상 1 + 차단여부 1 (기록수는 count 집계)
+  moderateStudent: BASE_ACTOR_READS + 3, // 교사확인 1 + 대상 1 + 차단쓰기 1 (기록 삭제는 아래 가변표)
   anonymizeStudent: BASE_ACTOR_READS + 2, // 교사확인 1 + tx(actor 조회) 1
   changeStudentClass: BASE_ACTOR_READS + 2,
   checkStudentProfile: BASE_ACTOR_READS + 2,
@@ -64,7 +65,8 @@ const VARIABLE_READS_PER_REQUEST = Object.freeze({
   getSchoolDashboard: "classes N + students M (둘 다 5.5초 인스턴스 캐시 miss 시에만)",
   getClassRanking: "classes K (5.5초 인스턴스 캐시 miss 시에만)",
   exportClassRecords: "기록 최대 201 (MAX_PAGE_SIZE+1, classExport.js)",
-  listPendingRegistrations: "대기요청 최대 100 (MAX_LIST_SIZE, registrationApproval.js)",
+  listClassStudents: "명부 최대 60 (MAX_ROSTER, teacherModeration.js) x 액터+차단 2회 조회",
+  moderateStudent: "기록 삭제 한 배치 최대 300 (DELETE_BATCH_SIZE, teacherModeration.js)",
   listSortingRecords: "기록 최대 41 (pageSize 최대 40 + 1)"
 });
 const RATE_LIMITS = Object.freeze({
@@ -117,7 +119,9 @@ const RATE_LIMITS = Object.freeze({
   // 2026-08-31 - 가입승인대기열(2단계). 교사 화면이 대기열을 자주 새로고침할
   // 수 있어 조회는 넉넉히, 승인/거절은 반 규모(수십 명) 감안해 60/분이면
   // 충분하고도 남는다.
-  ,listPendingRegistrations: { perMinute: 30 }, decideRegistration: { perMinute: 60 }
+  // 2026-09-09 - 승인 대기열을 없애고 교사 사후정리(명부/조회/차단·삭제)로 대체.
+  // 한 반 30명을 정리하는 상황을 감당해야 해서 승인(60/분)보다 넉넉히 잡는다.
+  ,listClassStudents: { perMinute: 60 }, describeStudent: { perMinute: 120 }, moderateStudent: { perMinute: 120 }
   // 2026-08-31 - 슈퍼어드민(4단계). 유일한 정당 사용자가 대표님 한 명뿐이라
   // 액터별 상한은 의미가 없고(anonymous actorId 체계 밖에 있음), 전역
   // 상한만 방어적으로 낮게 건다.
@@ -275,7 +279,9 @@ const ACTOR_RATE_LIMITS = Object.freeze({
   // 막는다(registerStudentProfile과 동일 값 - 둘 다 "정상적으로는 하루 몇 번
   // 안 쓰는" 1회성/저빈도 액션).
   checkTeacherStatus: { perMinute: 10, perDay: 200 }, verifyTeacherCode: { perMinute: 5, perDay: 20 },
-  listPendingRegistrations: { perMinute: 20, perDay: 2000 }, decideRegistration: { perMinute: 30, perDay: 500 },
+  // 교사 한 명이 자기 반 30명을 연속 정리해도 막히지 않아야 한다 - 승인이
+  // 30/분이라 31번째부터 429였던 문제를 되풀이하지 않으려고 올려 잡는다.
+  listClassStudents: { perMinute: 30, perDay: 2000 }, describeStudent: { perMinute: 60, perDay: 2000 }, moderateStudent: { perMinute: 60, perDay: 500 },
   exportClassRecords: { perMinute: 6, perDay: 100 },
   anonymizeStudent: { perMinute: 20, perDay: 500 },
   logDashboardRealtimeEvent: { perMinute: 10, perDay: 200 }

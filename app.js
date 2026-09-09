@@ -1570,56 +1570,62 @@
     if (typeof modal.showModal === "function") modal.showModal();
   }
 
-  // 3단 권한체계 2단계(2026-08-31) - teacherVerified된 기기가 자기 학교의
-  // 가입 신청을 한 명씩 승인/거절한다. 이름/번호는 학생이 자율로 적은
-  // 값이라 innerHTML이 아니라 textContent로만 넣는다(그대로 신뢰하지 않음).
-  async function renderTeacherApprovalList() {
+  // 2026-09-09(Bumm님 결정) - 가입 승인 대기열을 없애고, 대신 담임이 자기 반
+  // 학생 명부를 보고 필요하면 계정 차단·기록 삭제를 한다. 되돌릴 수 없는
+  // 조작이라 무엇이 지워지는지(이름 + 기록 건수)를 먼저 서버에 물어보고
+  // 보여준 다음 확인받는다 - 예전 승인 버튼은 이름만 보여줬다.
+  // 이름/번호는 학생이 자율로 적은 값이라 textContent로만 넣는다.
+  async function renderClassStudentList() {
     const client = window.AIWaysEdu2gClient;
-    const status = $("#teacherApprovalStatus");
-    const list = $("#teacherApprovalList");
+    const status = $('#teacherApprovalStatus');
+    const list = $('#teacherApprovalList');
     if (!client || !status || !list) return;
-    status.textContent = "불러오는 중...";
+    status.textContent = '불러오는 중...';
     list.replaceChildren();
-    const response = await client.listPendingRegistrations();
+    const response = await client.listClassStudents();
     if (!response.ok) {
-      status.textContent = response.code === "teacher_verification_required"
-        ? "이 기기는 아직 선생님 인증이 안 됐어요. 먼저 '선생님 인증하기'를 해주세요."
-        : client?.errorMessageFor?.(response?.code) || "불러오지 못했어요. 다시 시도해주세요.";
+      status.textContent = response.code === 'teacher_verification_required'
+        ? '이 기기는 아직 선생님 인증이 안 됐어요. 먼저 \'선생님 인증하기\'를 해주세요.'
+        : client?.errorMessageFor?.(response?.code) || '불러오지 못했어요. 다시 시도해주세요.';
       return;
     }
-    const requests = response.data?.requests || [];
-    if (!requests.length) { status.textContent = "대기중인 가입 신청이 없어요."; return; }
-    status.textContent = `대기중인 신청 ${requests.length}건`;
-    requests.forEach(request => {
-      const row = document.createElement("li");
-      const info = document.createElement("span");
-      info.textContent = `${request.grade}학년 ${request.classNum}반 ${request.studentNumber}번 ${request.name}`;
-      const approveBtn = document.createElement("button");
-      approveBtn.type = "button";
-      approveBtn.textContent = "승인";
-      approveBtn.addEventListener("click", () => {
-        // 승인은 거절과 달리 되돌릴 방법이 없다(거절은 학생이 재신청 가능,
-        // 승인취소 기능은 없음) - 초기화 버튼도 확인창이 있는데 이보다
-        // 훨씬 되돌리기 어려운 액션에 확인창이 없던 걸 감사에서 지적받음.
-        if (!window.confirm(`"${info.textContent}" 학생의 가입을 승인할까요? 승인은 취소할 수 없어요.`)) return;
-        decideTeacherApproval(request.actorId, "approve");
-      });
-      const rejectBtn = document.createElement("button");
-      rejectBtn.type = "button";
-      rejectBtn.textContent = "거절";
-      rejectBtn.addEventListener("click", () => decideTeacherApproval(request.actorId, "reject"));
-      row.append(info, approveBtn, rejectBtn);
+    const students = response.data?.students || [];
+    if (!students.length) { status.textContent = '우리 반에 가입한 학생이 아직 없어요.'; return; }
+    status.textContent = '우리 반 학생 ' + students.length + '명';
+    students.forEach(student => {
+      const row = document.createElement('li');
+      const info = document.createElement('span');
+      info.textContent = student.studentNumber + '번 ' + student.name + (student.blocked ? ' (차단됨)' : '');
+      const manageBtn = document.createElement('button');
+      manageBtn.type = 'button';
+      manageBtn.textContent = '관리';
+      manageBtn.addEventListener('click', () => manageClassStudent(student));
+      row.append(info, manageBtn);
       list.append(row);
     });
   }
-  async function decideTeacherApproval(targetActorId, decision) {
+  async function manageClassStudent(student) {
     const client = window.AIWaysEdu2gClient;
-    const response = await client?.decideRegistration?.({ targetActorId, decision });
+    // 먼저 서버에 실제로 무엇이 있는지 물어본다 - 화면이 들고 있던 값이
+    // 아니라 지금 값 기준으로 확인받아야 한다.
+    const detail = await client?.describeStudent?.({ targetActorId: student.actorId });
+    if (!detail?.ok) { showDashboardToast(client?.errorMessageFor?.(detail?.code) || '학생 정보를 불러오지 못했어요.'); return; }
+    const recordCount = detail.data?.recordCount || 0;
+    const blocked = !!detail.data?.blocked;
+    const who = student.studentNumber + '번 ' + student.name;
+    const deleteRecords = recordCount > 0 && window.confirm('"' + who + '" 학생의 기록 ' + recordCount + '건을 삭제할까요? 되돌릴 수 없어요.');
+    const blockAccount = !blocked && window.confirm('"' + who + '" 학생의 계정을 차단할까요? 그 기기로는 더 이상 접속할 수 없게 되고, 되돌릴 수 없어요.');
+    if (!deleteRecords && !blockAccount) { showDashboardToast('아무것도 바꾸지 않았어요.'); return; }
+    const response = await client?.moderateStudent?.({ targetActorId: student.actorId, blockAccount, deleteRecords });
     if (response?.ok) {
-      showDashboardToast(decision === "approve" ? "승인했어요." : "거절했어요.");
-      renderTeacherApprovalList();
+      const parts = [];
+      if (response.data?.deletedRecords) parts.push('기록 ' + response.data.deletedRecords + '건 삭제');
+      if (response.data?.remainingRecords) parts.push(response.data.remainingRecords + '건 남음 - 다시 눌러주세요');
+      if (response.data?.blocked) parts.push('계정 차단');
+      showDashboardToast(parts.join(' · ') || '처리했어요.');
+      renderClassStudentList();
     } else {
-      showDashboardToast(client?.errorMessageFor?.(response?.code) || "처리하지 못했어요. 다시 시도해주세요.");
+      showDashboardToast(client?.errorMessageFor?.(response?.code) || '처리하지 못했어요. 다시 시도해주세요.');
     }
   }
   function initTeacherApprovalModal() {
@@ -1677,7 +1683,7 @@
       closeMenu();
       const modal = $("#teacherApprovalModal");
       if (typeof modal?.showModal === "function") modal.showModal();
-      renderTeacherApprovalList();
+      renderClassStudentList();
     });
     $("[data-settings-action='class-csv']")?.addEventListener("click", () => {
       closeMenu();

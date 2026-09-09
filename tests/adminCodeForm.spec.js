@@ -74,3 +74,19 @@ test("단계가 보이고, 개발 용어가 화면에 남아 있지 않다", asy
   // 제목이 카드 안에 있어야 한다(예전엔 카드 밖에 h1 하나만 떠 있었다).
   await expect(page.locator("#teacherCodeSection .card-title h1")).toBeVisible();
 });
+
+test("학교·학년·반이 다 정해지기 전에는 발급 버튼을 누를 수 없다", async ({ page }) => {
+  // 그 전에는 이 반에 코드가 있는지 물어볼 수 없어서 버튼이 "발급인지 교체인지"
+  // 정직하게 말할 수 없다. 눌리는 버튼이 애매한 말을 하고 있는 것이 제일 나쁘다.
+  await openAdmin(page);
+  const submit = page.locator("#teacherCodeSubmitBtn");
+  await expect(submit).toBeDisabled();
+
+  await pickSchool(page, "인천마전초등학교");
+  await expect(submit, "학년·반을 아직 안 골랐다").toBeDisabled();
+  await page.selectOption("#teacherCodeGrade", "6");
+  await expect(submit, "반을 아직 안 골랐다").toBeDisabled();
+  await page.selectOption("#teacherCodeClassNum", "7");
+  await expect(submit).toBeEnabled();
+  await expect(page.locator("#teacherCodeValue")).toHaveValue("MAJEON607");
+});

@@ -171,12 +171,20 @@
       const note = $("teacherCodeReplaceNote");
       if (!submit) return;
       const ready = !!($("teacherCodeSchoolId")?.value.trim() && $("teacherCodeGrade")?.value.trim() && $("teacherCodeClassNum")?.value.trim());
+      // 학교·학년·반이 다 정해지기 전에는 누를 수 없다. 그 전에는 이 반에
+      // 코드가 있는지도 물어볼 수 없어서 버튼이 "발급인지 교체인지" 정직하게
+      // 말할 수 없는데, **눌리는 버튼이 애매한 말을 하고 있는 것**이 제일
+      // 나쁘다. 자료를 못 읽어 이미 막아둔 경우는 그대로 막아둔다(§21).
+      if (classDataReady()) submit.disabled = !ready;
       if (addModeOn()) {
         submit.textContent = "추가 코드 등록";
         if (note) note.textContent = "";
         return;
       }
-      submit.textContent = codeExists === true ? "코드 교체" : codeExists === false ? "코드 발급" : "코드 발급 또는 교체";
+      submit.textContent = !ready ? "코드 발급"
+        : codeExists === true ? "코드 교체"
+          : codeExists === false ? "코드 발급"
+            : "코드 발급 또는 교체";
       if (!note) return;
       // 무슨 일이 일어나는지를 그 자리에서 말해주는 것이, 용어를 가르치는
       // 것보다 낫다(Bumm님).

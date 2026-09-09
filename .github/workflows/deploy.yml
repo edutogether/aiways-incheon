@@ -120,6 +120,9 @@ jobs:
       - name: Registration approval emulator integration test
         run: npm run emulator:test:registration-approval
 
+      - name: Teacher moderation emulator integration test
+        run: npm run emulator:test:teacher-moderation
+
       # 2026-08-31 추가: 슈퍼어드민(4단계, manageTeacherCode) - 클레임 없는
       # 로그인 사용자는 거절되고, 클레임을 받은 뒤 발급한 코드가 실제로
       # verifyTeacherCode에서 통하는지까지(Firestore에 해시만 써졌다는 것

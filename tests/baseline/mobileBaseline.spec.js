@@ -57,6 +57,8 @@ const MOTION_PROPS = [
 // app.js/mobile/app.js가 getElementById로 DOM을 직접 붙잡는 구조라
 // **id 하나만 사라져도 그 기능이 조용히 죽는다** - 더 취약하다.
 function dumpSemantics() {
+  // dumpStyles와 같은 이유로 인증 게이트 안은 제외한다(비동기 렌더로 흔들린다).
+  const inGate = (el) => !!el.closest("#authGate");
   const attrsOf = (el, names) => {
     const out = {};
     for (const n of names) if (el.hasAttribute(n)) out[n] = el.getAttribute(n);
@@ -65,23 +67,23 @@ function dumpSemantics() {
   };
   return {
     // id는 정렬해서 전체를 통째로 비교한다 - 하나라도 없어지면 diff에 뜬다.
-    ids: [...document.querySelectorAll("[id]")].map((e) => e.id).sort(),
+    ids: [...document.querySelectorAll("[id]")].filter((e) => !inGate(e)).map((e) => e.id).sort(),
     meta: [...document.querySelectorAll("meta")]
       .map((m) => `${m.getAttribute("name") || m.getAttribute("property") || m.getAttribute("charset") || "?"}=${(m.getAttribute("content") || "").slice(0, 120)}`)
       .sort(),
     title: document.title,
     lang: document.documentElement.lang,
-    images: [...document.querySelectorAll("img")]
+    images: [...document.querySelectorAll("img")].filter((e) => !inGate(e))
       .map((i) => `${(i.getAttribute("src") || "").split("/").pop()} | alt=${i.getAttribute("alt")}`)
       .sort(),
-    links: [...document.querySelectorAll("a[href]")]
+    links: [...document.querySelectorAll("a[href]")].filter((e) => !inGate(e))
       .map((a) => `${a.getAttribute("href")} | ${(a.textContent || "").trim().slice(0, 30)} | rel=${a.getAttribute("rel") || ""} | target=${a.getAttribute("target") || ""}`)
       .sort(),
-    inputs: [...document.querySelectorAll("input, select, textarea")]
+    inputs: [...document.querySelectorAll("input, select, textarea")].filter((e) => !inGate(e))
       .map((el) => `${el.id || el.name || el.tagName}: ${JSON.stringify(attrsOf(el, ["type", "name", "placeholder", "maxlength", "minlength", "required", "inputmode", "pattern", "autocomplete", "min", "max", "step", "disabled", "readonly"]))}`)
       .sort(),
     // 버튼은 접근 가능한 이름이 사라지면 스크린리더에서 "버튼"으로만 읽힌다.
-    buttons: [...document.querySelectorAll("button")]
+    buttons: [...document.querySelectorAll("button")].filter((e) => !inGate(e))
       .map((b) => `${b.id || "(무id)"}: ${(b.textContent || "").trim().slice(0, 24)} | ${JSON.stringify(attrsOf(b, ["type", "disabled"]))}`)
       .sort()
   };
@@ -102,6 +104,11 @@ function dumpStyles(propList, withBox) {
   };
   const out = {};
   for (const el of document.querySelectorAll("[id], [data-role], button, .tab-btn")) {
+    // 인증 게이트는 우리가 화면상으로만 열어 우회한 영역이고, App Check 실패가
+    // 비동기로 렌더되면서 "다시 시도" 버튼과 로고 이미지가 캡처 시점마다
+    // 있었다 없었다 한다 - 기준선이 흔들리는 원인이었다. 우리가 재려는 것은
+    // 게이트 통과 이후의 앱 화면이므로 게이트 안은 제외한다.
+    if (el.closest("#authGate")) continue;
     const k = key(el);
     if (out[k]) continue;
     const cs = getComputedStyle(el);

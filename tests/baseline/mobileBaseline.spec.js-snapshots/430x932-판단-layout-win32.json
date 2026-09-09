@@ -1,12 +1,4 @@
 {
-  "#authGate": {
-    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
-    "true": ""
-  },
-  "#authGateContent": {
-    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
-    "true": ""
-  },
   "#appRoot": {
     "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
     "true": ""
@@ -280,6 +272,10 @@
     "true": ""
   },
   "#signupHomeroomNameInput": {
+    "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
+    "true": ""
+  },
+  "#signupTeacherGreeting": {
     "display,position,width,height,margin,padding,font-family,font-size,font-weight,line-height,letter-spacing,color,background-color,border,border-radius,box-shadow,flex-direction,justify-content,align-items,gap,grid-template-columns,opacity,overflow,z-index": "",
     "true": ""
   },

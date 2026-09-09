@@ -1,16 +1,4 @@
 {
-  "#authGate": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
-  },
-  "#authGateContent": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
-  },
-  "button:다시 시도": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
-  },
   "#appRoot": {
     "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
     "false": ""
@@ -284,6 +272,10 @@
     "false": ""
   },
   "#signupHomeroomNameInput": {
+    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
+    "false": ""
+  },
+  "#signupTeacherGreeting": {
     "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
     "false": ""
   },

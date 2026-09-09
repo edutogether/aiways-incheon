@@ -75,6 +75,51 @@
       }
     });
 
+    // 2026-09-09(Bumm님 지시) - 예전에는 임의 코드를 직접 입력해서 발급했는데,
+    // 서버엔 scrypt 해시로만 저장돼 대표님이 종이에 적어두지 않으면 다시 볼 수
+    // 없었다. 그 번거로움을 없애려고 코드를 "학교+학년+반"에서 규칙으로
+    // 파생시킨다 - 적어둘 필요 없이 언제든 다시 만들 수 있다.
+    //
+    // 학교 영문 표기는 국어의 로마자 표기법 기준이다. 청라만 주의가 필요한데,
+    // 표기법은 글자가 아니라 "발음"을 옮기므로 [청나]로 소리나는 청라는
+    // CHEONGRA가 아니라 CHEONGNA다(인천시 공식 표기도 Cheongna International
+    // City이고, 학교 홈페이지 도메인도 cheongna.icees.kr이다).
+    const SCHOOL_CODE_PREFIX = {
+      "7321030": "SEOHEUNG",  // 인천서흥초
+      "7361073": "CHEONGNA",  // 인천청라초
+      "7341025": "DONGBANG",  // 인천동방초
+      "7361064": "MAJEON"     // 인천마전초
+    };
+    function deriveTeacherCode(schoolId, grade, classNum) {
+      const prefix = SCHOOL_CODE_PREFIX[String(schoolId || "").trim()];
+      const g = String(grade || "").trim();
+      const c = String(classNum || "").trim();
+      if (!prefix || !g || !c) return "";
+      // 반은 두 자리로 맞춘다 - 사람이 읽을 때 "502"(5학년 2반)가 자연스럽다는
+      // 판단(Bumm님). 학년이 학교마다 고정이라 앞자리가 늘 같지만, 짧게 줄이면
+      // 오히려 낯설다는 이유로 그대로 둔다.
+      return `${prefix}${g}${c.padStart(2, "0")}`;
+    }
+    function refreshDerivedCode() {
+      const schoolId = $("teacherCodeSchoolId")?.value;
+      const grade = $("teacherCodeGrade")?.value;
+      const classNum = $("teacherCodeClassNum")?.value;
+      const field = $("teacherCodeValue");
+      const hint = $("teacherCodeHint");
+      if (!field) return;
+      const derived = deriveTeacherCode(schoolId, grade, classNum);
+      if (derived) {
+        field.value = derived;
+        if (hint) hint.textContent = `이 반의 인증코드는 «${derived}»입니다. 그대로 발급하거나 직접 고쳐도 됩니다.`;
+      } else if (hint) {
+        hint.textContent = String(schoolId || "").trim()
+          ? "등록된 4개 학교(서흥·청라·동방·마전)가 아니면 코드를 자동으로 만들지 않습니다. 직접 입력해 주세요."
+          : "";
+      }
+    }
+    ["teacherCodeSchoolId", "teacherCodeGrade", "teacherCodeClassNum"].forEach((id) => {
+      $(id)?.addEventListener("input", refreshDerivedCode);
+    });
     $("teacherCodeSubmitBtn")?.addEventListener("click", async () => {
       const status = $("teacherCodeStatus");
       const schoolId = $("teacherCodeSchoolId")?.value.trim();

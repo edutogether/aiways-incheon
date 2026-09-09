@@ -37,7 +37,8 @@
         <input type="text" id="teacherCodeSchoolId" placeholder="학교 코드 (NEIS 표준학교코드, 숫자)" />
         <input type="text" inputmode="numeric" maxlength="2" id="teacherCodeGrade" placeholder="학년" />
         <input type="text" inputmode="numeric" maxlength="2" id="teacherCodeClassNum" placeholder="반" />
-        <input type="text" id="teacherCodeValue" placeholder="새 인증코드 (6자 이상)" />
+        <input type="text" id="teacherCodeValue" placeholder="새 인증코드 (학교·학년·반을 넣으면 자동으로 채워집니다)" />
+        <p id="teacherCodeHint"></p>
         <button type="button" id="teacherCodeSubmitBtn">발급/회전</button>
         <p id="teacherCodeStatus" role="status" aria-live="polite"></p>
       </section>

@@ -340,6 +340,25 @@
   // 담임 전부 하나의 가입 화면에서 학교/학년/반 + 역할을 선택"하는 단일
   // 플로우 요구사항. 담임 선택 시 번호 입력 대신 인증코드 입력으로 바뀐다
   // (별도 화면·별도 코드입력 다이얼로그 없음).
+  // 2026-09-09(Bumm님 지시) - 담임을 고르고 성함을 적으면 그 이름으로 인사하고,
+  // 인증코드를 "운영자에게 받은 것"이라고 안내한다. 코드를 주는 사람을 무엇으로
+  // 부를지가 문제였는데, 앱 안에 이미 "선생님"과 "슈퍼어드민"이 있어 "관리자"는
+  // 그 둘 다로 읽히고 "개발자"는 선생님 입장에서 왜 그 사람이 코드를 주는지
+  // 설명이 안 된다 - "운영자"로 확정됐다.
+  // 이름은 담임이 직접 입력한 값이라 textContent로만 넣는다(innerHTML 금지).
+  function initHomeroomGreeting() {
+    const nameInput = $("signupHomeroomNameInput");
+    const greeting = $("signupTeacherGreeting");
+    if (!nameInput || !greeting) return;
+    const render = () => {
+      const name = (nameInput.value || "").trim();
+      if (!name) { greeting.classList.add("hidden"); greeting.textContent = ""; return; }
+      greeting.textContent = `${name} 선생님, 반갑습니다. 운영자에게 받으신 인증코드를 입력해 주세요.`;
+      greeting.classList.remove("hidden");
+    };
+    nameInput.addEventListener("input", render);
+    render();
+  }
   function initSignupRoleToggle() {
     const homeroomBtn = $("signupRoleHomeroomBtn");
     const studentBtn = $("signupRoleStudentBtn");
@@ -351,6 +370,8 @@
       const isHomeroom = role === "homeroom";
       studentFields.classList.toggle("hidden", isHomeroom);
       homeroomFields.classList.toggle("hidden", !isHomeroom);
+      // 학생으로 되돌리면 담임 인사도 같이 숨긴다.
+      if (!isHomeroom) { const g = $("signupTeacherGreeting"); if (g) { g.classList.add("hidden"); g.textContent = ""; } }
       homeroomBtn.classList.toggle("bg-blue-600", isHomeroom);
       homeroomBtn.classList.toggle("border-blue-600", isHomeroom);
       homeroomBtn.classList.toggle("text-white", isHomeroom);
@@ -384,6 +405,7 @@
 
     const schoolSearch = initSchoolSearch({ inputId: "signupSchoolInput", hiddenId: "signupSchoolCode", resultsId: "signupSchoolResults" });
     const roleToggle = initSignupRoleToggle();
+    initHomeroomGreeting();
 
     submitBtn.addEventListener("click", async () => {
       const role = roleToggle.getRole();

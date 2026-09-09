@@ -1,514 +1,1538 @@
 {
   "#appRoot": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:🔍 판단": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.3s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:🎮 퀴즈": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.3s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:🌱 통계": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.3s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:❓ 보류함": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.3s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#tab-judge": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupBanner": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupBannerGoBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupBannerDismissBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#judge-stat-count": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#judge-stat-carbon": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#judge-stat-hold": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#photoInput": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#photoTriggerBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.2s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#searchEmojiIcon": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "opacity",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "matrix(1, 0, 0, 1, 0, -9)"
   },
   "#searchInput": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.3s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#searchTriggerBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "color, background-color, border-color, text-decoration-color, fill, stroke",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#search-suggestions": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#quickSelectGrid": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:🥛우유갑종이팩류 검토": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.2s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:📦택배상자종이류 검토": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.2s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:🥤플라스틱컵플라스틱류": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.2s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:🍜컵라면 용기재질·오": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.2s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:🍪과자 봉지비닐류 또": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.2s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:🥫캔류캔류 검토": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.2s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:🧴페트병플라스틱류 검": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.2s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:🍾유리병유리류 검토": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.2s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:☕종이컵종이류 확정 금": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.2s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:🛍️비닐 봉투비닐류 ": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.2s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:🧾영수증일반폐기물 검": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.2s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:🔋건전지폐건전지 전용": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.2s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#holdQuickBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.2s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#tab-quiz": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#quizRankLadder": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#quiz-box": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#quiz-progress": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#quiz-score": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#quiz-progress-bar": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.3s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#quiz-emoji": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#quiz-question": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#quiz-buttons": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:O": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "button:X": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#quiz-explanation-panel": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#explanation-box-color": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#explanation-emoji": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#explanation-title": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#explanation-desc": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#nextQuizBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#quiz-result-summary": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#quiz-result-title": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#quiz-result-message": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#quiz-result-score-text": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#restartQuizBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#tab-stats": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupCard": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupRoleGroup": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupRoleHomeroomBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupRoleStudentBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupSchoolInput": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupSchoolCode": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupSchoolResults": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupGradeInput": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupClassInput": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupStudentFields": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupNumberInput": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupNameInput": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupHomeroomFields": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupHomeroomNameInput": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupTeacherGreeting": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupTeacherCodeInput": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupSubmitButton": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#signupStatus": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#interimClassCard": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#classSchoolInput": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#classSchoolCode": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#classSchoolResults": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#classGradeInput": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#classNumInput": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#classContextStatus": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#classRankingCard": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#classRankingRefreshBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#classRankingStatus": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#classRankingList": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#stat-count": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#stat-carbon": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#stat-hold": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#resetStatsBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "color, background-color, border-color, text-decoration-color, fill, stroke",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#practice-logs-container": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#no-logs-msg": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#tab-hold": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#directHoldInput": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#addHoldDirectBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#hold-count-badge": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#resetHoldBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "color, background-color, border-color, text-decoration-color, fill, stroke",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#hold-list-container": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#no-hold-items-msg": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#gemGradBanner": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#judgeModal": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#judgeModalBox": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#judgeModalClose": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "color, background-color, border-color, text-decoration-color, fill, stroke",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#judgeScanState": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#judgeScanImage": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#gemGradScan": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#judgeTextScanState": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#judgeTextScanQuery": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#gemGradTextScan": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#judgeResultState": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#resCategory": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#resTitle": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#resActionTag": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#resBody": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#resCandidates": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#resTip": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#hold-registration-form": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#holdItemName": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#registerHoldBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#practiceActionRow": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#btnLogPractice": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#customModal": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#modalBox": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.3s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#modalIcon": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#modalTitle": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#modalDesc": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#modalCancelBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#modalConfirmBtn": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#fire_app_check_[DEFAULT]": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   },
   "#g-recaptcha-response": {
-    "transition-property,transition-duration,transition-timing-function,transition-delay,animation-name,animation-duration,animation-timing-function,animation-delay,animation-iteration-count,transform": "",
-    "false": ""
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
   }
 }

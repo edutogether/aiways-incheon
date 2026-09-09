@@ -109,6 +109,14 @@ package.json이 셋이다 — `functions/`(백엔드·테스트), 루트(Playwri
 - **Vite가 넣는 번들 `<script type="module">`은 반드시 공유 스크립트 뒤에 와야 한다.** 앞에 오면 리액트가 `window.AIWaysEdu2gClient`보다 먼저 돌아 저장·로그인이 "가끔" 안 되는 형태로 깨진다 — 화면 스냅샷으로는 안 잡힌다. `vite.config.ts`의 `transformIndexHtml(order:"post")`가 순서를 잡고, `reactShell.spec.js`가 문서 순서를 검사한다
 - 산출물은 S5 전까지 `mobile-next/`(gitignore)로 나간다. **라이브 `mobile/`은 S5에서만 바뀐다**
 
+### 전환하면서 실제로 당한 것들 (같은 실수를 또 하지 않으려고 남긴다)
+- **`{값}글자`로 쓰면 텍스트 노드가 둘로 쪼개지고 글자 폭이 소수점 아래에서 달라진다.** `현재 점수: {score}점`이 원본보다 0.03px 넓게 나왔다. 원본이 한 덩어리 문자열이면 전환본도 한 덩어리(`{`현재 점수: ${score}점`}`)로 써야 한다
+- **JSX는 줄로 나뉜 요소 사이의 공백을 아예 없앤다.** 화면은 같아 보여도(flex `gap`이 간격을 만든다) `textContent`가 달라져서 스크린리더가 "❓잘 모르겠어요"처럼 붙여 읽는다. 원본이 `innerHTML` 템플릿이라 줄바꿈이 남는 자리에는 `{" "}`를 명시한다
+- **같은 탭을 다시 눌러도 원본은 높이를 다시 잰다**(`switchTab`이 매번 `growSharedTabHeight`를 부른다). 활성 탭 값만 보고 `useEffect`를 걸면 값이 안 바뀌어 재측정을 건너뛴다
+- **원본은 `classList.toggle`이라 클래스가 누적된다.** 담임 버튼은 `border-blue-200`이 계속 남은 채 `border-blue-600`이 더해지고, 테두리 색은 스타일시트 순서상 `border-blue-200`이 이긴다. "정리해서" 클래스를 통째로 갈아끼우면 **색이 바뀐다**
+- **난수 시드를 고정해도 소비 순서가 다르면 결과가 다르다.** 원본은 이모지 회전이 먼저 난수를 쓰고 리액트는 첫 렌더에서 퀴즈를 먼저 뽑는다. 하네스가 시드를 되돌리고 "다시 도전하기"를 눌러 양쪽을 같은 자리에서 다시 뽑게 한다
+- **같은 브라우저 컨텍스트에서 두 번째 페이지를 열면 익명 인증/App Check가 막힌다**(요청이 400으로 끝나고 응답이 안 온다). 원본과 전환본을 나란히 비교할 땐 **컨텍스트를 따로** 만든다. `browser.newContext()`에는 `playwright.config.js`의 `use` 설정이 안 붙으므로 `baseURL`을 직접 넘겨야 한다
+
 ## 자주 틀리는 것
 - **App Check가 ENFORCED라 자동화 브라우저(Playwright 등)는 라이브에서 403 `App attestation failed`를 받는다. 이건 라이브 장애가 아니라 정상 동작이다.** reCAPTCHA Enterprise가 사람/봇 점수를 매기는데 자동화 브라우저는 `navigator.webdriver === true`라 낮은 점수를 받고 App Check가 그 토큰을 거부한다 — **헤드풀(`channel:"chrome"`)로 띄워도 똑같다. 헤드리스 여부가 아니라 자동화 여부가 감지된다.** 2026-09-09에 이 세션이 "라이브 다운"으로 오판해 보고했고, 같은 날 CLASSCADE도 같은 함정에 걸렸다. 라이브가 실제로 살아 있는지는 **사람이 실제 휴대폰으로 열어보는 것**이 유일하게 확실한 확인이다
 - **자동화로 인증 이후 흐름을 보려면 디버그 토큰이 필요하고, 그건 localhost에서만 켜진다.** `firebaseAppCheck.js`의 `debugMode()`는 hostname이 `localhost`/`127.0.0.1`이고 쿼리에 `appcheck-debug=1`이 있을 때만 참이다(라이브 주소에서는 절대 안 켜진다). 그 상태로 열면 콘솔에 새 UUID가 찍히는데, **그 UUID를 Firebase 콘솔 > App Check > 앱 > 디버그 토큰 관리에 등록해야** 통과한다. Playwright는 실행마다 새 프로필이라 UUID가 매번 바뀌므로, 고정 토큰을 쓰려면 `?appcheck-debug=1` 없이 `addInitScript`로 `self.FIREBASE_APPCHECK_DEBUG_TOKEN = "<등록한 UUID>"`를 앱 스크립트보다 먼저 심는다(쿼리를 주면 코드가 `= true`로 덮어써서 매번 새로 생성된다). **등록된 디버그 토큰은 App Check를 우회하는 값이라 저장소에 커밋하지 않는다**

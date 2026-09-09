@@ -1,3 +1,4 @@
+import { quizPool } from "./data/sortingData";
 // 리액트 진입점.
 //
 // #appRoot 자체가 아니라 그 "안쪽"을 리액트가 그린다. #appRoot는 authGate.js가
@@ -19,3 +20,5 @@ createRoot(container).render(
     <App />
   </StrictMode>
 );
+
+(window as unknown as {__quizPool: unknown}).__quizPool = quizPool;

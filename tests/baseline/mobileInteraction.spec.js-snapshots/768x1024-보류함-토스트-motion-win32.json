@@ -1295,7 +1295,7 @@
     "animation-iteration-count": "1",
     "transform": "none"
   },
-  "div:종이류\n        ": {
+  "div:종이류 📄 종이/신문": {
     "transition-property": "all",
     "transition-duration": "0.3s",
     "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
@@ -1355,7 +1355,7 @@
     "animation-iteration-count": "1",
     "transform": "none"
   },
-  "div:플라스틱\n       ": {
+  "div:플라스틱 🥤 페트병 ": {
     "transition-property": "all",
     "transition-duration": "0.3s",
     "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
@@ -1415,7 +1415,7 @@
     "animation-iteration-count": "1",
     "transform": "none"
   },
-  "div:금속캔\n        ": {
+  "div:금속캔 🥫 캔 -12": {
     "transition-property": "all",
     "transition-duration": "0.3s",
     "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
@@ -1559,7 +1559,7 @@
     "animation-iteration-count": "1",
     "transform": "none"
   },
-  "div:테스트 안건\n     ": {
+  "div:테스트 안건 9월 9일": {
     "transition-property": "all",
     "transition-duration": "0.15s",
     "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
@@ -1619,7 +1619,7 @@
     "animation-iteration-count": "1",
     "transform": "none"
   },
-  "div:코팅된 책 표지\n   ": {
+  "div:코팅된 책 표지 9월 ": {
     "transition-property": "all",
     "transition-duration": "0.15s",
     "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
@@ -1655,7 +1655,7 @@
     "animation-iteration-count": "1",
     "transform": "none"
   },
-  "div:실리콘 케이스\n    ": {
+  "div:실리콘 케이스 9월 7": {
     "transition-property": "all",
     "transition-duration": "0.15s",
     "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",

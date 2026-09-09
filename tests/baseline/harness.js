@@ -63,6 +63,13 @@ export const INTERACTION_SCOPE = [
 // app.js/mobile/app.js가 getElementById로 DOM을 직접 붙잡는 구조라
 // **id 하나만 사라져도 그 기능이 조용히 죽는다** - 더 취약하다.
 export function dumpSemantics() {
+  // 글자를 잴 때 공백을 하나로 접는다. 원본 HTML은 줄바꿈+들여쓰기가
+  // 텍스트 노드로 남고 JSX는 그 자리를 비우는데, 화면에서는 둘 다
+  // 똑같이 보인다(공백은 접혀서 렌더된다). 접지 않고 비교하면 "소스를
+  // 어떻게 줄 나눴는가"를 비교하게 되어, 실제 차이가 아닌 것으로 계속
+  // 빨간불이 뜬다. 공백이 "있었는지 없었는지"는 접은 뒤에도 남으므로
+  // 진짜 유실은 여전히 잡힌다.
+  const text = (value) => (value || "").replace(/\s+/g, " ").trim();
   // dumpStyles와 같은 이유로 인증 게이트 안은 제외한다(비동기 렌더로 흔들린다).
   const inGate = (el) => !!el.closest("#authGate");
   const attrsOf = (el, names) => {
@@ -83,14 +90,14 @@ export function dumpSemantics() {
       .map((i) => `${(i.getAttribute("src") || "").split("/").pop()} | alt=${i.getAttribute("alt")}`)
       .sort(),
     links: [...document.querySelectorAll("a[href]")].filter((e) => !inGate(e))
-      .map((a) => `${a.getAttribute("href")} | ${(a.textContent || "").trim().slice(0, 30)} | rel=${a.getAttribute("rel") || ""} | target=${a.getAttribute("target") || ""}`)
+      .map((a) => `${a.getAttribute("href")} | ${text(a.textContent).slice(0, 30)} | rel=${a.getAttribute("rel") || ""} | target=${a.getAttribute("target") || ""}`)
       .sort(),
     inputs: [...document.querySelectorAll("input, select, textarea")].filter((e) => !inGate(e))
       .map((el) => `${el.id || el.name || el.tagName}: ${JSON.stringify(attrsOf(el, ["type", "name", "placeholder", "maxlength", "minlength", "required", "inputmode", "pattern", "autocomplete", "min", "max", "step", "disabled", "readonly"]))}`)
       .sort(),
     // 버튼은 접근 가능한 이름이 사라지면 스크린리더에서 "버튼"으로만 읽힌다.
     buttons: [...document.querySelectorAll("button")].filter((e) => !inGate(e))
-      .map((b) => `${b.id || "(무id)"}: ${(b.textContent || "").trim().slice(0, 24)} | ${JSON.stringify(attrsOf(b, ["type", "disabled"]))}`)
+      .map((b) => `${b.id || "(무id)"}: ${text(b.textContent).slice(0, 24)} | ${JSON.stringify(attrsOf(b, ["type", "disabled"]))}`)
       .sort()
   };
 }
@@ -108,7 +115,12 @@ export function dumpStyles([propList, withBox, scope]) {
   const key = (el) => {
     if (el.id) return `#${el.id}`;
     if (el.dataset && el.dataset.role) return `[data-role=${el.dataset.role}]`;
-    return `${el.tagName.toLowerCase()}:${(el.textContent || "").trim().slice(0, 12)}`;
+    // id가 없는 요소는 글자로 구분한다. 이때 공백을 하나로 접는 이유는
+    // dumpSemantics와 같다 - 원본 HTML은 줄바꿈+들여쓰기가 텍스트 노드로
+    // 남고 JSX는 그 자리를 비운다. 접지 않으면 같은 요소가 서로 다른
+    // 키를 갖게 되어, 실제로는 같은 화면인데 "원본에만 있는 요소"와
+    // "전환본에만 있는 요소"가 잔뜩 생긴다.
+    return `${el.tagName.toLowerCase()}:${(el.textContent || "").replace(/\s+/g, " ").trim().slice(0, 12)}`;
   };
   const out = {};
   for (const el of document.querySelectorAll(scope || "[id], [data-role], button, .tab-btn")) {
@@ -155,7 +167,10 @@ const WARMUP_MS = 2000;
 // 전환본이 "전환 전에 찍어 둔 바로 그 파일"과 대조돼야 증명이 된다.
 export const TARGET = process.env.AIWAYS_BASELINE_TARGET || "mobile";
 
-export async function openApp(page) {
+// target을 인자로 받을 수 있게 해 둔 이유: 원본과 전환본을 **한 테스트 안에서
+// 나란히 띄워 비교**하는 스펙(reactMarkup.spec.js)이 있기 때문이다. 환경변수
+// 하나로는 한쪽만 고를 수 있다.
+export async function openApp(page, target = TARGET) {
   // install()만 하면 가짜 시계가 실제 시간과 같이 흐른다. 날짜 문구는 이걸로
   // 고정되지만, 이모지 회전 위상까지 고정되지는 않는다(아래 참고).
   // 로드 "전"에 시계를 세워 버리는 방법도 해봤는데, App Check/Functions
@@ -167,13 +182,16 @@ export async function openApp(page) {
   // 매번 달랐다. 난수를 고정 시드로 바꿔야 "전환 전후가 같은가"를 비교할
   // 수 있다(앱 코드는 그대로 두고 테스트 쪽에서만 시드를 박는다).
   await page.addInitScript(() => {
-    let seed = 42;
+    const START = 42;
+    let seed = START;
     Math.random = () => {
       seed = (seed * 1664525 + 1013904223) % 4294967296;
       return seed / 4294967296;
     };
+    // 아래 "퀴즈 문제 맞추기" 주석 참고.
+    window.__aiwaysBaselineResetRandom = () => { seed = START; };
   });
-  await page.goto(`/${TARGET}/index.html`);
+  await page.goto(`/${target}/index.html`);
   await page.evaluate(() => {
     const gate = document.getElementById("authGate");
     const root = document.getElementById("appRoot");
@@ -199,6 +217,26 @@ export async function openApp(page) {
   // 앱이 로드 시점에 걸어둔 지연(syncTabHeights 400ms/1200ms)을 소진시킨다.
   await page.clock.runFor(WARMUP_MS);
 
+  // 퀴즈 문제 맞추기.
+  //
+  // 난수를 고정 시드로 바꿔도 **소비 순서**가 다르면 뽑히는 문제가 달라진다.
+  // 원본은 시작할 때 검색창 이모지 회전이 난수를 먼저 쓰고 그 다음에 문제를
+  // 뽑는데, 리액트는 첫 렌더에서 문제를 먼저 뽑는다. 어느 쪽이 옳고 그른
+  // 순서가 아니라 그냥 다를 뿐이라, 순서를 억지로 맞추는 대신 **둘 다 같은
+  // 자리에서 다시 뽑게** 한다: 시드를 처음으로 되돌리고 "다시 도전하기"를
+  // 누른다. 두 구현 모두 그 버튼이 문제를 새로 뽑는 유일한 입구다.
+  //
+  // 이 일을 **아래 이모지 위상 고정보다 먼저** 하는 이유: 이모지 쪽은
+  // 검색창에 글자를 넣었다 지우는 조작이라 리액트에 상태 갱신이 밀려 있게
+  // 되는데, 그 상태에서 버튼을 누르면 리액트가 밀린 일을 먼저 처리하면서
+  // 문제를 뽑는 시점이 어긋난다(실제로 두 화면이 다른 문제를 냈다).
+  // 아무것도 밀려 있지 않은 지금 뽑아 두면 그 문제가 생기지 않는다.
+  await page.evaluate(() => {
+    window.__aiwaysBaselineResetRandom?.();
+    document.getElementById("restartQuizBtn")?.click();
+  });
+  await page.waitForTimeout(150);
+
   // 이모지 회전의 "위상"을 고정한다.
   //
   // initSearchEmojiIcon()은 350ms마다 이모지를 바꾸는데, 바꿀 때마다
@@ -211,9 +249,23 @@ export async function openApp(page) {
   // 세어서 잰다. 빈 검색창에 input 이벤트를 주면 350ms 디바운스 뒤
   // matchNow()가 돌고, 값이 비어 있으므로 startRotation()으로 되돌아간다
   // - 화면에 남는 흔적은 없다(값은 그대로 빈 문자열이다).
-  await page.locator("#searchInput").dispatchEvent("input");
+  // 한 글자를 넣었다가 지운다. 넣으면 회전이 멈추고, 지우면 그 순간부터
+  // 회전이 처음부터 다시 시작한다 - 그 시작점을 우리가 알기 때문에 위상을
+  // 셀 수 있다. (값 자체는 결국 빈 문자열로 돌아오므로 화면에 흔적이 없다.
+  //  빈 입력창에 input 이벤트만 주는 방법도 써봤는데, 값이 안 바뀌면
+  //  리액트 쪽은 아무 일도 일어나지 않아서 두 구현에 다르게 동작했다.)
+  // 위상뿐 아니라 **어떤 이모지가 뽑히는지**도 맞춰야 한다. 회전이 다시
+  // 시작될 때 난수를 쓰는데, 그 시점의 난수 위치가 두 구현에서 다르면
+  // 화면에 다른 그림이 남는다. 여기서 시드를 한 번 더 처음으로 돌려두면,
+  // 아래 두 번의 입력 사이에는 난수를 쓰는 코드가 없으므로 회전이 다시
+  // 시작되는 순간의 난수 위치가 양쪽 모두 같아진다.
+  await page.evaluate(() => window.__aiwaysBaselineResetRandom?.());
+  await page.locator("#searchInput").fill("ㄱ");
+  await page.clock.runFor(350); // 디바운스 만료 -> 회전 정지
+  await page.locator("#searchInput").fill("");
   await page.clock.runFor(350); // 디바운스 만료 -> startRotation -> opacity 0
   await page.clock.runFor(100); // showIcon의 60ms 뒤 -> opacity 1 (다음 회전은 +350)
+
   await page.waitForTimeout(300);
 }
 

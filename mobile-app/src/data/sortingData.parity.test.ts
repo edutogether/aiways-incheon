@@ -93,6 +93,15 @@ describe("sortingData 이식 정합성", () => {
     }
   });
 
+  it("같은 난수를 주면 뽑는 10문제까지 원본과 같다", async () => {
+    // 이걸 안 보고 넘어갔다가 실제로 당했다 - 문제 은행(quizPool)이 같아도
+    // 뽑는 함수가 조금만 달라지면 학생이 푸는 문제가 달라진다. 은행만
+    // 비교하면 그 차이가 안 잡힌다.
+    const legacy = loadLegacy();
+    const converted = await loadConverted();
+    expect(converted.pickQuizSet()).toEqual(legacy.pickQuizSet());
+  });
+
   it("문제 뽑기가 O/X를 5개씩 섞어 10문제를 낸다", async () => {
     const converted = await loadConverted();
     const set = converted.pickQuizSet();

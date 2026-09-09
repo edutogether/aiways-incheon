@@ -1,141 +1,146 @@
-// S2(마크업 이식) 검증 - 리액트가 그린 DOM이 원본 마크업과 "같은가".
+// 전환본과 원본을 **둘 다 실행 상태로 나란히 띄워** 통째로 대조한다.
 //
-// 왜 스크린샷이 아니라 DOM 대조인가:
-// 렌더 결과는 (DOM, CSS, 뷰포트)의 함수다. CSS는 바이트 그대로 쓰고 있고
-// (reactShell.spec.js가 해시로 확인한다), 뷰포트는 테스트가 정한다. 그러면
-// **DOM이 같다는 것을 보이면 렌더가 같다는 것이 따라 나온다.** 표본을 몇 장
-// 찍어보는 스크린샷보다 강한 증명이고, "안 찍힌 화면"이 남지 않는다.
+// 스냅샷 대조(mobileBaseline / mobileInteraction)와 역할이 다르다. 스냅샷은
+// "전환 전에 찍어 둔 값과 같은가"를 보는데, 재는 범위가 정해져 있다 - id가
+// 붙은 요소, 버튼, 그리고 몇 가지 목록. 이 파일은 그 범위 밖까지 포함해
+// **#appRoot 아래 모든 요소**를 본다:
 //
-// 원본 쪽은 실행 중인 페이지가 아니라 **HTML 원문을 받아서 파싱한다**.
-// /mobile/index.html을 그냥 열면 app.js가 곧바로 퀵선택 그리드·자동완성
-// 목록·퀴즈 등급표를 채워 넣어서, 아직 그 로직을 옮기지 않은 S2 시점의
-// 리액트 DOM과 비교할 수가 없다. DOMParser로 파싱하면 스크립트가 돌지 않아
-// "손으로 쓴 마크업 그대로"를 얻는다.
+//   1. DOM 대조 - 태그·속성(class 포함)·글자가 하나도 다르지 않은가
+//   2. 실측 대조 - 4개 뷰포트에서 모든 요소의 좌표·크기·계산된 스타일이 같은가
 //
-// DOM 대조 하나만으로는 못 잡는 것이 있다: **인라인 요소 사이의 공백.**
-// HTML은 줄바꿈+들여쓰기가 공백 하나로 접히지만, JSX는 줄로 나뉜 요소 사이의
-// 공백을 아예 없앤다. 정규화가 공백만 있는 텍스트 노드를 버리므로 그 차이가
-// 여기서는 안 드러나는데, 화면에서는 글자 사이가 붙어버리는 실제 차이다.
-// 그래서 아래에 실측 대조를 하나 더 둔다 - 두 화면을 같은 뷰포트로 띄워
-// 모든 요소의 좌표·크기·계산된 스타일을 비교한다.
+// 1번이 있으면 2번이 논리적으로 따라 나온다(렌더는 DOM·CSS·뷰포트의 함수이고,
+// CSS는 바이트 그대로 쓰며 뷰포트는 테스트가 정한다). 그래도 2번을 같이 두는
+// 이유는, 1번이 공백을 접어서 비교하기 때문이다 - HTML은 줄바꿈+들여쓰기가
+// 텍스트 노드로 남고 JSX는 그 자리를 비우는데, 인라인 요소 사이에서는 그
+// 차이가 실제로 글자를 붙여 버린다. 그건 좌표로만 잡힌다.
+//
+// 처음(S2)에는 원본 쪽을 HTML 원문으로 파싱해서 비교했다. 그때는 전환본에
+// 로직이 없어서 "손으로 쓴 마크업"끼리 비교하는 게 맞았지만, 지금은 양쪽 다
+// 살아 움직이는 앱이라 **실행 상태끼리** 비교하는 것이 맞다.
 import { test, expect } from "@playwright/test";
-import { LAYOUT_PROPS, VIEWPORTS, settle } from "./harness.js";
+import { LAYOUT_PROPS, VIEWPORTS, openApp, settle } from "./harness.js";
 
-// 양쪽을 같은 함수로 정규화한다. 재는 자가 다르면 비교가 의미 없다.
-const COMPARE = async () => {
-  const describe = (root) => {
-    const lines = [];
-    const walk = (node, depth) => {
-      const pad = "  ".repeat(depth);
-      if (node.nodeType === Node.TEXT_NODE) {
-        const text = (node.nodeValue || "").replace(/\s+/g, " ").trim();
-        if (text) lines.push(`${pad}"${text}"`);
-        return;
-      }
-      if (node.nodeType !== Node.ELEMENT_NODE) return; // 주석은 렌더에 영향이 없다
-      // style만 "선언 단위"로 비교한다. 리액트는 style 객체를 문자열로 만들
-      // 때 끝에 세미콜론을 붙이고(width: 20%;) 원본 HTML에는 없다(width: 20%).
-      // 브라우저가 파싱한 결과는 똑같아서 렌더에 아무 영향이 없는데, 글자
-      // 그대로 비교하면 여기서 걸린다. 선언을 쪼개서 비교하면 "정말 다른
-      // 스타일"만 남는다.
-      const normalizeAttr = (name, value) =>
-        name === "style"
-          ? value.split(";").map((part) => part.trim()).filter(Boolean).join("; ")
-          : value;
-      const attrs = [...node.attributes]
-        .map((a) => `${a.name}=${JSON.stringify(normalizeAttr(a.name, a.value))}`)
-        .sort()
-        .join(" ");
-      lines.push(`${pad}<${node.nodeName.toLowerCase()}${attrs ? " " + attrs : ""}>`);
-      for (const child of node.childNodes) walk(child, depth + 1);
-    };
-    for (const child of root.childNodes) walk(child, 0);
-    return lines;
-  };
+const ORIGINAL = "mobile";
+const CONVERTED = "mobile-next";
+// playwright.config.js의 use.baseURL과 같아야 한다.
+const BASE_URL = "http://127.0.0.1:8001";
 
-  const html = await (await fetch("/mobile/index.html")).text();
-  const parsed = new DOMParser().parseFromString(html, "text/html");
-  const originalRoot = parsed.getElementById("appRoot");
-  const convertedRoot = document.getElementById("appRoot");
-  if (!originalRoot || !convertedRoot) return { error: "#appRoot 를 한쪽에서 찾지 못했다" };
-
-  const original = describe(originalRoot);
-  const converted = describe(convertedRoot);
-  const diffs = [];
-  for (let i = 0; i < Math.max(original.length, converted.length); i += 1) {
-    if (original[i] !== converted[i]) {
-      diffs.push({ line: i, 원본: original[i] ?? "(없음)", 전환본: converted[i] ?? "(없음)" });
-      if (diffs.length >= 5) break;
+// 한 페이지의 #appRoot 아래를 통째로 훑어 문자열 목록으로 만든다.
+function describeTree() {
+  const lines = [];
+  const walk = (node, depth) => {
+    const pad = "  ".repeat(depth);
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = (node.nodeValue || "").replace(/\s+/g, " ").trim();
+      if (text) lines.push(`${pad}"${text}"`);
+      return;
     }
-  }
-  return { diffs, originalLines: original.length, convertedLines: converted.length };
-};
-
-test("리액트가 그린 DOM이 원본 마크업과 같다", async ({ page }) => {
-  await page.goto("/mobile-next/index.html");
-  await page.waitForFunction(() => (document.getElementById("appRoot")?.childElementCount ?? 0) > 0);
-
-  const result = await page.evaluate(COMPARE);
-  expect(result.error).toBeUndefined();
-  // 차이를 그대로 보여준다 - "다르다"는 것만 알려주면 어디가 다른지 찾는 데
-  // 시간이 다 간다.
-  expect(result.diffs, JSON.stringify(result.diffs, null, 2)).toEqual([]);
-  expect(result.convertedLines).toBe(result.originalLines);
-});
-
-// 여기서부터가 실측 대조.
-//
-// 원본 페이지를 그냥 열면 app.js가 곧바로 화면을 채워버려서(퀵선택 그리드,
-// 퀴즈 문제 문구 등) S2 시점의 리액트 화면과 비교할 수가 없다. 그래서
-// **app.js 요청만 빈 응답으로 가로챈다** - 나머지 스크립트와 스타일은 평소대로
-// 로드되므로, 남는 것은 정확히 "손으로 쓴 마크업 + 실제 CSS"다.
-// 전환본 쪽은 아직 로직이 없어 그 자체로 같은 상태다.
-async function measure(page, url, { blockLegacyApp = false } = {}) {
-  if (blockLegacyApp) {
-    await page.route("**/mobile/app.js", (route) => route.fulfill({ contentType: "text/javascript", body: "" }));
-  }
-  await page.goto(url);
-  await page.waitForFunction(() => (document.getElementById("appRoot")?.childElementCount ?? 0) > 0);
-  await page.evaluate(() => {
-    const gate = document.getElementById("authGate");
-    const root = document.getElementById("appRoot");
-    if (gate) gate.style.display = "none";
-    if (root) { root.classList.remove("hidden"); root.style.display = ""; }
-  });
-  await page.evaluate(() => document.fonts && document.fonts.ready);
-  await page.waitForTimeout(300);
-  // 헤더의 animate-ping 점이 계속 깜빡여서, 재는 순간에 따라 opacity가
-  // 0.2~0.27 사이 아무 값이나 나온다. 애니메이션을 끝난 상태로 고정한 뒤
-  // 잰다(선언값은 기준선의 motion 덤프가 따로 본다).
-  await settle(page);
-
-  return page.evaluate((props) => {
-    // 키를 id나 글자가 아니라 **자리(경로)**로 잡는다. 앞선 테스트가 두 트리가
-    // 같은 모양임을 이미 보였으므로, 같은 자리는 같은 요소다. id 없는 요소도
-    // 빠짐없이 들어온다는 것이 이 방식의 이점이다.
-    const out = {};
-    const walk = (el, path) => {
-      const rect = el.getBoundingClientRect();
-      const cs = getComputedStyle(el);
-      const row = { _tag: el.tagName.toLowerCase(), _box: [Math.round(rect.x), Math.round(rect.y), Math.round(rect.width), Math.round(rect.height)] };
-      for (const p of props) row[p] = cs.getPropertyValue(p);
-      out[path] = row;
-      [...el.children].forEach((child, i) => walk(child, `${path}/${i}:${child.tagName.toLowerCase()}`));
+    if (node.nodeType !== Node.ELEMENT_NODE) return; // 주석은 렌더에 영향이 없다
+    // style만 "선언 단위"로 비교한다. 리액트는 style 객체를 문자열로 만들 때
+    // 끝에 세미콜론을 붙이고(width: 20%;) 원본에는 없다(width: 20%). 브라우저가
+    // 파싱한 결과는 같아 렌더에 아무 영향이 없는데, 글자 그대로 비교하면
+    // 여기서 걸린다.
+    //
+    // class는 **집합으로** 비교한다. 원본은 classList.toggle로 클래스를 몇 개만
+    // 켰다 껐다 해서 순서가 조작 이력에 따라 달라지는데, 순서는 화면에 아무
+    // 영향이 없다(어느 규칙이 이기는지는 스타일시트 순서가 정한다).
+    const normalize = (name, value) => {
+      if (name === "style") return value.split(";").map((part) => part.trim()).filter(Boolean).sort().join("; ");
+      if (name === "class") return value.split(/\s+/).filter(Boolean).sort().join(" ");
+      return value;
     };
-    const root = document.getElementById("appRoot");
-    [...root.children].forEach((child, i) => walk(child, `${i}:${child.tagName.toLowerCase()}`));
-    return out;
-  }, LAYOUT_PROPS);
+    const attrs = [...node.attributes]
+      // 빈 value 속성은 뺀다. 리액트는 제어 입력의 값을 속성에도 비추는데,
+      // 원본은 자바스크립트로 .value(프로퍼티)만 다뤄서 속성이 아예 없다.
+      // 화면에 보이는 값도, 읽히는 값도 양쪽 다 빈 문자열로 같다 - 다른 것은
+      // "기본값 속성이 붙어 있는가"뿐이고 이 앱에는 form reset이 없다.
+      // 값이 들어 있는 경우는 그대로 비교하므로 진짜 차이는 여전히 잡힌다.
+      .filter((a) => !(a.name === "value" && a.value === ""))
+      .map((a) => `${a.name}=${JSON.stringify(normalize(a.name, a.value))}`)
+      .sort()
+      .join(" ");
+    lines.push(`${pad}<${node.nodeName.toLowerCase()}${attrs ? " " + attrs : ""}>`);
+    for (const child of node.childNodes) walk(child, depth + 1);
+  };
+  const root = document.getElementById("appRoot");
+  for (const child of root.childNodes) walk(child, 0);
+  return lines;
 }
+
+// 자리(경로)를 키로 삼는다. 앞선 DOM 대조가 두 트리가 같은 모양임을 이미
+// 보였으므로 같은 자리는 같은 요소다. id 없는 요소도 빠짐없이 들어온다.
+function measureTree(props) {
+  const out = {};
+  const walk = (el, path) => {
+    const rect = el.getBoundingClientRect();
+    const cs = getComputedStyle(el);
+    const row = { _tag: el.tagName.toLowerCase(), _box: [Math.round(rect.x), Math.round(rect.y), Math.round(rect.width), Math.round(rect.height)] };
+    for (const p of props) row[p] = cs.getPropertyValue(p);
+    out[path] = row;
+    [...el.children].forEach((child, i) => walk(child, `${path}/${i}:${child.tagName.toLowerCase()}`));
+  };
+  const root = document.getElementById("appRoot");
+  [...root.children].forEach((child, i) => walk(child, `${i}:${child.tagName.toLowerCase()}`));
+  return out;
+}
+
+// 화면 하나를 열어 재고 닫는다.
+//
+// **컨텍스트를 매번 새로 만드는 것이 중요하다.** 같은 컨텍스트에서 두 번째
+// 화면을 열면 checkStudentProfile 응답이 영영 안 와서 배너 대기가 15초
+// 타임아웃으로 죽는다(익명 인증·App Check 상태가 컨텍스트 단위로 남아
+// 재사용되면서 두 번째 요청이 400으로 막히는 것으로 보인다). 순차로 열어도
+// 마찬가지였고, 컨텍스트를 분리해야만 둘 다 정상으로 열렸다.
+//
+// baseURL을 직접 넘기는 이유: browser.newContext()로 만든 컨텍스트에는
+// playwright.config.js의 use 설정이 자동으로 붙지 않는다.
+async function collect(browser, viewport, target, run) {
+  const context = await browser.newContext({ viewport, baseURL: BASE_URL });
+  try {
+    const page = await context.newPage();
+    await openApp(page, target);
+    return await run(page);
+  } finally {
+    await context.close();
+  }
+}
+
+// 컨텍스트는 직접 만들지 않고 픽스처를 쓴다. browser.newContext()로 만들면
+// playwright.config.js의 use 설정(baseURL 등)이 안 붙어서 로딩이 통째로
+// 실패한다 - 처음에 그렇게 짰다가 15초 타임아웃으로 죽었다.
+const DOM_VIEWPORT = { width: 390, height: 844 };
+
+test("전환본의 DOM이 원본과 같다", async ({ browser }) => {
+  {
+    const original = await collect(browser, DOM_VIEWPORT, ORIGINAL, (page) => page.evaluate(describeTree));
+    const converted = await collect(browser, DOM_VIEWPORT, CONVERTED, (page) => page.evaluate(describeTree));
+
+    const diffs = [];
+    for (let i = 0; i < Math.max(original.length, converted.length); i += 1) {
+      if (original[i] !== converted[i]) {
+        diffs.push({ 줄: i, 원본: original[i] ?? "(없음)", 전환본: converted[i] ?? "(없음)" });
+        if (diffs.length >= 5) break;
+      }
+    }
+    // 차이를 그대로 보여준다 - "다르다"만 알려주면 어디가 다른지 찾는 데
+    // 시간이 다 간다.
+    expect(diffs, JSON.stringify(diffs, null, 2)).toEqual([]);
+    expect(converted.length).toBe(original.length);
+  }
+});
 
 for (const vp of VIEWPORTS) {
   test(`전환본이 원본과 같은 자리·같은 스타일로 그려진다 ${vp.name}`, async ({ browser }) => {
-    const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height } });
-    try {
-      const originalPage = await context.newPage();
-      const original = await measure(originalPage, "/mobile/index.html", { blockLegacyApp: true });
-      const convertedPage = await context.newPage();
-      const converted = await measure(convertedPage, "/mobile-next/index.html");
+    {
+      const measure = (target) => collect(browser, { width: vp.width, height: vp.height }, target, async (page) => {
+        // 헤더의 animate-ping 점이 계속 깜빡여서, 재는 순간에 따라 opacity가
+        // 아무 값이나 나온다. 애니메이션을 끝난 상태로 고정한 뒤 잰다
+        // (선언값은 기준선의 motion 덤프가 따로 본다).
+        await settle(page);
+        return page.evaluate(measureTree, LAYOUT_PROPS);
+      });
+      const original = await measure(ORIGINAL);
+      const converted = await measure(CONVERTED);
 
       const diffs = [];
       for (const key of Object.keys(original)) {
@@ -147,8 +152,6 @@ for (const vp of VIEWPORTS) {
       }
       expect(diffs, JSON.stringify(diffs, null, 2)).toEqual([]);
       expect(Object.keys(converted).length).toBe(Object.keys(original).length);
-    } finally {
-      await context.close();
     }
   });
 }

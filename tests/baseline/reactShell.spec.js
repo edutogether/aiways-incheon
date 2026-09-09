@@ -48,18 +48,15 @@ test("공유 전역 스크립트가 앱 번들보다 먼저 실행된다", async
   // 실행 순서를 문서 순서가 아니라 "실제로 먼저 정의되어 있는가"로 확인한다.
   // defer 스크립트와 module 스크립트는 둘 다 문서 순서대로 실행되므로, 앱
   // 번들이 도는 시점에 이 전역들이 이미 있어야 한다.
+  // S3/S4에서 mobile/의 데이터·판정·화면 스크립트는 TS 모듈로 옮겨져 더 이상
+  // <script>로 로드되지 않는다. 남은 것은 PC 앱과 **공유하는** 세 개뿐이고,
+  // 이 셋이 앱 번들보다 먼저 준비돼 있어야 한다.
   const globals = await page.evaluate(() => ({
     appCheck: typeof window.AIWaysAppCheck,
     betaAuth: typeof window.AIWaysBetaAuth,
-    edu2gClient: typeof window.AIWaysEdu2gClient,
-    mobileData: typeof window.AIWaysMobileData,
-    vision: typeof window.AIWaysMobileVision,
-    textTip: typeof window.AIWaysMobileTextTip
+    edu2gClient: typeof window.AIWaysEdu2gClient
   }));
-  expect(globals).toEqual({
-    appCheck: "object", betaAuth: "object", edu2gClient: "object",
-    mobileData: "object", vision: "object", textTip: "object"
-  });
+  expect(globals).toEqual({ appCheck: "object", betaAuth: "object", edu2gClient: "object" });
 
   // 문서 순서도 같이 본다 - 위 확인은 "번들이 이미 다 돈 뒤"를 보는 것이라,
   // 순서가 뒤집혀도 통과할 수 있다.

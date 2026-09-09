@@ -28,14 +28,15 @@ const VERBATIM_STYLESHEETS = ["tailwind.generated.css", "mobile.css"];
 
 // 상위 폴더의 공유 스크립트는 PC 앱과 같이 쓰는 것이라 이번 전환에서
 // 건드리지 않고, 지금처럼 전역(window.AIWays*)으로 읽는다.
-// mobile/ 안의 스크립트들은 S3에서 TS 모듈로 옮기면서 이 목록에서 빠진다.
+// mobile/ 안의 데이터·판정 스크립트는 S3에서, 화면 로직은 S4에서 TS로 옮겨
+// 이 목록에서 빠졌다.
 const LEGACY_SCRIPTS = [
   "../firebaseAppCheck.js",
   "../firebaseBetaAuth.js",
   "../edu2gBetaClient.js",
-  "../mobile/sortingData.js",
-  "../mobile/sortingVision.js",
-  "../mobile/sortingTextTip.js",
+  // 인증 게이트는 아직 옮기지 않았다(S5에서 정리한다). App Check 실패 화면과
+  // 재시도까지 들어 있고, 리액트 밖의 #authGate를 다시 그리는 구조라 화면
+  // 이식과는 성격이 다르다.
   "../mobile/authGate.js"
 ];
 

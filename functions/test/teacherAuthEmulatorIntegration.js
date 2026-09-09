@@ -18,6 +18,8 @@ const ACTOR_ID = "teacher_auth_test_actor";
 const SCHOOL_ID = "7321071";
 const GRADE = "5", CLASS_NUM = "1";
 const CODE = "sunrise-teachers-2026";
+// 2026-09-09(Bumm님 결정): 반 코드와 **같이** 통해야 하는 담임 개인 코드.
+const PERSONAL_CODE = "EDU2G SANGHYUN";
 const NO_CODE_SCHOOL_ID = "9999999";
 
 function signup() {
@@ -49,7 +51,7 @@ test("verifyTeacherCode: wrong code rejected, unset class rejected distinctly, c
     await db.collection("actors").doc(ACTOR_ID).set({ status: "active", plan: "closed_beta" });
     await db.collection("actors").doc(ACTOR_ID).collection("trustedDevices").doc(uid).set({ uid, status: "active", managementId: "123e4567-e89b-42d3-a456-426614174601" });
     await db.collection("edu2gDeviceBindings").doc(uid).set({ actorId: ACTOR_ID, status: "active" });
-    await db.collection("teacherCodes").doc(teacherCodeDocId(SCHOOL_ID, GRADE, CLASS_NUM)).set(hashTeacherCode(CODE));
+    await db.collection("teacherCodes").doc(teacherCodeDocId(SCHOOL_ID, GRADE, CLASS_NUM)).set({ ...hashTeacherCode(CODE), extraCodes: [{ label: "박상현", ...hashTeacherCode(PERSONAL_CODE) }] });
     // school-lock 교정(3단계) 확인용 - 이 기기가 엉뚱한 학교로 이미 고정돼
     // 있었다고 가정한다.
     await db.collection("actors").doc(ACTOR_ID).set({ dashboardSchoolId: NO_CODE_SCHOOL_ID }, { merge: true });
@@ -91,6 +93,18 @@ test("verifyTeacherCode: wrong code rejected, unset class rejected distinctly, c
     assert.equal(after.body.schoolId, SCHOOL_ID);
     assert.equal(after.body.grade, GRADE);
     assert.equal(after.body.classNum, CLASS_NUM);
+
+    // 공존 - 반 코드로 들어간 뒤에도 담임 개인 코드가 그대로 통해야 한다.
+    // 대체로 만들면 개인 코드에 문제가 생겼을 때 그 선생님이 들어갈 길이
+    // 하나도 없어진다.
+    //
+    // 일부러 **띄어쓰기와 대소문자를 틀린 형태**로 보낸다 - 공존과 정규화를
+    // 한 번에 확인하려는 것이다(호출을 더 늘리면 액터별 레이트리밋에 걸려
+    // 뒤따르는 검사가 429로 죽는다 - 실제로 그렇게 됐었다). 정규화가
+    // 안 되면 실패가 쌓여 **그 반 전체가 15분 잠긴다**.
+    const personal = await call(verify, token, { schoolId: SCHOOL_ID, grade: GRADE, classNum: CLASS_NUM, code: "  edu2g   sanghyun " });
+    assert.equal(personal.status, 200, "개인 코드가 막혔다(공존 또는 정규화 실패)");
+    assert.equal(personal.body.verified, true);
 
     const invalid = await call(verify, token, { schoolId: "", grade: GRADE, classNum: CLASS_NUM, code: CODE });
     assert.equal(invalid.status, 400);

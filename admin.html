@@ -39,6 +39,15 @@
         <input type="text" inputmode="numeric" maxlength="2" id="teacherCodeClassNum" placeholder="반" />
         <input type="text" id="teacherCodeValue" placeholder="새 인증코드 (학교·학년·반을 넣으면 자동으로 채워집니다)" />
         <p id="teacherCodeHint"></p>
+        <!-- 2026-09-09(Bumm님 결정): 한 반이 코드를 여러 개 받는다.
+             다른 반 선생님들은 규칙 코드(SEOHEUNG103)를 쓰고, 네 분은
+             개인 코드(EDU2G SANGHYUN)를 쓰는데 **둘 다 통해야 한다.**
+             체크하면 기존 코드를 두고 하나 더 붙인다. -->
+        <label for="teacherCodeAddMode">
+          <input type="checkbox" id="teacherCodeAddMode" />
+          기존 코드를 두고 <strong>추가</strong>로 등록 (예: 담임 개인 코드 <code>EDU2G SANGHYUN</code>)
+        </label>
+        <input type="text" id="teacherCodeLabel" placeholder="추가 코드를 누구 것으로 적어둘지 (예: 박상현) — 추가 등록일 때만" />
         <button type="button" id="teacherCodeSubmitBtn">발급/회전</button>
         <p id="teacherCodeStatus" role="status" aria-live="polite"></p>
       </section>

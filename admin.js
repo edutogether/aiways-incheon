@@ -132,9 +132,20 @@
       const user = auth.currentUser;
       if (!user) { status.textContent = "먼저 로그인해주세요."; return; }
       const idToken = await user.getIdToken();
-      const result = await callSuperadminFunction("manageTeacherCode", idToken, { schoolId, grade, classNum, code });
-      status.textContent = result.ok ? "발급/회전 완료했어요."
+      // 추가 모드면 기존 코드를 두고 하나 더 붙인다(공존). 서버가 대표
+      // 코드가 없는 반에는 추가를 거부하므로, 규칙 코드를 먼저 발급한 뒤에
+      // 개인 코드를 붙이는 순서가 된다.
+      const addMode = $("teacherCodeAddMode")?.checked === true;
+      const label = $("teacherCodeLabel")?.value.trim() || "";
+      const result = await callSuperadminFunction("manageTeacherCode", idToken, {
+        schoolId, grade, classNum, code,
+        mode: addMode ? "add" : "replace",
+        ...(addMode && label ? { label } : {})
+      });
+      status.textContent = result.ok ? (addMode ? "추가 코드로 등록했어요. 기존 코드도 그대로 통합니다." : "발급/회전 완료했어요.")
         : result.code === "superadmin_required" ? "이 계정은 관리자 권한이 없어요."
+        : result.code === "teacher_code_not_set" ? "이 반에는 아직 기본 코드가 없어요. 먼저 체크를 풀고 규칙 코드를 발급해주세요."
+        : result.code === "too_many_codes" ? "추가 코드는 한 반에 3개까지만 등록할 수 있어요."
         : result.code === "invalid_request" ? "학교 코드 형식 또는 인증코드 길이(6자 이상)를 확인해주세요."
         : "처리하지 못했어요. 다시 시도해주세요.";
     });

@@ -108,6 +108,18 @@
       const hint = $("teacherCodeHint");
       if (!field) return;
       const derived = deriveTeacherCode(schoolId, grade, classNum);
+      // 추가 등록 중에는 코드 칸을 건드리지 않는다.
+      //
+      // 개인 코드(EDU2G SANGHYUN)를 적어 놓고 학년·반을 다시 만지면, 자동
+      // 채움이 그 자리를 규칙 코드로 덮어쓴다. 손으로 발급하는 화면이라
+      // 그 순간을 못 보고 그대로 눌러버리면 **엉뚱한 코드가 추가 등록된다.**
+      const addMode = $("teacherCodeAddMode")?.checked === true;
+      if (addMode) {
+        if (hint) hint.textContent = derived
+          ? `추가 등록 중입니다 - 코드 칸은 그대로 둡니다. 이 반의 규칙 코드는 «${derived}»입니다.`
+          : "추가 등록 중입니다 - 코드 칸은 그대로 둡니다.";
+        return;
+      }
       if (derived) {
         field.value = derived;
         if (hint) hint.textContent = `이 반의 인증코드는 «${derived}»입니다. 그대로 발급하거나 직접 고쳐도 됩니다.`;
@@ -120,6 +132,8 @@
     ["teacherCodeSchoolId", "teacherCodeGrade", "teacherCodeClassNum"].forEach((id) => {
       $(id)?.addEventListener("input", refreshDerivedCode);
     });
+    // 체크를 껐다 켤 때도 안내 문구가 따라와야 한다.
+    $("teacherCodeAddMode")?.addEventListener("change", refreshDerivedCode);
     $("teacherCodeSubmitBtn")?.addEventListener("click", async () => {
       const status = $("teacherCodeStatus");
       const schoolId = $("teacherCodeSchoolId")?.value.trim();

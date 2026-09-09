@@ -37,7 +37,13 @@
     try { headers = await window.AIWaysBetaAuth?.getEdu2gProtectedHeaders?.({ forceRefresh: retried }); } catch { return { ok: false, status: 0, code: "auth_invalid", data: null }; }
     // 로컬 에뮬레이터 검증 시엔 App Check 헤더가 없다(firebaseBetaAuth.js
     // 참고 - 같은 조건으로 서버쪽도 검증을 건너뜀).
-    if (!headers?.Authorization || (!headers["X-Firebase-AppCheck"] && !usingEmulator())) return { ok: false, status: 0, code: "auth_invalid", data: null };
+    if (!headers?.Authorization) return { ok: false, status: 0, code: "auth_invalid", data: null };
+    // 🔴 2026-09-10: App Check 헤더가 없는 것을 '연결 문제'로 뭉개지 않는다.
+    // 예전에는 둘 다 auth_invalid라 화면에 "연결을 다시 확인해 주세요"만 떴고,
+    // 보안 확인이 막힌 것인지 네트워크가 끊긴 것인지 구분할 수 없었다.
+    // 이 경우 요청은 **아예 나가지 않으므로 서버 로그에도 안 남는다** - 화면이
+    // 말해주지 않으면 원인을 알 방법이 없다.
+    if (!headers["X-Firebase-AppCheck"] && !usingEmulator()) return { ok: false, status: 0, code: "app_check_unavailable", data: null };
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 15000);
     try {
@@ -60,7 +66,7 @@
     return "Other";
   }
   function errorMessageFor(code) {
-    return ({ login_not_approved: "승인된 이름 또는 아이디를 확인해 주세요.", device_limit_reached: "등록 가능한 기기 수에 도달했습니다. 기존 기기 하나를 선택해 교체해 주세요.", device_already_bound: "이 기기는 이미 다른 사용자에게 연결되어 있습니다.", device_not_registered: "이 기기는 아직 등록되지 않았습니다.", device_revoked: "이 기기는 해제되었습니다.", actor_unavailable: "일시적으로 접속을 확인하지 못했습니다. 다시 시도해 주세요.", access_state_invalid: "연결 상태를 확인하지 못했습니다. 다시 시도해 주세요.", auth_missing: "연결을 다시 확인해 주세요.", auth_invalid: "연결을 다시 확인해 주세요.", anonymous_auth_required: "익명 인증 연결이 필요합니다. 다시 시도해 주세요.", app_check_missing: "보안 확인을 다시 시도해 주세요.", app_check_invalid: "보안 확인을 다시 시도해 주세요.", app_check_unavailable: "보안 확인 서비스가 일시적으로 준비되지 않았습니다.", protection_unavailable: "보안 확인 서비스가 일시적으로 준비되지 않았습니다.", origin_not_allowed: "허용되지 않은 접속 환경입니다.", device_not_trusted: "이 기기의 권한을 다시 확인해 주세요.", rate_limited: "잠시 후 다시 시도해 주세요.", request_in_progress: "같은 요청을 처리하고 있습니다. 잠시 후 다시 확인해 주세요.", request_expired: "요청 시간이 지나 다시 분석해 주세요.", provider_unavailable: "분석 서비스를 지금 사용할 수 없습니다. 잠시 후 다시 시도해 주세요.", invalid_model_response: "분석 결과를 확인하지 못했습니다. 다시 시도해 주세요.", analysis_failed: "분석에 실패했습니다. 다시 시도해 주세요.", request_timeout: "응답 시간이 초과되었습니다. 다시 시도해 주세요.", network_error: "네트워크 연결을 확인해 주세요.", invalid_response: "응답을 확인하지 못했습니다. 다시 시도해 주세요.", invalid_request: "입력 내용을 다시 확인해 주세요.", invalid_query: "검색어를 다시 확인해 주세요.", student_number_taken: "이 번호는 이미 다른 학생이 쓰고 있어요. 번호를 다시 확인해 주세요.", teacher_code_locked: "시도가 너무 많아 이 반의 인증코드가 잠시 잠겼어요. 15분 뒤 다시 시도해 주세요." }[code] || "일시적인 문제가 발생했습니다. 다시 시도해 주세요.");
+    return ({ login_not_approved: "승인된 이름 또는 아이디를 확인해 주세요.", device_limit_reached: "등록 가능한 기기 수에 도달했습니다. 기존 기기 하나를 선택해 교체해 주세요.", device_already_bound: "이 기기는 이미 다른 사용자에게 연결되어 있습니다.", device_not_registered: "이 기기는 아직 등록되지 않았습니다.", device_revoked: "이 기기는 해제되었습니다.", actor_unavailable: "일시적으로 접속을 확인하지 못했습니다. 다시 시도해 주세요.", access_state_invalid: "연결 상태를 확인하지 못했습니다. 다시 시도해 주세요.", auth_missing: "연결을 다시 확인해 주세요.", auth_invalid: "연결을 다시 확인해 주세요.", anonymous_auth_required: "익명 인증 연결이 필요합니다. 다시 시도해 주세요.", app_check_missing: "보안 확인을 다시 시도해 주세요.", app_check_invalid: "보안 확인을 다시 시도해 주세요.", app_check_unavailable: "보안 확인을 통과하지 못했어요. 브라우저를 완전히 닫았다 다시 열거나, 시크릿 창으로 접속해 보세요.", protection_unavailable: "보안 확인 서비스가 일시적으로 준비되지 않았습니다.", origin_not_allowed: "허용되지 않은 접속 환경입니다.", device_not_trusted: "이 기기의 권한을 다시 확인해 주세요.", rate_limited: "잠시 후 다시 시도해 주세요.", request_in_progress: "같은 요청을 처리하고 있습니다. 잠시 후 다시 확인해 주세요.", request_expired: "요청 시간이 지나 다시 분석해 주세요.", provider_unavailable: "분석 서비스를 지금 사용할 수 없습니다. 잠시 후 다시 시도해 주세요.", invalid_model_response: "분석 결과를 확인하지 못했습니다. 다시 시도해 주세요.", analysis_failed: "분석에 실패했습니다. 다시 시도해 주세요.", request_timeout: "응답 시간이 초과되었습니다. 다시 시도해 주세요.", network_error: "네트워크 연결을 확인해 주세요.", invalid_response: "응답을 확인하지 못했습니다. 다시 시도해 주세요.", invalid_request: "입력 내용을 다시 확인해 주세요.", invalid_query: "검색어를 다시 확인해 주세요.", student_number_taken: "이 번호는 이미 다른 학생이 쓰고 있어요. 번호를 다시 확인해 주세요.", teacher_code_locked: "시도가 너무 많아 이 반의 인증코드가 잠시 잠겼어요. 15분 뒤 다시 시도해 주세요." }[code] || "일시적인 문제가 발생했습니다. 다시 시도해 주세요.");
   }
   window.AIWaysEdu2gClient = {
     functionUrl, usingEmulator, visualReviewRequested, request, getPlatformLabel, errorMessageFor,

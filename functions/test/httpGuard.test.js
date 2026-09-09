@@ -15,9 +15,9 @@ test("cleanText trims, rejects control chars/angle brackets, and enforces max le
 
 test("isAllowedOrigin accepts the production origins and localhost dev ports only", () => {
   assert.equal(isAllowedOrigin("https://edutogether.github.io"), true);
-  // 2026-09-09 Bumm님 지시로 옛 Firebase 기본 주소는 끊었다 - 페이지는 뜨지만
-  // API는 거부되는 것이 의도한 상태다.
-  assert.equal(isAllowedOrigin("https://ai-ways-incheon.web.app"), false);
+  // 2026-09-09에 끊었다가 2026-09-10에 되살렸다(Bumm님 판단) - 정식 주소가
+  // 막혔을 때 들어갈 길이 하나도 없으면 안 된다. **두 주소 모두 통해야 한다.**
+  assert.equal(isAllowedOrigin("https://ai-ways-incheon.web.app"), true);
   assert.equal(isAllowedOrigin("https://ai-ways-incheon.firebaseapp.com"), true);
   assert.equal(isAllowedOrigin("https://edutogether.kr"), true);
   // 2026-09-09에 연결된 이 앱의 정식 주소.
@@ -31,6 +31,13 @@ test("isAllowedOrigin accepts the production origins and localhost dev ports onl
   assert.equal(isAllowedOrigin("http://127.0.0.1:8080"), true);
   assert.equal(isAllowedOrigin("https://evil.example.com"), false);
   assert.equal(isAllowedOrigin("http://edutogether.github.io"), false);
+  // 허용은 **목록에 있는 것만**이다(COMMON_STANDARDS §21-5 - 배제 방식이 아니라
+  // 허용 목록 방식). 허용된 주소를 앞에 붙이거나 뒤에 이어붙인 것도 통하면 안 된다.
+  assert.equal(isAllowedOrigin("https://ai-ways-incheon.web.app.evil.com"), false);
+  assert.equal(isAllowedOrigin("https://evil-ai-ways-incheon.web.app"), false);
+  assert.equal(isAllowedOrigin("https://incheon.edutogether.kr.evil.com"), false);
+  assert.equal(isAllowedOrigin("https://example.com"), false);
+  assert.equal(isAllowedOrigin(""), false);
 });
 
 function fakeRes() {

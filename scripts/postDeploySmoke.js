@@ -7,7 +7,10 @@
 // 2026-09-09: 정식 주소는 incheon.edutogether.kr 하나다. 옛 Firebase 기본
 // 주소는 Bumm님 지시로 CORS 허용목록에서 뺐으므로 검사 대상도 아니다 -
 // 그 주소는 페이지만 뜨고 API는 거부되는 것이 의도한 상태다.
-const PROD_ORIGINS = ["https://incheon.edutogether.kr"];
+// 2026-09-10: 정식 주소가 막혔을 때 들어갈 대비용 주소(Bumm님 판단)라,
+// **둘 다 실제로 통하는지** 배포마다 확인한다 - 대비용이 정작 필요할 때
+// 안 되면 대비가 아니다.
+const PROD_ORIGINS = ["https://incheon.edutogether.kr", "https://ai-ways-incheon.web.app"];
 const FUNCTIONS_BASE = "https://asia-northeast3-ai-ways-incheon.cloudfunctions.net";
 
 async function checkCorsNotBlocked(functionName, origin) {

@@ -30,15 +30,21 @@ const ALLOWED_STATIC_ORIGINS = new Set([
   "https://edutogether.github.io",
   "https://ai-ways-incheon.firebaseapp.com",
   "https://edutogether.kr",
-  // 2026-09-09: 이 앱의 정식 주소. Bumm님 지시로 옛 Firebase 기본 주소
-  // (ai-ways-incheon.web.app)는 허용목록에서 뺐다 - 박람회 때 쓰던 사용자를
-  // 정리하고 4학교 4학년만의 클로즈베타로 다시 시작하기 위함이다.
-  // Firebase Hosting의 기본 주소 자체는 끌 수 없어 페이지는 계속 뜨지만,
-  // 여기서 빠졌으므로 그 주소로는 API가 전부 invalid_origin으로 거부된다
-  // (= 기능이 안 된다). 그게 의도한 상태다.
+  // 2026-09-09: 이 앱의 정식 주소.
   // (처음엔 aiways.edutogether.kr로 잡았다가 가비아에서 incheon으로
   //  확정됐다 - aiways는 DNS에 존재하지 않으니 되살리지 말 것)
   "https://incheon.edutogether.kr",
+  // 2026-09-09에 Bumm님 지시로 여기서 뺐다가, 2026-09-10에 **다시 넣었다.**
+  //
+  // 뺀 이유: 박람회 때 쓰던 사용자를 정리하고 4학교 클로즈베타로 다시
+  // 시작하려고 - 옛 주소로 들어오면 화면은 떠도 기능은 안 되게.
+  // 되돌린 이유: **가용성.** 9/10에 정식 주소에서 App Check 토큰을 못 받아
+  // 아무 기능도 안 되는 일이 실제로 벌어졌는데, 그때 들어갈 다른 길이 하나도
+  // 없었다. Bumm님 판단 - "현 주소가 안 되면 대비용으로 쓸 수 있어야 한다."
+  //
+  // 🔴 클로즈베타 사용자 정리는 이것과 무관하다. 그건 오리진이 아니라
+  // 교사코드·가입 쪽에서 강제되므로, 오리진을 다시 열어도 느슨해지지 않는다.
+  "https://ai-ways-incheon.web.app",
 ]);
 
 function isAllowedOrigin(origin) {

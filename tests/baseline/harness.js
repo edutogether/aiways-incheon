@@ -47,6 +47,8 @@ export const INTERACTION_SCOPE = [
   DEFAULT_SCOPE,
   ".hold-item-card",
   ".hold-item-card span",
+  ".practice-item",
+  ".practice-item span",
   "#search-suggestions > div",
   "#quickSelectGrid > button",
   "#quizRankLadder > div",

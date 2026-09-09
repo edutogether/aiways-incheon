@@ -4,12 +4,10 @@
 // 모든 API가 403"인 상태로 그대로 나갔는데도 CI는 초록불이었다. 이 스크립트는
 // deploy-hosting 배포 직후 실행되어, 배포된 코드가 아니라 배포된 "결과"(실제
 // 라이브 응답)를 확인한다 - 로컬 유닛테스트로는 못 잡는 층이다.
-// 2026-09-09: 정식 주소가 incheon.edutogether.kr로 붙었다. 옛 주소를 빼지
-// 않고 둘 다 확인하는 이유는, Firebase Hosting이 커스텀 도메인을 "추가"하는
-// 것이지 기본 도메인을 대체하지 않아서 양쪽 다 살아 있고, 실제로 둘 중
-// 하나만 깨지는 상황(예: 새 도메인만 CORS 허용목록에서 빠짐)이 이 스크립트가
-// 잡아야 할 바로 그 사고이기 때문이다.
-const PROD_ORIGINS = ["https://incheon.edutogether.kr", "https://ai-ways-incheon.web.app"];
+// 2026-09-09: 정식 주소는 incheon.edutogether.kr 하나다. 옛 Firebase 기본
+// 주소는 Bumm님 지시로 CORS 허용목록에서 뺐으므로 검사 대상도 아니다 -
+// 그 주소는 페이지만 뜨고 API는 거부되는 것이 의도한 상태다.
+const PROD_ORIGINS = ["https://incheon.edutogether.kr"];
 const FUNCTIONS_BASE = "https://asia-northeast3-ai-ways-incheon.cloudfunctions.net";
 
 async function checkCorsNotBlocked(functionName, origin) {

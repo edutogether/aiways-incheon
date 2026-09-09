@@ -28,18 +28,16 @@ function cleanText(value, max = 80) {
 // 구조 - projects-42 전달). 페이지 코드 변경 없이 서버 허용목록에만 추가.
 const ALLOWED_STATIC_ORIGINS = new Set([
   "https://edutogether.github.io",
-  "https://ai-ways-incheon.web.app",
   "https://ai-ways-incheon.firebaseapp.com",
   "https://edutogether.kr",
-  // 2026-09-09: 이 앱 주소가 incheon.edutogether.kr로 확정·연결됐다
-  // (Firebase 주소를 노출하지 않기 위함). 실측으로 200 확인했고, 응답
-  // 본문 해시가 ai-ways-incheon.web.app과 동일하다 - 같은 호스팅에 도메인만
-  // 붙은 것이라 "주소는 열리는데 내용은 옛 빌드"인 상황이 아니다.
-  // 위 출처들을 지우지 않는 이유: Firebase Hosting은 커스텀 도메인을
-  // "추가"하는 것이지 기본 도메인을 대체하지 않아서 옛 주소도 계속 살아
-  // 있고, 그쪽으로 들어오는 기존 사용자를 끊을 이유가 없다.
-  // (처음엔 aiways.edutogether.kr로 미리 넣었는데 실제로는 가비아에서
-  //  incheon으로 정해져서 그 이름은 DNS에 존재하지 않는다 - 바로잡음)
+  // 2026-09-09: 이 앱의 정식 주소. Bumm님 지시로 옛 Firebase 기본 주소
+  // (ai-ways-incheon.web.app)는 허용목록에서 뺐다 - 박람회 때 쓰던 사용자를
+  // 정리하고 4학교 4학년만의 클로즈베타로 다시 시작하기 위함이다.
+  // Firebase Hosting의 기본 주소 자체는 끌 수 없어 페이지는 계속 뜨지만,
+  // 여기서 빠졌으므로 그 주소로는 API가 전부 invalid_origin으로 거부된다
+  // (= 기능이 안 된다). 그게 의도한 상태다.
+  // (처음엔 aiways.edutogether.kr로 잡았다가 가비아에서 incheon으로
+  //  확정됐다 - aiways는 DNS에 존재하지 않으니 되살리지 말 것)
   "https://incheon.edutogether.kr",
 ]);
 

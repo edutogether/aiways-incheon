@@ -15,7 +15,9 @@ test("cleanText trims, rejects control chars/angle brackets, and enforces max le
 
 test("isAllowedOrigin accepts the production origins and localhost dev ports only", () => {
   assert.equal(isAllowedOrigin("https://edutogether.github.io"), true);
-  assert.equal(isAllowedOrigin("https://ai-ways-incheon.web.app"), true);
+  // 2026-09-09 Bumm님 지시로 옛 Firebase 기본 주소는 끊었다 - 페이지는 뜨지만
+  // API는 거부되는 것이 의도한 상태다.
+  assert.equal(isAllowedOrigin("https://ai-ways-incheon.web.app"), false);
   assert.equal(isAllowedOrigin("https://ai-ways-incheon.firebaseapp.com"), true);
   assert.equal(isAllowedOrigin("https://edutogether.kr"), true);
   // 2026-09-09에 연결된 이 앱의 정식 주소.

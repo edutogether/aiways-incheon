@@ -1206,25 +1206,63 @@
     stepClass.hidden = false;
     const backBtn = $("#dashboardClassBackBtn");
     if (backBtn) backBtn.hidden = false;
+    // 2026-09-09(Bumm님 지시) - 예전에는 학교와 무관하게 1~15반을 다 띄우고
+    // "확인"을 눌러야 그제서야 "서비스 준비중"으로 막았다. 고르기 전에 알 수
+    // 있어야 한다는 지적에 따라 두 가지를 고친다:
+    //   (1) 학년을 고르기 전에는 반을 고를 수 없다
+    //   (2) 학년을 고르면 그 학교·학년에 실제로 있는 반만 뜬다
     gradeSelect.replaceChildren();
+    const gradePlaceholder = document.createElement("option");
+    gradePlaceholder.value = "";
+    gradePlaceholder.textContent = "학년을 먼저 선택해주세요";
+    gradeSelect.append(gradePlaceholder);
     for (let g = 1; g <= 6; g += 1) {
       const option = document.createElement("option");
       option.value = String(g);
       option.textContent = `${g}학년`;
       gradeSelect.append(option);
     }
-    gradeSelect.value = config.grade;
-    classNumSelect.replaceChildren();
-    for (let n = 1; n <= 15; n += 1) {
-      const option = document.createElement("option");
-      option.value = String(n);
-      option.textContent = `${n}반`;
-      classNumSelect.append(option);
+    gradeSelect.value = "";
+
+    function renderClassOptions() {
+      classNumSelect.replaceChildren();
+      const chosenGrade = gradeSelect.value;
+      if (!chosenGrade) {
+        const hint = document.createElement("option");
+        hint.value = "";
+        hint.textContent = "학년을 먼저 선택해주세요";
+        classNumSelect.append(hint);
+        classNumSelect.disabled = true;
+        return;
+      }
+      // 이 앱이 여는 학년은 학교마다 하나다(SCHOOL_CLASS_CONFIG). 다른 학년을
+      // 고르면 반 목록이 없으므로 이유를 그 자리에서 알려준다.
+      if (chosenGrade !== config.grade) {
+        const none = document.createElement("option");
+        none.value = "";
+        none.textContent = `${chosenGrade}학년은 서비스 준비중이에요`;
+        classNumSelect.append(none);
+        classNumSelect.disabled = true;
+        return;
+      }
+      for (let n = 1; n <= config.totalClasses; n += 1) {
+        const option = document.createElement("option");
+        option.value = String(n);
+        option.textContent = `${n}반`;
+        classNumSelect.append(option);
+      }
+      classNumSelect.disabled = false;
+      classNumSelect.value = "1";
     }
-    classNumSelect.value = "1";
+    gradeSelect.onchange = renderClassOptions;
+    renderClassOptions();
     confirmBtn.onclick = () => {
       const grade = gradeSelect.value;
       const classNum = classNumSelect.value;
+      if (!grade || !classNum) {
+        showDashboardToast("학년과 반을 모두 선택해주세요.");
+        return;
+      }
       if (grade !== config.grade || Number(classNum) > config.totalClasses) {
         showDashboardToast(`${school.schoolName} ${grade}학년 ${classNum}반은 서비스 준비중이에요. 곧 만나요 !`);
         return;

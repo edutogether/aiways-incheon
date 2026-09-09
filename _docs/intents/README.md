@@ -24,6 +24,8 @@
 | 날짜 | 슬러그 | 등급 | 상태 | 요약 |
 |---|---|---|---|---|
 | 2026-09-07 | hold-resolve-server-sync | 1 | done | 보류함 "해결완료"가 서버 기록(resolveSortingRecord)과 실제로 동기화되도록 배선 |
+| 2026-09-09 | teacher-delete-instead-of-approval | 2 | in-progress | 가입승인대기열을 없애고 교사에게 차단·삭제 권한을 주는 방식으로 교체 |
+| 2026-09-09 | mobile-react-conversion | 2 | in-progress | `mobile/`을 React+TS로 전환하되 화면·모션을 측정값 수준에서 동일하게 유지 |
 
 ## 폴더 규칙
 

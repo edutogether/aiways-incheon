@@ -17,7 +17,7 @@
 // 자동완성 항목, 토스트)은 대부분 id가 없기 때문이다.
 import { test, expect } from "@playwright/test";
 import {
-  VIEWPORTS, LAYOUT_PROPS, MOTION_PROPS, INTERACTION_SCOPE,
+  VIEWPORTS, LAYOUT_PROPS, MOTION_PROPS, INTERACTION_SCOPE, assertNotEmpty,
   dumpSemantics, dumpStyles, openApp, settle, unsettle
 } from "./harness.js";
 
@@ -52,6 +52,8 @@ async function openSeededApp(page) {
 // "같다"의 기준이 두 개가 되어 버린다.
 async function capture(page, vp, state) {
   const semantics = await page.evaluate(dumpSemantics);
+  // 빈 결과를 정답으로 굳히지 않는다(harness.js assertNotEmpty 주석 참고).
+  assertNotEmpty({ semantics });
   expect(JSON.stringify(semantics, null, 2)).toMatchSnapshot(`${vp}-${state}.semantics.json`);
 
   const motion = await page.evaluate(dumpStyles, [MOTION_PROPS, false, INTERACTION_SCOPE]);
@@ -59,6 +61,7 @@ async function capture(page, vp, state) {
 
   await settle(page);
   const layout = await page.evaluate(dumpStyles, [LAYOUT_PROPS, true, INTERACTION_SCOPE]);
+  assertNotEmpty({ styles: layout });
   expect(JSON.stringify(layout, null, 2)).toMatchSnapshot(`${vp}-${state}.layout.json`);
   await expect(page).toHaveScreenshot(`${vp}-${state}.png`, { fullPage: true });
   // 다음 상태의 모션 선언값이 0s로 오염되지 않게 반드시 걷어낸다.

@@ -62,6 +62,14 @@ export const INTERACTION_SCOPE = [
 // 전환 과정에서 요소 id 20여 개를 잃은 것을 이 대조로 잡았다. 이 앱은
 // app.js/mobile/app.js가 getElementById로 DOM을 직접 붙잡는 구조라
 // **id 하나만 사라져도 그 기능이 조용히 죽는다** - 더 취약하다.
+// 화면이 제대로 뜨지 않았을 때의 빈 결과를 "정답"으로 받아들이지 않기
+// 위한 하한. 실제로 잡히는 값은 id 110개 / 요소 128개쯤이라, 절반 아래로
+// 떨어졌다면 그건 회귀가 아니라 **페이지가 안 뜬 것**이다. 이 하한이
+// 없으면 빈 스냅샷끼리 비교해 초록불이 나고, 더 나쁘게는 그 빈 결과가
+// --update-snapshots로 기준선에 들어앉는다(COMMON_STANDARDS §21).
+const MIN_IDS = 60;
+const MIN_ELEMENTS = 60;
+
 export function dumpSemantics() {
   // 글자를 잴 때 공백을 하나로 접는다. 원본 HTML은 줄바꿈+들여쓰기가
   // 텍스트 노드로 남고 JSX는 그 자리를 비우는데, 화면에서는 둘 다
@@ -100,6 +108,20 @@ export function dumpSemantics() {
       .map((b) => `${b.id || "(무id)"}: ${text(b.textContent).slice(0, 24)} | ${JSON.stringify(attrsOf(b, ["type", "disabled"]))}`)
       .sort()
   };
+}
+
+// 위 두 덤프가 "아무것도 못 찾았다"를 조용히 통과시키지 않게 하는 문지기.
+// 재는 쪽에서 부른다 - 덤프 함수 자체는 page.evaluate로 직렬화돼 넘어가므로
+// 바깥 상수를 참조할 수 없다.
+export function assertNotEmpty({ semantics, styles }) {
+  if (semantics) {
+    if (semantics.ids.length < MIN_IDS) throw new Error(`화면에 id가 ${semantics.ids.length}개뿐입니다(최소 ${MIN_IDS}) - 페이지가 제대로 안 뜬 상태를 기준선으로 삼을 뻔했습니다.`);
+    if (!semantics.title) throw new Error("document.title이 비었습니다 - 페이지가 제대로 안 뜬 상태입니다.");
+  }
+  if (styles) {
+    const count = Object.keys(styles).length;
+    if (count < MIN_ELEMENTS) throw new Error(`잰 요소가 ${count}개뿐입니다(최소 ${MIN_ELEMENTS}) - 페이지가 제대로 안 뜬 상태를 기준선으로 삼을 뻔했습니다.`);
+  }
 }
 
 // page.evaluate에 넘길 때 함수 본문만 직렬화되므로 key()를 안에 다시 둔다.

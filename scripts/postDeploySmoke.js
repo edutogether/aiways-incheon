@@ -43,6 +43,18 @@ async function main() {
     ...PROD_ORIGINS.flatMap(origin => functionNames.map(name => () => checkCorsNotBlocked(name, origin))),
     ...PROD_ORIGINS.map(base => () => checkHostingHeaders(base)),
   ];
+  // 검사 목록이 비면 실패가 0건이라 "전부 통과"로 끝나 버린다. 오리진이나
+  // 함수 이름 목록을 잘못 비우면 **배포가 깨져도 초록불**이 된다 - 이 파일이
+  // 라이브를 실제로 확인하는 유일한 층이라 특히 위험하다(COMMON_STANDARDS §21).
+  //
+  // 기대치를 **고정값으로 적는다.** 처음엔 PROD_ORIGINS/functionNames 길이로
+  // 계산했는데, 목록을 비우면 기대치도 같이 0이 되어 그대로 통과했다 -
+  // 문지기가 감시 대상에서 기준을 가져오면 감시가 되지 않는다.
+  const MIN_FUNCTIONS = 4, MIN_ORIGINS = 1, MIN_CHECKS = 5;
+  if (functionNames.length < MIN_FUNCTIONS || PROD_ORIGINS.length < MIN_ORIGINS || checks.length < MIN_CHECKS) {
+    console.error(`스모크 검사 대상이 줄었습니다 - 함수 ${functionNames.length}/${MIN_FUNCTIONS}, 오리진 ${PROD_ORIGINS.length}/${MIN_ORIGINS}, 검사 ${checks.length}/${MIN_CHECKS}. 검사 없이 통과할 뻔했습니다.`);
+    process.exit(1);
+  }
   const failures = [];
   for (const check of checks) {
     try {

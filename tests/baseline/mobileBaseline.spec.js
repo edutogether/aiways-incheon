@@ -29,7 +29,7 @@
 // 건드리지 않으며, 실제 보안은 전부 Functions 쪽에서 강제되므로 이 우회가
 // 보안을 우회하지는 않는다.
 import { test, expect } from "@playwright/test";
-import { VIEWPORTS, LAYOUT_PROPS, MOTION_PROPS, dumpSemantics, dumpStyles, openApp, settle, unsettle } from "./harness.js";
+import { VIEWPORTS, LAYOUT_PROPS, MOTION_PROPS, assertNotEmpty, dumpSemantics, dumpStyles, openApp, settle, unsettle } from "./harness.js";
 
 const TABS = ["판단", "퀴즈", "통계", "보류함"];
 
@@ -42,13 +42,17 @@ for (const vp of VIEWPORTS) {
 
       for (const tab of TABS) {
         const button = page.getByRole("button", { name: new RegExp(tab) }).first();
-        if (await button.count()) {
-          await button.click();
-          await page.waitForTimeout(400);
-        }
+        // 예전에는 버튼을 못 찾으면 조용히 안 누르고 지나갔다. 그러면 탭이
+        // 사라져도 **직전 탭 화면을 그 탭의 정답으로 찍어** 초록불이 난다
+        // (COMMON_STANDARDS §21). 못 찾으면 실패해야 한다.
+        expect(await button.count(), `${tab} 탭 버튼을 찾지 못했다`).toBeGreaterThan(0);
+        await button.click();
+        await page.waitForTimeout(400);
 
         // 0) 화면에 안 보이는 값 - id/meta/alt/aria/링크/입력 속성.
         const semantics = await page.evaluate(dumpSemantics);
+        // 빈 결과를 정답으로 굳히지 않는다(harness.js assertNotEmpty 주석 참고).
+        assertNotEmpty({ semantics });
         expect(JSON.stringify(semantics, null, 2)).toMatchSnapshot(`${vp.name}-${tab}.semantics.json`);
 
         // 1) 모션 명세 - 재생을 멈추기 "전"에 선언값을 읽는다.
@@ -58,6 +62,7 @@ for (const vp of VIEWPORTS) {
         // 2) 정지 상태 - 재생을 끝낸 뒤 레이아웃을 잰다.
         await settle(page);
         const layout = await page.evaluate(dumpStyles, [LAYOUT_PROPS, true]);
+        assertNotEmpty({ styles: layout });
         expect(JSON.stringify(layout, null, 2)).toMatchSnapshot(`${vp.name}-${tab}.layout.json`);
         await expect(page).toHaveScreenshot(`${vp.name}-${tab}.png`, { fullPage: true });
         // 다음 탭의 모션 명세가 0s로 오염되지 않도록 반드시 걷어낸다.

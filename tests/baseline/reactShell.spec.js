@@ -46,6 +46,13 @@ test("공유 전역 스크립트가 앱 번들보다 먼저 실행된다", async
   const bundleAt = order.findIndex((src) => src.includes("/bundle/"));
   const lastLegacyAt = order.reduce((last, src, i) => (src.includes("/bundle/") ? last : i), -1);
   expect(bundleAt, "앱 번들 <script>를 찾지 못했다").toBeGreaterThan(-1);
+  // 공유 스크립트가 통째로 사라지면 lastLegacyAt이 -1이 되어 아래 비교가
+  // 저절로 통과한다 - 순서를 지켰기 때문이 아니라 비교할 것이 없어서다
+  // (COMMON_STANDARDS §21). 실제로 있는지 먼저 못박는다.
+  expect(lastLegacyAt, "공유 스크립트가 하나도 없다").toBeGreaterThan(-1);
+  // 앱 번들보다 먼저 와야 하는 <script defer> 넷: 공유 셋(AppCheck/BetaAuth/
+  // Edu2gClient) + 인증 게이트. 개수를 못박아 두면 하나가 조용히 빠지는 것도 잡힌다.
+  expect(order.filter((src) => !src.includes("/bundle/")).length, "먼저 로드돼야 할 스크립트 개수가 달라졌다").toBe(4);
   expect(bundleAt, "앱 번들이 공유 스크립트보다 앞에 있다").toBeGreaterThan(lastLegacyAt);
 });
 

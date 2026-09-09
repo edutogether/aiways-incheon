@@ -32,7 +32,11 @@ test("frontend CSS is a compact canonical architecture", () => {
   assert.ok(report.rules <= 700, JSON.stringify(report));
   assert.ok(report.media <= 10 && report.uniqueViewportConditions <= 5, JSON.stringify(report));
   assert.ok(report.maxSelectorDefinitions <= 3, JSON.stringify(report));
-  Object.entries(report).filter(([name]) => /Declarations|important/.test(name)).forEach(([, value]) => assert.equal(value, 0, JSON.stringify(report)));
+  // 걸러낸 항목이 0개면 forEach가 안 돌아 이 줄이 통째로 사라진다 - 리포트
+  // 키 이름만 바뀌어도 검사가 조용히 없어진다(COMMON_STANDARDS §21).
+  const zeroChecks = Object.entries(report).filter(([name]) => /Declarations|important/.test(name));
+  assert.ok(zeroChecks.length >= 4, `0이어야 하는 항목을 못 찾았다: ${JSON.stringify(report)}`);
+  zeroChecks.forEach(([, value]) => assert.equal(value, 0, JSON.stringify(report)));
   assert.doesNotMatch(css, /(?:PAGE_FIX|FINAL_FIX|scroll-snap|overflow-x\s*:\s*hidden)/i);
   assert.doesNotMatch(html, /(?:tensorflow|mobilenet|teachablemachine)[^\n]*<\/script>/i);
   process.stdout.write(`${JSON.stringify(report)}\n`);

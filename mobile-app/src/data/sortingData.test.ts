@@ -14,6 +14,18 @@
 import { describe, expect, it } from "vitest";
 import { DECORATIVE_EMOJI_LOOKUP, QUICK_SELECT_ORDER, pickQuizSet, quizPool, quizRank, sortingDbV2 } from "./sortingData";
 
+// 아래 검사들은 대부분 목록을 돌면서 확인한다. 목록이 비면 **반복문이 안 돌아
+// 전부 초록불**이 된다 - 데이터가 통째로 사라진 것이 가장 큰 사고인데 그때
+// 제일 조용해지는 셈이다(COMMON_STANDARDS §21). 먼저 개수부터 못박는다.
+describe("데이터가 실제로 있다", () => {
+  it("품목·빠른선택·이모지표·문제은행이 비어 있지 않다", () => {
+    expect(Object.keys(sortingDbV2).length).toBeGreaterThanOrEqual(12);
+    expect(QUICK_SELECT_ORDER.length).toBeGreaterThanOrEqual(12);
+    expect(DECORATIVE_EMOJI_LOOKUP.length).toBeGreaterThanOrEqual(10);
+    expect(quizPool.length).toBe(500);
+  });
+});
+
 describe("품목 데이터", () => {
   it("모든 항목의 id가 키와 같다", () => {
     // renderResult가 item.id로 다시 조회하는 자리가 있어서, 키와 어긋나면

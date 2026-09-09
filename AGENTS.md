@@ -19,7 +19,15 @@
 
 ## 명령
 
-루트에는 `package.json`이 없다. **모든 명령은 `functions/`에서 실행한다.**
+이 저장소에는 **package.json이 세 개** 있고, 각각 보는 범위가 다르다.
+
+| 위치 | 무엇을 위한 것 | 게이트 |
+|---|---|---|
+| `functions/` | 백엔드(Cloud Functions) + 대부분의 테스트 | `check` / `lint` / `test` / `emulator:test:*` |
+| 루트 | Playwright 비주얼 기준선 | `npm test` (mobile-app 빌드 후 전체 스펙) |
+| `mobile-app/` | mobile/의 React+TypeScript 전환 | `lint` / `typecheck` / `build` |
+
+**백엔드 명령은 전부 `functions/`에서 실행한다.**
 
 ```bash
 cd functions
@@ -38,6 +46,17 @@ npm run emulator:test:teacher-code-lockout
 
 전체 목록은 `functions/package.json`의 `scripts`를 보면 된다. 각 스크립트는
 `firebase emulators:exec ... "vitest run --config vitest.emulator.config.js test/<파일>"` 형태다.
+
+화면 쪽 검증은 저장소 루트에서 돌린다.
+
+```bash
+npm test              # mobile-app 빌드 + Playwright 전체(기준선 20 + 전환 껍데기 4)
+npm run build:mobile  # 전환 산출물만 빌드 -> mobile-next/ (git에 안 들어감)
+```
+
+`tests/baseline/`이 리액트 전환의 **증명 수단**이다. 전환본을 재려면
+`AIWAYS_BASELINE_TARGET=mobile-next`를 주고 같은 스펙을 돌린다 — 스냅샷 파일은
+그대로 두고 대조한다. 새로 찍어서 맞추면 증명이 아니다.
 
 로컬에서 실제 화면을 클릭해 보려면 `node functions/scripts/seedLocalPreviewDemo.js`로 데모
 데이터를 심고 `?auth-emulator=1` 쿼리를 붙여 접속한다.

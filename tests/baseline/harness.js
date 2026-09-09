@@ -149,6 +149,12 @@ const FROZEN_TIME = new Date("2026-09-09T09:00:00Z");
 // 회전의 "투명한 60ms" 구간에 걸리지 않는 값이어야 한다.
 const WARMUP_MS = 2000;
 
+// 어느 화면을 잴 것인가. 기본은 지금 라이브인 mobile/이고, 리액트 전환
+// 산출물을 잴 때는 AIWAYS_BASELINE_TARGET=mobile-next 로 돌린다.
+// **스냅샷 파일 이름은 바뀌지 않는다** - 그게 이 구조의 핵심이다.
+// 전환본이 "전환 전에 찍어 둔 바로 그 파일"과 대조돼야 증명이 된다.
+export const TARGET = process.env.AIWAYS_BASELINE_TARGET || "mobile";
+
 export async function openApp(page) {
   // install()만 하면 가짜 시계가 실제 시간과 같이 흐른다. 날짜 문구는 이걸로
   // 고정되지만, 이모지 회전 위상까지 고정되지는 않는다(아래 참고).
@@ -167,7 +173,7 @@ export async function openApp(page) {
       return seed / 4294967296;
     };
   });
-  await page.goto("/mobile/index.html");
+  await page.goto(`/${TARGET}/index.html`);
   await page.evaluate(() => {
     const gate = document.getElementById("authGate");
     const root = document.getElementById("appRoot");

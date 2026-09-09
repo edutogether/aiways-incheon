@@ -202,6 +202,46 @@ jobs:
       - name: CB5 record/resolve recovery emulator integration test
         run: npm run emulator:test:cb5-record-resolve-recovery
 
+  # 2026-09-09 추가: mobile/의 React+TypeScript 전환(mobile-app/) 게이트.
+  # 저장소의 다른 게이트들은 functions/ 안만 본다 - eslint도 functions/
+  # 범위이고, package.json의 check는 하드코딩 목록이다. mobile-app/은
+  # 자기 package.json으로 도는 별도 프로젝트라, 여기 걸어두지 않으면
+  # 어느 게이트에도 안 걸린 채 코드가 쌓인다.
+  #
+  # 이 job을 deploy-hosting의 needs에 아직 넣지 않은 것은 의도다. 전환
+  # 산출물(mobile-next/)은 S5 전까지 배포에 포함되지 않으므로, 지금
+  # needs로 묶으면 "배포와 실제로 상관없는 것"이 배포를 막게 된다.
+  # S5에서 mobile/이 이 빌드의 산출물로 바뀔 때 needs에 넣는다.
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile-app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: mobile-app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      # 빌드까지 돌리는 이유: 타입검사가 통과해도 index.html 주입이나
+      # 스타일시트 복사가 깨질 수 있고, 그건 빌드해야만 드러난다.
+      - name: Build
+        run: npm run build
+
   # 2026-08-29 추가: functions/firestore.rules/firestore.indexes.json은
   # 지금까지 자동배포가 전혀 없었다 - 개발자가 로컬에서 매번 수동으로
   # `firebase deploy --only functions:<name>`을 쳐야만 실제로 반영됐다

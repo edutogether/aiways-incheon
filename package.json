@@ -2,7 +2,8 @@
   "name": "aiways-incheon",
   "private": true,
   "scripts": {
-    "test": "playwright test",
+    "test": "npm run build:mobile && playwright test",
+    "build:mobile": "npm --prefix mobile-app run build",
     "baseline:capture": "playwright test tests/baseline --update-snapshots",
     "static": "node functions/test/localStaticServer.js"
   },

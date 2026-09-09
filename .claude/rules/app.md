@@ -92,13 +92,22 @@ API를 두드려 보는 것이 이 층을 확인하는 유일한 방법이다.**
 - **익명 계정 30일 자동 정리**가 켜져 있는지 먼저 확인한다(Firebase 콘솔 → Authentication →
   Settings → User account management). 켜져 있으면 수동 삭제 범위가 줄어든다
 ## 명령
-루트에 `package.json`이 없다. 전부 `functions/`에서 실행한다.
+package.json이 셋이다 — `functions/`(백엔드·테스트), 루트(Playwright 기준선),
+`mobile-app/`(React 전환). 백엔드 명령은 전부 `functions/`에서 실행한다.
 - 테스트: `cd functions && npm test` (vitest)
 - 린트: `cd functions && npm run lint`
 - 문법 검사: `cd functions && npm run check`
 - 에뮬레이터: `cd functions && npm run emulator:test:<이름>` — 파일 하나당 스크립트 하나(전체 목록은 `functions/package.json`)
 - 로컬 데모 데이터: `node functions/scripts/seedLocalPreviewDemo.js` 후 `?auth-emulator=1`로 접속
+- 화면 기준선: 루트에서 `npm test` (mobile-app 빌드 + Playwright 24개)
+- 전환본을 재기: `AIWAYS_BASELINE_TARGET=mobile-next npx playwright test tests/baseline`
 - 배포 후 라이브 확인: `node scripts/postDeploySmoke.js` (코드가 아니라 실제 라이브 응답을 보는 유일한 층)
+
+## 리액트 전환 (2026-09-09~, intent: `_docs/intents/2026-09-09-mobile-react-conversion/`)
+- `mobile-app/`이 전환 프로젝트다. **루트 package.json에 `"type": "module"`을 넣지 않는다** — 루트 .js는 브라우저가 `<script>`로 읽는 고전 스크립트이고 functions/test가 `require()`한다(이것 때문에 CI가 한 번 죽었다). 그래서 하위 폴더에 자기 package.json을 뒀다
+- **`mobile/tailwind.generated.css`를 다시 만들지 않는다.** 빌드 파이프라인 없이 만들어져 커밋된 24KB 사전 생성 번들이다. 다시 만들면 purge 범위·버전 차이로 화면이 미세하게 달라지는데 발견이 어렵다. 빌드가 바이트 그대로 복사하고, `reactShell.spec.js`가 해시를 대조한다
+- **Vite가 넣는 번들 `<script type="module">`은 반드시 공유 스크립트 뒤에 와야 한다.** 앞에 오면 리액트가 `window.AIWaysEdu2gClient`보다 먼저 돌아 저장·로그인이 "가끔" 안 되는 형태로 깨진다 — 화면 스냅샷으로는 안 잡힌다. `vite.config.ts`의 `transformIndexHtml(order:"post")`가 순서를 잡고, `reactShell.spec.js`가 문서 순서를 검사한다
+- 산출물은 S5 전까지 `mobile-next/`(gitignore)로 나간다. **라이브 `mobile/`은 S5에서만 바뀐다**
 
 ## 자주 틀리는 것
 - **App Check가 ENFORCED라 자동화 브라우저(Playwright 등)는 라이브에서 403 `App attestation failed`를 받는다. 이건 라이브 장애가 아니라 정상 동작이다.** reCAPTCHA Enterprise가 사람/봇 점수를 매기는데 자동화 브라우저는 `navigator.webdriver === true`라 낮은 점수를 받고 App Check가 그 토큰을 거부한다 — **헤드풀(`channel:"chrome"`)로 띄워도 똑같다. 헤드리스 여부가 아니라 자동화 여부가 감지된다.** 2026-09-09에 이 세션이 "라이브 다운"으로 오판해 보고했고, 같은 날 CLASSCADE도 같은 함정에 걸렸다. 라이브가 실제로 살아 있는지는 **사람이 실제 휴대폰으로 열어보는 것**이 유일하게 확실한 확인이다

@@ -101,8 +101,10 @@
     "UTF-8=",
     "description=AI와 데이터로 실천하는 학교 자원순환 UX 개선 프로젝트",
     "og:description=AI와 데이터로 실천하는 자원순환 UX 개선 프로젝트",
-    "og:image=https://incheon.edutogether.kr/assets/brand/aiways-logo.png",
-    "og:title=AI Ways Incheon",
+    "og:image:height=630",
+    "og:image:width=1200",
+    "og:image=https://incheon.edutogether.kr/assets/og/incheon.jpg",
+    "og:title=AI Ways Incheon | 버리는 순간을 바꾸는 학교 자원순환",
     "og:type=website",
     "og:url=https://incheon.edutogether.kr/",
     "viewport=width=device-width, initial-scale=1.0"

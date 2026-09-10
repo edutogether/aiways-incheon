@@ -292,6 +292,27 @@ package.json이 셋이다 — `functions/`(백엔드·테스트), 루트(Playwri
 - **`existsSync`로 감싼 복사는 없는 것을 조용히 뺀다.** 배포 스테이징이 그랬다 -
   화면 파일이 통째로 사라져도 배포는 성공하고 빈 사이트가 나간다
 
+## PC 리액트 전환 (2026-09-10~, intent: `_docs/intents/2026-09-10-pc-react-conversion/`)
+
+- `pc-app/`이 전환 프로젝트다. `mobile-app/`과 같은 이유로 하위 폴더에 자기
+  package.json을 둔다(루트에 `"type": "module"`을 넣으면 CI가 죽는다)
+- 산출물은 S5 전까지 `pc-next/`(gitignore)로 나간다. **라이브 `index.html`은
+  S5에서만 바뀐다**
+- 🔴 **손으로 쓴 CSS 세 파일을 다시 만들지 않는다. 바이트 그대로 복사한다.**
+  같은 변경에서 CSS까지 손대면 화면에 차이가 났을 때 전환 탓인지 CSS 탓인지
+  영원히 못 가린다. `pcShell.spec.js`가 해시를 대조한다
+- 🔴 **번들 `<script type="module">`은 반드시 고전 스크립트 뒤에 와야 한다.**
+  앞에 오면 리액트가 `window.AIWays*`보다 먼저 돌아 저장·로그인이 "가끔" 안
+  되는 형태로 깨진다 — 화면 스냅샷으로는 안 잡힌다. `pcShell.spec.js`가 순서를
+  검사한다(되돌림 확인 완료)
+- **전환 전 기준선은 `tests/baseline/pcBaseline.spec.js`이고, 무엇을 담고
+  무엇을 안 담는지는 `tests/baseline/PC-BASELINE.md`에 있다. 이어받는 사람은
+  그 문서를 먼저 읽는다** — 특히 전환 전부터 있던 결함 셋을 그대로 재현해야
+  한다는 것과, 상호작용 다섯 가지의 내부 동작은 기준선에 없다는 것
+- 🔴 **기준선을 잴 때 스크롤 위치를 고정하지 않으면 좌표가 통째로 5px씩
+  밀린다**(scroll-snap이 비동기로 자리를 잡는다). `showSection()`이 스냅을 끄고
+  정수 위치로 옮긴 뒤 실제로 멎었는지 확인한다 — 어긋나면 던진다
+
 ## 자주 틀리는 것
 - **App Check가 ENFORCED라 자동화 브라우저(Playwright 등)는 라이브에서 403 `App attestation failed`를 받는다. 이건 라이브 장애가 아니라 정상 동작이다.** reCAPTCHA Enterprise가 사람/봇 점수를 매기는데 자동화 브라우저는 `navigator.webdriver === true`라 낮은 점수를 받고 App Check가 그 토큰을 거부한다 — **헤드풀(`channel:"chrome"`)로 띄워도 똑같다. 헤드리스 여부가 아니라 자동화 여부가 감지된다.** 2026-09-09에 이 세션이 "라이브 다운"으로 오판해 보고했고, 같은 날 CLASSCADE도 같은 함정에 걸렸다. 라이브가 실제로 살아 있는지는 **사람이 실제 휴대폰으로 열어보는 것**이 유일하게 확실한 확인이다
 - **자동화로 App Check를 확인하려는 시도는 이미 해봤고, 이 저장소에서는 안 된다**(2026-09-09 실측). 다른 저장소가 찾은 방법(헤드풀 실제 크롬으로 토큰을 받아 본문 없는 요청을 보내고, 응답 코드가 `app_check_*`인지 `auth_missing`인지로 가른다)을 그대로 옮겨 봤다. **서버 쪽 전제는 성립한다** — `protectedActor.js`가 App Check를 가장 먼저 보고 본문 파싱은 그 뒤라, 코드로 가를 수 있다. 그런데 **클라이언트 쪽에서 토큰 자체가 안 나온다**(헤드풀 크롬에서도 `getAIWaysAppCheckHeaders()`가 null). 🔴 **대조군(예전부터 등록된 `firebaseapp.com`)도 같이 막혔으므로 설정 문제가 아니라 자동화의 한계다.** 검사는 `tests/appCheckLiveProbe.spec.js`에 남겨 뒀다(기본은 건너뜀, `AIWAYS_APPCHECK_PROBE=1`로 실행). reCAPTCHA 설정이 바뀌면 저절로 통과하게 되고, **대조군만 통과하고 정식 주소가 막히면 그때는 실패로 알려준다**

@@ -21,8 +21,8 @@ export default tseslint.config(
     rules: { ...reactHooks.configs.recommended.rules }
   },
   {
-    // 빌드 설정은 Node에서 돈다.
-    files: ["vite.config.ts"],
+    // 빌드 설정과 변환 스크립트는 Node에서 돈다.
+    files: ["vite.config.ts", "scripts/**/*.mjs"],
     languageOptions: { globals: globals.node }
   },
   {

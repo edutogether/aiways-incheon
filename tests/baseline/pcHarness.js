@@ -22,7 +22,7 @@ export const PAGE = TARGET ? `/${TARGET}/index.html` : "/index.html";
 
 // 시각이 화면에 그대로 찍히므로 고정한다. harness.js와 같은 값을 쓴다.
 const FROZEN_TIME = new Date("2026-09-01T09:00:00+09:00");
-const WARMUP_MS = 2000;
+// (WARMUP_MS는 settleBoot이 대신한다 - 고정 시간 대신 "끝났다는 증거"를 기다린다)
 const PAUSE_MARGIN_MS = 3000;
 
 export const PC_VIEWPORTS = [
@@ -120,8 +120,82 @@ export async function openDashboard(page) {
   // 흐르므로 여유를 둔다 - 그러지 않으면 "과거로는 못 간다"고 거부당한다.
   const pageNow = await page.evaluate(() => Date.now());
   await page.clock.pauseAt(new Date(pageNow + PAUSE_MARGIN_MS));
-  await page.clock.runFor(WARMUP_MS);
-  await page.waitForTimeout(300);
+  await settleBoot(page);
+}
+
+// 부팅이 **끝난 자리**까지 시계를 흘려보낸다.
+//
+// 🔴 예전에는 `clock.runFor(2000)` 한 번이었다. "그때쯤이면 됐겠지"였고, 실제로
+// 그 시점은 **부팅 중간**이었다 — 네 폭 전부 스플래시가 아직 `display:grid`인
+// 상태로 찍혔다(opacity는 0이라 화면에는 안 보였고, 470ms 뒤 `display:none`으로
+// 바꾸는 타이머가 아직 안 돈 것이다). 그래서 전환본과 대조하면 이 한 속성이
+// 계속 어긋났다.
+//
+// 🔴 토스트는 **2200ms 뒤 스스로 사라진다.** 즉 떴다 지는 값이라, 찍는 순간이
+// 그 사이면 기준선에 들어가고 아니면 안 들어간다 — **시계 위치에 따라 갈리는
+// 값을 기준선에 넣으면 안 된다.** 그래서 뜬 것이 다 지나간 뒤를 찍는다.
+// 🔴 **고정된 양만큼 한 번에 흘려보낸다. 조건을 보며 조금씩 흘리면 안 된다.**
+//
+// 처음엔 "끝났다는 증거가 나올 때까지 250ms씩" 흘렸다. 그랬더니 대상마다 **흘린
+// 횟수가 달라졌고**, 그 횟수만큼 렌더가 더/덜 돌면서 **시드 고정한 Math.random의
+// 소비 횟수가 달라졌다.** 결과로 매립지 패널 폭이 캡처할 때마다 312.609 →
+// 312.828 → 312.719로 흔들렸다. (옛 하네스는 같은 값을 두 번 재현했다 — 즉
+// 흔들림은 내가 넣은 것이었다.)
+//
+// `mobile/` 전환 때 이미 적어둔 함정이다: **난수 시드를 고정해도 소비 순서가
+// 다르면 결과가 다르다.** 그래서 흘리는 양을 고정하고, **다 흘린 뒤에 끝났는지를
+// 확인만** 한다 — 못 끝났으면 찍지 않고 던진다.
+const SETTLE_TOTAL_MS = 9000;
+const TOAST_FLUSH_MS = 3000;
+
+// 🔴 다 기다린 뒤 **똑같은 시각에서 찍는다.**
+//
+// 기다리는 방식은 대상마다 걸리는 단계 수가 달라, 원본과 전환본의 페이지 시계가
+// 1.5초쯤 어긋난 채로 찍혔다(실측: 00:00:08.691 / 00:00:07.168). 화면에 시각이
+// 찍히는 자리가 있어서 **초 자릿수가 달라지면 글자 폭이 달라지고**, 그 폭이
+// 매립지 패널의 grid 열 너비를 0.2~1.1px 밀었다 — 화면이 다른 것이 아니라
+// **재는 순간이 다른 것**이라, 대조에서 이 한 패널이 계속 어긋났다.
+//
+// 그래서 마지막에 **고정된 절대 시각으로 맞춘다.** 두 대상 모두 그 전에
+// 안정되므로, 어디서 출발했든 같은 자리에서 찍힌다.
+const CAPTURE_TIME = new Date(FROZEN_TIME.getTime() + 30000);
+
+// 🔴 "스플래시가 걷혔는가"만 보면 안 된다. `index.html`의 인라인 스크립트가
+// **5초 뒤에 무조건** 걷어내므로 **완전히 죽은 화면도 그 조건을 만족한다**
+// (§21-14 - 죽은 화면에서도 만족되는 조건은 갈리는 값이 아니다). 그래서 화면이
+// 실제로 채워졌다는 값을 같이 본다 - 실측으로 죽은 화면 0 / 살아난 화면 214다.
+const BOOT_SETTLED = () => {
+  const splash = document.getElementById("bootSplash");
+  const splashGone = !splash || getComputedStyle(splash).display === "none";
+  const observed = document.querySelector("[data-school-observed]");
+  const filled = !!observed && Number(String(observed.textContent || "").replace(/[^\d.-]/g, "")) > 0;
+  return splashGone && filled;
+};
+
+const TOAST_COUNT = () => {
+  const host = document.getElementById("dashboardToastHost");
+  return host ? host.children.length : 0;
+};
+
+export async function settleBoot(page) {
+  await page.clock.runFor(SETTLE_TOTAL_MS);
+  await page.waitForTimeout(150);
+  if (!(await page.evaluate(BOOT_SETTLED))) {
+    // 못 채워진 화면을 기준선으로 굳히지 않는다.
+    throw new Error(`부팅이 ${SETTLE_TOTAL_MS}ms 안에 끝나지 않았습니다(스플래시가 남았거나 숫자가 0입니다) - 부팅 중간을 기준선으로 찍을 뻔했습니다.`);
+  }
+
+  // 떴다 지는 토스트가 다 지나가게 둔다.
+  await page.clock.runFor(TOAST_FLUSH_MS);
+  await page.waitForTimeout(80);
+  const left = await page.evaluate(TOAST_COUNT);
+  if (left > 0) {
+    throw new Error(`토스트가 ${TOAST_FLUSH_MS}ms 뒤에도 ${left}개 남아 있습니다 - 떴다 지는 값이 기준선에 들어갑니다.`);
+  }
+
+  // 🔴 어디서 출발했든 같은 시각에서 찍는다(위 CAPTURE_TIME 주석 참고).
+  await page.clock.pauseAt(CAPTURE_TIME);
+  await page.waitForTimeout(200);
 }
 
 // 섹션 하나를 화면에 올린다.

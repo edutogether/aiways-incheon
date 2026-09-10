@@ -3,13 +3,13 @@
     "_box": [
       0,
       0,
-      768,
-      1024
+      0,
+      0
     ],
-    "display": "grid",
+    "display": "none",
     "position": "fixed",
-    "width": "768px",
-    "height": "1024px",
+    "width": "auto",
+    "height": "auto",
     "margin": "0px",
     "padding": "0px",
     "font-family": "Pretendard, \"Noto Sans KR\", system-ui, sans-serif",
@@ -26,7 +26,7 @@
     "justify-content": "normal",
     "align-items": "center",
     "gap": "26px",
-    "grid-template-columns": "768px",
+    "grid-template-columns": "none",
     "opacity": "0",
     "overflow": "visible",
     "z-index": "9999"
@@ -1448,7 +1448,7 @@
     ],
     "display": "grid",
     "position": "static",
-    "width": "312.609px",
+    "width": "312.719px",
     "height": "112px",
     "margin": "0px",
     "padding": "0px",
@@ -1466,7 +1466,7 @@
     "justify-content": "normal",
     "align-items": "normal",
     "gap": "8px 18px",
-    "grid-template-columns": "188.844px 105.766px",
+    "grid-template-columns": "188.922px 105.797px",
     "opacity": "1",
     "overflow": "visible",
     "z-index": "auto"
@@ -1480,7 +1480,7 @@
     ],
     "display": "block",
     "position": "static",
-    "width": "188.844px",
+    "width": "188.922px",
     "height": "80px",
     "margin": "0px",
     "padding": "0px",
@@ -1601,7 +1601,7 @@
   },
   "div:68.3% 반입량": {
     "_box": [
-      612,
+      613,
       320,
       99,
       99
@@ -1633,7 +1633,7 @@
   },
   "div:32.7% 잔여량": {
     "_box": [
-      612,
+      613,
       419,
       99,
       99

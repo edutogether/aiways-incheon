@@ -27,6 +27,7 @@
 | 2026-09-09 | teacher-delete-instead-of-approval | 2 | in-progress | 가입승인대기열을 없애고 교사에게 차단·삭제 권한을 주는 방식으로 교체 |
 | 2026-09-09 | mobile-react-conversion | 2 | done | `mobile/`을 React+TS로 전환하되 화면·모션을 측정값 수준에서 동일하게 유지 |
 | 2026-09-09 | admin-class-picker | 1 | done | 관리자 화면에서 실제로 있는 학년·반만 고르게(NEIS 학급정보 기준) |
+| 2026-09-10 | pc-react-conversion | 2 | accepted | PC 대시보드를 React+TS로 — 화면은 픽셀 그대로 |
 
 ## 폴더 규칙
 

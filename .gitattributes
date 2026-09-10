@@ -20,6 +20,23 @@ tests/**/*-snapshots/** text eol=lf
 **/__snapshots__/** text eol=lf
 *.snap text eol=lf
 
+# 🔴 위 규칙은 경로 전체를 잡으므로 **그 안의 그림까지 텍스트로 다룬다.** PNG의
+# 파일 서명 안에는 CR과 LF가 그대로 들어 있어서, 텍스트로 다루면 그 두 바이트가
+# 하나로 합쳐지며 **파일이 깨진다.**
+#
+# 2026-09-11에 실제로 스크린샷 40장을 그렇게 커밋했다(81,725 -> 81,724바이트,
+# 서명 깨짐). git이 'CRLF will be replaced by LF'라고 경고를 찍어 줬는데,
+# 그 경고가 **그림 파일에 붙은 것**이 신호였다.
+#
+# 나중 규칙이 이기므로 여기서 되돌린다. 스냅샷 폴더에 새 이진 형식을 넣게 되면
+# 여기에도 같이 적어야 한다.
+*.png -text
+*.jpg -text
+*.jpeg -text
+*.webp -text
+*.woff -text
+*.woff2 -text
+
 # ── 2) 빌드가 "바이트 그대로 복사"하는 정적 파일
 #
 # `pcShell.spec.js`와 `reactShell.spec.js`가 원본과 산출물의 sha256을 대조한다.

@@ -1767,6 +1767,36 @@ html[data-tier="phone"] .phone-shell-frame {
   }
   .school-panel .donut-pair { justify-content: center !important; }
   .upload-panel::after { content: none !important; }
+
+  /* 2026-09-10 (Bumm님 지적, 실측으로 재현) - 세로 태블릿에서 매립지 패널의
+     도넛 두 개가 패널 오른쪽 밖으로 나가 잘렸다. 실측: .landfill-kpi-ring이
+     이 폭에서 128px인데 그 칸은 그보다 좁고, .landfill-kpi-module이
+     align-items:flex-end라 넘친 만큼이 그대로 오른쪽으로 밀렸다
+     (좌 615 / 우 743 vs 패널 우 738).
+     🔴 도넛은 원이어야 하므로 폭만 칸에 묶고 높이는 aspect-ratio가 따라오게
+     둔다 - block-size를 같이 고정하면 타원이 된다. */
+  .landfill-panel .landfill-kpi-module { align-items: center !important; min-inline-size: 0; }
+  .landfill-panel .landfill-kpi-ring {
+    inline-size: min(100%, 6.2rem) !important;
+    block-size: auto !important;
+    aspect-ratio: 1 !important;
+  }
+
+  /* 같은 화면 - QR 안내 글자가 한 글자씩 줄바꿈됐다("QR코/드를/스캔/하면").
+     실측: 그 <p>가 폭 47px, 높이 228px. 이미지와 글을 가로로 나란히 두기엔
+     이 폭에서 칸이 너무 좁다 - 세로로 쌓는다. */
+  .dashboard-scene .qr-invite {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: .5rem;
+  }
+  .dashboard-scene .qr-invite > p {
+    inline-size: 100%;
+    text-align: center;
+    font-size: .78rem;
+    line-height: 1.45;
+  }
+  .dashboard-scene .qr-invite img { inline-size: min(100%, 7.5rem); block-size: auto; }
 }
 
 /* 학교 설정 모달 - 사용자가 직접 제시한 참고 이미지대로, 이 앱의 나머지

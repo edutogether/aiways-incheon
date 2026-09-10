@@ -238,6 +238,23 @@ export async function showSection(page, id) {
   }, target);
   await page.waitForTimeout(200);
 
+  // 🔴 재기 직전에 떠 있는 토스트를 걷어낸다 (2026-09-11).
+  //
+  // `#dashboardToastHost`의 알림은 **네트워크 응답이 도착할 때** 만들어지는데
+  // 지우는 것은 **2200ms 타이머**다. 그런데 여기서는 시계가 멈춰 있어(기준선을
+  // 고정하려고) **한 번 뜨면 영영 안 사라진다.** 그래서 응답이 `settleBoot`
+  // 뒤에 도착하면 그 알림이 그대로 스냅샷에 박힌다 — 도착 시점이 실행마다
+  // 달라 **네 폭이 돌아가며 빨간불**이 났다(실측: 실패 목록이 매번 바뀜).
+  //
+  // 이 알림은 자동화가 App Check를 통과하지 못해서 나는 것이고 **학생 화면에는
+  // 없는 것**이다. `#authGate`를 떼어내는 것과 같은 이유로 여기서 걷어낸다 —
+  // 기준선이 담아야 하는 것은 대시보드 배치이지 이 알림이 아니다.
+  await page.evaluate(() => {
+    for (const id of ["dashboardToastHost", "dashboardToastHostModal"]) {
+      document.getElementById(id)?.replaceChildren();
+    }
+  });
+
   const finalY = await page.evaluate(() => Math.round(window.scrollY));
   // 문서가 짧아 목표까지 못 내려가는 마지막 섹션은 정상이다. 그 경우가
   // 아닌데 어긋났다면 그대로 재면 안 된다 - 5px 밀린 기준선이 만들어진다.

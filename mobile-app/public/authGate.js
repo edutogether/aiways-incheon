@@ -15,6 +15,10 @@
   const appRoot = document.getElementById("appRoot");
   if (!gate || !gateContent || !appRoot) return;
 
+  let appShown = false;       // 앱을 드러냈는가
+  let failureCode = null;     // 탐침이 실패했다면 그 코드(드러내기 전이면 보류)
+  let fadeTimer = 0;          // 스플래시 페이드아웃 뒤 숨기는 타이머
+
   function el(tag, className, text) {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -39,7 +43,9 @@
     // too once the fade has finished.
     gate.style.opacity = "0";
     gate.style.pointerEvents = "none";
-    window.setTimeout(() => {
+    // 🔴 이 타이머는 취소할 수 있어야 한다. 탐침이 실패해 곧바로 띠를 띄우면,
+    // 이 타이머가 420ms 뒤에 그 띠까지 지워버린다.
+    fadeTimer = window.setTimeout(() => {
       gate.classList.add("hidden");
       gate.style.display = "none";
     }, 420);
@@ -54,6 +60,9 @@
   // 화면 기준선이 `#authGate` 안쪽을 일부러 제외하고 재기 때문이다 - 밖에 새
   // 요소를 만들면 스냅샷 24장이 전부 흔들린다.
   function renderBanner(code) {
+    // 🔴 페이드아웃 뒤 숨기는 타이머를 먼저 걷어낸다 - 안 그러면 방금 띄운 띠가
+    // 420ms 뒤에 지워진다.
+    window.clearTimeout(fadeTimer);
     gate.style.position = "sticky";
     gate.style.inset = "auto";
     gate.style.top = "0";
@@ -115,12 +124,58 @@
   // 누르면 그 자리에서 또 막히고 이유가 나온다 - 그 경로는 원래부터 있었다.
   async function probe() {
     const result = await client().checkStudentProfile();
+    failureCode = result.ok ? null : result.code;
+    if (!appShown) return;              // 아직 스플래시 중이면 reveal이 처리한다
     if (result.ok) { hideBanner(); return; }
-    renderBanner(result.code);
+    renderBanner(failureCode);
+  }
+
+  // 🔴 스플래시를 **최소 두 바퀴**는 보여준다 (2026-09-10 Bumm님 지시).
+  //
+  // 앱을 바로 띄우게 고쳤더니 이번엔 너무 빨라서 "번쩍하고 지나간다"가 됐다.
+  // 브랜드를 보여주는 자리가 깜빡임처럼 보이면 만들다 만 것처럼 보인다.
+  //
+  // **최소**다. 최대가 아니다:
+  //   - 앱이 두 바퀴보다 빨리 준비되면 → 두 바퀴를 채우고 보여준다
+  //   - 앱이 두 바퀴보다 느리면 → 준비될 때까지 그대로 돈다(기다림을 더하지 않는다)
+  //
+  // 🔴 **기다리는 것은 오직 시계뿐이다. 탐침을 다시 기다리지 않는다** - 그러면
+  // 오늘 고친 구조(5.5초 대기)로 되돌아간다.
+  //
+  // 🔴 주기를 하드코딩하지 않고 **막대 애니메이션에서 직접 읽는다.** 나중에 누가
+  // 속도를 바꾸면 "두 바퀴"가 저절로 따라가야 한다. 그리고 애니메이션 자신의
+  // 경과 시각(currentTime)으로 재므로 **주기 경계에서 정확히 끊긴다** - 벽시계로
+  // 재면 시작점이 어긋나 둘째 바퀴가 도중에 잘린다.
+  const MINIMUM_TURNS = 2;
+  const FALLBACK_PERIOD_MS = 1100;
+
+  function splashRemainingMs() {
+    const bar = gate.querySelector('[style*="aiways-boot-bar"]');
+    const animation = bar?.getAnimations?.().find((a) => {
+      const timing = a.effect?.getComputedTiming?.();
+      return typeof timing?.duration === "number" && timing.duration > 0;
+    });
+    if (!animation) return FALLBACK_PERIOD_MS * MINIMUM_TURNS;
+    const period = animation.effect.getComputedTiming().duration;
+    const elapsed = Number(animation.currentTime) || 0;
+    return Math.max(0, period * MINIMUM_TURNS - elapsed);
+  }
+
+  function reveal() {
+    if (appShown) return;
+    appShown = true;
+    showApp();
+    if (failureCode) {
+      // 페이드가 끝나기를 기다리지 않는다 - renderBanner가 타이머를 걷어낸다.
+      renderBanner(failureCode);
+    }
   }
 
   window.addEventListener("DOMContentLoaded", () => {
-    showApp();
+    const remaining = splashRemainingMs();
+    if (remaining > 0) window.setTimeout(reveal, remaining);
+    else reveal();
+    // 🔴 탐침은 기다리지 않고 지금 시작한다.
     void probe();
   }, { once: true });
 })();

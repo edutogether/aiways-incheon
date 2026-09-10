@@ -13,6 +13,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
+import { LegacyBoot } from "./legacyBoot";
 
 const container = document.createElement("div");
 container.style.display = "contents";
@@ -21,5 +22,8 @@ document.body.append(container);
 createRoot(container).render(
   <StrictMode>
     <App />
+    {/* 🔴 App **뒤에** 둔다. effect는 트리 순서로 도므로, 이 자리에 두어야
+        app.js가 붙잡을 DOM이 이미 커밋된 뒤에 boot()이 불린다. */}
+    <LegacyBoot />
   </StrictMode>
 );

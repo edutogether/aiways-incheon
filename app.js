@@ -5028,7 +5028,23 @@
     // behind it yet to reveal.
   }
 
-  if (document.readyState === "loading") {
+  // 리액트 전환본이 화면을 그린 뒤 직접 부를 수 있도록 진입점을 내놓는다.
+  // 원본 페이지의 동작에는 영향이 없다 — 아래 자동 실행이 그대로 남는다.
+  window.AIWaysPcDashboard = { boot };
+
+  // 🔴 전환본에서는 자동 실행을 건너뛴다.
+  //
+  // 이 함수는 DOM을 `getElementById`로 붙잡는데, 리액트는 그보다 **뒤에** 그린다
+  // (번들이 defer 고전 스크립트 뒤에 오고 `createRoot().render()`는 동기 완료가
+  // 보장되지 않는다). 여기서 그냥 돌면 채울 DOM을 못 찾고 화면이 빈 채 남는다.
+  // 그래서 **리액트가 마운트를 마친 뒤 `AIWaysPcDashboard.boot()`을 직접 부른다** —
+  // "그때쯤이면 됐겠지"에 기대지 않는다.
+  //
+  // 깃발은 `pcReactBoot.js`가 세우고 그 파일은 전환본에만 실린다. 원본
+  // `index.html`에는 없으므로 **라이브는 예전 그대로 자동 실행된다.**
+  if (window.__AIWAYS_PC_REACT_BOOT) {
+    // 리액트가 부른다.
+  } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot, { once: true });
   } else {
     boot();

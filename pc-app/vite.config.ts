@@ -30,6 +30,9 @@ const VERBATIM_STYLESHEETS = ["style.css", "styles/cb3a.css"];
 // 아직 전환하지 않은 고전 스크립트. S3~S4에서 하나씩 TS로 옮기며 이 목록에서
 // 뺀다. 순서는 원본 index.html과 **같아야 한다** — 서로 전역으로 의존한다.
 const LEGACY_SCRIPTS = [
+  // 🔴 맨 앞이어야 한다. app.js가 자동 실행을 건너뛸지 이 깃발로 판단하므로,
+  // app.js보다 먼저 실행돼야 한다(public/pcReactBoot.js 주석 참고).
+  "./pcReactBoot.js",
   "./deviceTier.js",
   "./firebaseAppCheck.js",
   "./firebaseBetaAuth.js",
@@ -42,12 +45,27 @@ const LEGACY_SCRIPTS = [
   "./app.js"
 ];
 
+// 위 목록 중 **저장소 루트에서 복사해 와야 하는 것들.** `pcReactBoot.js`는
+// `pc-app/public/`에 있어 Vite가 알아서 산출물 루트로 옮기므로 뺀다.
+// 🔴 S5에서 산출물이 저장소 루트로 갈 때는 이 복사도 끈다 — 그때는 원본이 이미
+// 그 자리에 있고, 복사하면 원본을 제 자신으로 덮어쓰게 된다(스타일시트와 같다).
+const LEGACY_FILES = LEGACY_SCRIPTS
+  .filter((src) => src !== "./pcReactBoot.js")
+  .map((src) => src.replace(/^\.\//, ""));
+
 function aiwaysPcAssets(): Plugin {
   return {
     name: "aiways-pc-assets",
-    // 스타일시트를 손대지 않고 산출물로 옮긴다.
+    // 스타일시트와 고전 스크립트를 손대지 않고 산출물로 옮긴다.
+    //
+    // 🔴 스크립트를 복사하지 않으면 **태그만 있고 파일이 없다.** 산출물은
+    // `pc-next/`에 있고 태그는 `./app.js`라 `/pc-next/app.js`를 찾는데, 원본은
+    // 저장소 루트에 있어 **10개가 전부 404**였다(2026-09-10 실측). 그 상태에서도
+    // `pcShell.spec.js`의 순서 검사는 **통과한다** — 문서에 적힌 태그 순서만 보지
+    // 파일이 실제로 실려 도는지는 안 보기 때문이다. 순서가 맞는 404 열 개도
+    // 순서 검사에는 초록불이다(§21).
     closeBundle() {
-      for (const rel of VERBATIM_STYLESHEETS) {
+      for (const rel of [...VERBATIM_STYLESHEETS, ...LEGACY_FILES]) {
         const from = resolve(REPO_ROOT, rel);
         const to = resolve(OUT_DIR, rel);
         mkdirSync(dirname(to), { recursive: true });

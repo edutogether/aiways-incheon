@@ -1789,15 +1789,20 @@ html[data-tier="phone"] .phone-shell-frame {
   /* 같은 화면 - QR 안내 글자가 한 글자씩 줄바꿈됐다("QR코/드를/스캔/하면").
      실측: 그 <p>가 폭 47px, 높이 228px. 이미지와 글을 가로로 나란히 두기엔
      이 폭에서 칸이 너무 좁다 - 세로로 쌓는다. */
+  /* 칸이 넓으면 QR과 글이 나란히, 좁으면 저절로 아래로 접힌다 -
+     방향을 폭으로 나눠 규칙을 둘로 만들지 않는다(2026-09-10). */
   .dashboard-scene .qr-invite {
-    flex-direction: column !important;
+    flex-flow: row wrap !important;
     align-items: center !important;
-    gap: .5rem;
+    justify-content: center !important;
+    gap: .5rem .75rem;
   }
   .dashboard-scene .qr-invite > p {
-    inline-size: 100%;
-    text-align: center;
-    font-size: .78rem;
+    flex: 1 1 8rem;
+    min-inline-size: 0;
+    margin: 0;
+    text-align: start;
+    font-size: .74rem;
     line-height: 1.45;
   }
   .dashboard-scene .qr-invite img { inline-size: min(100%, 7.5rem); block-size: auto; }
@@ -1812,8 +1817,40 @@ html[data-tier="phone"] .phone-shell-frame {
   .class-panel { grid-template-columns: minmax(0, 6.25rem) minmax(0, 1fr) !important; }
   .school-panel .school-visuals, .school-panel .school-visuals *,
   .class-panel .confusion, .class-panel .confusion * { min-inline-size: 0 !important; }
+  /* 🔴 이 줄은 **세 칸**이다: 라벨 · 막대 · 숫자. 2026-09-10에 여기를
+     두 칸으로 줄였다가 **막대가 통째로 사라지고 숫자가 아랫줄로 밀려났다**
+     (실측 PC: 60px/73.8px/38.4px 세 칸 → 잘못 고친 뒤: 281px/0px 두 칸).
+     칸 수는 PC와 같게 두고, 줄어들 수 있게만 만든다 - 양끝은 내용 크기,
+     가운데 막대가 남는 폭을 가져간다. */
   .school-panel .bar-list > div,
-  .class-panel .confusion > div { grid-template-columns: minmax(0, 1fr) minmax(0, auto) !important; }
+  .class-panel .confusion > div {
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto) !important;
+  }
+
+  /* 2026-09-10 (Bumm님 지적, 가로 태블릿) - QR 안내가 "Powered by Google
+     Gemini" 글자와 맨 아래 출처 문구 위에 겹쳐 읽을 수 없었다.
+     실측 원인: PC에서는 이 자리에 안내문(.portal-teaser)만 있어서
+     .portal-frame이 38px면 충분한데, 태블릿은 그 자리에 QR을 대신 띄우면서
+     내용이 220px가 됐다. 그런데 .portal-frame의 min-block-size가 115px로
+     묶여 있어 **칸은 안 늘어나고 내용만 밖으로 삐져나왔다**(y544~764 vs
+     칸 y600~715 - 위아래로 동시에 흘러넘쳐 양쪽 글자를 덮었다).
+     🔴 칸이 내용만큼 자라게 풀고, QR 자체도 이 폭에 맞게 줄인다. */
+  .dashboard-scene .experience-portal,
+  .dashboard-scene .portal-frame {
+    min-block-size: 0 !important;
+    block-size: auto !important;
+    align-content: start !important;
+  }
+  /* 패널이 flex 세로 배치라 자식이 기본으로 줄어든다(flex-shrink:1). 칸을
+     늘려놔도 QR이 든 이 블록만 다시 눌려서 아래 문구를 덮었다 - 이 블록은
+     줄어들지 않게 못박는다. */
+  .dashboard-scene .experience-portal { flex: 0 0 auto !important; }
+  /* QR을 감싼 <a>가 한 줄을 통째로 차지해서 글이 아래로 접히고, 그만큼
+     패널 내용이 높이를 넘겼다(실측: 패널 346px에 내용 468px). 이미지는
+     제 크기만 차지하게 두고 글이 옆에 오게 한다. */
+  .dashboard-scene .qr-invite > a { flex: 0 0 5.5rem !important; inline-size: 5.5rem !important; }
+  .dashboard-scene .qr-invite img { inline-size: min(100%, 5.5rem) !important; }
+  .dashboard-scene .qr-invite > p { font-size: .72rem; line-height: 1.4; }
 }
 
 /* 학교 설정 모달 - 사용자가 직접 제시한 참고 이미지대로, 이 앱의 나머지

@@ -4,7 +4,7 @@
 // package.json에 "type": "module"을 넣으면 루트 .js 파일들(브라우저가
 // <script>로 읽는 고전 스크립트)이 ESM으로 해석되면서 functions/test의
 // require()가 깨진다 — 실제로 CI가 한 번 이것 때문에 죽었다.
-import { copyFileSync, mkdirSync } from "node:fs";
+import { copyFileSync, cpSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
@@ -53,6 +53,15 @@ const LEGACY_FILES = LEGACY_SCRIPTS
   .filter((src) => src !== "./pcReactBoot.js")
   .map((src) => src.replace(/^\.\//, ""));
 
+// 🔴 스크립트만으로는 부족하다. 화면이 **실행 중에** 받아오는 것들도 산출물에
+// 있어야 한다. 없으면 404가 나는데, 그 실패가 **화면에 그대로 안 보인다**:
+//   - `base-data-seed.tsv` — 대시보드 기본 자료. 없으면 app.js가 내장 기본값으로
+//     떨어지는데, 그 값이 시드와 **우연히 같아서**(3학년 72+64+78 = 214) 숫자만
+//     보면 정상으로 보인다. 2026-09-10에 실제로 그 상태를 "정상"으로 읽을 뻔했다.
+//   - `assets/` — 부트 스플래시 로고와 파비콘.
+const RUNTIME_FILES = ["base-data-seed.tsv"];
+const RUNTIME_DIRS = ["assets"];
+
 function aiwaysPcAssets(): Plugin {
   return {
     name: "aiways-pc-assets",
@@ -65,11 +74,14 @@ function aiwaysPcAssets(): Plugin {
     // 파일이 실제로 실려 도는지는 안 보기 때문이다. 순서가 맞는 404 열 개도
     // 순서 검사에는 초록불이다(§21).
     closeBundle() {
-      for (const rel of [...VERBATIM_STYLESHEETS, ...LEGACY_FILES]) {
+      for (const rel of [...VERBATIM_STYLESHEETS, ...LEGACY_FILES, ...RUNTIME_FILES]) {
         const from = resolve(REPO_ROOT, rel);
         const to = resolve(OUT_DIR, rel);
         mkdirSync(dirname(to), { recursive: true });
         copyFileSync(from, to);
+      }
+      for (const rel of RUNTIME_DIRS) {
+        cpSync(resolve(REPO_ROOT, rel), resolve(OUT_DIR, rel), { recursive: true });
       }
     },
     transformIndexHtml: {

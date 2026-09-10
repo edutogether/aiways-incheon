@@ -155,6 +155,11 @@ D의 팔레트가 현재 빌드에서 전반적으로 탁해져 있었다. 배�
 복구 지점: 태그 **`pc-front-palette-d-20260812`** (커밋 `439e2c2`). 아래 변경이 잘못되면
 `git reset --hard pc-front-palette-d-20260812`로 색 복원까지만 남은 상태로 즉시 돌아온다.
 
+> 🔴 2026-09-10에 이 태그를 **`refs/archive/tags/pc-front-palette-d-20260812`로 옮겼다**(§23-6 태그
+> 정리). `git tag`에는 더 이상 안 보이지만 커밋 `439e2c2`는 그대로 있다 — 위 명령은
+> `git reset --hard refs/archive/tags/pc-front-palette-d-20260812`(또는 `439e2c2`)로 읽는다.
+> 지운 것이 아니다.
+
 ### 7.1 스크롤 스냅 복구 + 대기 예산 축소
 
 6절에서 규명한 원인에 대한 조치다. `styles/cb3a.css`의 `@media (min-width:64rem)` 블록에만 넣었다 —

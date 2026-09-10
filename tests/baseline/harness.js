@@ -229,6 +229,62 @@ export async function openApp(page, target = TARGET) {
   // 대조했을 때 탭 공유 높이가 710px/857px로 갈렸다. 그릴 것을 다 그린
   // 뒤에 여는 쪽이 실제 동작에 가깝고, 환경에 따라 흔들리지도 않는다.
   await page.waitForFunction(() => (document.getElementById("appRoot")?.childElementCount ?? 0) > 0, null, { timeout: 15000 });
+  // 🔴 authGate.js가 **스스로 앱을 드러낼 때까지 기다린다**(2026-09-11).
+  //
+  // 2026-09-10부터 드러내는 조건이 "인증 성공"이 아니라 **스플래시 최소 두 바퀴
+  // (약 2.2초)** 하나뿐이다. 그래서 자동화에서도 실제와 똑같이 드러난다 —
+  // 하네스가 억지로 열 이유가 없어졌다.
+  //
+  // 기다리지 않으면: 하네스가 먼저 열고 탭을 옮기는 도중에 authGate가 뒤늦게
+  // `syncTabHeights()`를 부른다. 그 순간 활성 탭이 무엇이냐에 따라 **공유 탭
+  // 높이가 달라져** 기준선이 흔들린다(실제로 1069 -> 1216으로 갈렸다). 이
+  // 파일에 이미 적혀 있던 함정(710/857)과 같은 것이다.
+  await page.waitForFunction(() => {
+    const root = document.getElementById("appRoot");
+    return !!root && !root.classList.contains("hidden");
+  }, null, { timeout: 20000 });
+  // 🔴 `hidden`이 떨어진 것만으로는 부족하다. `showApp()`은 그 다음
+  // **requestAnimationFrame에서** `syncTabHeights()`를 부른다. 그 프레임 전에
+  // 하네스가 탭을 옮기기 시작하면 **어느 탭이 활성일 때 재느냐가 실행마다
+  // 달라져** 공유 탭 높이가 흔들린다(실측: 30개 통과 / 2개 실패 / 8개 실패로
+  // 매번 달랐다). 그 프레임이 지나가고 높이가 자리를 잡을 때까지 기다린다.
+  // 🔴 프레임 하나를 기다리는 것으로는 부족하다. `useSharedTabHeight`는 마운트
+  // 뒤 **400ms·1200ms에도 다시 재고**(웹폰트가 늦게 오면 줄바꿈이 달라지므로),
+  // 공유 높이는 **커지기만 한다.** 그 재측정이 하네스가 탭을 옮기기 전에
+  // 끝나느냐 뒤에 끝나느냐가 실행마다 갈려 값이 흔들렸다.
+  //
+  // 그래서 **값이 멎을 때까지** 기다린다 — 시각이 아니라 결과를 기다리는 것이라
+  // 느린 기계에서도 같은 값에 도달한다. 안 멎으면 그대로 찍지 않고 던진다.
+  // 🔴 **탭을 한 바퀴 돌아 공유 높이를 수렴시킨다.**
+  //
+  // `useSharedTabHeight`의 공유 높이는 **본 적 있는 탭 중 가장 큰 값**이고
+  // **커지기만 한다.** 그래서 "언제 재느냐"가 아니라 **"그때까지 어느 탭을
+  // 봤느냐"**가 값을 정한다 — 하네스가 탭을 옮기는 순서·시점과 앱이 스스로
+  // 다시 재는 타이머(400ms·1200ms)가 엇갈리면서 값이 실행마다 달라졌다.
+  //
+  // 실제 학생도 탭을 몇 번 옮기면 **같은 최종값(1275px)에 도달한다**(실측).
+  // 그 수렴한 상태에서 재면 순서에 상관없이 항상 같은 값이 된다.
+  await page.evaluate(async () => {
+    const buttons = [...document.querySelectorAll("#appRoot nav button, nav button")];
+    for (const button of buttons) {
+      button.click();
+      await new Promise((r) => setTimeout(r, 220));
+    }
+    buttons[0]?.click();
+    await new Promise((r) => setTimeout(r, 220));
+  });
+  await page.evaluate(async () => {
+    const read = () => document.querySelector(".tab-content:not(.hidden)")?.style.minHeight || "";
+    let stable = 0;
+    let last = read();
+    for (let i = 0; i < 40 && stable < 4; i += 1) {           // 최대 10초
+      await new Promise((r) => setTimeout(r, 250));
+      const now = read();
+      stable = now === last ? stable + 1 : 0;
+      last = now;
+    }
+    if (stable < 4) throw new Error(`공유 탭 높이가 멎지 않았습니다(마지막 ${last}) - 흔들리는 값을 기준선으로 찍을 뻔했습니다.`);
+  });
   await page.evaluate(() => {
     const gate = document.getElementById("authGate");
     const root = document.getElementById("appRoot");

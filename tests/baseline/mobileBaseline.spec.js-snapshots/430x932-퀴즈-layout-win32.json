@@ -4,12 +4,12 @@
       12,
       12,
       406,
-      1201
+      1541
     ],
     "display": "flex",
     "position": "static",
     "width": "406px",
-    "height": "1200.88px",
+    "height": "1540.88px",
     "margin": "0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -1028,12 +1028,12 @@
       29,
       226,
       372,
-      857
+      1197
     ],
     "display": "block",
     "position": "static",
     "width": "372px",
-    "height": "857px",
+    "height": "1197px",
     "margin": "24px 0px 0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",

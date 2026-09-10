@@ -1,12 +1,708 @@
-// S2 진행 중 — 원본 index.html의 섹션을 하나씩 옮긴다.
+// 원본 index.html 88~801행(<body> 안 화면)을 **기계로** 옮긴 것이다.
 //
-// 순서는 원본과 같아야 한다(스크롤 순서가 곧 화면이다). 지금은 대시보드
-// 한 섹션만 있고, 나머지 여섯은 아직 원본에만 있다.
+// 🔴 손으로 고치지 않는다. 원본이 바뀌면
+// `node pc-app/scripts/regeneratePage.mjs`를 다시 돌린다.
 //
-// 무엇을 지켜야 하는지는 tests/baseline/PC-BASELINE.md에 있다 - 특히
+// 값을 채우는 것은 아직 `app.js`가 한다(S2는 마크업만 옮긴다). 그래서 id와
+// class 이름이 **원본과 정확히 같아야** 한다 — 하나라도 다르면 그 자리의
+// 값이 조용히 안 채워진다.
+//
+// 무엇을 지켜야 하는지는 tests/baseline/PC-BASELINE.md에 있다 — 특히
 // **전환 전부터 있던 결함 셋은 그대로 재현해야 한다**는 것.
-import { DashboardSection } from "./sections/DashboardSection";
+import type { CSSProperties } from "react";
 
 export function App() {
-  return <DashboardSection />;
+  return (
+    <>
+    <header className="site-header">{" "}
+      <a className="brand" href="#dashboard" aria-label="AI Ways Incheon dashboard">{" "}
+        <span className="brand-mark"><img src="./assets/brand/aiways-logo.png" alt="AI Ways Incheon" /></span>{" "}
+        <span>AI Ways Incheon</span>{" "}
+      </a>{" "}
+      <nav className="main-nav" aria-label="주요 섹션">{" "}
+        <a href="#dashboard">대시보드</a>{" "}
+        <a href="#project">프로젝트</a>{" "}
+        <a href="#curriculum">교육과정</a>{" "}
+        <a href="#hah">H-A-H</a>{" "}
+        <a href="#flow">차시흐름</a>{" "}
+        <a href="#gallery">갤러리</a>{" "}
+        <a href="#resources">자료실</a>{" "}
+      </nav>{" "}
+      <div className="mobile-shell-bar" aria-label="모바일 작업 바로가기">{" "}
+        <div className="mobile-shell-context" aria-live="polite">{" "}
+          <span>현재 화면</span>{" "}
+          <strong data-mobile-shell-title="">대시보드</strong>{" "}
+        </div>{" "}
+        <a className="mobile-shell-primary" href="./mobile/index.html" target="_blank" rel="noopener noreferrer">3초 판단</a>{" "}
+      </div>{" "}
+      <p className="mobile-shell-state" data-mobile-shell-state="" role="status" hidden={true}></p>{" "}
+    </header>{" "}
+     COMMENT0{" "} 
+    <div className="dashboard-settings" id="dashboardSettings">{" "}
+      <button type="button" id="dashboardSettingsToggle" className="dashboard-settings-toggle" aria-label="대시보드 설정" aria-haspopup="true" aria-expanded="false">{" "}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{" "}
+          <circle cx="12" cy="12" r="3.2" />{" "}
+          <path d="M19.4 13.2a7.7 7.7 0 0 0 0-2.4l2.02-1.57a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.38.96a7.6 7.6 0 0 0-2.08-1.2L14.2 2.3a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.5a7.6 7.6 0 0 0-2.08 1.2l-2.38-.96a.5.5 0 0 0-.6.22L1.92 8.58a.5.5 0 0 0 .12.64L4.06 10.8a7.7 7.7 0 0 0 0 2.4l-2.02 1.57a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.38-.96c.62.51 1.32.92 2.08 1.2l.36 2.5a.5.5 0 0 0 .5.42h3.84a.5.5 0 0 0 .5-.42l.36-2.5a7.6 7.6 0 0 0 2.08-1.2l2.38.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64Z" />{" "}
+        </svg>{" "}
+      </button>{" "}
+      <div className="dashboard-settings-menu" id="dashboardSettingsMenu" hidden={true}>{" "}
+        <button type="button" data-settings-action="sample">👀 샘플 데이터 보기</button>{" "}
+        <button type="button" data-settings-action="reconfigure">🏫 학년반 다시 설정하기</button>{" "}
+        <button type="button" data-settings-action="csv">📥 내 기록 CSV로 저장</button>{" "}
+        <button type="button" data-settings-action="teacher">🍎 선생님 인증하기</button>{" "}
+        <button type="button" data-settings-action="approvals">📋 우리 반 학생 관리</button>{" "}
+        <button type="button" data-settings-action="class-csv">📊 CSV 반전체 내보내기</button>{" "}
+        <button type="button" data-settings-action="reset">🔄 모두 초기화하기</button>{" "}
+      </div>{" "}
+    </div>{" "}
+    <nav className="mobile-quick-nav" aria-label="모바일 주요 진입">{" "}
+      <a href="#dashboard">대시보드</a>{" "}
+      <a href="#ranking">랭킹</a>{" "}
+      <a href="#landfill">매립지 확인</a>{" "}
+    </nav>{" "}
+
+     COMMENT1{" "} 
+    <iframe id="phoneShellFrame" className="phone-shell-frame" title="AI Ways Incheon 모바일 3초판단 앱" hidden={true}></iframe>{" "}
+
+     COMMENT2{" "} 
+    <button type="button" id="sampleDataBadge" className="sample-data-badge" hidden={true}>📊 샘플 데이터 보는 중 · 학교 설정하기</button>{" "}
+
+    <main className="snap-root">{" "}
+      <section className="scene dashboard-scene" id="dashboard" data-nav="대시보드">{" "}
+        <div className="scene-orbs" aria-hidden="true">{" "}
+          <span className="orb-xl" style={{ width: "620px", height: "620px", top: "-18%", left: "-6%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "520px", height: "520px", bottom: "-20%", right: "-8%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "460px", height: "460px", top: "20%", left: "32%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "400px", height: "400px", bottom: "-10%", left: "-4%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb" style={{ width: "300px", height: "300px", top: "2%", right: "4%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb2" style={{ width: "220px", height: "220px", bottom: "6%", left: "30%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb2" style={{ width: "260px", height: "260px", top: "44%", right: "-4%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb2" style={{ width: "200px", height: "200px", top: "60%", left: "10%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-md" style={{ width: "210px", height: "210px", bottom: "-8%", right: "22%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-md" style={{ width: "160px", height: "160px", top: "12%", left: "20%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-sm" style={{ width: "120px", height: "120px", top: "34%", left: "56%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-sm" style={{ width: "110px", height: "110px", bottom: "24%", left: "26%", background: "#64a9ff" }}></span>{" "}
+        </div>{" "}
+        <div className="hero-copy">{" "}
+          <p className="eyebrow">학생의 버리는 순간을 읽는 자원순환 분석 엔진</p>{" "}
+          <h1>{" "}
+            <span>버리는 순간,</span>{" "}
+            <span>데이터가 되다</span>{" "}
+          </h1>{" "}
+          <p className="hero-description">{" "}
+            AI Ways Incheon은 환경 보호 포스터를 만드는 수업이 아닙니다.<br />{" "}
+            우리가 실제로 쓰레기를 버리는 순간을 관찰하고,<br />{" "}
+            <span className="hero-fixed-line">AI를 통해 데이터를 1차 판단한 뒤 사람이 중심이 되어 다시 확인하는,</span>{" "}
+            <span className="hero-fixed-line">우리 학교의 자원순환 UX를 개선하는 H-A-H 기반 수업 프로젝트입니다.</span>{" "}
+          </p>{" "}
+          <p className="mobile-home-summary">우리 학교의 자원순환을 살펴보고, 지금 필요한 판단으로 바로 이동하세요.</p>{" "}
+          <div className="hero-actions">{" "}
+            <a className="primary-btn" href="#sorting">지금 분류하기</a>{" "}
+          </div>{" "}
+        </div>{" "}
+        <p className="mobile-home-status" data-mobile-home-status="" role="status" hidden={true}></p>{" "}
+
+        <div className="dashboard-grid" aria-label="실시간 자원순환 대시보드">{" "}
+          <article className="panel school-panel">{" "}
+            <div className="panel-head">{" "}
+              <div>{" "}
+                <p>School Resource Dashboard</p>{" "}
+                <h2>우리학교 자원순환 대시보드</h2>{" "}
+              </div>{" "}
+              <span>수업용 데이터</span>{" "}
+            </div>{" "}
+            <label className="select-line">{" "}
+              <span>학년 선택</span>{" "}
+              <select id="gradeSelect" aria-label="학년 선택" defaultValue="5학년">{" "}
+                <option>3학년</option>{" "}
+                <option>4학년</option>{" "}
+                <option>5학년</option>{" "}
+                <option>6학년</option>{" "}
+              </select>{" "}
+            </label>{" "}
+            <div className="kpi-row">{" "}
+              <div><strong data-school-classes="">0</strong><span>참여 학급</span></div>{" "}
+              <div><strong data-school-observed="">0</strong><span>배출 관찰</span></div>{" "}
+              <div><strong data-school-hold="">0</strong><span>판단 보류</span></div>{" "}
+            </div>{" "}
+            <div className="school-visuals">{" "}
+              <div className="bar-list" aria-label="학년별 참여" data-grade-bars="">{" "}
+                <div><span>3학년</span><i style={{ "--value": "0%" } as CSSProperties}></i><b>0</b></div>{" "}
+                <div><span>4학년</span><i style={{ "--value": "0%" } as CSSProperties}></i><b>0</b></div>{" "}
+                <div><span>5학년</span><i style={{ "--value": "0%" } as CSSProperties}></i><b>0</b></div>{" "}
+                <div><span>6학년</span><i style={{ "--value": "0%" } as CSSProperties}></i><b>0</b></div>{" "}
+              </div>{" "}
+              <div className="donut-pair">{" "}
+                <div className="donut" style={{ "--pct": "0" } as CSSProperties}><span>0%</span><small>배출 성공률</small></div>{" "}
+                <div className="donut violet" style={{ "--pct": "0" } as CSSProperties}><span>0%</span><small>판단 보류 비율</small></div>{" "}
+              </div>{" "}
+            </div>{" "}
+          </article>{" "}
+
+          <article className="panel landfill-panel" id="landfill" data-source-url="https://www.data.go.kr/tcs/dss/selectDataSetList.do?dType=API&amp;keyword=%EC%88%98%EB%8F%84%EA%B6%8C%EB%A7%A4%EB%A6%BD%EC%A7%80%20%EB%B0%98%EC%9E%85">{" "}
+            <div className="panel-head">{" "}
+              <div>{" "}
+                <p>공식 관리 지표 구조 참고</p>{" "}
+                <h2>수도권매립지 모니터</h2>{" "}
+              </div>{" "}
+              <div className="landfill-actions">{" "}
+                <a className="source-link" href="https://www.data.go.kr/tcs/dss/selectDataSetList.do?dType=API&amp;keyword=%EC%88%98%EB%8F%84%EA%B6%8C%EB%A7%A4%EB%A6%BD%EC%A7%80%20%EB%B0%98%EC%9E%85" target="_blank" rel="noopener noreferrer">기록</a>{" "}
+                <button className="data-refresh-btn" type="button" data-refresh-records="" aria-label="대시보드 데이터 새로고침">{" "}
+                  <span className="data-refresh-arrow" aria-hidden="true">&#8635;</span>{" "}
+                  <span className="data-refresh-ring" aria-hidden="true"></span>{" "}
+                </button>{" "}
+              </div>{" "}
+            </div>{" "}
+            <div className="landfill-metrics">{" "}
+              <div><strong>0t</strong><span>오늘 반입 총량</span></div>{" "}
+              <div><strong>0%</strong><span>전일 대비</span></div>{" "}
+              <div><strong>0%</strong><span>총량 대비 반입량</span></div>{" "}
+              <div><strong>0%</strong><span>잔여 관리 여력</span></div>{" "}
+            </div>{" "}
+            <div className="chart-wrap">{" "}
+              <div className="chart-title-row">{" "}
+                <h3 className="chart-title">최근 일주일 반입량 추이</h3>{" "}
+                <time className="landfill-time-now" dateTime="2026-07-05T00:00:00" data-landfill-clock="" aria-live="polite">26.07.05(일) 00:00:00</time>{" "}
+              </div>{" "}
+              <svg className="combo-chart" viewBox="-16 0 456 252" preserveAspectRatio="xMinYMid meet" role="img" aria-label="최근 일주일 반입량 막대와 선 그래프">{" "}
+                <defs>{" "}
+                  <linearGradient id="cleanLineFill" x1="0" x2="0" y1="0" y2="1">{" "}
+                    <stop offset="0%" stop-color="#4bffe1" stop-opacity=".12" />{" "}
+                    <stop offset="58%" stop-color="#50b4ff" stop-opacity=".06" />{" "}
+                    <stop offset="100%" stop-color="#50b4ff" stop-opacity="0" />{" "}
+                  </linearGradient>{" "}
+                  <linearGradient id="cleanBarFill" x1="0" x2="0" y1="0" y2="1">{" "}
+                    <stop offset="0%" stop-color="#7affdf" stop-opacity=".96" />{" "}
+                    <stop offset="56%" stop-color="#56e9ff" stop-opacity=".72" />{" "}
+                    <stop offset="100%" stop-color="#5b96ff" stop-opacity=".42" />{" "}
+                  </linearGradient>{" "}
+                </defs>{" "}
+                <g className="chart-grid" stroke="rgba(220,245,255,.16)" stroke-width="1">{" "}
+                  <path d="M48 24 H400" />{" "}
+                  <path d="M48 57 H400" />{" "}
+                  <path d="M48 90 H400" />{" "}
+                  <path d="M48 122 H400" />{" "}
+                  <path d="M48 155 H400" />{" "}
+                  <path d="M48 188 H400" />{" "}
+                </g>{" "}
+                <g className="chart-axis" fill="rgba(220,245,255,.6)" font-size="10" font-weight="760">{" "}
+                  <text x="1" y="28">25K</text>{" "}
+                  <text x="1" y="61">20K</text>{" "}
+                  <text x="1" y="94">15K</text>{" "}
+                  <text x="1" y="126">10K</text>{" "}
+                  <text x="1" y="159">5K</text>{" "}
+                  <text x="1" y="192">0</text>{" "}
+                  <text className="x-label" x="64" y="216" text-anchor="middle"><tspan className="date-label" x="64">06.29</tspan><tspan className="weekday-label" x="64" dy="15">월</tspan></text><text className="x-label" x="114" y="216" text-anchor="middle"><tspan className="date-label" x="114">06.30</tspan><tspan className="weekday-label" x="114" dy="15">화</tspan></text><text className="x-label" x="164" y="216" text-anchor="middle"><tspan className="date-label" x="164">07.01</tspan><tspan className="weekday-label" x="164" dy="15">수</tspan></text><text className="x-label" x="214" y="216" text-anchor="middle"><tspan className="date-label" x="214">07.02</tspan><tspan className="weekday-label" x="214" dy="15">목</tspan></text><text className="x-label" x="264" y="216" text-anchor="middle"><tspan className="date-label" x="264">07.03</tspan><tspan className="weekday-label" x="264" dy="15">금</tspan></text><text className="x-label" x="314" y="216" text-anchor="middle"><tspan className="date-label" x="314">07.04</tspan><tspan className="weekday-label" x="314" dy="15">토</tspan></text><text className="x-label" x="364" y="216" text-anchor="middle"><tspan className="date-label" x="364">07.05</tspan><tspan className="weekday-label" x="364" dy="15">일</tspan></text>{" "}
+                </g>{" "}
+                <path className="chart-area" d="M64 188 L114 188 L164 188 L214 188 L264 188 L314 188 L364 188 L364 188 L64 188 Z" fill="url(#cleanLineFill)" opacity="0" />{" "}
+                <g className="chart-bars" fill="url(#cleanBarFill)">{" "}
+                  <rect x="54" y="188" width="20" height="0" rx="6" />{" "}
+                  <rect x="104" y="188" width="20" height="0" rx="6" />{" "}
+                  <rect x="154" y="188" width="20" height="0" rx="6" />{" "}
+                  <rect x="204" y="188" width="20" height="0" rx="6" />{" "}
+                  <rect x="254" y="188" width="20" height="0" rx="6" />{" "}
+                  <rect x="304" y="188" width="20" height="0" rx="6" />{" "}
+                  <rect x="354" y="188" width="20" height="0" rx="6" />{" "}
+                </g>{" "}
+                <path className="chart-line" d="M64 188 L114 188 L164 188 L214 188 L264 188 L314 188 L364 188" fill="none" stroke="#65f4dc" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" opacity="0" />{" "}
+              </svg>{" "}
+              <div className="progress-stack">{" "}
+                <label><span>총량 대비 반입량</span><b>0%</b><i><em style={{ width: "0%" }}></em></i></label>{" "}
+                <label><span>잔여 관리 여력</span><b>0%</b><i><em style={{ width: "0%" }}></em></i></label>{" "}
+              </div>{" "}
+              <aside className="landfill-kpi-module" aria-label="총량 대비 반입량과 잔여 관리 여력">{" "}
+                <div className="donut landfill-kpi-ring" style={{ "--pct": "0" } as CSSProperties}>{" "}
+                  <span>0%</span>{" "}
+                  <small>반입량</small>{" "}
+                </div>{" "}
+                <div className="donut landfill-kpi-ring landfill-kpi-ring--secondary" style={{ "--pct": "0" } as CSSProperties}>{" "}
+                  <span data-landfill-secondary-value="">0%</span>{" "}
+                  <small>잔여량</small>{" "}
+                </div>{" "}
+              </aside>{" "}
+            </div>{" "}
+          </article>{" "}
+
+          <article className="panel class-panel" id="ranking">{" "}
+            <div className="panel-head">{" "}
+              <div>{" "}
+                <p>Class Resource Dashboard</p>{" "}
+                <h2>우리반 자원순환 대시보드</h2>{" "}
+              </div>{" "}
+            </div>{" "}
+            <label className="select-line">{" "}
+              <span>학급 선택</span>{" "}
+              <select id="classSelect" aria-label="학급 선택" defaultValue="5학년 1반">{" "}
+                <option>3학년 1반</option>{" "}
+                <option>3학년 2반</option>{" "}
+                <option>3학년 3반</option>{" "}
+                <option>4학년 1반</option>{" "}
+                <option>4학년 2반</option>{" "}
+                <option>4학년 3반</option>{" "}
+                <option>4학년 4반</option>{" "}
+                <option>5학년 1반</option>{" "}
+                <option>5학년 2반</option>{" "}
+                <option>5학년 3반</option>{" "}
+                <option>5학년 4반</option>{" "}
+                <option>6학년 1반</option>{" "}
+                <option>6학년 2반</option>{" "}
+                <option>6학년 3반</option>{" "}
+              </select>{" "}
+            </label>{" "}
+            <div className="class-kpis">{" "}
+              <div><strong data-today-observed="">0</strong><span>오늘 관찰</span></div>{" "}
+              <div><strong data-ai-classified="">0</strong><span>판단 보류</span></div>{" "}
+              <div><strong data-human-confirmed="">0</strong><span>전환 사례</span></div>{" "}
+            </div>{" "}
+            <div className="confusion">{" "}
+              <h3>헷갈린 물건 TOP 5</h3>{" "}
+              <div><span>종이컵</span><i style={{ "--value": "0%" } as CSSProperties}></i><b>0</b></div>{" "}
+              <div><span>우유갑</span><i style={{ "--value": "0%" } as CSSProperties}></i><b>0</b></div>{" "}
+              <div><span>과자 포장지</span><i style={{ "--value": "0%" } as CSSProperties}></i><b>0</b></div>{" "}
+              <div><span>컵라면 용기</span><i style={{ "--value": "0%" } as CSSProperties}></i><b>0</b></div>{" "}
+              <div><span>영수증</span><i style={{ "--value": "0%" } as CSSProperties}></i><b>0</b></div>{" "}
+            </div>{" "}
+            <p className="rank-note">RANKING 🥇 5학년 중 1위 · 🏫 전교 0위</p>{" "}
+          </article>{" "}
+
+          <article className="panel upload-panel">{" "}
+            <div className="panel-head">{" "}
+              <div>{" "}
+                <p>3 second Module</p>{" "}
+                <h2>버려지는 순간을 기록하세요</h2>{" "}
+              </div>{" "}
+            </div>{" "}
+            <p>사진을 찍어 AI와 함께 분류하며 판단합니다.</p>{" "}
+            <ul className="upload-highlights">{" "}
+              <li>AI가 확인할 항목을 제안합니다.</li>{" "}
+              <li>최종 배출 판단은 사용자가 결정합니다.</li>{" "}
+              <li>사진은 저장하지 않고 판단 기록만 남습니다.</li>{" "}
+            </ul>{" "}
+            <span className="gemini-credit"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c.6 4.6 5.4 9.4 10 10-4.6.6-9.4 5.4-10 10-.6-4.6-5.4-9.4-10-10 4.6-.6 9.4-5.4 10-10Z" /></svg>Powered by Gemini</span>{" "}
+            <div className="experience-portal">{" "}
+              <span className="portal-powered"><svg className="portal-gemini-star" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="geminiStarA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f9ab00" /><stop offset=".55" stop-color="#4285f4" /><stop offset="1" stop-color="#4285f4" /></linearGradient><linearGradient id="geminiStarB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ea4335" stop-opacity=".95" /><stop offset=".45" stop-color="#ea4335" stop-opacity="0" /><stop offset=".62" stop-color="#34a853" stop-opacity="0" /><stop offset="1" stop-color="#34a853" stop-opacity=".95" /></linearGradient></defs><path fill="url(#geminiStarA)" d="M12 2c.6 4.6 5.4 9.4 10 10-4.6.6-9.4 5.4-10 10-.6-4.6-5.4-9.4-10-10 4.6-.6 9.4-5.4 10-10Z" /><path fill="url(#geminiStarB)" d="M12 2c.6 4.6 5.4 9.4 10 10-4.6.6-9.4 5.4-10 10-.6-4.6-5.4-9.4-10-10 4.6-.6 9.4-5.4 10-10Z" /></svg>Powered by Google Gemini</span>{" "}
+              <div className="portal-frame">{" "}
+                <p className="portal-teaser">모든 화면을 끝까지 둘러본 뒤 이곳으로 다시 돌아오면<br /><strong>새로운 자원 순환 UX 체험 포탈</strong>이 열립니다.</p>{" "}
+                <span className="portal-arrow" aria-hidden="true"></span>{" "}
+                <div className="qr-invite">{" "}
+                  <a href="./mobile/index.html" target="_blank" rel="noopener noreferrer">{" "}
+                    <img src="./assets/qr/kiosk-5-1.png" alt="내 폰으로 3초판단 바로 열기 QR코드" loading="lazy" />{" "}
+                  </a>{" "}
+                  <p>QR코드를 스캔하면<br />버리는 순간을 바꾸는<br /><strong>3초 판단 도우미 앱</strong>을<br />체험할 수 있어요.</p>{" "}
+                </div>{" "}
+              </div>{" "}
+            </div>{" "}
+            <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden={true} />{" "}
+            <input id="uploadInput" type="file" accept="image/*" hidden={true} />{" "}
+            <div className="upload-actions upload-card-actions">{" "}
+              <button type="button" data-upload="camera">{" "}
+                <span className="upload-icon" aria-hidden="true">{" "}
+                  <svg viewBox="0 0 24 24"><path d="M4 8h4l1.8-2h4.4L16 8h4v10H4z" /><circle cx="12" cy="13" r="3.4" /></svg>{" "}
+                </span>{" "}
+                <span>카메라로<br />지금 찍기</span>{" "}
+              </button>{" "}
+              <button type="button" data-upload="file">{" "}
+                <span className="upload-icon" aria-hidden="true">{" "}
+                  <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2" /><path d="M7 16l3.4-3.4 2.6 2.6 2-2L20 18" /><circle cx="15.5" cy="9.5" r="1.4" /></svg>{" "}
+                </span>{" "}
+                <span>찍은 사진<br />올리기</span>{" "}
+              </button>{" "}
+            </div>{" "}
+            <small>※ 본 플랫폼은 환경부 분리배출 및 인천광역시교육청 자원순환 공식 지침을 바탕으로 제작되었습니다.</small>{" "}
+          </article>{" "}
+        </div>{" "}
+
+        <article className="panel skill-panel">{" "}
+          <div className="panel-head">{" "}
+            <div>{" "}
+              <p>Class Skill Registry</p>{" "}
+              <h2>우리 반이 AI에게 가르친 것</h2>{" "}
+            </div>{" "}
+          </div>{" "}
+          <details className="classroom-skill-panel" id="classroomSkillPanel">{" "}
+            <summary>우리 반이 AI에게 가르친 것</summary>{" "}
+            <p className="classroom-skill-intro">Gemini의 판단을 바꾸지 않고, 우리 반이 만든 Teachable Machine 기술을 참고용으로 누적합니다.</p>{" "}
+            <div className="class-profile-panel" id="classProfilePanel">{" "}
+              <p id="classProfileStatus" className="class-profile-status" role="status" aria-live="polite">반을 연결하면 우리 반 Skill만 참고용으로 사용합니다.</p>{" "}
+              <form id="classProfileForm" className="class-profile-form">{" "}
+                <label>학교 ID<input id="classProfileSchoolId" required={true} maxLength={80} placeholder="예: aiways-elementary" autoComplete="organization" /></label>{" "}
+                <label>학교 이름<input id="classProfileSchoolName" required={true} maxLength={80} placeholder="예: AI Ways 초등학교" autoComplete="organization" /></label>{" "}
+                <label>학년<input id="classProfileGrade" required={true} maxLength={12} placeholder="예: 3" inputMode="numeric" /></label>{" "}
+                <label>반<input id="classProfileClassName" required={true} maxLength={24} placeholder="예: 3-2" /></label>{" "}
+                <label>연결 방식<select id="classProfileMode"><option value="personal">개인 기기</option><option value="class_device">공용 기기</option></select></label>{" "}
+                <button type="submit">우리 반 연결</button>{" "}
+              </form>{" "}
+              <div id="classProfileActions" className="class-profile-actions" hidden={true}>{" "}
+                <button type="button" id="classProfileChangeButton">다른 반으로 연결</button>{" "}
+                <button type="button" id="classProfileClearButton">반 연결 해제</button>{" "}
+              </div>{" "}
+            </div>{" "}
+            <p id="classroomSkillCount" className="classroom-skill-count" aria-live="polite">우리 반이 AI에게 가르친 기술 0개</p>{" "}
+            <button type="button" id="classroomSeedSkillButton">AI Ways Seed 분리수거 Skill 연결</button>{" "}
+            <form id="classroomSkillForm" className="classroom-skill-form">{" "}
+              <label>기술 이름<input id="classroomSkillName" required={true} maxLength={60} placeholder="예: 우리 반 페트병 구분" /></label>{" "}
+              <label>무엇을 가르쳤는지<textarea id="classroomSkillDescription" required={true} maxLength={240} placeholder="예: 찌그러진 페트병과 일반 플라스틱을 구분했어요."></textarea></label>{" "}
+              <label>Teachable Machine model URL<input id="classroomSkillUrl" type="url" required={true} placeholder="https://teachablemachine.withgoogle.com/models/..." /></label>{" "}
+              <label>공개 범위<select id="classroomSkillVisibility"><option value="class">우리 반</option><option value="school">우리 학교</option><option value="public">공개</option></select></label>{" "}
+              <button type="submit">기술 미리보기</button>{" "}
+            </form>{" "}
+            <div id="classroomSkillPreview" hidden={true}></div>{" "}
+            <p id="classroomSkillStatus" role="status" aria-live="polite"></p>{" "}
+            <ul id="classroomSkillList" className="classroom-skill-list"><li className="empty-state">아직 우리 반이 가르쳐준 기술이 없어요. 첫 번째 기술을 만들어볼까요? 🎓</li></ul>{" "}
+          </details>{" "}
+        </article>{" "}
+      </section>{" "}
+
+      <section className="scene project-scene" id="project" data-nav="프로젝트">{" "}
+        <div className="scene-orbs" aria-hidden="true">{" "}
+          <span className="orb-xl" style={{ width: "660px", height: "660px", top: "-22%", right: "-14%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "540px", height: "540px", bottom: "-22%", left: "-10%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "440px", height: "440px", top: "30%", left: "36%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "400px", height: "400px", top: "-16%", left: "14%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb" style={{ width: "280px", height: "280px", top: "-4%", left: "2%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb2" style={{ width: "240px", height: "240px", bottom: "-10%", left: "36%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb2" style={{ width: "200px", height: "200px", top: "58%", left: "-6%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb2" style={{ width: "220px", height: "220px", bottom: "16%", right: "-4%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-md" style={{ width: "200px", height: "200px", top: "50%", right: "14%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-md" style={{ width: "160px", height: "160px", bottom: "34%", left: "8%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-sm" style={{ width: "130px", height: "130px", bottom: "8%", right: "2%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-sm" style={{ width: "110px", height: "110px", top: "12%", right: "32%", background: "#5ef7cd" }}></span>{" "}
+        </div>{" "}
+        <div className="project-intro">{" "}
+          <p className="eyebrow">Project Frame</p>{" "}
+          <p className="project-origin">내가 버린 쓰레기는 어디로 사라질까?</p>{" "}
+          <p className="project-subtitle">AI와 데이터로 실천하는 자원순환 UX 개선 프로젝트</p>{" "}
+          <div className="project-statement" aria-label="프로젝트 핵심 문장">{" "}
+            <h2>{" "}
+              <span>환경 보호 포스터를 만드는 수업이 아니라,</span>{" "}
+              <span>교실 속 버리는 순간을 바꾸는 수업입니다.</span>{" "}
+            </h2>{" "}
+          </div>{" "}
+        </div>{" "}
+        <div className="project-cards">{" "}
+          <article><span>01</span><h3>버리는 순간을 데이터로 바꾸다</h3><p>교실과 복도의 배출 장면을 관찰 가능한 학습 데이터로 전환합니다.</p></article>{" "}
+          <article><span>02</span><h3>AI가 먼저 제안하고, 사람이 최종 판단하다</h3><p>AI는 초안을 만들고 학생은 학교 기준과 오염 여부를 다시 확인합니다.</p></article>{" "}
+          <article><span>03</span><h3>우리 학교 UX를 직접 개선하다</h3><p>3초 판단, 보류함, 대시보드를 학교 안 실천으로 연결합니다.</p></article>{" "}
+        </div>{" "}
+      </section>{" "}
+
+      <section className="scene curriculum-scene" id="curriculum" data-nav="교육과정">{" "}
+        <div className="scene-orbs" aria-hidden="true">{" "}
+          <span className="orb-xl" style={{ width: "600px", height: "600px", bottom: "-24%", left: "-10%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "500px", height: "500px", top: "-20%", right: "-12%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "420px", height: "420px", top: "26%", left: "30%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "380px", height: "380px", bottom: "-14%", right: "12%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb" style={{ width: "300px", height: "300px", top: "-6%", right: "-4%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb2" style={{ width: "230px", height: "230px", top: "24%", left: "6%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb2" style={{ width: "250px", height: "250px", bottom: "2%", right: "20%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb2" style={{ width: "210px", height: "210px", top: "60%", left: "44%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-md" style={{ width: "190px", height: "190px", top: "56%", right: "2%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-md" style={{ width: "160px", height: "160px", bottom: "30%", left: "12%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-sm" style={{ width: "120px", height: "120px", top: "10%", left: "46%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-sm" style={{ width: "110px", height: "110px", bottom: "8%", right: "44%", background: "#ad8cff" }}></span>{" "}
+        </div>{" "}
+        <div className="scene-copy">{" "}
+          <p className="eyebrow">Curriculum-based Learning Design</p>{" "}
+          <h2 className="curriculum-title"><span>2022 교육과정</span><span>기반 수업 설계</span></h2>{" "}
+          <p className="curriculum-description">{" "}
+            <span>본 프로젝트는 생활 자원 관리와 지속 가능한 미래 및 지역사회 문제 탐구,</span>{" "}
+            <span>토의 · 토론, 조정 역량을 연결하여 학생이 생활 속 배출 문제를 발견하고,</span>{" "}
+            <span>AI와 데이터를 활용해 학교 자원순환 UX를 개선하도록 설계한 융합 수업입니다.</span>{" "}
+          </p>{" "}
+        </div>{" "}
+        <div className="curriculum-layout">{" "}
+          <div className="subject-grid">{" "}
+            <a className="panel subject-card" href="https://e.m-teacher.co.kr/pages/ele/Main.mrn" target="_blank" rel="noopener noreferrer"><span>실과</span><h3>생활 자원 관리</h3><p>생활 자원 관리, 합리적 소비, 재활용·재사용 실천을 실제 문제와 연결합니다.</p><em>E-book</em></a>{" "}
+            <a className="panel subject-card" href="https://www.i-scream.co.kr/user/main/MainPage.do" target="_blank" rel="noopener noreferrer"><span>사회</span><h3>지역사회 문제 탐구</h3><p>인천 수도권매립지와 자원순환 문제를 생활권 기반 지역사회 문제로 탐구합니다.</p><em>E-book</em></a>{" "}
+            <a className="panel subject-card" href="https://ele.tsherpa.co.kr/" target="_blank" rel="noopener noreferrer"><span>국어</span><h3>토의와 판단 조정</h3><p>AI 제안과 자료를 근거로 비교하고, 딜레마 토론과 설득적 표현으로 판단을 조정합니다.</p><em>E-book</em></a>{" "}
+            <a className="panel subject-card" href="https://e.m-teacher.co.kr/pages/ele/Main.mrn" target="_blank" rel="noopener noreferrer"><span>창체</span><h3>실천과 확산</h3><p>3초 판단 도우미, 판단 보류함, 대시보드 점검을 교실 밖 실천과 확산으로 이어갑니다.</p><em>E-book</em></a>{" "}
+          </div>{" "}
+          <section className="standards-panel" aria-label="연계 성취기준">{" "}
+            <div>{" "}
+              <h3>연계 성취기준</h3>{" "}
+              <p>2022 개정 교육과정 기반 · 자원순환 UX 프로젝트 적용</p>{" "}
+            </div>{" "}
+            <div className="standards-grid">{" "}
+              <article><span>6실02-03</span><p>생활 자원의 올바른 사용과 환경을 고려한 <span className="keep-together">재활용·재사용 실천</span></p></article>{" "}
+              <article><span>6실05-03</span><p>실생활 문제 해결 프로그램을 협력하여 작성하고 산출물 공유</p></article>{" "}
+              <article><span>6실05-04</span><p>디지털·아날로그 데이터의 특징과 AI 활용 데이터 유형 탐색</p></article>{" "}
+              <article><span>6실05-05</span><p>인공지능이 만들어지는 과정을 체험하고 사회적 영향 탐색</p></article>{" "}
+              <article><span>6사12-02</span><p>지속 가능한 미래를 위한 지구촌 문제와 해결 방안 탐색</p></article>{" "}
+              <article><span>6국01-02</span><p>주장과 근거의 타당성을 평가하며 듣고 토의·토론하기</p></article>{" "}
+            </div>{" "}
+          </section>{" "}
+        </div>{" "}
+      </section>{" "}
+
+      <section className="scene hah-scene" id="hah" data-nav="H-A-H">{" "}
+        <div className="scene-orbs" aria-hidden="true">{" "}
+          <span className="orb-xl" style={{ width: "640px", height: "640px", top: "-20%", left: "8%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "520px", height: "520px", bottom: "-22%", right: "-6%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "440px", height: "440px", top: "26%", left: "52%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "400px", height: "400px", bottom: "-16%", left: "22%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb" style={{ width: "290px", height: "290px", bottom: "-8%", right: "0%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb2" style={{ width: "220px", height: "220px", top: "30%", right: "20%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb2" style={{ width: "240px", height: "240px", bottom: "4%", left: "-8%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb2" style={{ width: "200px", height: "200px", top: "6%", right: "36%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-md" style={{ width: "200px", height: "200px", top: "50%", left: "0%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-md" style={{ width: "160px", height: "160px", bottom: "30%", right: "30%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-sm" style={{ width: "130px", height: "130px", top: "6%", right: "0%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-sm" style={{ width: "110px", height: "110px", bottom: "10%", left: "44%", background: "#64a9ff" }}></span>{" "}
+        </div>{" "}
+        <div className="scene-copy center-copy">{" "}
+          <p className="eyebrow">H-A-H Learning Loop</p>{" "}
+          <h2 className="hah-title"><span>사람이 발견하고, AI로 확장하고,</span><span>다시 사람이 결정합니다.</span></h2>{" "}
+          <p className="hah-description">AI Ways Incheon의 핵심은 AI에게 판단을 맡기는 것이 아니라, 학생이 자기 삶의 문제를 발견하고 AI를 조력자로 활용한 뒤 사람의 기준으로 다시 검증하는 Human → AI → Human의 학습 루프입니다.</p>{" "}
+        </div>{" "}
+        <div className="hah-grid">{" "}
+          <article className="panel"><span>H1</span><h3>문제 발견</h3><p>교실과 가정에서 실제로 헷갈리고 불편했던 분리배출 경험을 VOC로 모읍니다.</p><ul><li>교실·복도 쓰레기통 관찰</li><li>가정 분리배출 불편 데이터 수집</li><li>인천 수도권매립지 문제와 연결</li></ul></article>{" "}
+          <article className="panel accent"><span>AI</span><h3>아이디어 확장</h3><p>생성형 AI와 함께 학교 쓰레기 문제를 해결할 UX 기능 후보를 넓게 탐색합니다.</p><ul><li>3초 판단 앱</li><li>판단 보류함</li><li>가이드선·퀴즈·랭킹 대시보드</li></ul></article>{" "}
+          <article className="panel"><span>H2</span><h3>인간 검증</h3><p>AI의 제안을 우리 교실에 맞는 기준으로 판단하여 결정합니다.</p><ul><li>실천 가능성</li><li>환경 효과</li><li>지속 가능성·공동체성</li></ul></article>{" "}
+        </div>{" "}
+        <p className="callout">AI는 최종 정답을 확정하지 않습니다. AI는 1차 판단을 제안하고, 학생은 학교 기준과 오염 여부를 다시 확인합니다.</p>{" "}
+      </section>{" "}
+
+      <section className="scene flow-scene" id="flow" data-nav="차시흐름">{" "}
+        <div className="scene-orbs" aria-hidden="true">{" "}
+          <span className="orb-xl" style={{ width: "480px", height: "480px", top: "-4%", left: "2%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "440px", height: "440px", top: "8%", right: "-4%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "460px", height: "460px", bottom: "-6%", left: "30%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "400px", height: "400px", bottom: "4%", right: "14%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb" style={{ width: "260px", height: "260px", top: "36%", left: "8%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb2" style={{ width: "230px", height: "230px", top: "14%", right: "22%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb2" style={{ width: "240px", height: "240px", bottom: "22%", left: "52%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb2" style={{ width: "220px", height: "220px", bottom: "8%", right: "38%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-md" style={{ width: "190px", height: "190px", top: "60%", right: "6%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-md" style={{ width: "170px", height: "170px", top: "4%", left: "40%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-sm" style={{ width: "130px", height: "130px", bottom: "30%", left: "20%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-sm" style={{ width: "120px", height: "120px", top: "46%", right: "4%", background: "#ad8cff" }}></span>{" "}
+        </div>{" "}
+        <div className="scene-copy">{" "}
+          <p className="eyebrow">8-Lesson Journey + Experience + Diffusion</p>{" "}
+          <h2>여덟 발자국의<br />수업 여정</h2>{" "}
+          <p>문제 발견에서 AI 활용, 인간 검증, 블록코딩·바이브코딩까지 이어지고,<br />대시보드 활용으로 실천 데이터를 아카이빙하고 실시간으로 확인합니다.</p>{" "}
+        </div>{" "}
+        <div className="flow-grid">{" "}
+          <a className="flow-card" href="https://drive.google.com/file/d/1KBEZLVRLCXwKL2GoyCZbFar_s7omKd4l/view?usp=sharing" target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer"><span>1차시 · 문제 발견</span><h3>학생의 목소리에서<br />출발하는 문제 발견</h3><p>학생 VOC와 교실 관찰로<br />버리는 순간의 어려움을 찾습니다.</p><em>수업자료</em></a>{" "}
+          <a className="flow-card" href="https://padlet.com/ssam_kang/padlet-zvqohi1e8wbips6v" target="_blank" rel="noopener noreferrer"><span>2차시 · Flipped Learning</span><h3>쓰레기의 끝은<br />어디일까</h3><p>거꾸로 학습을 통해<br />쓰레기 배출 문제가<br />우리 고장 속에서<br />살아있는 삶 속의 문제라는<br />현실에 직면합니다.</p><em>수업자료</em></a>{" "}
+          <a className="flow-card ai-badge" href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g/wish/jpoxajzbX6K0abPE" target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer"><span>3차시 · Brainstorming</span><h3>인간과 AI가 함께하는<br />생각의 확장</h3><p>아이디어 보드로 브레인스토밍하고,<br />AI와 함께 소통하며<br />분리배출 문제를 해결할<br />UX 개선 아이디어 후보를<br />탐색합니다.</p><em>수업자료</em></a>{" "}
+          <a className="flow-card h2-badge" href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g/wish/x5A7arDb2ByDZwr6" target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer"><span>4차시 · Dilemma Discussion</span><h3>토의 · 토론을 통한<br />인간 검증</h3><p>AI 제안의 무비판적 수용이 아닌,<br />인간의 기준으로 다시 판단합니다.</p><em>수업자료</em></a>{" "}
+          <a className="flow-card" href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g/wish/1xkVaqd3MjxRWl0e" target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer"><span>5차시 · Block Coding</span><h3>블록코딩으로 알아보는<br />AI 이미지 분류 원리</h3><p>AI가 이미지를 인식하고 분류하는 개념을<br />블록코딩을 이용하여 쉽고 재미있게<br />체험하며 이해합니다.</p><em>수업자료</em></a>{" "}
+          <a className="flow-card" href="https://padlet.com/ssam_kang/padlet-9vcpfg8gtpv008md" target="_blank" rel="noopener noreferrer"><span>6차시 · Teachable Machine</span><h3>우리 반 AI 모델 학습</h3><p>우리 반 생활 쓰레기들의 사진을 찍으며<br />티처블 머신으로 이미지 인식 모델을<br />학습시킵니다.</p><em>수업자료</em></a>{" "}
+          <a className="flow-card" href="./miniapp/3second.html" target="_blank" rel="noopener noreferrer"><span>7차시 · Vibe Coding</span><h3>자연어로 설계하는<br />프로토타입</h3><p>자연어로 앱 기능을 설계하고<br />바이브 코딩으로 UX 프로토타입을<br />개선합니다.</p><em>체험하기</em></a>{" "}
+          <a className="flow-card" href="#resources"><span>Experience · Diffusion</span><h3>살아있는 데이터<br />아카이빙과 확산 및 공유</h3><p>대시보드 활용으로<br />살아있는 실천 데이터를 아카이빙하고,<br />공유하며 확산합니다.</p><em>체험하기</em></a>{" "}
+        </div>{" "}
+      </section>{" "}
+
+      <section className="scene gallery-scene" id="gallery" data-nav="갤러리">{" "}
+        <div className="scene-orbs" aria-hidden="true">{" "}
+          <span className="orb-xl" style={{ width: "520px", height: "520px", top: "-16%", right: "-10%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "460px", height: "460px", bottom: "-20%", left: "-12%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "380px", height: "380px", top: "30%", left: "-8%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "400px", height: "400px", bottom: "-18%", right: "-6%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb" style={{ width: "240px", height: "240px", bottom: "-6%", left: "20%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb2" style={{ width: "220px", height: "220px", top: "-4%", left: "44%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb2" style={{ width: "230px", height: "230px", bottom: "30%", right: "-4%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb2" style={{ width: "210px", height: "210px", top: "52%", left: "8%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-md" style={{ width: "180px", height: "180px", top: "8%", right: "8%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-md" style={{ width: "160px", height: "160px", bottom: "10%", left: "52%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-sm" style={{ width: "130px", height: "130px", top: "60%", right: "16%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-sm" style={{ width: "110px", height: "110px", top: "20%", left: "6%", background: "#ad8cff" }}></span>{" "}
+        </div>{" "}
+        <div className="scene-copy">{" "}
+          <p className="eyebrow">Student Outputs</p>{" "}
+          <h2>갤러리</h2>{" "}
+          <p className="gallery-description">학생들이 발견한 불편함, AI와 함께 확장한 아이디어, 사람이 다시 판단한 기록을 모아<br />우리 학교 자원순환 UX가 어떻게 바뀌었는지 보여주는 산출물 아카이브입니다.</p>{" "}
+        </div>{" "}
+        <div className="gallery-stage" id="galleryStage">{" "}
+          <div className="gallery-grid">{" "}
+            <article data-gallery="학생 VOC 활동지"><span>01</span><h3>학생 VOC 활동지</h3><button type="button">바로가기</button></article>{" "}
+            <article data-gallery="쓰레기매립지 알아보기"><span>02</span><h3>쓰레기매립지 알아보기</h3><button type="button">바로가기</button></article>{" "}
+            <article data-gallery="아이디어 확장하기"><span>03</span><h3>아이디어 확장하기</h3><button type="button">바로가기</button></article>{" "}
+            <article data-gallery="딜레마 토론"><span>04</span><h3>딜레마 토론</h3><button type="button">바로가기</button></article>{" "}
+            <article data-gallery="블록코딩"><span>05</span><h3>블록코딩</h3><button type="button">바로가기</button></article>{" "}
+            <article data-gallery="이미지 모델 학습 자료"><span>06</span><h3>이미지 모델<br />학습 자료</h3><button type="button">바로가기</button></article>{" "}
+            <article data-gallery="3초판단 앱 프로토타입"><span>07</span><h3>3초판단 앱 프로토타입</h3><button type="button">바로가기</button></article>{" "}
+            <article data-gallery="H-A-H 토의하기"><span>08</span><h3>H-A-H 토의하기</h3><button type="button">바로가기</button></article>{" "}
+          </div>{" "}
+          <aside className="gallery-detail" id="galleryDetail" aria-live="polite">{" "}
+            <button type="button" id="galleryBack">← 돌아가기</button>{" "}
+            <div className="gallery-detail-head">{" "}
+              <span id="galleryDetailNumber">01</span>{" "}
+              <strong id="galleryDetailTitle">학생 VOC 활동지</strong>{" "}
+              <p id="galleryDetailCaption">학생들이 발견한 불편함을 실제 활동지 이미지로 확인합니다.</p>{" "}
+            </div>{" "}
+            <div className="gallery-detail-grid" id="galleryDetailGrid" aria-label="갤러리 상세 이미지"></div>{" "}
+          </aside>{" "}
+        </div>{" "}
+      </section>{" "}
+
+      <section className="scene resources-scene" id="resources" data-nav="자료실">{" "}
+        <div className="scene-orbs" aria-hidden="true">{" "}
+          <span className="orb-xl" style={{ width: "500px", height: "500px", bottom: "-20%", right: "-8%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "440px", height: "440px", top: "-20%", left: "-10%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "400px", height: "400px", top: "38%", right: "-10%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-xl" style={{ width: "380px", height: "380px", bottom: "-16%", left: "-8%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb" style={{ width: "240px", height: "240px", top: "-4%", right: "10%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb2" style={{ width: "210px", height: "210px", top: "30%", left: "-6%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb2" style={{ width: "220px", height: "220px", bottom: "14%", right: "26%", background: "#64a9ff" }}></span>{" "}
+          <span className="orb2" style={{ width: "200px", height: "200px", bottom: "-6%", left: "30%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-md" style={{ width: "160px", height: "160px", top: "14%", right: "4%", background: "#ad8cff" }}></span>{" "}
+          <span className="orb-md" style={{ width: "150px", height: "150px", bottom: "30%", left: "8%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-sm" style={{ width: "120px", height: "120px", top: "4%", left: "44%", background: "#5ef7cd" }}></span>{" "}
+          <span className="orb-sm" style={{ width: "110px", height: "110px", bottom: "50%", left: "4%", background: "#64a9ff" }}></span>{" "}
+        </div>{" "}
+        <div className="scene-copy center-copy">{" "}
+          <p className="eyebrow">Resources</p>{" "}
+          <h2>자료실</h2>{" "}
+          <p className="resources-description">수업 설계안, 활동지, 학부모 안내 자료, 학생 산출물 양식을 한곳에 모았습니다.<br />교사는 바로 활용하고, 학생은 자신의 실천 기록을 다시 확인할 수 있도록 구성했습니다.<br />자료는 수업 운영 흐름에 따라 계속 업데이트됩니다.</p>{" "}
+        </div>{" "}
+        <aside className="scroll-finale-hint">{" "}
+          <span className="hint-kicker">ONE MORE SCROLL</span>{" "}
+          <p className="hint-title">아래로 스크롤 해보세요 !</p>{" "}
+          <p className="hint-sub"><strong>3초 판단 앱</strong>을 직접 체험할 수 있는<br />QR코드가 나타납니다 !</p>{" "}
+          <span className="hint-arrow" aria-hidden="true"></span>{" "}
+        </aside>{" "}
+        <div className="resource-grid">{" "}
+          <a href="https://drive.google.com/file/d/1XNCMOSDJTFnsaVcYYR_eTKW8lIrEj5gx/view?usp=sharing" target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer"><span>01</span>수업 설계 기획안</a>{" "}
+          <a href="https://forms.gle/FvAwezV3drFjegCU9" target="_blank" rel="noopener noreferrer"><span>02</span>학부모 GoogleForm</a>{" "}
+          <a href="https://drive.google.com/file/d/1i7jJXMjurLV4oQfQLi9hRstAUmQbfzt_/view?usp=sharing" target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer"><span>03</span>차시별 활동지</a>{" "}
+          <a href="https://padlet.com/ssam_kang/ai-ways-incheon-9225rg99mnjvfd8g" target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer"><span>04</span>Padlet 수업 자료</a>{" "}
+          <a href="https://github.com/edutogether/aiways-incheon" target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer"><span>05</span>GitHub 저장소</a>{" "}
+          <a className="resource-pending" aria-disabled="true" tabIndex={-1}><span>06</span><em>업로드 예정</em></a>{" "}
+          <a className="resource-pending" aria-disabled="true" tabIndex={-1}><span>07</span><em>업로드 예정</em></a>{" "}
+          <a className="resource-pending" aria-disabled="true" tabIndex={-1}><span>08</span><em>업로드 예정</em></a>{" "}
+          <a className="resource-pending" aria-disabled="true" tabIndex={-1}><span>09</span><em>업로드 예정</em></a>{" "}
+          <a className="resource-pending" aria-disabled="true" tabIndex={-1}><span>10</span><em>업로드 예정</em></a>{" "}
+        </div>{" "}
+        <div className="footer-credit">{" "}
+          <p>AI Ways Incheon · Human → AI → Human Learning Project</p>{" "}
+          <p>같이교육 · 강서희 · 원나연</p>{" "}
+        </div>{" "}
+      </section>{" "}
+    </main>{" "}
+    <span className="scroll-cue" aria-hidden="true"></span>{" "}
+
+    <dialog className="ai-modal" id="aiModal">{" "}
+      <form method="dialog">{" "}
+        <button className="close-btn" type="button" value="close" aria-label="닫기" data-close-analysis="">×</button>{" "}
+      </form>{" "}
+      <div className="modal-preview"><img id="modalPreview" alt="업로드한 사진 미리보기" /><span className="scan-overlay" aria-hidden="true"></span></div>{" "}
+      <div className="modal-body">{" "}
+        <p className="eyebrow">AI 1차 판단 초안</p>{" "}
+        <h2 id="draftTitle">AI가 분류를 제안하고 있습니다</h2>{" "}
+        <p id="draftDesc">학생이 최종 판단을 누르기 전까지 기록은 저장되지 않습니다.</p>{" "}
+        <dl>{" "}
+          <div><dt>감지 물건</dt><dd id="draftItem">분석 중</dd></div>{" "}
+          <div><dt>분류 제안</dt><dd id="draftCategory">분석 중</dd></div>{" "}
+          <div><dt>신뢰도</dt><dd id="draftConfidence">-</dd></div>{" "}
+        </dl>{" "}
+        <div className="student-question">{" "}
+          <strong>학생 확인 질문</strong>{" "}
+          <p>오염, 코팅, 내용물, 학교 분리배출 기준을 다시 확인했나요?</p>{" "}
+        </div>{" "}
+        <div className="decision-grid" aria-label="학생 최종 판단">{" "}
+          <button type="button" data-final-category="플라스틱류">플라스틱류</button>{" "}
+          <button type="button" data-final-category="종이류">종이류</button>{" "}
+          <button type="button" data-final-category="종이팩">종이팩</button>{" "}
+          <button type="button" data-final-category="캔류">캔류</button>{" "}
+          <button type="button" data-final-category="비닐류">비닐류</button>{" "}
+          <button type="button" data-final-category="일반쓰레기">일반쓰레기</button>{" "}
+          <button type="button" data-final-category="판단 보류">판단 보류</button>{" "}
+        </div>{" "}
+        <div className="decision-confirm" id="decisionConfirm" hidden={true}>{" "}
+          <span id="pendingDecisionText">선택한 판단을 저장할까요?</span>{" "}
+          <button type="button" id="confirmDecision">확인</button>{" "}
+          <button type="button" id="cancelDecision">취소</button>{" "}
+        </div>{" "}
+        <button className="modal-cancel-action" type="button" data-close-analysis="">취소하고 닫기</button>{" "}
+        <p className="save-state" id="saveState" aria-live="polite"></p>{" "}
+      </div>{" "}
+    </dialog>{" "}
+
+    <dialog className="ai-modal school-setup-modal" id="dashboardSchoolModal">{" "}
+      <button type="button" id="dashboardClassBackBtn" className="modal-back-btn" aria-label="뒤로" hidden={true}>{" "}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H4M4 12l6-6M4 12l6 6" /></svg>{" "}
+      </button>{" "}
+      <button className="close-btn" type="button" aria-label="닫기" data-close-school-modal="">×</button>{" "}
+      <div className="modal-body">{" "}
+        <div id="dashboardSchoolStepSearch">{" "}
+          <div className="school-setup-icon" aria-hidden="true">{" "}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{" "}
+              <path d="M12 21s7-6.4 7-11.6A7 7 0 0 0 5 9.4C5 14.6 12 21 12 21Z" />{" "}
+              <circle cx="12" cy="9.4" r="2.5" />{" "}
+            </svg>{" "}
+          </div>{" "}
+          <h2>여러분의 학교는<br />어디인가요?</h2>{" "}
+          <div className="school-search-row">{" "}
+            <button type="button" id="dashboardSchoolSearchBtn" aria-label="검색">{" "}
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4.35-4.35" /></svg>{" "}
+            </button>{" "}
+            <input type="text" id="dashboardSchoolInput" autoComplete="off" placeholder="학교 이름 검색 (예: 같이초)" />{" "}
+            <div id="dashboardSchoolResults" className="classroom-skill-list"></div>{" "}
+          </div>{" "}
+          <p id="dashboardSchoolStatus" className="save-state" role="status" aria-live="polite"></p>{" "}
+        </div>{" "}
+        <div id="dashboardSchoolStepClass" hidden={true}>{" "}
+          <div className="school-setup-icon" aria-hidden="true">{" "}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{" "}
+              <path d="m4 6 8-4 8 4" />{" "}
+              <path d="m18 10 4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2" />{" "}
+              <path d="M14 22v-4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v4" />{" "}
+              <path d="M18 5v17" />{" "}
+              <path d="M6 5v17" />{" "}
+              <circle cx="12" cy="9" r="2" />{" "}
+            </svg>{" "}
+          </div>{" "}
+          <h2>학년 반을 입력해주세요.</h2>{" "}
+          <div className="class-picker-selects">{" "}
+            <select id="dashboardGradeSelect" aria-label="학년"></select>{" "}
+            <select id="dashboardClassNumSelect" aria-label="반"></select>{" "}
+          </div>{" "}
+          <button type="button" id="dashboardClassConfirmBtn" className="class-picker-confirm">확인</button>{" "}
+        </div>{" "}
+      </div>{" "}
+      <div id="dashboardToastHostModal" className="dashboard-toast-host" aria-live="assertive"></div>{" "}
+    </dialog>{" "}
+
+     COMMENT3{" "} 
+    <dialog className="ai-modal" id="teacherApprovalModal">{" "}
+      <button className="close-btn" type="button" aria-label="닫기" data-close-teacher-approval-modal="">×</button>{" "}
+      <div className="modal-body">{" "}
+        <h2>우리 반 학생 관리</h2>{" "}
+        <p id="teacherApprovalStatus" className="save-state" role="status" aria-live="polite"></p>{" "}
+        <ul id="teacherApprovalList" className="classroom-skill-list"></ul>{" "}
+      </div>{" "}
+    </dialog>{" "}
+
+     COMMENT4{" "} 
+    <dialog className="ai-modal school-setup-modal" id="teacherCodeModal">{" "}
+      <button className="close-btn" type="button" aria-label="닫기" data-close-teacher-code-modal="">×</button>{" "}
+      <div className="modal-body">{" "}
+        <h2>선생님 인증코드를 입력해주세요.</h2>{" "}
+        <input type="text" inputMode="numeric" id="teacherCodeModalGradeInput" className="class-picker-text-input" placeholder="담임 학년" autoComplete="off" />{" "}
+        <input type="text" inputMode="numeric" id="teacherCodeModalClassInput" className="class-picker-text-input" placeholder="담임 반" autoComplete="off" />{" "}
+        <input type="text" id="teacherCodeModalInput" className="class-picker-text-input" placeholder="학교에서 안내받은 인증코드" autoComplete="off" />{" "}
+        <button type="button" id="teacherCodeModalConfirmBtn" className="class-picker-confirm">확인</button>{" "}
+        <p id="teacherCodeModalStatus" className="save-state" role="status" aria-live="polite"></p>{" "}
+      </div>{" "}
+    </dialog>{" "}
+
+    <dialog className="ai-modal school-setup-modal" id="classCsvExportModal">{" "}
+      <button className="close-btn" type="button" aria-label="닫기" data-close-class-csv-modal="">×</button>{" "}
+      <div className="modal-body">{" "}
+        <h2>내보낼 학년·반을 골라주세요.</h2>{" "}
+        <div className="class-picker-selects">{" "}
+          <select id="classCsvGradeSelect" aria-label="학년"></select>{" "}
+          <select id="classCsvClassNumSelect" aria-label="반"></select>{" "}
+        </div>{" "}
+        <button type="button" id="classCsvExportConfirmBtn" className="class-picker-confirm">CSV로 내보내기</button>{" "}
+        <p id="classCsvExportStatus" className="save-state" role="status" aria-live="polite"></p>{" "}
+      </div>{" "}
+    </dialog>{" "}
+
+     COMMENT5{" "} 
+    <div id="dashboardToastHost" className="dashboard-toast-host" aria-live="assertive"></div>
+    </>
+  );
 }

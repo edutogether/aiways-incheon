@@ -33,7 +33,8 @@ const RENAME = {
 
 // 리액트 타입이 number로 받는 속성. **DOM에 남는 값은 같다** — 문자열로 두면
 // 타입 검사에서만 막히고 화면은 똑같다. 숫자로 내서 통과시킨다.
-const NUMERIC = new Set(["maxlength", "minlength", "size", "cols", "rows", "span", "start"]);
+// tabindex는 음수(-1)도 쓰므로 부호를 허용한다.
+const NUMERIC = new Set(["maxlength", "minlength", "size", "cols", "rows", "span", "start", "tabindex"]);
 
 // 값이 없으면 참인 속성.
 const BOOLEAN = new Set(["hidden", "disabled", "checked", "selected", "required", "readonly", "autofocus", "multiple", "novalidate", "open"]);
@@ -77,7 +78,7 @@ function convertTag(tag) {
       attrs.push(BOOLEAN.has(lower) ? key + "={true}" : key + '=""');
     } else if (lower === "style") {
       attrs.push("style=" + styleToObject(value));
-    } else if (NUMERIC.has(lower) && /^\d+$/.test(value)) {
+    } else if (NUMERIC.has(lower) && /^-?\d+$/.test(value)) {
       attrs.push(key + "={" + value + "}");
     } else if (/[{}]/.test(value)) {
       // 값 안의 중괄호를 JSX가 표현식으로 읽지 않게 문자열로 넘긴다.

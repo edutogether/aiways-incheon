@@ -36,7 +36,10 @@ function builtHtml() {
   if (!existsSync(path)) {
     throw new Error(`${path}이 없습니다 - 먼저 \`npm run build:pc\`를 돌리세요. 없는 것을 건너뛰면 이 검사가 아무것도 뜻하지 않게 됩니다.`);
   }
-  return readFileSync(path, "utf8");
+  // 🔴 주석을 먼저 걷어낸다. 주석 안에 `<script src=` 같은 글자가 설명으로
+  // 들어 있으면 그것을 진짜 태그로 세어 **엉뚱한 자리에서 실패**한다
+  // (실제로 그렇게 한 번 빨간불이 났다).
+  return readFileSync(path, "utf8").replace(/<!--[\s\S]*?-->/g, "");
 }
 
 test("손으로 쓴 스타일시트를 다시 만들지 않고 바이트 그대로 내보낸다", () => {

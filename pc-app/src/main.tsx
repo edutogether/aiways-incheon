@@ -1,21 +1,22 @@
-// PC 화면 리액트 전환의 진입점 (S1).
+// PC 화면 리액트 전환의 진입점.
 //
-// 🔴 지금은 **아무것도 그리지 않는다.** S1의 목표는 "토대가 서고 기존
-// 라이브는 그대로"이지, 화면을 만드는 것이 아니다. 마크업은 S2에서
-// 원본 index.html을 옮기며 채운다.
+// 🔴 리액트를 **id 없는 래퍼**에 붙이고 그 래퍼를 `display: contents`로 둔다.
 //
-// 붙는 자리를 #pcRoot로 따로 둔 이유: 원본에는 app.js가 붙잡는 id가
-// 200개 가까이 있고, 그 이름들을 S2에서 **그대로** 가져와야 한다.
-// 지금 임의로 겹치는 id를 만들어 두면 나중에 무엇이 원본 것이고
-// 무엇이 내가 만든 것인지 구분이 안 된다.
+// 원본은 header·main·dialog들이 전부 <body>의 직계 자식이다. 리액트를 붙이려면
+// 그릇이 하나 필요한데, 그 그릇이 레이아웃에 끼면 body의 자식 구성이 달라진다.
+// `display: contents`는 그 상자를 레이아웃에서 빼서 **자식들이 body의 자식처럼**
+// 배치되게 한다(이 저장소 CSS에 `body >` 선택자가 없는 것을 확인했다).
+//
+// id를 안 붙이는 이유: 기준선이 `[id]`를 전부 모아 비교하므로, 원본에 없는
+// id가 하나라도 생기면 **그 대조가 영원히 빨간불**이 된다. 원본에 없는 것을
+// 만들지 않는 것이 이 전환의 규칙이다.
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
 
-const container = document.getElementById("pcRoot");
-// 조용히 아무 일도 안 하는 대신 큰 소리로 실패한다 - 붙을 자리가 없으면
-// 화면이 통째로 안 뜨는 것이고, 그건 알아야 할 사고다.
-if (!container) throw new Error("#pcRoot를 찾지 못했습니다 - 리액트가 붙을 자리가 없습니다.");
+const container = document.createElement("div");
+container.style.display = "contents";
+document.body.append(container);
 
 createRoot(container).render(
   <StrictMode>

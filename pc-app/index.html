@@ -1,14 +1,83 @@
 <!doctype html>
 <html lang="ko">
   <head>
-    <meta charset="utf-8" />
-    <!-- S1(토대) 단계의 셸이다. 실제 화면 마크업은 S2에서 원본
-         index.html을 TSX로 옮기면서 채운다. 지금은 리액트가 붙는
-         자리와 스크립트 순서만 맞춰 둔다. -->
+    <!-- 🔴 이 <head>는 원본 index.html의 것을 그대로 옮긴 것이다. 스타일시트와
+         고전 스크립트 <script src=> 태그만 뺐다 - 그 둘은 빌드(vite.config.ts)가
+         공유 스크립트 뒤 순서로 다시 넣는다. 여기 두면 두 번 들어간다.
+         부트 스플래시와 그 인라인 스크립트도 원본 그대로다 - **리액트보다 먼저**
+         그려져야 브랜드 화면이 첫 프레임부터 보인다(원본의 동작). -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI Ways Incheon</title>
+    <meta
+      name="description"
+      content="AI와 데이터로 실천하는 학교 자원순환 UX 개선 프로젝트"
+    />
+    <!-- 카카오톡 등 메신저 링크 미리보기는 이 og: 태그를 읽는다 - 이게
+         없으면 "여기를 눌러 링크를 확인하세요" 같은 기본 문구만 뜬다
+         (사용자 지적). description은 위 name="description"과 같은 문구로
+         맞춘다. -->
+    <meta property="og:title" content="AI Ways Incheon | 버리는 순간을 바꾸는 학교 자원순환" />
+    <meta property="og:description" content="AI와 데이터로 실천하는 자원순환 UX 개선 프로젝트" />
+    <!-- 공유 카드 이미지는 **이 도메인에서 서빙한다.** 포털 주소를 가리키면
+         포털이 죽을 때 6개 앱의 카드가 같이 죽는다. 원본은 포털이 만들고
+         (portal/public/assets/og/incheon.jpg) 여기로 복사해 둔 것이라,
+         포털의 감시 검사가 sha256으로 대조한다 - 다시 인코딩하거나 webp로
+         바꾸면 계속 불일치로 잡힌다. **카카오톡은 webp를 썸네일로 못 쓴다.** -->
+    <meta property="og:image" content="https://incheon.edutogether.kr/assets/og/incheon.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content="https://incheon.edutogether.kr/" />
+    <meta property="og:type" content="website" />
+    <!-- CSP는 2026-09-01 Firebase Hosting 이전과 함께 firebase.json의
+         hosting.headers로 옮겼다(Codyssey 패턴) - meta 태그와 서버 헤더가
+         동시에 있으면 둘 다 만족해야 해서 중복/충돌 우려가 있어 meta는
+         제거했다. 로컬 정적 서버로만 열면(firebase.json 헤더가 안 붙는
+         환경) CSP 보호 없이 뜨니, 로컬 검증은 `firebase emulators:start
+         --only hosting`으로 헤더까지 재현해서 확인할 것. -->
+    <link rel="icon" type="image/png" href="./assets/brand/aiways-logo.png" />
   </head>
   <body>
-    <div id="pcRoot"></div>
+    <!-- 부트 스플래시. 스타일을 인라인으로 적는 이유: 외부 스타일시트가 도착해
+         화면이 처음 그려지는 그 순간, 이미 완성된 브랜드 화면이 보이게 하려는
+         것이다. 배경은 앱과 같은 #020611이라 앱으로 넘어갈 때 색이 튀지 않는다.
+         app.js가 첫 화면 배치를 마치면 페이드아웃한다. -->
+    <div id="bootSplash" style="position:fixed;inset:0;z-index:9999;display:grid;place-items:center;align-content:center;gap:26px;background:radial-gradient(circle at 72% 16%, rgba(86,141,255,.16), transparent 34vw), radial-gradient(circle at 14% 78%, rgba(80,255,207,.10), transparent 30vw), #020611;transition:opacity .45s ease">
+      <span style="display:grid;place-items:center;width:88px;height:88px;padding:10px;border-radius:26px;background:linear-gradient(155deg,#fff 12%,#eef8ff 56%,#d9edf7 100%);box-shadow:0 2px 10px rgba(0,0,0,.22), inset 0 1px rgba(255,255,255,.9), 0 0 34px rgba(94,247,205,.22)">
+        <img src="./assets/brand/aiways-logo.png" alt="" width="68" height="68" style="width:100%;height:100%;object-fit:contain" />
+      </span>
+      <span style="display:grid;justify-items:center;gap:10px;text-align:center">
+        <span style="color:#5ef7cd;font-size:15px;font-weight:800;letter-spacing:.46em;padding-left:.46em">AI WAYS INCHEON</span>
+        <span style="color:#f6fbff;font-size:26px;font-weight:850;letter-spacing:-.02em">버리는 순간, 데이터가 되다</span>
+      </span>
+      <span style="display:block;width:190px;height:3px;border-radius:99px;background:rgba(94,247,205,.20);overflow:hidden">
+        <span style="display:block;width:40%;height:100%;border-radius:99px;background:linear-gradient(90deg,#5ef7cd,#64eaff);animation:aiways-boot-bar 1.15s ease-in-out infinite"></span>
+      </span>
+      <style>@keyframes aiways-boot-bar{0%{margin-left:-40%}100%{margin-left:100%}}</style>
+    </div>
+    <!-- 2026-09-01 종합감사(B그룹 7번): firebase.json의 CSP script-src가
+         이 인라인 스크립트만 sha256 해시로 허용한다('unsafe-inline' 제거) -
+         아래 스크립트 태그 안쪽 내용을 한 글자라도 바꾸면 그 해시가 안 맞아
+         브라우저가 조용히 실행을 막는다(부팅 스플래시가 5초 타임아웃으로
+         자동 숨겨지긴 하지만). 내용을 바꿀 땐 반드시 새 해시를 계산해서
+         firebase.json도 같이 갱신할 것(Node crypto로 이 태그 안쪽 텍스트를
+         그대로 sha256 후 base64 인코딩). -->
+    <script>
+      (function () {
+        var el = document.getElementById("bootSplash");
+        var done = false;
+        function hide() {
+          if (done) return;
+          done = true;
+          el.style.opacity = "0";
+          el.style.pointerEvents = "none";
+          window.setTimeout(function () { el.style.display = "none"; }, 470);
+        }
+        window.__aiwaysHideBootSplash = hide;
+        // Never let a failed boot leave the page trapped behind the splash.
+        window.setTimeout(hide, 5000);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

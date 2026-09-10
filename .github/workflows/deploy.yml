@@ -254,6 +254,51 @@ jobs:
       - name: Build
         run: npm run build
 
+  # 2026-09-10 추가: PC의 React+TypeScript 전환(pc-app/) 게이트. 위 frontend
+  # job과 같은 이유이고 같은 모양이다 - pc-app/도 자기 package.json으로 도는
+  # 별도 프로젝트라, 여기 걸어두지 않으면 어느 게이트에도 안 걸린다.
+  #
+  # 🔴 S3의 이식 정합성 테스트가 바로 그 상태였다. app.js에서 원본 함수를
+  # 떼어 와 값을 대조하는 157개 검사를 만들어 놓고도 **CI에서는 한 번도 돌지
+  # 않아**, 옮기다 틀린 것이 다른 사람 손에서는 안 잡혔을 것이다. 안 도는
+  # 검사는 검사가 아니다(§21).
+  #
+  # deploy-hosting의 needs에 아직 넣지 않은 것은 frontend와 같은 이유다 -
+  # 전환 산출물(pc-next/)은 S5 전까지 배포에 포함되지 않으므로, 지금 묶으면
+  # 배포와 상관없는 것이 배포를 막는다. S5에서 넣는다.
+  pc-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pc-app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: pc-app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      # 이식 정합성 테스트가 여기 걸린다 - 원본 app.js를 실제로 실행해서
+      # 옮긴 모듈과 값을 대조하므로, 전사 오류를 여기서 잡는다.
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
   # 2026-08-29 추가: functions/firestore.rules/firestore.indexes.json은
   # 지금까지 자동배포가 전혀 없었다 - 개발자가 로컬에서 매번 수동으로
   # `firebase deploy --only functions:<name>`을 쳐야만 실제로 반영됐다

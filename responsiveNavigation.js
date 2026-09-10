@@ -1,6 +1,14 @@
 "use strict";
 
+// 🔴 이 파일도 `app.js`와 같은 문제를 갖는다 — **실행되는 순간 DOM을 잡는다.**
+// 리액트 전환본에서는 그때 화면이 아직 없어서 아래 `if (!header || !nav) return`에
+// 걸려 **조용히 아무것도 안 한다.** 그러면 반응형 메뉴 버튼이 아예 안 생긴다
+// (2026-09-10 기준선 대조에서 `responsive-main-nav`가 빠진 것으로 드러났다).
+//
+// 그래서 `app.js`와 같은 방식으로 진입점을 내놓고, 깃발이 서 있으면 자동 실행을
+// 건너뛴다. 리액트가 마운트 뒤 **원본과 같은 순서로** 부른다.
 (() => {
+  function init() {
   const header = document.querySelector(".site-header");
   const nav = document.querySelector(".main-nav");
   if (!header || !nav) return;
@@ -53,4 +61,8 @@
   });
   window.addEventListener("aiways:mobile-shell-state", event => setMobileShellState(event.detail));
   syncMobileShell();
+  }
+
+  window.AIWaysResponsiveNav = { init };
+  if (!window.__AIWAYS_PC_REACT_BOOT) init();
 })();

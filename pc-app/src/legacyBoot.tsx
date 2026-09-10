@@ -12,9 +12,21 @@ import { useEffect } from "react";
 declare global {
   interface Window {
     AIWaysPcDashboard?: { boot?: () => void };
+    AIWaysResponsiveNav?: { init?: () => void };
+    AIWaysDeviceTier?: { init?: () => void };
     __AIWAYS_PC_REACT_BOOT?: boolean;
   }
 }
+
+// 🔴 **원본 `index.html`의 <script> 순서와 같아야 한다.** 셋 다 실행되는 순간
+// DOM을 잡는 코드라 전환본에서는 리액트가 그린 뒤 불러야 하는데, 부르는 순서가
+// 원본과 다르면 서로 만든 것을 못 보게 된다.
+// 원본 순서: deviceTier(1) … responsiveNavigation(6) … app.js(10).
+const ENTRIES: { 이름: string; 부르기: () => (() => void) | undefined }[] = [
+  { 이름: "deviceTier", 부르기: () => window.AIWaysDeviceTier?.init },
+  { 이름: "responsiveNavigation", 부르기: () => window.AIWaysResponsiveNav?.init },
+  { 이름: "app.js", 부르기: () => window.AIWaysPcDashboard?.boot }
+];
 
 // StrictMode는 개발 중에 effect를 두 번 부른다. `boot()`은 리스너를 붙이므로
 // 두 번 돌면 핸들러가 겹친다 — 모듈 수준 깃발로 한 번만 돌게 막는다.
@@ -23,15 +35,18 @@ let booted = false;
 export function LegacyBoot(): null {
   useEffect(() => {
     if (booted) return;
-    const boot = window.AIWaysPcDashboard?.boot;
-    if (typeof boot !== "function") {
-      // 🔴 조용히 넘어가지 않는다. 여기서 못 부르면 화면이 **빈 채로** 뜨는데,
-      // 그건 "아무 일도 안 일어난 것"처럼 보여서 원인을 찾는 데 오래 걸린다.
-      console.error("[aiways] app.js의 진입점(window.AIWaysPcDashboard.boot)을 찾지 못했습니다 - 고전 스크립트가 실리지 않았거나 순서가 어긋났습니다.");
-      return;
-    }
     booted = true;
-    boot();
+    for (const { 이름, 부르기 } of ENTRIES) {
+      const 진입점 = 부르기();
+      if (typeof 진입점 !== "function") {
+        // 🔴 조용히 넘어가지 않는다. 여기서 못 부르면 그 기능만 **소리 없이**
+        // 죽는데, 그건 "아무 일도 안 일어난 것"처럼 보여 원인 찾기가 오래 걸린다.
+        // 실제로 오늘 responsiveNavigation과 deviceTier가 그 상태였다.
+        console.error(`[aiways] ${이름}의 진입점을 찾지 못했습니다 - 고전 스크립트가 실리지 않았거나 순서가 어긋났습니다.`);
+        continue;
+      }
+      진입점();
+    }
   }, []);
   return null;
 }

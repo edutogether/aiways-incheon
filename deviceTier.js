@@ -4,7 +4,13 @@
 // 그 폭을 벗어나면 다시 내려서 백그라운드에서 계속 도는 걸 막는다. 창을
 // 늘렸다 줄였다 해도 즉시 반영되도록 resize마다 재평가한다(CSS는 순수 CSS
 // 미디어쿼리로 이미 레이아웃을 처리하므로, 여기서는 iframe의 src만 관리).
+// 🔴 이 파일도 실행되는 순간 DOM을 잡는다. 리액트 전환본에서는 그때 화면이
+// 아직 없어 아래 `if (!frame) return`에 걸려 **조용히 아무것도 안 한다** — 그러면
+// 폰으로 들어온 학생이 학생 앱으로 안 넘어가고 PC 대시보드를 받는다.
+// 🔴 기준선으로는 이것을 못 잡는다. 재는 네 폭이 전부 짧은 변 600 이상이라
+// 어느 폭에서도 이 코드가 화면을 바꾸지 않기 때문이다. 그래서 따로 검사한다.
 (() => {
+  function init() {
   const frame = document.getElementById("phoneShellFrame");
   if (!frame) return;
 
@@ -51,4 +57,8 @@
   });
 
   applyTier();
+  }
+
+  window.AIWaysDeviceTier = { init };
+  if (!window.__AIWAYS_PC_REACT_BOOT) init();
 })();

@@ -254,6 +254,17 @@ jobs:
       - name: Build
         run: npm run build
 
+      # 2026-09-11 추가: CSP는 인라인 스크립트를 **바이트 sha256**으로 허용하는데,
+      # 어긋나면 브라우저가 **조용히** 막는다 - 서버는 200을 주고 CI도 초록이라
+      # 아무 신호가 없다. `miniapp/3second.html`이 실제로 그렇게 2026-09-01부터
+      # 열흘 동안 죽어 있었고 아무도 못 봤다(누르면 아무 일도 안 났다).
+      #
+      # 🔴 이 job은 `deploy-hosting`의 needs에 있으므로 **여기서 막으면 어긋난
+      # 바이트가 라이브로 나가지 않는다.** 그게 이 단계를 하필 이 job에 둔 이유다.
+      - name: CSP inline hashes match what actually ships
+        working-directory: .
+        run: node scripts/checkMiniappCsp.js
+
   # 2026-09-10 추가: PC의 React+TypeScript 전환(pc-app/) 게이트. 위 frontend
   # job과 같은 이유이고 같은 모양이다 - pc-app/도 자기 package.json으로 도는
   # 별도 프로젝트라, 여기 걸어두지 않으면 어느 게이트에도 안 걸린다.

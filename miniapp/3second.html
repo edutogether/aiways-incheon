@@ -7,7 +7,6 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap');
         body {
             font-family: 'Pretendard', sans-serif;
             background-color: #f1f5f9;
@@ -49,16 +48,16 @@
         
         <!-- 탭 메뉴 (4가지 탭으로 반응형 확장) -->
         <nav class="grid grid-cols-4 gap-1 bg-slate-100 p-1.5 rounded-2xl text-[11px] sm:text-xs font-bold">
-            <button onclick="switchTab('tab-judge')" id="btn-tab-judge" class="text-center py-2.5 rounded-xl transition-all duration-300 bg-white text-slate-900 shadow-sm">
+            <button data-act="switchTab" data-tab="tab-judge" id="btn-tab-judge" class="text-center py-2.5 rounded-xl transition-all duration-300 bg-white text-slate-900 shadow-sm">
                 🔍 판단
             </button>
-            <button onclick="switchTab('tab-quiz')" id="btn-tab-quiz" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">
+            <button data-act="switchTab" data-tab="tab-quiz" id="btn-tab-quiz" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">
                 🎮 퀴즈
             </button>
-            <button onclick="switchTab('tab-stats')" id="btn-tab-stats" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">
+            <button data-act="switchTab" data-tab="tab-stats" id="btn-tab-stats" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">
                 🌱 통계
             </button>
-            <button onclick="switchTab('tab-hold')" id="btn-tab-hold" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">
+            <button data-act="switchTab" data-tab="tab-hold" id="btn-tab-hold" class="text-center py-2.5 rounded-xl transition-all duration-300 text-slate-500 hover:text-slate-800">
                 🟨 보류함
             </button>
         </nav>
@@ -71,9 +70,9 @@
                     🎯 무엇을 버리시나요?
                 </label>
                 <div class="relative">
-                    <input type="text" id="searchInput" onkeyup="handleSearch(event)" placeholder="예: 영수증, 볼펜, 컵라면, 캔, 생수병..." 
+                    <input type="text" id="searchInput" placeholder="예: 영수증, 볼펜, 컵라면, 캔, 생수병..." 
                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 pl-4 pr-12 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-300" />
-                    <button onclick="triggerSearch()" class="absolute right-3.5 top-3.5 text-slate-400 hover:text-blue-600 transition-colors">
+                    <button data-act="triggerSearch" class="absolute right-3.5 top-3.5 text-slate-400 hover:text-blue-600 transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </button>
                 </div>
@@ -85,31 +84,31 @@
             <div>
                 <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">자주 찾는 학교 쓰레기 (3초 클릭)</span>
                 <div class="grid grid-cols-2 gap-2.5">
-                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" onclick="checkTrash('🥛 우유갑')">
+                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" data-act="checkTrash" data-item="🥛 우유갑">
                         <span class="text-2xl">🥛</span>
                         <span class="text-xs font-bold text-slate-700">우유갑</span>
                     </button>
-                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" onclick="checkTrash('📄 종이류')">
+                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" data-act="checkTrash" data-item="📄 종이류">
                         <span class="text-2xl">📄</span>
                         <span class="text-xs font-bold text-slate-700">종이류</span>
                     </button>
-                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" onclick="checkTrash('🥤 플라스틱 컵')">
+                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" data-act="checkTrash" data-item="🥤 플라스틱 컵">
                         <span class="text-2xl">🥤</span>
                         <span class="text-xs font-bold text-slate-700">플라스틱 컵</span>
                     </button>
-                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" onclick="checkTrash('🍜 컵라면 용기')">
+                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" data-act="checkTrash" data-item="🍜 컵라면 용기">
                         <span class="text-2xl">🍜</span>
                         <span class="text-xs font-bold text-slate-700">컵라면 용기</span>
                     </button>
-                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" onclick="checkTrash('🍿 과자 봉지')">
+                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" data-act="checkTrash" data-item="🍿 과자 봉지">
                         <span class="text-2xl">🍿</span>
                         <span class="text-xs font-bold text-slate-700">과자 봉지</span>
                     </button>
-                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" onclick="checkTrash('🥫 캔류')">
+                    <button class="flex flex-col items-center gap-1.5 p-3 bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 rounded-2xl transition-all duration-200 active:scale-95" data-act="checkTrash" data-item="🥫 캔류">
                         <span class="text-2xl">🥫</span>
                         <span class="text-xs font-bold text-slate-700">캔류</span>
                     </button>
-                    <button class="col-span-2 flex items-center justify-center gap-2.5 p-3 bg-amber-50 hover:bg-amber-100/50 border border-amber-100 hover:border-amber-300 rounded-2xl transition-all duration-200 text-amber-800 active:scale-95" onclick="checkTrash('🤔 판단 보류 물건')">
+                    <button class="col-span-2 flex items-center justify-center gap-2.5 p-3 bg-amber-50 hover:bg-amber-100/50 border border-amber-100 hover:border-amber-300 rounded-2xl transition-all duration-200 text-amber-800 active:scale-95" data-act="checkTrash" data-item="🤔 판단 보류 물건">
                         <span class="text-xl">🟨</span>
                         <span class="text-xs font-bold">잘 모르겠어요 (판단 보류함 기록)</span>
                     </button>
@@ -156,7 +155,7 @@
                         </p>
                         <div class="flex gap-2">
                             <input type="text" id="holdItemName" placeholder="예: 스프링 공책, 부러진 자" class="flex-1 bg-white border border-amber-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500" />
-                            <button onclick="registerHoldItem()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shrink-0">보류함 기록</button>
+                            <button data-act="registerHoldItem" class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shrink-0">보류함 기록</button>
                         </div>
                     </div>
 
@@ -199,8 +198,8 @@
 
                 <!-- O/X 선택 버튼 -->
                 <div class="grid grid-cols-2 gap-4" id="quiz-buttons">
-                    <button onclick="submitQuizAnswer(true)" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 rounded-2xl shadow-md transition-all active:scale-[0.97] text-xl">O</button>
-                    <button onclick="submitQuizAnswer(false)" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3.5 rounded-2xl shadow-md transition-all active:scale-[0.97] text-xl">X</button>
+                    <button data-act="submitQuizAnswer" data-answer="true" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 rounded-2xl shadow-md transition-all active:scale-[0.97] text-xl">O</button>
+                    <button data-act="submitQuizAnswer" data-answer="false" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3.5 rounded-2xl shadow-md transition-all active:scale-[0.97] text-xl">X</button>
                 </div>
 
                 <!-- 정답 풀이 패널 -->
@@ -212,7 +211,7 @@
                             <p id="explanation-desc" class="text-[11px] leading-relaxed mt-0.5 text-slate-600"></p>
                         </div>
                     </div>
-                    <button onclick="nextQuiz()" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-3 rounded-xl transition-all">다음 문제 풀기 ➔</button>
+                    <button data-act="nextQuiz" class="w-full bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-3 rounded-xl transition-all">다음 문제 풀기 ➔</button>
                 </div>
             </div>
 
@@ -227,7 +226,7 @@
                     <p>• 빨간 국물이 씻기지 않는 컵라면 스티로폼 용기는 일반쓰레기입니다.</p>
                     <p>• 택배 상자는 플라스틱 테이프와 운송장 비닐 스티커를 깨끗하게 제거해야 종이류로 재활용할 수 있습니다.</p>
                 </div>
-                <button onclick="startQuiz()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-3 rounded-xl transition-all">다시 도전하기 🔄</button>
+                <button data-act="startQuiz" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-3 rounded-xl transition-all">다시 도전하기 🔄</button>
             </div>
         </div>
 
@@ -257,7 +256,7 @@
             <div class="space-y-2">
                 <div class="flex justify-between items-center">
                     <span class="text-xs font-bold text-slate-400">오늘의 실천 타임라인</span>
-                    <button onclick="promptResetStats()" class="text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors">기록 초기화 🗑️</button>
+                    <button data-act="promptResetStats" class="text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors">기록 초기화 🗑️</button>
                 </div>
                 <div id="practice-logs-container" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
                     <!-- 로그가 없을 때의 기본 상태 -->
@@ -284,7 +283,7 @@
                 <div class="flex gap-2">
                     <input type="text" id="directHoldInput" placeholder="예: 코팅 박막 책 표지, 실리콘 케이스" 
                            class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all" />
-                    <button onclick="addHoldItemDirect()" class="bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs px-4 py-2 rounded-xl transition-all shadow-sm shrink-0">
+                    <button data-act="addHoldItemDirect" class="bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs px-4 py-2 rounded-xl transition-all shadow-sm shrink-0">
                         등록
                     </button>
                 </div>
@@ -294,7 +293,7 @@
             <div class="space-y-2">
                 <div class="flex justify-between items-center">
                     <span class="text-xs font-bold text-slate-400">보류 및 유예 처리 물건 (<span id="hold-count-badge">0</span>개)</span>
-                    <button onclick="promptResetHold()" class="text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors">목록 비우기 🗑️</button>
+                    <button data-act="promptResetHold" class="text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors">목록 비우기 🗑️</button>
                 </div>
                 <div id="hold-list-container" class="space-y-2 max-h-52 overflow-y-auto custom-scrollbar">
                     <!-- 기본 비어있음 상태 -->
@@ -1084,6 +1083,41 @@
                 document.getElementById('quiz-result-score-text').innerText = `${quizData.length}문제 중 최종 점수: ${userQuizScore}점 달성!`;
             }
         }
+
+        // 2026-09-11: 인라인 onclick/onkeyup 21개를 전부 여기로 옮겼다.
+        //
+        // 🔴 CSP는 인라인 <script> 블록은 sha256 해시로 허용하지만 **onclick= 같은
+        // 이벤트 핸들러 속성은 별개로 막는다** - 통과시키려면 'unsafe-inline'이나
+        // 'unsafe-hashes'가 있어야 한다. 2026-09-11에 해시만 넣고 확인했더니
+        // **스크립트는 도는데 버튼이 하나도 안 먹었다.** 여기로 옮기면 그 둘이
+        // 하나도 필요 없다.
+        //
+        // 🔴 핸들러마다 해시를 박는 방법('unsafe-hashes')은 일부러 쓰지 않았다 -
+        // 품목 문구가 한 글자만 바뀌어도 그 버튼이 **조용히** 죽기 때문이다.
+        // 품목은 앞으로도 늘어난다.
+        const MINIAPP_ACTIONS = {
+            switchTab: (el) => switchTab(el.dataset.tab),
+            checkTrash: (el) => checkTrash(el.dataset.item),
+            submitQuizAnswer: (el) => submitQuizAnswer(el.dataset.answer === "true"),
+            triggerSearch: () => triggerSearch(),
+            registerHoldItem: () => registerHoldItem(),
+            nextQuiz: () => nextQuiz(),
+            startQuiz: () => startQuiz(),
+            promptResetStats: () => promptResetStats(),
+            addHoldItemDirect: () => addHoldItemDirect(),
+            promptResetHold: () => promptResetHold(),
+        };
+
+        document.querySelectorAll("[data-act]").forEach((el) => {
+            const run = MINIAPP_ACTIONS[el.dataset.act];
+            // 🔴 이름이 목록에 없으면 조용히 넘기지 않고 알린다 - 오타 하나로
+            // 버튼이 죽어도 아무 신호가 없는 것이 이 파일이 열흘간 겪은 일이다.
+            if (!run) { console.error("[3초판단] 모르는 data-act:", el.dataset.act); return; }
+            el.addEventListener("click", () => run(el));
+        });
+
+        const searchBoxEl = document.getElementById("searchInput");
+        if (searchBoxEl) searchBoxEl.addEventListener("keyup", (event) => handleSearch(event));
     </script>
 </body>
 </html>

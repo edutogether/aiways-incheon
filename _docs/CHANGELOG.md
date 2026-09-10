@@ -10,6 +10,63 @@
 
 ---
 
+## 2026-09-11
+
+### `miniapp/3second.html`(7차시 Vibe Coding 체험)이 **열흘 동안 죽어 있던 것**을 되살렸다
+
+**2026-09-01 `2f90569`(GitHub Pages → Firebase Hosting)부터다.** 그 전까지 CSP는
+`index.html` 안의 `<meta http-equiv>`였고, **meta CSP는 그 문서에만 적용되므로
+`3second.html`에는 아무 CSP도 안 걸려 있었다.** 이전하면서 CSP를 `firebase.json`의
+`hosting.headers`(`source: "**"`)로 옮기자 **모든 문서**에 걸리게 됐고, 이 파일은
+그 CSP를 만족하도록 쓰여 있지 않았다. 인라인 스크립트와 `cdn.tailwindcss.com`이
+둘 다 막혀 **화면은 뜨는데 버튼을 눌러도 아무 일이 안 났다.** 수업 중에 학생이
+누르면 그냥 반응이 없는 상태였고, `index.html`의 "7차시 · Vibe Coding 체험하기"
+카드에서 도달 가능했다.
+
+🔴 **열흘 동안 아무도 못 본 이유: 배포가 이 파일을 검사하지 않았기 때문이다.**
+CSP 차단은 **브라우저가 조용히** 하고 서버는 200을 준다. 스모크 검사도 CI도
+초록불이었다. 그래서 이번에 되살리면서 **`scripts/checkMiniappCsp.js`**를 같이
+넣었다 — 배포 전에 *실제로 나갈 바이트*로 인라인 해시를 계산해 `firebase.json`과
+대조하고, 어긋나면 멈춘다. `deploy-hosting`이 `needs`로 잡는 `frontend` job에
+걸어 두어 **어긋난 바이트가 라이브로 나가지 않게** 했다.
+
+되살린 방법:
+
+- **전역 CSP는 넓히지 않았다.** `source: "/miniapp/**"` 항목을 따로 두어 그 경로에만
+  다른 `script-src`를 준다. 프로브 채널로 **실제 응답 헤더를 받아** 확인했다 —
+  `/index.html`은 기존 값 그대로이고, miniapp 경로에서도 X-Frame-Options·
+  Permissions-Policy·X-Content-Type-Options가 살아 있다. `script-src` 외 **9개
+  지시자가 전역과 글자 그대로 같은 것**을 프로그램으로 대조했다.
+- **인라인 이벤트 핸들러 21개를 `addEventListener`로 옮겼다.** 🔴 CSP에서 해시는
+  `<script>` 블록만 허용하고 `onclick=` 같은 **속성은 별개로 막힌다** — 해시만
+  넣었을 때 *스크립트는 도는데 버튼이 하나도 안 먹는* 상태가 실측으로 드러났다.
+  `'unsafe-hashes'`로 핸들러마다 해시를 박는 방법은 **품목 문구가 한 글자만 바뀌어도
+  그 버튼이 조용히 죽어서** 쓰지 않았다. 지금 CSP에는 `'unsafe-inline'`도
+  `'unsafe-hashes'`도 없다.
+- **죽은 웹폰트 `@import`를 지웠다.** `fonts.googleapis.com`이 `Pretendard`를
+  **제공하지 않아** 그 요청은 HTTP 400에 `text/html`을 받고 브라우저(ORB)가 막는다
+  (대조군 `Roboto`는 200 `text/css`). **처음부터 한 번도 동작한 적이 없었고** CSP와도
+  무관하다. 화면은 이미 `sans-serif`로 떨어져 있었으므로 보이는 변화는 없다.
+- `.gitattributes`에 **`miniapp/3second.html`과 `index.html`을 LF로 고정**했다.
+  CSP 해시는 바이트로 비교하는데 로컬은 CRLF, CI는 LF라 **로컬에서 직접 배포하면
+  해시가 어긋난다.** 새 검사가 실제로 그것을 즉시 잡아냈다 — `index.html`의 부트
+  스플래시가 그 상태였다(라이브는 CI가 LF라 무사했다).
+
+### 그 밖
+
+- **Hosting 프리뷰 채널 오리진을 CORS에 허용**했다. S5 전환본을 라이브와 같은
+  조건에서 확인하기 위한 것이고, 좁은 정규식으로 이 프로젝트 채널만 잡는다.
+  🔴 S5가 끝나면 정규식·테스트·`scripts/stageReviewChannel.js`를 같이 뺀다.
+- **`pc-frontend` CI job이 `a8d2f5c`(9/10)부터 계속 실패**하고 있던 것을 고쳤다.
+  PC 빌드가 gitignore된 `mobile/`을 요구하는데 그 job이 만들지 않아서였다.
+  요구사항을 없애지 않고(그 검사는 폰 폭 404 빈 프레임을 잡은 장치다) job이
+  조건을 채우게 했다. `deploy-hosting`이 이 job을 `needs`로 잡지 않아 배포는
+  계속 나갔고, 그만큼 눈에 안 띄었다.
+- **태블릿은 교실 전광판이라 내비게이션이 없는 것이 의도**임을 확정하고
+  `app.md`에 못박았다(실측 표 포함). QR도 태블릿에서 이미 첫 화면에 있다 —
+  아이패드 전 크기(12.9" 양 방향 포함)를 뷰포트 기준으로 재서 확인했다.
+  경계는 `87.4rem` = 1398.4px다.
+
 ## 2026-09-09
 
 하루에 두 가지 큰 것이 나갔다: **모바일 앱 리액트 전환(라이브 교체까지)** 과

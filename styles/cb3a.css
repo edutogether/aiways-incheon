@@ -1798,12 +1798,12 @@ html[data-tier="phone"] .phone-shell-frame {
     gap: .5rem .75rem;
   }
   .dashboard-scene .qr-invite > p {
-    flex: 1 1 8rem;
+    flex: 1 1 0;
     min-inline-size: 0;
     margin: 0;
     text-align: start;
-    font-size: .74rem;
-    line-height: 1.45;
+    font-size: .72rem;
+    line-height: 1.4;
   }
   .dashboard-scene .qr-invite img { inline-size: min(100%, 7.5rem); block-size: auto; }
 
@@ -1848,9 +1848,29 @@ html[data-tier="phone"] .phone-shell-frame {
   /* QR을 감싼 <a>가 한 줄을 통째로 차지해서 글이 아래로 접히고, 그만큼
      패널 내용이 높이를 넘겼다(실측: 패널 346px에 내용 468px). 이미지는
      제 크기만 차지하게 두고 글이 옆에 오게 한다. */
-  .dashboard-scene .qr-invite > a { flex: 0 0 5.5rem !important; inline-size: 5.5rem !important; }
-  .dashboard-scene .qr-invite img { inline-size: min(100%, 5.5rem) !important; }
+  .dashboard-scene .qr-invite > a { flex: 0 0 4.5rem !important; inline-size: 4.5rem !important; }
+  .dashboard-scene .qr-invite img { inline-size: 100% !important; block-size: auto !important; }
   .dashboard-scene .qr-invite > p { font-size: .72rem; line-height: 1.4; }
+
+  /* 2026-09-10 - 가로 태블릿(1024×768)에서 두 패널이 칸보다 내용이 커서
+     아래가 잘렸다(실측: 3초모듈 380/346, 매립지 377/346). 배치를 바꾸지 않고
+     **여백만** 줄여 넣는다 - 요소를 빼거나 자리를 옮기면 그건 다른 화면이 된다.
+     세로 태블릿은 칸이 더 커서 이 값으로도 여유가 있다. */
+  .dashboard-grid > .panel { gap: .6rem !important; padding: .85rem !important; }
+  .upload-panel .upload-highlights { gap: .4rem !important; padding: .55rem .65rem !important; }
+  .upload-panel .upload-highlights li { line-height: 1.25 !important; }
+  .landfill-panel .landfill-metrics { row-gap: .4rem !important; }
+  .landfill-panel .landfill-metrics > div { padding: .45rem .55rem !important; }
+  /* 남은 20~30px은 차트 높이와 맨 아래 문구에서 줄인다. 차트는 비율이 아니라
+     높이만 줄어들므로 꺾은선·막대 모양은 그대로다. */
+  /* 🔴 꺾은선·막대 그래프(svg.combo-chart)에 이 폭에서는 높이 상한이 없어서
+     제 원래 크기(161px)로 그려졌고, **감싼 칸(76px) 위아래로 삐져나와** 위쪽
+     숫자 카드(68.3% / 32.7%)를 덮고 아래로는 패널 밖까지 나갔다. PC에는
+     max-block-size 상한이 있는데(64rem 블록) 이 폭에는 없었다.
+     칸과 그래프 둘 다에 상한을 준다 - 그래프는 높이만 줄고 모양은 그대로다. */
+  .landfill-panel .chart-wrap { max-block-size: 7rem !important; }
+  .landfill-panel .combo-chart { max-block-size: 5rem !important; block-size: auto !important; min-block-size: 0 !important; }
+  .upload-panel > small { font-size: .7rem !important; line-height: 1.35 !important; margin-block-start: 0 !important; }
 }
 
 /* 학교 설정 모달 - 사용자가 직접 제시한 참고 이미지대로, 이 앱의 나머지

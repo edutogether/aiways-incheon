@@ -12,6 +12,14 @@ import { LAYOUT_PROPS, MOTION_PROPS } from "./harness.js";
 
 export { LAYOUT_PROPS, MOTION_PROPS };
 
+// 무엇을 재는가. 기본은 지금 라이브인 루트 index.html이고, 전환본을 재려면
+// AIWAYS_PC_TARGET=pc-next 로 바꾼다 - `mobile/` 전환 때 쓴 것과 같은 방식이다.
+//
+// 🔴 **기준선 파일은 그대로 두고 대상만 바꾼다.** 전환본을 재면서 스냅샷을
+// 다시 찍으면 비교 대상이 자기가 만든 것이 되어 검사가 아니게 된다(§21-7).
+const TARGET = process.env.AIWAYS_PC_TARGET || "";
+export const PAGE = TARGET ? `/${TARGET}/index.html` : "/index.html";
+
 // 시각이 화면에 그대로 찍히므로 고정한다. harness.js와 같은 값을 쓴다.
 const FROZEN_TIME = new Date("2026-09-01T09:00:00+09:00");
 const WARMUP_MS = 2000;
@@ -99,7 +107,7 @@ export async function openDashboard(page) {
     };
     window.__aiwaysBaselineResetRandom = () => { seed = START; };
   });
-  await page.goto("/index.html");
+  await page.goto(PAGE);
   // 대시보드 그리드가 실제로 자리를 잡을 때까지 기다린다. 존재 여부가 아니라
   // **폭이 잡혔는지**를 본다 - 부모가 display:none이면 요소는 있어도 0이다.
   await page.waitForFunction(() => {

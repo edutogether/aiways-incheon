@@ -319,6 +319,9 @@ package.json이 셋이다 — `functions/`(백엔드·테스트), 루트(Playwri
   앞에 오면 리액트가 `window.AIWays*`보다 먼저 돌아 저장·로그인이 "가끔" 안
   되는 형태로 깨진다 — 화면 스냅샷으로는 안 잡힌다. `pcShell.spec.js`가 순서를
   검사한다(되돌림 확인 완료)
+- **전환본을 재려면 `AIWAYS_PC_TARGET=pc-next npx playwright test tests/baseline/pcBaseline.spec.js`.**
+  🔴 기준선 파일은 그대로 두고 **대상만** 바꾼다 — 전환본을 재면서 스냅샷을 다시
+  찍으면 비교 대상이 자기가 만든 것이 되어 검사가 아니게 된다(§21-7)
 - **전환 전 기준선은 `tests/baseline/pcBaseline.spec.js`이고, 무엇을 담고
   무엇을 안 담는지는 `tests/baseline/PC-BASELINE.md`에 있다. 이어받는 사람은
   그 문서를 먼저 읽는다** — 특히 전환 전부터 있던 결함 셋을 그대로 재현해야

@@ -47,8 +47,23 @@ const ALLOWED_STATIC_ORIGINS = new Set([
   "https://ai-ways-incheon.web.app",
 ]);
 
+// 2026-09-11: Hosting 프리뷰 채널. **S5 전환본을 라이브와 같은 조건**(https·실제
+// 백엔드·실제 자료·Hosting 헤더)에서 Bumm님이 확인하시려고 열었다 - 로컬 정적
+// 서버로는 App Check가 통하지 않아 자료 없는 화면만 보이고, 그것을 "레이아웃이
+// 틀어졌다"로 오독하는 일이 실제로 있었다(그날 원본·프리즈·전환본 셋이 다
+// 비슷해 보였던 것은 셋 다 자료가 없는 같은 상태였기 때문이다).
+//
+// 🔴 **빼는 시점: S5 확인이 끝나고 채널이 만료되면 이 줄과 테스트를 같이 뺀다**
+// (채널 `pc-s5-review`는 2026-09-18 만료).
+//
+// 🔴 좁게 잡는다. 채널 주소는 `ai-ways-incheon--<채널>-<해시>.web.app` 형태이고
+// 이 형태는 **이 프로젝트에서만** 발급된다. `--`를 반드시 포함시키는 것이 핵심이라
+// `evil--pc.web.app`처럼 프로젝트 이름이 다른 것은 걸리지 않는다. 끝을 `$`로 막아
+// `...web.app.evil.com` 같은 접미사 공격도 막는다.
+const PREVIEW_CHANNEL_ORIGIN = /^https:\/\/ai-ways-incheon--[a-z0-9-]+\.web\.app$/;
+
 function isAllowedOrigin(origin) {
-  return ALLOWED_STATIC_ORIGINS.has(origin) || ALLOWED_ORIGIN.test(origin);
+  return ALLOWED_STATIC_ORIGINS.has(origin) || ALLOWED_ORIGIN.test(origin) || PREVIEW_CHANNEL_ORIGIN.test(origin);
 }
 
 function applyCors(req, res) {

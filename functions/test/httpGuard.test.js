@@ -40,6 +40,37 @@ test("isAllowedOrigin accepts the production origins and localhost dev ports onl
   assert.equal(isAllowedOrigin(""), false);
 });
 
+test("isAllowedOrigin accepts this project's Hosting preview channels but nothing else shaped like one", () => {
+  // 2026-09-11: S5 전환본을 라이브와 같은 조건에서 확인하려고 연 프리뷰 채널.
+  // 🔴 S5 확인이 끝나고 채널이 만료되면 이 테스트와 lib 쪽 정규식을 같이 뺀다.
+  //
+  // **통해야 하는 것** - 실제로 발급된 주소와 같은 형태.
+  assert.equal(isAllowedOrigin("https://ai-ways-incheon--pc-s5-review-5qopjkzi.web.app"), true);
+  assert.equal(isAllowedOrigin("https://ai-ways-incheon--another-channel-ab12cd34.web.app"), true);
+
+  // **막혀야 하는 것** - 여기가 이 테스트의 존재 이유다. 정규식을 넓게 고치면
+  // 아래가 깨져서 알려준다.
+  //
+  // 프로젝트 이름이 다르다(`--`만 보고 통과시키면 이게 뚫린다).
+  assert.equal(isAllowedOrigin("https://evil--pc.web.app"), false);
+  assert.equal(isAllowedOrigin("https://evil-ai-ways-incheon--x.web.app"), false);
+  // 다른 프로젝트의 채널.
+  assert.equal(isAllowedOrigin("https://other-project--pc-s5-review.web.app"), false);
+  // 뒤에 이어붙였다(끝을 $로 막지 않으면 뚫린다).
+  assert.equal(isAllowedOrigin("https://ai-ways-incheon--pc.web.app.evil.com"), false);
+  // 앞에 붙였다.
+  assert.equal(isAllowedOrigin("https://evil.ai-ways-incheon--pc.web.app"), false);
+  // https가 아니다.
+  assert.equal(isAllowedOrigin("http://ai-ways-incheon--pc.web.app"), false);
+  // 채널 이름 자리가 비어 있다(`+`가 `*`로 바뀌면 뚫린다).
+  assert.equal(isAllowedOrigin("https://ai-ways-incheon--.web.app"), false);
+  // web.app이 아닌 다른 TLD.
+  assert.equal(isAllowedOrigin("https://ai-ways-incheon--pc.web.app.co"), false);
+  assert.equal(isAllowedOrigin("https://ai-ways-incheon--pc.firebaseapp.com"), false);
+  // 채널 이름에 점을 넣어 도메인을 하나 더 파고드는 것.
+  assert.equal(isAllowedOrigin("https://ai-ways-incheon--a.evil.web.app"), false);
+});
+
 function fakeRes() {
   const headers = {};
   return { headers, set(key, value) { headers[key] = value; } };

@@ -42,7 +42,7 @@ declare global {
     AIWaysMobileApp?: { syncTabHeights: () => void };
     // firebaseAppCheck.js가 마지막 실패 이유를 남겨둔다. 화면이 그것을
     // 사람에게 보여줄 수 있게 여기서만 타입을 붙인다.
-    AIWaysAppCheck?: { lastFailureSummary?: () => string };
+    AIWaysAppCheck?: { lastFailureSummary?: () => string; lastFailureAdvice?: () => string };
   }
 }
 

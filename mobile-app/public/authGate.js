@@ -73,15 +73,19 @@
       el("p", "text-sm font-semibold text-slate-700", "접속 확인에 실패했습니다."),
       el("p", "text-xs text-slate-500", client().errorMessageFor(code))
     );
-    // 🔴 2026-09-10: 왜 실패했는지를 **화면에** 남긴다.
+    // 🔴 2026-09-10: 왜 실패했는지를 더 이상 버리지 않는다.
     //
-    // 그동안은 실패 이유를 코드가 통째로 버려서, 사람이 "안 돼요"라고 알려와도
+    // 그동안은 실패 이유를 코드가 통째로 삼켜서, 사람이 "안 돼요"라고 알려와도
     // 기기가 24시간 잠긴 것인지, 도메인이 승인 목록에 없는 것인지, 서버가
-    // 죽은 것인지 구분할 방법이 없었다. 휴대폰에서는 콘솔을 열 수 없으니
-    // 화면에 없으면 영영 알 수 없다. 사람에게 설명하는 말이 아니라 **알려줄 때
-    // 같이 읽어줄 한 줄**이라 작게 둔다.
-    const detail = [code, window.AIWaysAppCheck?.lastFailureSummary?.()].filter(Boolean).join(" · ");
-    if (detail) box.append(el("p", "text-[10px] text-slate-400 font-mono", detail));
+    // 죽은 것인지 구분할 방법이 없었다. 실제로 그것 때문에 하루가 갔다.
+    //
+    // 화면에는 **원인 계열과 사용자가 할 수 있는 일**만 적는다 - 학생이 쓰는
+    // 앱이라 내부 코드를 보여줄 자리가 아니다. 내부 코드는 콘솔에만 한 줄
+    // 남긴다(오류 객체를 통째로 찍지 않는다 - 토큰 조각이 섞일 수 있다).
+    const advice = window.AIWaysAppCheck?.lastFailureAdvice?.();
+    if (advice) box.append(el("p", "text-[11px] text-amber-600 leading-snug", advice));
+    const detail = window.AIWaysAppCheck?.lastFailureSummary?.();
+    if (detail) console.warn("[AIWaysAppCheck] 토큰 발급 실패:", detail);
     const retryBtn = el("button", "w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm py-3 rounded-2xl transition-all active:scale-[0.98]", "다시 시도");
     retryBtn.type = "button";
     retryBtn.addEventListener("click", restore);

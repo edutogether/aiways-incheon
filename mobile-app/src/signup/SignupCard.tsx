@@ -102,13 +102,17 @@ export function SignupCard({ signup }: { signup: ReturnType<typeof useSignup> })
             {/* 🔴 검색이 실패한 것을 "그런 학교가 없다"로 말하지 않는다.
                 2026-09-10에 실제로 이 화면이 "검색 결과가 없어요"라고만 말해서,
                 보안 확인이 막힌 것인지 학교가 없는 것인지 아무도 몰랐다.
-                코드까지 작게 붙인다 - 휴대폰에서는 콘솔을 못 열기 때문에,
-                알려줄 때 같이 읽어줄 한 줄이 없으면 원인을 영영 못 찾는다. */}
+                내부 코드는 적지 않는다(학생이 쓰는 화면이다) - 대신 **사용자가
+                스스로 할 수 있는 것**을 말한다. 쓰로틀은 시크릿 창이나 시간이
+                지나면 풀리는데, 지금까지는 그 길을 알려주지 않았다. */}
             {school.error && (
               <div className="px-3 py-2 text-amber-700 bg-amber-50">
                 <span className="block font-semibold">검색하지 못했어요.</span>
-                <span className="block text-[11px] mt-0.5">{edu2gClient()?.errorMessageFor?.(school.error) ?? "잠시 후 다시 시도해 주세요."}</span>
-                <span className="block text-[10px] text-amber-600 font-mono mt-1">{[school.error, window.AIWaysAppCheck?.lastFailureSummary?.()].filter(Boolean).join(" · ")}</span>
+                <span className="block text-[11px] mt-0.5">
+                  {window.AIWaysAppCheck?.lastFailureAdvice?.()
+                    || edu2gClient()?.errorMessageFor?.(school.error)
+                    || "잠시 후 다시 시도해 주세요."}
+                </span>
               </div>
             )}
             {!school.error && school.results?.length === 0 && <div className="px-3 py-2 text-slate-400">검색 결과가 없어요.</div>}

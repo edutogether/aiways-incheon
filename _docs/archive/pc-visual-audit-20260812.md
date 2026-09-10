@@ -159,6 +159,13 @@ D의 팔레트가 현재 빌드에서 전반적으로 탁해져 있었다. 배�
 > 정리). `git tag`에는 더 이상 안 보이지만 커밋 `439e2c2`는 그대로 있다 — 위 명령은
 > `git reset --hard refs/archive/tags/pc-front-palette-d-20260812`(또는 `439e2c2`)로 읽는다.
 > 지운 것이 아니다.
+>
+> 🔴 **`refs/archive/*`는 `git clone`·`git fetch`가 기본으로 안 가져온다.** 갓 클론한 곳에서는
+> 위 ref가 "그런 것 없다"로 실패하므로, 먼저 한 번 받아야 한다:
+>
+> ```
+> git fetch origin 'refs/archive/*:refs/archive/*'
+> ```
 
 ### 7.1 스크롤 스냅 복구 + 대기 예산 축소
 

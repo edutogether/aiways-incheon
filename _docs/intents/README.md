@@ -28,7 +28,7 @@
 | 2026-09-09 | mobile-react-conversion | 2 | done | `mobile/`을 React+TS로 전환하되 화면·모션을 측정값 수준에서 동일하게 유지 |
 | 2026-09-09 | admin-class-picker | 1 | done | 관리자 화면에서 실제로 있는 학년·반만 고르게(NEIS 학급정보 기준) |
 | 2026-09-10 | pc-react-conversion | 2 | accepted | PC 대시보드를 React+TS로 — 화면은 픽셀 그대로 |
-| 2026-09-11 | tablet-section-navigation | 2 | draft | 태블릿(600~1023px)에서 대시보드 밖으로 나갈 경로가 0개인 것 — 실측 확정, 고치는 방법은 미결 |
+| 2026-09-11 | tablet-section-navigation | 2 | dropped | 태블릿에 내비가 없는 것은 **의도된 구성**(교실 전광판)임을 Bumm님이 확정 — 실측값은 맞았고 결함으로 읽은 것이 틀렸다 |
 
 ## 폴더 규칙
 

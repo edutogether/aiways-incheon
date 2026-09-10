@@ -8,16 +8,24 @@
   const frame = document.getElementById("phoneShellFrame");
   if (!frame) return;
 
-  const PHONE_MAX_WIDTH = 767; // 47.99rem 기준(16px * 47.99 ≈ 767.8)
+  // 2026-09-10(Bumm님 지시) - 학교에 보급되는 소형 태블릿이 600×960이라,
+  // 폭 767 이하를 전부 "폰"으로 보면 **그 태블릿이 대시보드 대신 학생 앱을**
+  // 받는다. 그렇다고 경계를 폭 599로만 내리면 이번엔 **폰을 가로로 눕혔을 때**
+  // (예: 667×375) 폭이 667이라 대시보드가 떠버린다.
+  //
+  // 🔴 그래서 폭이 아니라 **짧은 변**으로 가른다. 기기를 어느 방향으로 놓든
+  // 짧은 변은 그대로다 - 폰은 눕히든 세우든 430 안팎이고, 가장 작은 태블릿도
+  // 600이다. 방향이 바뀌어도 판정이 흔들리지 않는 유일한 기준이다.
+  const PHONE_MAX_SHORT_SIDE = 599;
   let currentTier = "";
 
-  function tierFor(width) {
-    if (width <= PHONE_MAX_WIDTH) return "phone";
+  function tierFor(shortSide) {
+    if (shortSide <= PHONE_MAX_SHORT_SIDE) return "phone";
     return "not-phone";
   }
 
   function applyTier() {
-    const tier = tierFor(window.innerWidth);
+    const tier = tierFor(Math.min(window.innerWidth, window.innerHeight));
     if (tier === currentTier) return;
     currentTier = tier;
     // 2026-08-27: 실사용 교사 제보(학교 PC에서 모바일 화면이 풀스크린으로

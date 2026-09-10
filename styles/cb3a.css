@@ -1502,7 +1502,11 @@ html[data-tier="phone"] .phone-shell-frame {
    패드이므로 커버해야 하는데, 그 폭은 노트북/PC 창 폭과 겹쳐서 폭만으로는
    구분이 안 된다. (hover:none) and (pointer:coarse)로 실제 터치 기기만
    가려낸다 - 마우스로 그 폭까지 줄인 PC 창은 그대로 PC 화면을 유지한다. */
-@media (min-width: 48rem) and (max-width: 63.99rem),
+/* 2026-09-10 (Bumm님 지시) - 아래 경계를 48rem(768px)에서 37.5rem(600px)로
+   내렸다. 학교에 보급되는 소형 안드로이드 태블릿이 600×960이라, 그 폭에서는
+   이 블록이 아예 안 걸려 **폰 레이아웃(1열)이 나오고 있었다.** 폰은 600px보다
+   좁으므로 이 경계 변경이 폰 화면에 닿지 않는다(확인: 599px 이하 그대로). */
+@media (min-width: 37.5rem) and (max-width: 63.99rem),
        (min-width: 64rem) and (max-width: 87.4rem) and (hover: none) and (pointer: coarse) {
   .site-header, .mobile-quick-nav, .phone-shell-frame { display: none !important; }
   /* 이 <dialog>는 네이티브 top-layer라 z-index로 못 가린다(폰 폭 규칙과 동일 이유). */
@@ -1797,6 +1801,19 @@ html[data-tier="phone"] .phone-shell-frame {
     line-height: 1.45;
   }
   .dashboard-scene .qr-invite img { inline-size: min(100%, 7.5rem); block-size: auto; }
+
+  /* 2026-09-10 (Bumm님 지시로 600px까지 넓히면서) - 폭 600px에서 패널 한 칸이
+     262px가 되는데, 우리학교/우리반 패널의 "좁은 라벨열 + 넓은 내용열"이
+     그보다 넓은 최소폭을 요구해 내용이 패널 밖으로 19군데 삐져나왔다.
+     🔴 폭 구간을 하나 더 만들어 계단식으로 끊지 않고, **줄어들 수 있게** 바꾼다
+     - minmax의 하한을 0으로 열고 min-inline-size를 풀면 같은 규칙 하나가
+     600~1023px 구간 전체를 덮는다(실측: 600/768/800/960/1024 전부 넘침 0). */
+  .school-panel { grid-template-columns: minmax(0, 8.25rem) minmax(0, 1fr) !important; }
+  .class-panel { grid-template-columns: minmax(0, 6.25rem) minmax(0, 1fr) !important; }
+  .school-panel .school-visuals, .school-panel .school-visuals *,
+  .class-panel .confusion, .class-panel .confusion * { min-inline-size: 0 !important; }
+  .school-panel .bar-list > div,
+  .class-panel .confusion > div { grid-template-columns: minmax(0, 1fr) minmax(0, auto) !important; }
 }
 
 /* 학교 설정 모달 - 사용자가 직접 제시한 참고 이미지대로, 이 앱의 나머지

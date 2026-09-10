@@ -30,6 +30,7 @@
 | 2026-09-10 | pc-react-conversion | 2 | accepted | PC 대시보드를 React+TS로 — 화면은 픽셀 그대로 |
 | 2026-09-11 | tablet-section-navigation | 2 | dropped | 태블릿에 내비가 없는 것은 **의도된 구성**(교실 전광판)임을 Bumm님이 확정 — 실측값은 맞았고 결함으로 읽은 것이 틀렸다 |
 | 2026-09-11 | miniapp-csp-native | 2 | draft | 3초판단 화면을 전역 CSP만으로 통과하게(인라인 스크립트 외부화 + tailwind CDN 제거) — S5 뒤, 화면 달라질 위험이 있어 미결 |
+| 2026-09-11 | long-cache-for-hashed-assets | 2 | draft | 해시 붙은 산출물에만 1년 불변 캐시 — 지금은 전부 max-age=3600. S5 뒤, 해시 경로를 가르는 것이 본체 |
 
 ## 폴더 규칙
 

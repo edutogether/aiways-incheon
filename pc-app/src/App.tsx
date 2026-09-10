@@ -16,7 +16,7 @@ export function App() {
     <>
     <header className="site-header">{" "}
       <a className="brand" href="#dashboard" aria-label="AI Ways Incheon dashboard">{" "}
-        <span className="brand-mark"><img src="./assets/brand/aiways-logo.png" alt="AI Ways Incheon" /></span>{" "}
+        <span className="brand-mark"><img src="./assets/brand/aiways-logo-splash.png" alt="AI Ways Incheon" /></span>{" "}
         <span>AI Ways Incheon</span>{" "}
       </a>{" "}
       <nav className="main-nav" aria-label="주요 섹션">{" "}

@@ -126,6 +126,30 @@ html = html.replace(/>(\s*\n\s*)</g, (_, gap) => ">{\" \"}" + gap + "<");
 html = html.replace(/>(\s*\n\s*)([^<\s])/g, (_, gap, ch) => ">{\" \"}" + gap + ch);
 html = html.replace(/([^>\s}])(\s*\n\s*)</g, (_, ch, gap) => ch + "{\" \"}" + gap + "<");
 
-html = html.replace(/ COMMENT(\d+) /g, (_, i) => "{/*" + comments[Number(i)] + "*/}");
+// 🔴 자리표시자를 JSX 주석으로 되돌린다. **앞뒤 공백에 기대지 않는다.**
+//
+// 2026-09-11에 여기서 사고가 났다. 예전 정규식은 `/ COMMENT(\d+) /`로 **앞뒤 공백을
+// 요구**했는데, 바로 위 125~127행의 `{" "}` 삽입이 그 사이에 끼어들어
+// ` COMMENT0{" "} `가 되면서 **뒤 공백이 사라져 하나도 안 바뀌었다.** 그 결과
+// 자리표시자 6개가 **화면에 그대로 글자로 찍혔다** — 헤더 바로 아래
+// (y=79) `COMMENT0 COMMENT1 COMMENT2`가 보이는 상태로 프리뷰에 나갔고,
+// Bumm님이 발견하셨다. 원본에는 없는 글자다.
+//
+// 공백에 기대지 않게 하고, 뒤에 붙은 `{" "}`도 같이 걷어낸다 — 원본에서 주석은
+// 텍스트 노드를 만들지 않으므로 그 자리에 공백을 넣으면 안 된다.
+html = html.replace(/[ \t]*COMMENT(\d+)(\{" "\})?[ \t]*/g, (_, i) => {
+  const body = comments[Number(i)];
+  if (body === undefined) throw new Error(`COMMENT${i}에 대응하는 주석이 없습니다 - 자리표시자와 목록이 어긋났습니다.`);
+  // JSX 주석 안의 */ 는 주석을 일찍 닫아 문법을 깨뜨린다.
+  if (body.includes("*/")) throw new Error(`주석 ${i}번 본문에 */ 가 들어 있어 JSX 주석으로 옮길 수 없습니다.`);
+  return "{/*" + body + "*/}";
+});
+
+// 🔴 하나라도 남으면 **조용히 화면에 글자로 나간다.** 그대로 내보내지 않고 멈춘다
+// (COMMON_STANDARDS §21 - 조용히 통과하는 실패가 이 저장소에서 제일 비싸다).
+const leftover = html.match(/COMMENT\d+/g);
+if (leftover) {
+  throw new Error(`자리표시자가 ${leftover.length}개 남았습니다(${[...new Set(leftover)].join(", ")}) - 그대로 두면 화면에 글자로 찍힙니다.`);
+}
 
 process.stdout.write(html + "\n");

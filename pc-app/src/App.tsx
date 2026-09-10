@@ -37,7 +37,7 @@ export function App() {
       </div>{" "}
       <p className="mobile-shell-state" data-mobile-shell-state="" role="status" hidden={true}></p>{" "}
     </header>{" "}
-     COMMENT0{" "} 
+    {/* 헤더 밖의 독립된 형제 요소 - 태블릿 대시보드 전용 뷰가 .site-header를 통째로 display:none으로 가리는데, 부모가 display:none이면 자식은 어떤 CSS로도 다시 못 보이게 하는 게 CSS 규칙이라(예외 없음) 헤더 안에 있으면 패드에서 톱니바퀴 자체가 사라진다(사용자 지적). #sampleDataBadge와 같은 방식으로 position:fixed를 써서 헤더 안에 있을 때와 화면상 같은 자리를 유지하면서도, 헤더의 display:none과 무관하게 항상 보이게 한다. */}
     <div className="dashboard-settings" id="dashboardSettings">{" "}
       <button type="button" id="dashboardSettingsToggle" className="dashboard-settings-toggle" aria-label="대시보드 설정" aria-haspopup="true" aria-expanded="false">{" "}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{" "}
@@ -61,10 +61,10 @@ export function App() {
       <a href="#landfill">매립지 확인</a>{" "}
     </nav>{" "}
 
-     COMMENT1{" "} 
+    {/* 3단 기기 라우팅: 폰 폭에서는 이 페이지 대신 진짜 모바일 앱(mobile/)을 iframe으로 통째로 띄운다. 코드를 합치지 않고 그대로 재사용하는 이유는 mobile/이 완전히 독립된 앱(자체 app.js 등)이라, 억지로 합치면 두 앱의 스크립트가 충돌할 위험이 있기 때문. src는 deviceTier.js가 폰 폭일 때만 채워 넣는다(항상 로드해두면 PC/패드 방문자도 모바일 앱을 매번 공짜로 부팅시키는 낭비가 생김). */}
     <iframe id="phoneShellFrame" className="phone-shell-frame" title="AI Ways Incheon 모바일 3초판단 앱" hidden={true}></iframe>{" "}
 
-     COMMENT2{" "} 
+    {/* 학교를 아직 설정 안 한 PC에서 화면 속 숫자가 진짜 학교 데이터처럼 보여서 헷갈리던 문제(사용자 지적) - 학교 미설정 상태인 동안 계속 떠있는 배지로 "이거 예시일 뿐"이라는 걸 명확히 하고, 눌러서 언제든 다시 학교 검색 모달을 열 수 있게 한다. */}
     <button type="button" id="sampleDataBadge" className="sample-data-badge" hidden={true}>📊 샘플 데이터 보는 중 · 학교 설정하기</button>{" "}
 
     <main className="snap-root">{" "}
@@ -665,7 +665,7 @@ export function App() {
       <div id="dashboardToastHostModal" className="dashboard-toast-host" aria-live="assertive"></div>{" "}
     </dialog>{" "}
 
-     COMMENT3{" "} 
+    {/* 3단 권한체계 2단계(2026-08-31) - 교사가 학생 가입 신청을 한 명씩 승인/거절하는 대기열. teacherVerified된 기기에서만 실제 데이터가 뜬다(대기열 조회 자체가 서버에서 교사 인증을 요구). */}
     <dialog className="ai-modal" id="teacherApprovalModal">{" "}
       <button className="close-btn" type="button" aria-label="닫기" data-close-teacher-approval-modal="">×</button>{" "}
       <div className="modal-body">{" "}
@@ -675,7 +675,7 @@ export function App() {
       </div>{" "}
     </dialog>{" "}
 
-     COMMENT4{" "} 
+    {/* UX 재감사 지적사항(2026-09-01) 대응 - window.prompt() 대신 이 앱의 기존 모달 패턴(school-setup-modal의 class-picker-selects)을 따르는 전용 입력창. */}
     <dialog className="ai-modal school-setup-modal" id="teacherCodeModal">{" "}
       <button className="close-btn" type="button" aria-label="닫기" data-close-teacher-code-modal="">×</button>{" "}
       <div className="modal-body">{" "}
@@ -701,7 +701,7 @@ export function App() {
       </div>{" "}
     </dialog>{" "}
 
-     COMMENT5{" "} 
+    {/* 학교를 아직 설정 안 했거나(또는 "샘플 보기"를 눌렀을 때) 잠깐 뜨는 안내 팝업 - "서비스 준비중이에요" 같은 걸 조용히 문단 텍스트로 바꾸는 대신 눈에 띄는 이벤트로 튀어나오게 해달라는 요청. */}
     <div id="dashboardToastHost" className="dashboard-toast-host" aria-live="assertive"></div>
     </>
   );

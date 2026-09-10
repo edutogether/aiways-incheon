@@ -58,11 +58,21 @@ test("공유 전역 스크립트가 앱 번들보다 먼저 실행된다", async
 
 test("리액트가 #appRoot 자체는 건드리지 않는다", async ({ page }) => {
   await page.goto(PAGE);
-  // authGate.js가 인증 통과 시점에 이 요소에서 hidden을 뗀다. 리액트가 이
-  // 요소를 소유하면 그 조작이 리렌더에 지워질 수 있어, 안쪽만 그리게 했다.
+  // authGate.js가 이 요소에서 hidden을 뗀다. 리액트가 이 요소를 소유하면 그
+  // 조작이 리렌더에 지워질 수 있어, 안쪽만 그리게 했다.
+  //
+  // 🔴 `hidden`은 검사 대상이 아니다. 2026-09-10부터 authGate.js가 **인증을
+  // 기다리지 않고 바로** 떼므로, 재는 순간에 따라 있기도 없기도 하다. 이 검사가
+  // 지키려는 것은 **나머지 클래스가 그대로인가**(= 리액트가 이 요소를 다시
+  // 그리지 않았는가)이지 보이는지 여부가 아니다. 예전에는 둘이 붙어 있어서,
+  // 게이트 동작을 바꾸자 이 검사가 엉뚱한 이유로 빨간불이 됐다.
   const root = await page.evaluate(() => {
     const el = document.getElementById("appRoot");
-    return el ? { className: el.className, tag: el.tagName } : null;
+    if (!el) return null;
+    return {
+      classes: [...el.classList].filter((c) => c !== "hidden").sort().join(" "),
+      tag: el.tagName
+    };
   });
-  expect(root).toEqual({ className: "hidden w-full flex flex-col items-center", tag: "DIV" });
+  expect(root).toEqual({ classes: "flex flex-col items-center w-full", tag: "DIV" });
 });

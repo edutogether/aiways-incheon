@@ -232,7 +232,18 @@ export async function openApp(page, target = TARGET) {
   await page.evaluate(() => {
     const gate = document.getElementById("authGate");
     const root = document.getElementById("appRoot");
-    if (gate) gate.style.display = "none";
+    // 🔴 숨기는 것이 아니라 **떼어낸다**(2026-09-10).
+    //
+    // 2026-09-10부터 authGate.js는 앱을 가리지 않고, 인증 확인이 실패했을 때만
+    // 화면 맨 위에 띠로 남는다. 그런데 **자동화는 App Check를 절대 통과하지
+    // 못하므로 여기서는 그 실패가 100% 일어난다** - `display:none`으로만 숨기면
+    // 잠시 뒤 탐침이 실패하면서 띠가 스스로 다시 나타나 **화면 전체를 54px
+    // 밀어낸다.** 실제로 그렇게 기준선 21개가 깨졌다.
+    //
+    // 학생이 정상적으로 접속했을 때는 이 띠가 없다. 기준선이 담아야 하는 것은
+    // 그 화면이므로, 자동화에서만 생기는 이 띠를 아예 떼어낸다. 게이트 안쪽은
+    // 원래부터 덤프에서 제외돼 있어(아래 inGate) 떼어내도 재는 값은 안 바뀐다.
+    if (gate) gate.remove();
     if (root) { root.classList.remove("hidden"); root.style.display = ""; }
   });
   // 웹폰트가 늦게 오면 줄바꿈·높이가 달라져 캡처가 흔들린다.

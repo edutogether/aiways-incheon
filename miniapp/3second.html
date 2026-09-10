@@ -620,7 +620,13 @@
 
             // 화면 표시 필드 바인딩
             document.getElementById('resCategory').innerText = data.category;
-            document.getElementById('resTitle').innerHTML = data.isHold && refinedKey !== "판단 보류 물건" ? `🤔 ${refinedKey} (기준 불투명)` : data.name;
+            // 🔴 innerHTML이 아니라 textContent다. refinedKey는 학생이 검색창에 친
+            // 글자라, innerHTML로 넣으면 `<img src=x onerror=...>`가 실제로 실행된다
+            // (2026-09-10 CodeQL js/xss-through-dom, 실측으로 실행 확인).
+            // 양쪽 분기 모두 순수 텍스트라 화면은 그대로다 - trashDb의 name에는
+            // 태그가 하나도 없다. 아래 resBody는 data.guide에 <b>가 일부러 들어
+            // 있으므로 innerHTML을 유지한다(우리가 쓴 문구다).
+            document.getElementById('resTitle').textContent = data.isHold && refinedKey !== "판단 보류 물건" ? `🤔 ${refinedKey} (기준 불투명)` : data.name;
             document.getElementById('resBody').innerHTML = data.guide;
             document.getElementById('resTip').innerText = data.tip;
 
@@ -854,19 +860,30 @@
                 holdBoxList.forEach(item => {
                     const div = document.createElement('div');
                     div.className = "hold-item-card flex justify-between items-center bg-white p-3.5 border border-slate-100 rounded-2xl shadow-sm text-xs hover:border-amber-200 transition-all";
+                    // 🔴 물건 이름은 학생이 직접 친 글자다. 구조만 innerHTML로 만들고
+                    // **이름과 날짜는 textContent로 넣는다** - 예전에는 이름이 그대로
+                    // 마크업이 되어 새로고침할 때마다 실행됐다(localStorage에 남으므로).
                     div.innerHTML = `
                         <div class="flex items-center gap-2.5 min-w-0 mr-2">
                             <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
-                            <span class="font-extrabold text-slate-800 truncate">${item.name}</span>
+                            <span class="font-extrabold text-slate-800 truncate" data-hold-name></span>
                         </div>
                         <div class="flex items-center gap-2 shrink-0">
-                            <span class="text-[9px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded-md">${item.date}</span>
-                            <button onclick="resolveHoldItem('${item.id}', '${item.name}')" 
+                            <span class="text-[9px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded-md" data-hold-date></span>
+                            <button type="button" data-hold-resolve
                                     class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-xl font-bold text-[10px] transition-colors">
                                 해결 완료
                             </button>
                         </div>
                     `;
+                    div.querySelector('[data-hold-name]').textContent = item.name;
+                    div.querySelector('[data-hold-date]').textContent = item.date;
+                    // 🔴 인라인 onclick을 없앤다. 이름이 작은따옴표 속성 안에 들어가던
+                    // 구조라 이름에 `'` 하나만 있어도 속성이 깨졌다 - 장난이 아니라
+                    // 실수로도 화면이 망가진다. 여기서는 값을 문자열로 엮지 않고
+                    // 클로저가 그대로 넘겨준다.
+                    div.querySelector('[data-hold-resolve]')
+                        .addEventListener('click', () => resolveHoldItem(item.id, item.name));
                     container.appendChild(div);
                 });
             }

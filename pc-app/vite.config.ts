@@ -4,7 +4,7 @@
 // package.json에 "type": "module"을 넣으면 루트 .js 파일들(브라우저가
 // <script>로 읽는 고전 스크립트)이 ESM으로 해석되면서 functions/test의
 // require()가 깨진다 — 실제로 CI가 한 번 이것 때문에 죽었다.
-import { copyFileSync, cpSync, mkdirSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
@@ -60,7 +60,11 @@ const LEGACY_FILES = LEGACY_SCRIPTS
 //     보면 정상으로 보인다. 2026-09-10에 실제로 그 상태를 "정상"으로 읽을 뻔했다.
 //   - `assets/` — 부트 스플래시 로고와 파비콘.
 const RUNTIME_FILES = ["base-data-seed.tsv"];
-const RUNTIME_DIRS = ["assets"];
+//   - `mobile/` — 🔴 폰 폭에서 `deviceTier.js`가 `./mobile/index.html`을 iframe에
+//     띄운다. 산출물이 `pc-next/`에 있으므로 그 안에도 있어야 한다 - 없으면
+//     **판정은 제대로 되는데(`data-tier="phone"`) iframe이 404로 비어** 학생이
+//     빈 화면을 본다(2026-09-11 실측). 배포 산출물이 아니라 **미리보기용**이다.
+const RUNTIME_DIRS = ["assets", "mobile"];
 
 function aiwaysPcAssets(): Plugin {
   return {
@@ -81,7 +85,12 @@ function aiwaysPcAssets(): Plugin {
         copyFileSync(from, to);
       }
       for (const rel of RUNTIME_DIRS) {
-        cpSync(resolve(REPO_ROOT, rel), resolve(OUT_DIR, rel), { recursive: true });
+        const from = resolve(REPO_ROOT, rel);
+        if (!existsSync(from)) {
+          // 조용히 건너뛰지 않는다 - 빠지면 화면이 비는데 빌드는 성공한다(§21).
+          throw new Error(`${rel}/ 이 없어 전환본에 담을 수 없습니다. \`npm run build:mobile\`을 먼저 돌리세요.`);
+        }
+        cpSync(from, resolve(OUT_DIR, rel), { recursive: true });
       }
     },
     transformIndexHtml: {

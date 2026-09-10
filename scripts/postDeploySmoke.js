@@ -40,19 +40,26 @@ async function checkHostingHeaders(base) {
   console.log(`OK  ${base}/index.html: 보안 헤더 정상 부착`);
 }
 
-// 🔴 HTML이 **쓰기 전에 서버에 물어보는지** 확인한다 (2026-09-11 추가).
+// 🔴 HTML이 **짧게만 캐시되는지** 확인한다 (2026-09-11 추가, 같은 날 기준 변경).
 //
-// 규칙이 없어 Firebase 기본값(max-age=3600)이 나가고 있었다. 그러면 브라우저가
-// 최대 한 시간 동안 서버에 묻지도 않고 옛 HTML을 쓰고, 옛 HTML은 옛 해시 번들을
-// 가리킨다 - 배포 직후 들어온 사람이 "옛 HTML + 새 번들"이라는 시험된 적 없는
-// 조합을 받는다. 되돌려도 **이미 캐시된 브라우저에는 안 닿는다.**
+// 규칙이 없으면 Firebase 기본값(max-age=3600)이라 브라우저가 최대 한 시간 옛
+// HTML을 쓰고, 옛 HTML은 옛 해시 번들을 가리킨다 - 배포 직후 들어온 사람이
+// "옛 HTML + 새 번들"이라는 시험된 적 없는 조합을 받는다. 되돌려도 **이미
+// 캐시된 브라우저에는 안 닿는다.**
 //
-// 헤더는 조용히 되돌아가는 종류다(firebase.json 한 줄이면 사라지고, 화면에는
-// 아무 표시도 안 난다). 그래서 라이브 응답으로 확인하는 이 층에 둔다.
+// 🔴 처음엔 `no-cache`를 요구했는데 같은 날 `max-age=60`으로 바꿨다. 실측하니
+// `no-cache`는 브라우저뿐 아니라 **CDN 엣지 캐시까지 끄고**(모든 요청이 MISS),
+// **Firebase Hosting은 조건부 요청에 304를 주지 않아**(ETag를 맞춰 보내도 200 +
+// 전체 본문) `no-cache`가 "물어보기"가 아니라 "매번 전체 재다운로드"가 된다.
+//
+// 헤더는 조용히 되돌아가는 종류다(firebase.json 한 줄이면 사라지고 화면에는 아무
+// 표시도 안 난다). 그래서 라이브 응답으로 확인하는 이 층에 둔다.
 //
 // 🔴 학생 앱(mobile/)을 반드시 같이 본다 - 제일 중요한 화면인데 규칙에서 빠지면
-// 그 화면만 옛 것을 계속 쓰게 된다.
+// 그 화면만 옛 것을 오래 쓰게 된다.
 const HTML_PATHS = ["/", "/index.html", "/mobile/index.html", "/admin.html", "/miniapp/3second.html"];
+// 🔴 상한을 못박는다. 값이 커지면(예: 3600) 되돌리기가 사용자에게 안 닿는다.
+const MAX_HTML_AGE = 300;
 
 async function checkHtmlNotCached(base) {
   // 대상이 줄면 조용히 통과한다 - 고정 하한으로 못박는다(§21).
@@ -64,12 +71,17 @@ async function checkHtmlNotCached(base) {
     const res = await fetch(`${base}${path}`);
     if (res.status !== 200) throw new Error(`${base}${path}이 200이 아님 (${res.status})`);
     const cache = String(res.headers.get("cache-control") || "");
-    // no-store가 아니라 no-cache여야 한다 - no-store면 매번 통째로 다시 받는다.
-    if (!/no-cache/.test(cache)) {
-      throw new Error(`${base}${path}의 Cache-Control이 "${cache}"입니다 - no-cache여야 합니다. 브라우저가 옛 HTML을 서버에 묻지도 않고 쓰게 되고, 되돌려도 캐시된 브라우저에는 안 닿습니다.`);
+    const age = /max-age=(\d+)/.exec(cache);
+    // no-cache도 통과시킨다 - 더 보수적인 값이라 "오래 굳는" 위험은 없다.
+    if (/no-cache|no-store/.test(cache)) continue;
+    if (!age) {
+      throw new Error(`${base}${path}의 Cache-Control이 "${cache}"입니다 - max-age가 없습니다. 규칙이 빠지면 Firebase 기본값(3600)이 나가고, 되돌려도 최대 한 시간 사용자에게 안 닿습니다.`);
+    }
+    if (Number(age[1]) > MAX_HTML_AGE) {
+      throw new Error(`${base}${path}의 Cache-Control이 "${cache}"입니다 - max-age가 ${MAX_HTML_AGE}초를 넘습니다. 배포를 되돌려도 그만큼 사용자에게 안 닿습니다.`);
     }
   }
-  console.log(`OK  ${base}: HTML ${HTML_PATHS.length}개 전부 no-cache`);
+  console.log(`OK  ${base}: HTML ${HTML_PATHS.length}개 전부 짧은 캐시(max-age<=${MAX_HTML_AGE})`);
 }
 
 async function main() {

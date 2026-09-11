@@ -1,8 +1,8 @@
 import { QUIZ_RANK_RANGES, quizRank } from "../quiz/rankLadder";
 import type { useQuiz } from "../state/useQuiz";
 
-const CORRECT_TITLE = "정답입니다! 훌륭한 실력이에요.";
-const WRONG_TITLE = "아쉽네요! 자원순환 규칙을 배워봐요.";
+const CORRECT_TITLE = "정답입니다 ! 훌륭한 실력이에요.";
+const WRONG_TITLE = "아쉽네요 ! 자원순환 규칙을 배워봐요.";
 const CORRECT_TITLE_CLASS = "text-xs font-extrabold text-emerald-800";
 const WRONG_TITLE_CLASS = "text-xs font-extrabold text-rose-800";
 const CORRECT_BOX_CLASS = "p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/70 flex items-start gap-2.5";
@@ -20,8 +20,8 @@ export function QuizTab({ hidden, minHeight, quiz }: { hidden: boolean; minHeigh
       style={minHeight ? { minHeight: `${minHeight}px` } : undefined}
     >
       <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 text-center space-y-2">
-        <span className="text-base font-extrabold text-blue-600">🎮 3초 퀴즈! 분리배출 O/X 챌린지</span>
-        <p className="text-sm font-semibold text-slate-600">분리배출 관련 500문제 중 10문제가 랜덤으로 출제돼요.</p>
+        <span className="text-base font-extrabold text-blue-600">🎮 3초 퀴즈 ! 분리배출 O/X 챌린지</span>
+        <p className="text-sm font-semibold text-slate-600">분리배출 500문제 중 10문제가 랜덤 출제돼요.</p>
         <div id="quizRankLadder" className="grid grid-cols-3 gap-1.5 pt-1.5">
           {QUIZ_RANK_RANGES.map((range) => {
             const rank = quizRank(range.min);

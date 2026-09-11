@@ -67,7 +67,7 @@
             <!-- 검색 영역 -->
             <div class="relative">
                 <label for="searchInput" class="block text-xs sm:text-sm font-bold text-slate-700 mb-2 flex items-center gap-1">
-                    🎯 무엇을 버리시나요?
+                    🎯 무엇을 버리시나요 ?
                 </label>
                 <div class="relative">
                     <input type="text" id="searchInput" placeholder="예: 영수증, 볼펜, 컵라면, 캔, 생수병..." 
@@ -120,7 +120,7 @@
                 <!-- 기본 상태 -->
                 <div id="placeholder" class="text-center py-6">
                     <p class="text-3xl mb-2">🔍</p>
-                    <p class="text-xs sm:text-sm font-semibold text-slate-600">위의 물건을 선택하거나 직접 검색해 보세요!</p>
+                    <p class="text-xs sm:text-sm font-semibold text-slate-600">위의 물건을 선택하거나 직접 검색해 보세요 !</p>
                     <p class="text-[11px] text-slate-400 mt-1">인천광역시 분리배출 가이드라인 기준 판단 결과를 제공합니다.</p>
                 </div>
                 
@@ -172,7 +172,7 @@
         <!-- 2. 3초 퀴즈 탭 -->
         <div id="tab-quiz" class="tab-content hidden space-y-5">
             <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 text-center">
-                <span class="text-xs font-bold text-blue-600">3초 블리츠! 분리배출 O/X 챌린지</span>
+                <span class="text-xs font-bold text-blue-600">3초 블리츠 ! 분리배출 O/X 챌린지</span>
                 <p class="text-[11px] text-slate-500 mt-1">학교에서 흔히 발생하는 알쏭달쏭 퀴즈를 맞히고 우수 대원이 되어보세요.</p>
             </div>
 
@@ -218,7 +218,7 @@
             <!-- 결과 요약 박스 (종료 시 노출) -->
             <div id="quiz-result-summary" class="hidden text-center p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
                 <span class="text-4xl">🏆</span>
-                <h3 class="text-lg font-extrabold text-slate-800">퀴즈 완료!</h3>
+                <h3 class="text-lg font-extrabold text-slate-800">퀴즈 완료 !</h3>
                 <p id="quiz-result-score-text" class="text-sm font-semibold text-slate-600">5문제 중 4문제를 맞췄습니다.</p>
                 <div class="bg-white p-3.5 rounded-xl border text-left text-[11px] space-y-1.5 text-slate-500">
                     <p class="font-bold text-slate-700">💡 잊지 말아야 할 분리배출 규칙:</p>
@@ -261,7 +261,7 @@
                 <div id="practice-logs-container" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
                     <!-- 로그가 없을 때의 기본 상태 -->
                     <div id="no-logs-msg" class="text-center py-8 border border-dashed border-slate-200 rounded-2xl">
-                        <p class="text-[11px] text-slate-400">아직 기록된 실천이 없습니다.<br>'3초 판단'에서 가이드라인을 확인하고 실천해보세요!</p>
+                        <p class="text-[11px] text-slate-400">아직 기록된 실천이 없습니다.<br>'3초 판단'에서 가이드라인을 확인하고 실천해보세요 !</p>
                     </div>
                 </div>
             </div>
@@ -298,7 +298,7 @@
                 <div id="hold-list-container" class="space-y-2 max-h-52 overflow-y-auto custom-scrollbar">
                     <!-- 기본 비어있음 상태 -->
                     <div id="no-hold-items-msg" class="text-center py-8 border border-dashed border-slate-200 rounded-2xl">
-                        <p class="text-[11px] text-slate-400">기록된 판단 보류 물건이 없습니다.<br>'3초 판단'에서 애매한 쓰레기를 등록하거나, 직접 기재해 보세요!</p>
+                        <p class="text-[11px] text-slate-400">기록된 판단 보류 물건이 없습니다.<br>'3초 판단'에서 애매한 쓰레기를 등록하거나, 직접 기재해 보세요 !</p>
                     </div>
                 </div>
             </div>
@@ -499,7 +499,7 @@
                 emoji: "🧾",
                 question: "물건을 사고 받은 종이 영수증은 가공 가치가 높기 때문에 깨끗한 종량제 종이류 수거함에 섞어 배출해도 된다.",
                 answer: false,
-                explanation: "영수증은 열에 반응하는 특수 약품 코팅이 되어 있는 감열지입니다. 일반 폐지와 섞이면 가공 품질이 훼손되므로 일반쓰레기로 전량 폐기해야 정답입니다!"
+                explanation: "영수증은 열에 반응하는 특수 약품 코팅이 되어 있는 감열지입니다. 일반 폐지와 섞이면 가공 품질이 훼손되므로 일반쓰레기로 전량 폐기해야 정답입니다 !"
             },
             {
                 emoji: "🍜",
@@ -746,7 +746,7 @@
             });
 
             updateStatsUI();
-            showVisualAlert(`🌳 지구를 지키는 올바른 실천! CO2 ${item.carbonSaved}g이 절감되었습니다.`, "emerald");
+            showVisualAlert(`🌳 지구를 지키는 올바른 실천 ! CO2 ${item.carbonSaved}g이 절감되었습니다.`, "emerald");
         }
 
         function updateStatsUI() {
@@ -891,7 +891,7 @@
         function resolveHoldItem(id, name) {
             openCustomModal(
                 "분류 기준 수립 및 보류 해결",
-                `"${name}" 품목의 세부 분리 배출 매뉴얼이 확정되었나요? 확인을 누르면 보류 리스트에서 정리됩니다.`,
+                `"${name}" 품목의 세부 분리 배출 매뉴얼이 확정되었나요 ? 확인을 누르면 보류 리스트에서 정리됩니다.`,
                 "🎉",
                 "bg-emerald-600 hover:bg-emerald-700",
                 function() {
@@ -950,7 +950,7 @@
         function promptResetStats() {
             openCustomModal(
                 "실천 타임라인 비우기",
-                "지금까지 달성한 실천 횟수 및 감축 이력이 영구 소멸됩니다. 정말 리셋을 진행하시겠습니까?",
+                "지금까지 달성한 실천 횟수 및 감축 이력이 영구 소멸됩니다. 정말 리셋을 진행하시겠습니까 ?",
                 "🗑️",
                 "bg-rose-500 hover:bg-rose-600",
                 function() {
@@ -971,7 +971,7 @@
         function promptResetHold() {
             openCustomModal(
                 "보류함 목록 완전 초기화",
-                "보류 안건 목록에 등록된 모든 대기 쓰레기 내역을 깔끔히 비우시겠습니까?",
+                "보류 안건 목록에 등록된 모든 대기 쓰레기 내역을 깔끔히 비우시겠습니까 ?",
                 "🗑️",
                 "bg-rose-500 hover:bg-rose-600",
                 function() {
@@ -1054,12 +1054,12 @@
 
             if (isCorrect) {
                 expEmoji.innerText = "🎉";
-                expTitle.innerText = "정답입니다! 훌륭한 실력이에요.";
+                expTitle.innerText = "정답입니다 ! 훌륭한 실력이에요.";
                 expTitle.className = "text-xs font-extrabold text-emerald-800";
                 expBox.className = "p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/70 flex items-start gap-2.5";
             } else {
                 expEmoji.innerText = "💡";
-                expTitle.innerText = "아쉽네요! 자원수칙 가이드를 배워봐요.";
+                expTitle.innerText = "아쉽네요 ! 자원수칙 가이드를 배워봐요.";
                 expTitle.className = "text-xs font-extrabold text-rose-800";
                 expBox.className = "p-3.5 rounded-xl border border-rose-200 bg-rose-50/70 flex items-start gap-2.5";
             }
@@ -1080,7 +1080,7 @@
                 const summary = document.getElementById('quiz-result-summary');
                 summary.classList.remove('hidden');
 
-                document.getElementById('quiz-result-score-text').innerText = `${quizData.length}문제 중 최종 점수: ${userQuizScore}점 달성!`;
+                document.getElementById('quiz-result-score-text').innerText = `${quizData.length}문제 중 최종 점수: ${userQuizScore}점 달성 !`;
             }
         }
 

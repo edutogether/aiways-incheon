@@ -2,14 +2,14 @@
   "#appRoot": {
     "_box": [
       12,
-      -449,
+      -27,
       366,
-      1577
+      1351
     ],
     "display": "flex",
     "position": "static",
     "width": "366px",
-    "height": "1576.88px",
+    "height": "1351px",
     "margin": "0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -34,7 +34,7 @@
   "button:🔍 판단": {
     "_box": [
       35,
-      -301,
+      121,
       77,
       37
     ],
@@ -66,7 +66,7 @@
   "button:🎮 퀴즈": {
     "_box": [
       116,
-      -301,
+      121,
       77,
       37
     ],
@@ -98,7 +98,7 @@
   "button:🌱 통계": {
     "_box": [
       197,
-      -301,
+      121,
       77,
       37
     ],
@@ -130,7 +130,7 @@
   "button:❓ 보류함": {
     "_box": [
       278,
-      -301,
+      121,
       77,
       37
     ],
@@ -1410,14 +1410,14 @@
   "#tab-quiz": {
     "_box": [
       29,
-      -235,
+      187,
       332,
-      1233
+      1042
     ],
     "display": "block",
     "position": "static",
     "width": "332px",
-    "height": "1233px",
+    "height": "1042px",
     "margin": "24px 0px 0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -1442,7 +1442,7 @@
   "#quizRankLadder": {
     "_box": [
       46,
-      -138,
+      264,
       298,
       189
     ],
@@ -1474,7 +1474,7 @@
   "div:🌱0~2개분리배출 새": {
     "_box": [
       46,
-      -132,
+      270,
       95,
       82
     ],
@@ -1506,7 +1506,7 @@
   "div:🍀3~4개분리배출 연": {
     "_box": [
       147,
-      -132,
+      270,
       95,
       82
     ],
@@ -1538,7 +1538,7 @@
   "div:🔎5~6개자원순환 탐": {
     "_box": [
       249,
-      -132,
+      270,
       95,
       82
     ],
@@ -1570,7 +1570,7 @@
   "div:♻️7~8개분리배출 실": {
     "_box": [
       46,
-      -44,
+      358,
       95,
       96
     ],
@@ -1602,7 +1602,7 @@
   "div:🌍9개자원순환 환경운": {
     "_box": [
       147,
-      -44,
+      358,
       95,
       96
     ],
@@ -1634,7 +1634,7 @@
   "div:🏆10개AI Ways": {
     "_box": [
       249,
-      -44,
+      358,
       95,
       96
     ],
@@ -1666,7 +1666,7 @@
   "#quiz-box": {
     "_box": [
       29,
-      88,
+      490,
       332,
       357
     ],
@@ -1698,7 +1698,7 @@
   "#quiz-progress": {
     "_box": [
       50,
-      109,
+      511,
       45,
       15
     ],
@@ -1730,7 +1730,7 @@
   "#quiz-score": {
     "_box": [
       278,
-      109,
+      511,
       62,
       15
     ],
@@ -1762,7 +1762,7 @@
   "#quiz-progress-bar": {
     "_box": [
       50,
-      132,
+      534,
       58,
       6
     ],
@@ -1794,7 +1794,7 @@
   "#quiz-emoji": {
     "_box": [
       50,
-      170,
+      572,
       290,
       40
     ],
@@ -1826,7 +1826,7 @@
   "#quiz-question": {
     "_box": [
       50,
-      218,
+      620,
       290,
       39
     ],
@@ -1954,7 +1954,7 @@
   "#quiz-explanation-panel": {
     "_box": [
       50,
-      289,
+      691,
       290,
       136
     ],
@@ -1986,7 +1986,7 @@
   "#explanation-box-color": {
     "_box": [
       50,
-      289,
+      691,
       290,
       84
     ],
@@ -2018,7 +2018,7 @@
   "#explanation-emoji": {
     "_box": [
       65,
-      304,
+      706,
       25,
       28
     ],
@@ -2050,7 +2050,7 @@
   "#explanation-title": {
     "_box": [
       100,
-      304,
+      706,
       225,
       16
     ],
@@ -2082,7 +2082,7 @@
   "#explanation-desc": {
     "_box": [
       100,
-      322,
+      724,
       225,
       36
     ],
@@ -2114,7 +2114,7 @@
   "#nextQuizBtn": {
     "_box": [
       50,
-      385,
+      787,
       290,
       40
     ],
@@ -3154,230 +3154,6 @@
     "line-height": "18.72px",
     "letter-spacing": "normal",
     "color": "rgb(91, 101, 114)",
-    "background-color": "rgba(0, 0, 0, 0)",
-    "border": "0px solid rgb(229, 231, 235)",
-    "border-radius": "0px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "visible",
-    "z-index": "auto"
-  },
-  "#interimClassCard": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "block",
-    "position": "static",
-    "width": "auto",
-    "height": "auto",
-    "margin": "20px 0px 0px",
-    "padding": "16px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "16px",
-    "font-weight": "400",
-    "line-height": "24px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgb(248, 250, 252)",
-    "border": "1px solid rgb(226, 232, 240)",
-    "border-radius": "16px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "visible",
-    "z-index": "auto"
-  },
-  "#classSchoolInput": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "inline-block",
-    "position": "static",
-    "width": "100%",
-    "height": "auto",
-    "margin": "0px",
-    "padding": "8px 12px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "12px",
-    "font-weight": "400",
-    "line-height": "16px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgb(255, 255, 255)",
-    "border": "1px solid rgb(226, 232, 240)",
-    "border-radius": "12px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "clip",
-    "z-index": "auto"
-  },
-  "#classSchoolCode": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "none",
-    "position": "static",
-    "width": "auto",
-    "height": "auto",
-    "margin": "0px",
-    "padding": "0px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "16px",
-    "font-weight": "400",
-    "line-height": "24px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgba(0, 0, 0, 0)",
-    "border": "0px solid rgb(229, 231, 235)",
-    "border-radius": "0px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "clip",
-    "z-index": "auto"
-  },
-  "#classSchoolResults": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "none",
-    "position": "absolute",
-    "width": "auto",
-    "height": "auto",
-    "margin": "0px",
-    "padding": "0px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "12px",
-    "font-weight": "400",
-    "line-height": "16px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgb(255, 255, 255)",
-    "border": "1px solid rgb(226, 232, 240)",
-    "border-radius": "12px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "auto",
-    "z-index": "20"
-  },
-  "#classGradeInput": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "block",
-    "position": "static",
-    "width": "auto",
-    "height": "auto",
-    "margin": "0px",
-    "padding": "8px 12px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "12px",
-    "font-weight": "400",
-    "line-height": "16px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgb(255, 255, 255)",
-    "border": "1px solid rgb(226, 232, 240)",
-    "border-radius": "12px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "clip",
-    "z-index": "auto"
-  },
-  "#classNumInput": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "block",
-    "position": "static",
-    "width": "auto",
-    "height": "auto",
-    "margin": "0px",
-    "padding": "8px 12px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "12px",
-    "font-weight": "400",
-    "line-height": "16px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgb(255, 255, 255)",
-    "border": "1px solid rgb(226, 232, 240)",
-    "border-radius": "12px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "clip",
-    "z-index": "auto"
-  },
-  "#classContextStatus": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "block",
-    "position": "static",
-    "width": "auto",
-    "height": "auto",
-    "margin": "10px 0px 0px",
-    "padding": "0px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "10px",
-    "font-weight": "600",
-    "line-height": "15px",
-    "letter-spacing": "normal",
-    "color": "rgb(148, 163, 184)",
     "background-color": "rgba(0, 0, 0, 0)",
     "border": "0px solid rgb(229, 231, 235)",
     "border-radius": "0px",

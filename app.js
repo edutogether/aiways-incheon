@@ -342,12 +342,12 @@
   // SORTING_JUDGEMENT_V2: rule and checklist data. This supplements the
   // original quick-item database so legacy quiz/statistics flows remain intact.
   const CHECKS = {
-    empty: ["empty", "내용물을 비웠나요?"],
-    rinse: ["rinse", "이물질을 헹구거나 닦았나요?"],
-    label: ["label", "라벨·뚜껑·부속품을 분리했나요?"],
-    material: ["material", "재질 표기와 분리 방법을 확인했나요?"],
-    tape: ["tape", "테이프·송장·스티커를 제거했나요?"],
-    local: ["local", "우리 지역 또는 학교 기준과 맞는지 확인했나요?"]
+    empty: ["empty", "내용물을 비웠나요 ?"],
+    rinse: ["rinse", "이물질을 헹구거나 닦았나요 ?"],
+    label: ["label", "라벨·뚜껑·부속품을 분리했나요 ?"],
+    material: ["material", "재질 표기와 분리 방법을 확인했나요 ?"],
+    tape: ["tape", "테이프·송장·스티커를 제거했나요 ?"],
+    local: ["local", "우리 지역 또는 학교 기준과 맞는지 확인했나요 ?"]
   };
 
   function checklist(...keys) {
@@ -1717,8 +1717,8 @@
     const recordCount = detail.data?.recordCount || 0;
     const blocked = !!detail.data?.blocked;
     const who = student.studentNumber + '번 ' + student.name;
-    const deleteRecords = recordCount > 0 && window.confirm('"' + who + '" 학생의 기록 ' + recordCount + '건을 삭제할까요? 되돌릴 수 없어요.');
-    const blockAccount = !blocked && window.confirm('"' + who + '" 학생의 계정을 차단할까요? 그 기기로는 더 이상 접속할 수 없게 되고, 되돌릴 수 없어요.');
+    const deleteRecords = recordCount > 0 && window.confirm('"' + who + '" 학생의 기록 ' + recordCount + '건을 삭제할까요 ? 되돌릴 수 없어요.');
+    const blockAccount = !blocked && window.confirm('"' + who + '" 학생의 계정을 차단할까요 ? 그 기기로는 더 이상 접속할 수 없게 되고, 되돌릴 수 없어요.');
     if (!deleteRecords && !blockAccount) { showDashboardToast('아무것도 바꾸지 않았어요.'); return; }
     const response = await client?.moderateStudent?.({ targetActorId: student.actorId, blockAccount, deleteRecords });
     if (response?.ok) {
@@ -1795,7 +1795,7 @@
     });
     $("[data-settings-action='reset']")?.addEventListener("click", () => {
       closeMenu();
-      if (!window.confirm("정말 모두 초기화할까요? 이 기기에 설정된 학교, 학년, 반이 모두 사라지고 처음 학교 검색 화면으로 돌아가요.")) return;
+      if (!window.confirm("정말 모두 초기화할까요 ? 이 기기에 설정된 학교, 학년, 반이 모두 사라지고 처음 학교 검색 화면으로 돌아가요.")) return;
       try {
         localStorage.removeItem(DASHBOARD_SCHOOL_ID_KEY);
         localStorage.removeItem(DASHBOARD_SCHOOL_NAME_KEY);
@@ -4264,7 +4264,7 @@
       ${safeResult.imageHints.length ? `<p class="judgement-image-hint">${escapeHtml(safeResult.imageHints.join(" · "))}</p>` : ""}
       <details class="judgement-details judgement-cautions"><summary>보이는 주의 요소</summary><ul>${safeResult.visibleCautions.map(caution => `<li>${escapeHtml(caution)}</li>`).join("")}</ul></details>
       <section class="judgement-checklist"><h4>배출 전 체크리스트</h4><div>${checklistHtml}</div></section>
-      <section class="judgement-recommendation ${completed ? "is-ready" : "is-hold"}"><strong>${completed ? "잘했어요. 배출 준비가 완료됐습니다." : needsHold ? "지금 확정하지 않아도 됩니다. 확인이 필요한 물건으로 보류함에 저장할까요?" : "확인 항목을 마친 뒤 사용자가 최종 판단합니다."}</strong><span>${escapeHtml(item.primaryFlow)}</span></section>
+      <section class="judgement-recommendation ${completed ? "is-ready" : "is-hold"}"><strong>${completed ? "잘했어요. 배출 준비가 완료됐습니다." : needsHold ? "지금 확정하지 않아도 됩니다. 확인이 필요한 물건으로 보류함에 저장할까요 ?" : "확인 항목을 마친 뒤 사용자가 최종 판단합니다."}</strong><span>${escapeHtml(item.primaryFlow)}</span></section>
       <section class="judgement-corrections"><span>AI가 항목을 잘못 읽었다면 바로 고쳐 주세요.</span><div>${correctionButtons}</div></section>
       <div class="quick-action-row judgement-actions"><button type="button" data-judgement-action="record" ${completed && !safeResult.hold.recommended ? "" : "disabled"}>배출 기록 남기기</button><button type="button" data-judgement-action="decide" ${completed ? "" : "disabled"}>확인 후 결정하기</button><button type="button" data-judgement-action="hold">보류함에 저장</button><button type="button" data-next-sorting-item>다음 물건</button></div>`;
     const holdAction = container?.querySelector('[data-judgement-action="hold"]');
@@ -4335,7 +4335,7 @@
     if (!top) return { status: "NONE", message: "", topPrediction: null, lowConfidence: false };
     const lowConfidence = Number(top.confidence) < 0.5;
     if (geminiFamily && skillFamily && geminiFamily === skillFamily) return { status: "AGREEMENT", message: "우리 반이 가르쳐준 모델도 같은 쪽을 보고 있어요. 👀", topPrediction: top, lowConfidence };
-    if (geminiFamily && skillFamily && geminiFamily !== skillFamily) return { status: "CONFLICT", message: "제 생각과 우리 반 모델의 의견이 조금 달라요. 표시된 부분을 한 번 더 확인해볼까요?", topPrediction: top, lowConfidence };
+    if (geminiFamily && skillFamily && geminiFamily !== skillFamily) return { status: "CONFLICT", message: "제 생각과 우리 반 모델의 의견이 조금 달라요. 표시된 부분을 한 번 더 확인해볼까요 ?", topPrediction: top, lowConfidence };
     return { status: "REFERENCE", message: lowConfidence ? "약한 참고 결과이므로 사진의 재질과 상태를 직접 확인해 주세요." : "우리 반 모델의 참고 결과입니다.", topPrediction: top, lowConfidence };
   }
 
@@ -4503,7 +4503,7 @@
     const text = $("#pendingDecisionText");
     if (!box) return;
     box.hidden = !visible;
-    if (text) text.textContent = category ? `${category} 판단을 저장할까요?` : "선택한 판단을 저장할까요?";
+    if (text) text.textContent = category ? `${category} 판단을 저장할까요 ?` : "선택한 판단을 저장할까요 ?";
   }
 
   function setScanning(active) {
@@ -4959,7 +4959,7 @@
       const skills = enabledClassroomSkills();
       if (count) count.textContent = `우리 반이 AI에게 가르친 기술 ${skills.length}개`;
       list.replaceChildren();
-      if (!skills.length) { const empty = document.createElement("li"); empty.className = "empty-state"; empty.textContent = "아직 우리 반이 가르쳐준 기술이 없어요. 첫 번째 기술을 만들어볼까요? 🎓"; list.append(empty); return; }
+      if (!skills.length) { const empty = document.createElement("li"); empty.className = "empty-state"; empty.textContent = "아직 우리 반이 가르쳐준 기술이 없어요. 첫 번째 기술을 만들어볼까요 ? 🎓"; list.append(empty); return; }
       skills.forEach(skill => {
         const item = document.createElement("li"), copy = document.createElement("span"), title = document.createElement("strong"), detail = document.createElement("small"), toggle = document.createElement("button");
         title.textContent = skill.name; detail.textContent = `${skill.className} · ${skill.classes.length}개 클래스 · v${skill.version} · ${skill.status === "enabled" ? "활성" : "비활성"}`;

@@ -38,7 +38,7 @@ export function JudgeTab({ hidden, minHeight, judge, stats, holdCount, bannerVis
           가입 완료되거나 '나중에'를 누르면 다시 안 뜬다. */}
       <div id="signupBanner" className={`${bannerVisible ? "" : "hidden "}bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 space-y-2 shadow-sm`}>
         <div className="flex items-center gap-1.5 text-xs font-extrabold text-white">
-          <span>🎓</span><span>아직 가입 전이에요!</span>
+          <span>🎓</span><span>아직 가입 전이에요 !</span>
         </div>
         <p className="text-[11px] text-blue-100 leading-snug">한 번만 가입하면 내 기록이 우리 학년 반별 순위에 정확히 반영돼요. 안 해도 판단/퀴즈는 그대로 쓸 수 있어요.</p>
         <div className="flex gap-2">

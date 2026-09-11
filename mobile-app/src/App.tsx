@@ -8,7 +8,6 @@ import { ConfirmModal } from "./modals/ConfirmModal";
 import { JudgeModal } from "./modals/JudgeModal";
 import { submitSortingRecord } from "./records/sortingRecords";
 import { useClassRanking } from "./signup/useClassRanking";
-import { useInterimClass } from "./signup/useInterimClass";
 import { useSignup } from "./signup/useSignup";
 import { useConfirmModal } from "./state/useConfirmModal";
 import { useHoldBox } from "./state/useHoldBox";
@@ -49,7 +48,6 @@ export function App() {
       : null),
     [signup.state]);
   const ranking = useClassRanking(registeredSchoolId, registeredClass);
-  const interimClass = useInterimClass();
   const hold = useHoldBox({ showToast, registeredSchoolId });
   const quiz = useQuiz();
   const judge = useJudge({ showToast });
@@ -73,7 +71,7 @@ export function App() {
       registeredSchoolId: signup.registeredSchoolId
     });
     practice.record(item);
-    showToast(`🌳 올바른 실천! CO2 ${item.carbonSaved || 0}g이 절감되었습니다.`, "emerald");
+    showToast(`🌳 올바른 실천 ! CO2 ${item.carbonSaved || 0}g이 절감되었습니다.`, "emerald");
   }, [judge.result, practice, showToast, signup.registeredSchoolId]);
 
   const goToSignup = useCallback(() => {
@@ -108,10 +106,9 @@ export function App() {
           signup={signup}
           ranking={ranking}
           rankingReloadKey={rankingReloadKey}
-          interimClass={interimClass}
           onResetStats={() => confirmModal.open({
             title: "실천 타임라인 비우기",
-            description: "지금까지 쌓은 실천 횟수와 감축 이력이 사라집니다. 정말 초기화할까요?",
+            description: "지금까지 쌓은 실천 횟수와 감축 이력이 사라집니다. 정말 초기화할까요 ?",
             icon: "🗑️",
             confirmClass: "bg-rose-500 hover:bg-rose-600",
             onConfirm: () => {
@@ -127,14 +124,14 @@ export function App() {
           onAdd={hold.add}
           onResolve={(item) => confirmModal.open({
             title: "분류 기준 수립 및 보류 해결",
-            description: `"${item.name}" 품목의 세부 분리배출 기준이 확정되었나요? 확인을 누르면 보류 목록에서 정리됩니다.`,
+            description: `"${item.name}" 품목의 세부 분리배출 기준이 확정되었나요 ? 확인을 누르면 보류 목록에서 정리됩니다.`,
             icon: "🎉",
             confirmClass: "bg-emerald-600 hover:bg-emerald-700",
             onConfirm: () => { void hold.resolve(item.id); }
           })}
           onClearAll={() => confirmModal.open({
             title: "보류함 목록 초기화",
-            description: "보류함에 등록된 모든 대기 목록을 비우시겠습니까?",
+            description: "보류함에 등록된 모든 대기 목록을 비우시겠습니까 ?",
             icon: "🗑️",
             confirmClass: "bg-rose-500 hover:bg-rose-600",
             onConfirm: () => {

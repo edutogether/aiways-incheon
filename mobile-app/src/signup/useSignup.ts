@@ -153,7 +153,7 @@ export function useSignup({ showToast, openConfirm, onProfileChanged }: SignupOp
           kind: "teacherVerified",
           summary: { schoolId: selection.schoolId, schoolName: selection.schoolName, grade: trimmedGrade, classNum: trimmedClassNum, name }
         });
-        showToast(`🍎 ${trimmedGrade}학년 ${trimmedClassNum}반 담임 인증 완료!`, "emerald");
+        showToast(`🍎 ${trimmedGrade}학년 ${trimmedClassNum}반 담임 인증 완료 !`, "emerald");
         return;
       }
       setStatus(
@@ -188,7 +188,8 @@ export function useSignup({ showToast, openConfirm, onProfileChanged }: SignupOp
     // 기기에 영구히 고정되는 결정이라 한 번 더 묻는다.
     openConfirm({
       title: "가입 정보 확인",
-      description: `정말 "${selection.schoolName} ${trimmedGrade}학년 ${trimmedClassNum}반 ${number}번 ${name}" 학생이 맞나요? 가입하면 이 기기에 영구히 저장되고 다시 바꿀 수 없어요.`,
+      description: `정말 "${selection.schoolName} ${trimmedGrade}학년 ${trimmedClassNum}반 ${number}번 ${name}" 학생이 맞나요 ?
+가입하면 이 기기에 영구히 저장되고 다시 바꿀 수 없어요.`,
       icon: "🎓",
       confirmClass: "bg-blue-600 hover:bg-blue-700",
       onConfirm: () => {
@@ -201,7 +202,7 @@ export function useSignup({ showToast, openConfirm, onProfileChanged }: SignupOp
           if (result.ok && data?.pending) {
             setBannerVisible(false);
             setState({ kind: "pending", preview: data.preview ?? {} });
-            showToast(`⏳ "${name}" 학생 가입 신청 완료! 선생님 승인을 기다려 주세요.`, "amber");
+            showToast(`⏳ "${name}" 학생 가입 신청 완료 ! 선생님 승인을 기다려 주세요.`, "amber");
             return;
           }
           setStatus(
@@ -247,7 +248,7 @@ export function useSignup({ showToast, openConfirm, onProfileChanged }: SignupOp
     }
     openConfirm({
       title: "반 변경 확인",
-      description: `정말 "${target.schoolName || target.schoolId} ${target.grade}학년 ${target.classNum}반"으로 바꾸시겠어요? 반 변경은 하루에 한 번만 할 수 있어요.`,
+      description: `정말 "${target.schoolName || target.schoolId} ${target.grade}학년 ${target.classNum}반"으로 바꾸시겠어요 ? 반 변경은 하루에 한 번만 할 수 있어요.`,
       icon: "🔄",
       confirmClass: "bg-blue-600 hover:bg-blue-700",
       onConfirm: () => {
@@ -256,7 +257,7 @@ export function useSignup({ showToast, openConfirm, onProfileChanged }: SignupOp
           const data = result.data as { profile?: StudentProfile; code?: string; retryAfterSeconds?: number } | undefined;
           if (result.ok && data?.profile) {
             showLocked(data.profile);
-            showToast(`🔄 ${target.grade}학년 ${target.classNum}반으로 변경 완료!`, "emerald");
+            showToast(`🔄 ${target.grade}학년 ${target.classNum}반으로 변경 완료 !`, "emerald");
             return;
           }
           setClassChangeStatus(

@@ -2,14 +2,14 @@
   "#appRoot": {
     "_box": [
       12,
-      -622,
+      -519,
       366,
-      1577
+      1351
     ],
     "display": "flex",
     "position": "static",
     "width": "366px",
-    "height": "1576.88px",
+    "height": "1351px",
     "margin": "0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -34,7 +34,7 @@
   "button:🔍 판단": {
     "_box": [
       35,
-      -474,
+      -371,
       77,
       37
     ],
@@ -66,7 +66,7 @@
   "button:🎮 퀴즈": {
     "_box": [
       116,
-      -474,
+      -371,
       77,
       37
     ],
@@ -98,7 +98,7 @@
   "button:🌱 통계": {
     "_box": [
       197,
-      -474,
+      -371,
       77,
       37
     ],
@@ -130,7 +130,7 @@
   "button:❓ 보류함": {
     "_box": [
       278,
-      -474,
+      -371,
       77,
       37
     ],
@@ -162,14 +162,14 @@
   "#tab-judge": {
     "_box": [
       29,
-      -408,
+      -305,
       332,
-      1233
+      1042
     ],
     "display": "block",
     "position": "static",
     "width": "332px",
-    "height": "1233px",
+    "height": "1042px",
     "margin": "24px 0px 0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -194,7 +194,7 @@
   "#signupBanner": {
     "_box": [
       29,
-      -408,
+      -305,
       332,
       126
     ],
@@ -226,7 +226,7 @@
   "#signupBannerGoBtn": {
     "_box": [
       45,
-      -330,
+      -227,
       237,
       32
     ],
@@ -258,7 +258,7 @@
   "#signupBannerDismissBtn": {
     "_box": [
       290,
-      -330,
+      -227,
       55,
       32
     ],
@@ -290,7 +290,7 @@
   "#judge-stat-count": {
     "_box": [
       44,
-      -187,
+      -84,
       95,
       28
     ],
@@ -322,7 +322,7 @@
   "#judge-stat-carbon": {
     "_box": [
       147,
-      -187,
+      -84,
       95,
       28
     ],
@@ -354,7 +354,7 @@
   "#judge-stat-hold": {
     "_box": [
       251,
-      -187,
+      -84,
       95,
       28
     ],
@@ -418,7 +418,7 @@
   "#photoTriggerBtn": {
     "_box": [
       29,
-      -82,
+      21,
       332,
       60
     ],
@@ -450,7 +450,7 @@
   "#searchEmojiIcon": {
     "_box": [
       45,
-      36,
+      139,
       25,
       18
     ],
@@ -482,7 +482,7 @@
   "#searchInput": {
     "_box": [
       29,
-      22,
+      125,
       332,
       46
     ],
@@ -514,7 +514,7 @@
   "#searchTriggerBtn": {
     "_box": [
       327,
-      36,
+      139,
       20,
       20
     ],
@@ -962,7 +962,7 @@
   "#quickSelectGrid": {
     "_box": [
       29,
-      82,
+      185,
       332,
       303
     ],
@@ -994,7 +994,7 @@
   "button:🥛우유갑종이팩류 검토": {
     "_box": [
       29,
-      82,
+      185,
       77,
       96
     ],
@@ -1026,7 +1026,7 @@
   "button:📦택배상자종이류 검토": {
     "_box": [
       114,
-      82,
+      185,
       77,
       96
     ],
@@ -1058,7 +1058,7 @@
   "button:🥤플라스틱컵플라스틱류": {
     "_box": [
       199,
-      82,
+      185,
       77,
       96
     ],
@@ -1090,7 +1090,7 @@
   "button:🍜컵라면 용기재질·오": {
     "_box": [
       284,
-      82,
+      185,
       77,
       96
     ],
@@ -1122,7 +1122,7 @@
   "button:🍪과자 봉지비닐류 또": {
     "_box": [
       29,
-      186,
+      289,
       77,
       96
     ],
@@ -1154,7 +1154,7 @@
   "button:🥫캔류캔류 검토": {
     "_box": [
       114,
-      186,
+      289,
       77,
       96
     ],
@@ -1186,7 +1186,7 @@
   "button:🧴페트병플라스틱류 검": {
     "_box": [
       199,
-      186,
+      289,
       77,
       96
     ],
@@ -1218,7 +1218,7 @@
   "button:🍾유리병유리류 검토": {
     "_box": [
       284,
-      186,
+      289,
       77,
       96
     ],
@@ -1250,7 +1250,7 @@
   "button:☕종이컵종이류 확정 금": {
     "_box": [
       29,
-      289,
+      392,
       77,
       96
     ],
@@ -1282,7 +1282,7 @@
   "button:🛍️비닐 봉투비닐류 ": {
     "_box": [
       114,
-      289,
+      392,
       77,
       96
     ],
@@ -1314,7 +1314,7 @@
   "button:🧾영수증일반폐기물 검": {
     "_box": [
       199,
-      289,
+      392,
       77,
       96
     ],
@@ -1346,7 +1346,7 @@
   "button:🔋건전지폐건전지 전용": {
     "_box": [
       284,
-      289,
+      392,
       77,
       96
     ],
@@ -1378,7 +1378,7 @@
   "#holdQuickBtn": {
     "_box": [
       29,
-      395,
+      498,
       332,
       54
     ],
@@ -3154,230 +3154,6 @@
     "line-height": "18.72px",
     "letter-spacing": "normal",
     "color": "rgb(91, 101, 114)",
-    "background-color": "rgba(0, 0, 0, 0)",
-    "border": "0px solid rgb(229, 231, 235)",
-    "border-radius": "0px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "visible",
-    "z-index": "auto"
-  },
-  "#interimClassCard": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "block",
-    "position": "static",
-    "width": "auto",
-    "height": "auto",
-    "margin": "20px 0px 0px",
-    "padding": "16px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "16px",
-    "font-weight": "400",
-    "line-height": "24px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgb(248, 250, 252)",
-    "border": "1px solid rgb(226, 232, 240)",
-    "border-radius": "16px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "visible",
-    "z-index": "auto"
-  },
-  "#classSchoolInput": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "inline-block",
-    "position": "static",
-    "width": "100%",
-    "height": "auto",
-    "margin": "0px",
-    "padding": "8px 12px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "12px",
-    "font-weight": "400",
-    "line-height": "16px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgb(255, 255, 255)",
-    "border": "1px solid rgb(226, 232, 240)",
-    "border-radius": "12px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "clip",
-    "z-index": "auto"
-  },
-  "#classSchoolCode": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "none",
-    "position": "static",
-    "width": "auto",
-    "height": "auto",
-    "margin": "0px",
-    "padding": "0px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "16px",
-    "font-weight": "400",
-    "line-height": "24px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgba(0, 0, 0, 0)",
-    "border": "0px solid rgb(229, 231, 235)",
-    "border-radius": "0px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "clip",
-    "z-index": "auto"
-  },
-  "#classSchoolResults": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "none",
-    "position": "absolute",
-    "width": "auto",
-    "height": "auto",
-    "margin": "0px",
-    "padding": "0px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "12px",
-    "font-weight": "400",
-    "line-height": "16px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgb(255, 255, 255)",
-    "border": "1px solid rgb(226, 232, 240)",
-    "border-radius": "12px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "auto",
-    "z-index": "20"
-  },
-  "#classGradeInput": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "block",
-    "position": "static",
-    "width": "auto",
-    "height": "auto",
-    "margin": "0px",
-    "padding": "8px 12px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "12px",
-    "font-weight": "400",
-    "line-height": "16px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgb(255, 255, 255)",
-    "border": "1px solid rgb(226, 232, 240)",
-    "border-radius": "12px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "clip",
-    "z-index": "auto"
-  },
-  "#classNumInput": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "block",
-    "position": "static",
-    "width": "auto",
-    "height": "auto",
-    "margin": "0px",
-    "padding": "8px 12px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "12px",
-    "font-weight": "400",
-    "line-height": "16px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgb(255, 255, 255)",
-    "border": "1px solid rgb(226, 232, 240)",
-    "border-radius": "12px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "clip",
-    "z-index": "auto"
-  },
-  "#classContextStatus": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "block",
-    "position": "static",
-    "width": "auto",
-    "height": "auto",
-    "margin": "10px 0px 0px",
-    "padding": "0px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "10px",
-    "font-weight": "600",
-    "line-height": "15px",
-    "letter-spacing": "normal",
-    "color": "rgb(148, 163, 184)",
     "background-color": "rgba(0, 0, 0, 0)",
     "border": "0px solid rgb(229, 231, 235)",
     "border-radius": "0px",

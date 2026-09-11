@@ -4,12 +4,12 @@
       24,
       24,
       720,
-      1497
+      1300
     ],
     "display": "flex",
     "position": "static",
     "width": "720px",
-    "height": "1496.94px",
+    "height": "1299.5px",
     "margin": "0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -1732,12 +1732,12 @@
       153,
       254,
       462,
-      1144
+      967
     ],
     "display": "block",
     "position": "static",
     "width": "462px",
-    "height": "1144px",
+    "height": "967px",
     "margin": "24px 0px 0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -2591,234 +2591,10 @@
     "overflow": "visible",
     "z-index": "auto"
   },
-  "#interimClassCard": {
-    "_box": [
-      153,
-      417,
-      462,
-      157
-    ],
-    "display": "block",
-    "position": "static",
-    "width": "462px",
-    "height": "156.5px",
-    "margin": "20px 0px 0px",
-    "padding": "16px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "16px",
-    "font-weight": "400",
-    "line-height": "24px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgb(248, 250, 252)",
-    "border": "1px solid rgb(226, 232, 240)",
-    "border-radius": "16px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "visible",
-    "z-index": "auto"
-  },
-  "#classSchoolInput": {
-    "_box": [
-      170,
-      498,
-      137,
-      34
-    ],
-    "display": "inline-block",
-    "position": "static",
-    "width": "137.328px",
-    "height": "34px",
-    "margin": "0px",
-    "padding": "8px 12px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "12px",
-    "font-weight": "400",
-    "line-height": "16px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgb(255, 255, 255)",
-    "border": "1px solid rgb(226, 232, 240)",
-    "border-radius": "12px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "clip",
-    "z-index": "auto"
-  },
-  "#classSchoolCode": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "none",
-    "position": "static",
-    "width": "auto",
-    "height": "auto",
-    "margin": "0px",
-    "padding": "0px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "16px",
-    "font-weight": "400",
-    "line-height": "24px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgba(0, 0, 0, 0)",
-    "border": "0px solid rgb(229, 231, 235)",
-    "border-radius": "0px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "clip",
-    "z-index": "auto"
-  },
-  "#classSchoolResults": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "none",
-    "position": "absolute",
-    "width": "auto",
-    "height": "auto",
-    "margin": "0px",
-    "padding": "0px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "12px",
-    "font-weight": "400",
-    "line-height": "16px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgb(255, 255, 255)",
-    "border": "1px solid rgb(226, 232, 240)",
-    "border-radius": "12px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "auto",
-    "z-index": "20"
-  },
-  "#classGradeInput": {
-    "_box": [
-      315,
-      498,
-      137,
-      34
-    ],
-    "display": "block",
-    "position": "static",
-    "width": "137.328px",
-    "height": "34px",
-    "margin": "0px",
-    "padding": "8px 12px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "12px",
-    "font-weight": "400",
-    "line-height": "16px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgb(255, 255, 255)",
-    "border": "1px solid rgb(226, 232, 240)",
-    "border-radius": "12px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "clip",
-    "z-index": "auto"
-  },
-  "#classNumInput": {
-    "_box": [
-      461,
-      498,
-      137,
-      34
-    ],
-    "display": "block",
-    "position": "static",
-    "width": "137.328px",
-    "height": "34px",
-    "margin": "0px",
-    "padding": "8px 12px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "12px",
-    "font-weight": "400",
-    "line-height": "16px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgb(255, 255, 255)",
-    "border": "1px solid rgb(226, 232, 240)",
-    "border-radius": "12px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "clip",
-    "z-index": "auto"
-  },
-  "#classContextStatus": {
-    "_box": [
-      170,
-      542,
-      428,
-      15
-    ],
-    "display": "block",
-    "position": "static",
-    "width": "428px",
-    "height": "15px",
-    "margin": "10px 0px 0px",
-    "padding": "0px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "10px",
-    "font-weight": "600",
-    "line-height": "15px",
-    "letter-spacing": "normal",
-    "color": "rgb(148, 163, 184)",
-    "background-color": "rgba(0, 0, 0, 0)",
-    "border": "0px solid rgb(229, 231, 235)",
-    "border-radius": "0px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "visible",
-    "z-index": "auto"
-  },
   "#classRankingCard": {
     "_box": [
       153,
-      594,
+      417,
       462,
       174
     ],
@@ -2850,7 +2626,7 @@
   "#classRankingRefreshBtn": {
     "_box": [
       547,
-      611,
+      435,
       51,
       15
     ],
@@ -2882,7 +2658,7 @@
   "#classRankingStatus": {
     "_box": [
       170,
-      637,
+      460,
       428,
       14
     ],
@@ -2914,7 +2690,7 @@
   "#classRankingEmpty": {
     "_box": [
       170,
-      660,
+      484,
       428,
       81
     ],
@@ -2946,7 +2722,7 @@
   "#classRankingList": {
     "_box": [
       170,
-      751,
+      574,
       428,
       0
     ],
@@ -2978,7 +2754,7 @@
   "#stat-count": {
     "_box": [
       166,
-      915,
+      738,
       121,
       32
     ],
@@ -3010,7 +2786,7 @@
   "#stat-carbon": {
     "_box": [
       323,
-      915,
+      738,
       121,
       32
     ],
@@ -3042,7 +2818,7 @@
   "#stat-hold": {
     "_box": [
       481,
-      915,
+      738,
       121,
       32
     ],
@@ -3074,7 +2850,7 @@
   "#resetStatsBtn": {
     "_box": [
       517,
-      980,
+      803,
       98,
       28
     ],
@@ -3106,7 +2882,7 @@
   "#practice-logs-container": {
     "_box": [
       153,
-      1016,
+      839,
       462,
       190
     ],
@@ -3138,7 +2914,7 @@
   "#no-logs-msg": {
     "_box": [
       153,
-      1016,
+      839,
       462,
       99
     ],

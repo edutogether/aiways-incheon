@@ -75,7 +75,7 @@ export function JudgeModal({ judge, onRegisterHold, onLogPractice }: JudgeModalP
           <p id="resBody" className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">{result?.body ?? "안내 가이드라인 문장"}</p>
 
           <div id="resCandidates" className={`${result?.candidates.length ? "" : "hidden "}flex flex-wrap gap-1.5`}>
-            {result?.candidates.length ? <span className="text-[10px] text-slate-400 font-bold w-full">다른 후보였나요?</span> : null}
+            {result?.candidates.length ? <span className="text-[10px] text-slate-400 font-bold w-full">다른 후보였나요 ?</span> : null}
             {result?.candidates.map((candidate) => (
               <button key={candidate.itemId} type="button"
                       className="text-[10px] font-bold px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-200 text-slate-600 transition-colors"

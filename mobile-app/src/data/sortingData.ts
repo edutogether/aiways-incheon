@@ -423,8 +423,8 @@ function pickQuizSet(): QuizQuestion[] {
 
 function quizRank(correctCount: number): QuizRank {
   if (correctCount >= 10) return { title: "AI Ways 자원순환 마스터", message: "완벽해요. 오늘의 분리배출 챔피언입니다 🏆", emoji: "🏆" };
-  if (correctCount >= 9) return { title: "자원순환 환경운동가", message: "와우! 기준도 좋고 실천 감각도 뛰어나요 🌍", emoji: "🌍" };
-  if (correctCount >= 7) return { title: "분리배출 실천가", message: "잘하고 있어요! 학교에서도 믿고 맡길 수 있는 수준이에요 ♻️", emoji: "♻️" };
+  if (correctCount >= 9) return { title: "자원순환 환경운동가", message: "와우 ! 기준도 좋고 실천 감각도 뛰어나요 🌍", emoji: "🌍" };
+  if (correctCount >= 7) return { title: "분리배출 실천가", message: "잘하고 있어요 ! 학교에서도 믿고 맡길 수 있는 수준이에요 ♻️", emoji: "♻️" };
   if (correctCount >= 5) return { title: "자원순환 탐험가", message: "기준을 꽤 잘 알고 있어요. 이제 실천력을 더 키워봐요 🔎", emoji: "🔎" };
   if (correctCount >= 3) return { title: "분리배출 연습생", message: "조금씩 감이 오고 있어요. 한 번 더 하면 더 잘할 수 있어요 🍀", emoji: "🍀" };
   return { title: "분리배출 새싹", message: "처음은 누구나 헷갈릴 수 있어요. 다시 도전해봐요 🌱", emoji: "🌱" };

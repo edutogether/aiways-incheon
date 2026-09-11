@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { SignupCard } from "../signup/SignupCard";
 import type { useClassRanking } from "../signup/useClassRanking";
-import type { useInterimClass } from "../signup/useInterimClass";
 import type { useSignup } from "../signup/useSignup";
 import type { PracticeStats } from "../state/usePracticeStats";
 
@@ -13,21 +12,17 @@ interface StatsTabProps {
   signup: ReturnType<typeof useSignup>;
   ranking: ReturnType<typeof useClassRanking>;
   rankingReloadKey: number;
-  interimClass: ReturnType<typeof useInterimClass>;
   onResetStats: () => void;
 }
 
 // 3. 실천 통계 탭.
-export function StatsTab({ hidden, minHeight, stats, holdCount, signup, ranking, rankingReloadKey, interimClass, onResetStats }: StatsTabProps) {
+export function StatsTab({ hidden, minHeight, stats, holdCount, signup, ranking, rankingReloadKey, onResetStats }: StatsTabProps) {
   const rankingLoad = ranking.load;
   // 처음 한 번, 그리고 가입·반 변경으로 소속이 바뀔 때마다 다시 불러온다.
   useEffect(() => {
     void rankingLoad();
   }, [rankingLoad, rankingReloadKey]);
 
-  // 가입이 끝나면 임시 입력 카드는 의미가 없다(서버가 가진 정보가 이긴다).
-  const interimHidden = signup.state.kind !== "form";
-  const school = interimClass.school;
 
   return (
     <div
@@ -37,38 +32,6 @@ export function StatsTab({ hidden, minHeight, stats, holdCount, signup, ranking,
     >
       <SignupCard signup={signup} />
 
-      {/* 임시 학교/반 입력: 가입 안 한 학생의 기록에 붙일 값. 가입하면 이
-          카드는 숨겨지고(서버가 가입 정보로 대체), 안 하면 계속 쓸 수 있다. */}
-      <div id="interimClassCard" className={`${interimHidden ? "hidden " : ""}bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5`}>
-        <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700">
-          <span>🏫</span><span>내 학교/반 (임시 입력)</span>
-        </div>
-        <p className="text-[10px] text-slate-500 leading-snug">우리 반 기록으로 집계되려면 학교/학년/반을 적어 주세요. 정식 가입 기능이 열리면 이 입력은 자동으로 대체됩니다.</p>
-        <div className="grid grid-cols-3 gap-2">
-          <div className="col-span-3 sm:col-span-1 relative">
-            <input type="text" id="classSchoolInput" placeholder="학교 이름 검색" autoComplete="off" className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-                   value={school.query}
-                   onChange={(event) => school.onQueryChange(event.target.value)}
-                   onFocus={school.onFocus} onBlur={() => { school.onBlur(); interimClass.sync(); }} />
-            <input type="hidden" id="classSchoolCode" value={school.selection?.schoolId ?? ""} />
-            <div id="classSchoolResults" className={`${school.results ? "" : "hidden "}absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-20 max-h-40 overflow-y-auto text-xs`}>
-              {school.results?.length === 0 && <div className="px-3 py-2 text-slate-400">검색 결과가 없어요.</div>}
-              {school.results?.map((result) => (
-                <button key={result.schoolCode} type="button" className="block w-full text-left px-3 py-2 hover:bg-blue-50 border-b border-slate-100 last:border-0"
-                        onClick={() => { school.select(result); window.setTimeout(interimClass.sync, 0); }}>
-                  <span className="block font-semibold">{`${result.schoolName} (${result.schoolLevel})`}</span>
-                  <span className="block text-[11px] text-slate-400 mt-0.5">{result.address || result.region}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-          <input type="text" inputMode="numeric" id="classGradeInput" placeholder="학년" className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-                 value={interimClass.grade} onChange={(event) => interimClass.setGrade(event.target.value)} onBlur={interimClass.sync} />
-          <input type="text" id="classNumInput" placeholder="반" className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-                 value={interimClass.classNum} onChange={(event) => interimClass.setClassNum(event.target.value)} onBlur={interimClass.sync} />
-        </div>
-        <p id="classContextStatus" className="text-[10px] font-semibold text-slate-400">{interimClass.status}</p>
-      </div>
 
       <div id="classRankingCard" className="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 space-y-2.5">
         <div className="flex items-center justify-between">
@@ -137,7 +100,7 @@ export function StatsTab({ hidden, minHeight, stats, holdCount, signup, ranking,
         </div>
         <div id="practice-logs-container" className="space-y-2 h-[190px] overflow-y-auto custom-scrollbar">
           <div id="no-logs-msg" className={`${stats.logs.length ? "hidden " : ""}text-center py-8 border border-dashed border-slate-200 rounded-2xl`}>
-            <p className="text-[11px] text-slate-400">아직 기록된 실천이 없습니다.<br />&apos;3초 판단&apos;에서 가이드라인을 확인하고 실천해보세요!</p>
+            <p className="text-[11px] text-slate-400">아직 기록된 실천이 없습니다.<br />&apos;3초 판단&apos;에서 가이드라인을 확인하고 실천해보세요 !</p>
           </div>
           {stats.logs.map((log, position) => (
             // 같은 물건을 같은 초에 두 번 기록할 수 있어 시간만으로는 키가
@@ -158,7 +121,7 @@ export function StatsTab({ hidden, minHeight, stats, holdCount, signup, ranking,
       </div>
 
       <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 space-y-2">
-        <span className="text-sm font-bold text-blue-600">💡 왜 실천을 기록하나요?</span>
+        <span className="text-sm font-bold text-blue-600">💡 왜 실천을 기록하나요 ?</span>
         <p className="text-xs text-slate-600 leading-relaxed">한 번의 올바른 분리배출은 작아 보이지만, 우리 반 전체가 매일 실천하면 학교 단위의 자원순환 데이터가 쌓입니다. 이 기록은 우리 학교가 실제로 자원을 얼마나 아끼고 있는지 보여주는 증거가 됩니다.</p>
         <p className="text-xs text-slate-600 leading-relaxed"><strong className="font-bold text-slate-700">🌍 깜짝 상식:</strong> 투명 페트병 1개를 제대로 분리배출하면 약 22g의 이산화탄소를 줄일 수 있어요. 하루에 우리 반 25명이 하나씩만 실천해도 약 550g을 절감하는 셈이에요.</p>
       </div>

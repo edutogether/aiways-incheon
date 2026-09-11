@@ -38,6 +38,8 @@ const LEGACY_SCRIPTS = [
   "../firebaseAppCheck.js",
   "../firebaseBetaAuth.js",
   "../edu2gBetaClient.js",
+  // 학교 검색을 브라우저 안에서 한다(PC와 같은 구현 한 벌).
+  "../schoolListSearch.js",
   // 인증 게이트는 **일부러 옮기지 않았다.** App Check 실패 화면과 재시도가
   // 들어 있고 리액트 밖의 #authGate를 다시 그리는 구조라 화면 이식과 성격이
   // 다르다. 같이 건드리면 문제가 났을 때 전환 때문인지 게이트 때문인지

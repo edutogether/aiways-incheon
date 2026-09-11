@@ -96,7 +96,7 @@ export function SignupCard({ signup }: { signup: ReturnType<typeof useSignup> })
       <div className="grid grid-cols-3 gap-2">
         <div className="col-span-3 sm:col-span-1 relative">
           <input type="text" id="signupSchoolInput" placeholder="학교 이름 검색" autoComplete="off" className="w-full bg-white border border-blue-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-                 value={school.query} onChange={(event) => school.onQueryChange(event.target.value)} onBlur={school.onBlur} />
+                 value={school.query} onChange={(event) => school.onQueryChange(event.target.value)} onFocus={school.onFocus} onBlur={school.onBlur} />
           <input type="hidden" id="signupSchoolCode" value={school.selection?.schoolId ?? ""} />
           <div id="signupSchoolResults" className={`${school.results ? "" : "hidden "}absolute left-0 right-0 mt-1 bg-white border border-blue-200 rounded-xl shadow-lg z-20 max-h-40 overflow-y-auto text-xs`}>
             {/* 🔴 검색이 실패한 것을 "그런 학교가 없다"로 말하지 않는다.

@@ -8,7 +8,7 @@
 // **목록에서 고르기 전에는 코드가 비어 있다.** 그래서 이름만 쳐놓고 제출하는
 // 것을 막을 수 있다(selection이 null이면 제출 단계에서 거른다).
 import { useCallback, useEffect, useRef, useState } from "react";
-import { edu2gClient } from "../legacy/globals";
+import { edu2gClient, schoolList } from "../legacy/globals";
 
 const DEBOUNCE_MS = 300;
 const MIN_QUERY_LENGTH = 2;
@@ -45,7 +45,16 @@ export function useSchoolSearch() {
     if (blurTimer.current !== null) window.clearTimeout(blurTimer.current);
   }, []);
 
+  // 🔴 첫 화면에서 미리 받지 않는다. 이 훅은 App 최상위에서 마운트되므로
+  // 마운트 시점에 받으면 그것이 곧 첫 화면이다 - 학교 검색을 쓰지도 않는 학생이
+  // 학교 와이파이에서 164KB를 받게 된다. **검색창을 만지는 순간**에만 받는다.
+  // 아낌 모드·2G면 받지 않고 서버 검색으로 가는 판정은 schoolListSearch.js에 있다.
+  const onFocus = useCallback(() => { void schoolList()?.loadNow(); }, []);
+
   const onQueryChange = useCallback((value: string) => {
+    // 포커스 없이 값이 들어오는 경로(붙여넣기 등)에서도 시작되게 한다.
+    // load()는 약속을 캐시하므로 여러 번 불러도 한 번만 받는다.
+    void schoolList()?.loadNow();
     setQuery(value);
     // 고른 뒤에 글자를 고치면 그 선택은 무효다 - 코드를 비워서 "고르지 않은
     // 상태"로 되돌린다.
@@ -57,6 +66,16 @@ export function useSchoolSearch() {
       setResults(null);
       return;
     }
+    // 🔴 목록이 브라우저에 있으면 서버를 거치지 않는다. 디바운스도 걸지 않는다 -
+    // 필터가 밀리초로 끝나는데 300ms를 기다리면 "타자 치는 대로"가 성립하지 않고,
+    // 한글은 자모마다 값이 바뀌므로 기다리는 만큼 목록이 멎어 보인다.
+    const local = schoolList()?.search(trimmed);
+    if (local) {
+      setResults(local.slice(0, MAX_RESULTS));
+      return;
+    }
+
+    // 목록이 아직 안 왔거나 못 받았으면 예전처럼 서버로 간다(폴백).
     debounce.current = window.setTimeout(() => {
       void edu2gClient()?.searchSchool?.({ query: trimmed }).then((response) => {
         if (!response.ok) { setError(response.code || "unknown"); setResults([]); return; }
@@ -89,5 +108,5 @@ export function useSchoolSearch() {
 
   const selection: SchoolSelection | null = schoolId ? { schoolId, schoolName: query.trim() } : null;
 
-  return { query, results, error, selection, onQueryChange, onBlur, select, setValue };
+  return { query, results, error, selection, onQueryChange, onFocus, onBlur, select, setValue };
 }

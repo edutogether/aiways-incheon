@@ -106,16 +106,16 @@ async function fetchPage(index) {
   // 손으로 고치게 두면 **목록만 바뀌고 주소는 그대로라 옛것을 1년 쓰는** 사고가
   // 난다 - 그래서 여기서 자동으로 고치고, 못 고치면 멈춘다.
   const hash = crypto.createHash("sha256").update(text, "utf8").digest("hex").slice(0, 12);
-  const appPath = path.resolve(__dirname, "..", "app.js");
+  const appPath = path.resolve(__dirname, "..", "schoolListSearch.js");
   const app = fs.readFileSync(appPath, "utf8");
-  const pattern = /const SCHOOL_LIST_URL = "\.\/assets\/school-list\.tsv\?v=[^"]*";/;
+  const pattern = /const SCHOOL_LIST_URL = "\/assets\/school-list\.tsv\?v=[^"]*";/;
   if (!pattern.test(app)) {
-    throw new Error("app.js에서 SCHOOL_LIST_URL 줄을 찾지 못했습니다 - 목록만 바뀌고 주소가 그대로면 옛것을 계속 쓰게 됩니다.");
+    throw new Error("schoolListSearch.js에서 SCHOOL_LIST_URL 줄을 찾지 못했습니다 - 목록만 바뀌고 주소가 그대로면 옛것을 계속 쓰게 됩니다.");
   }
-  const updated = app.replace(pattern, `const SCHOOL_LIST_URL = "./assets/school-list.tsv?v=${hash}";`);
+  const updated = app.replace(pattern, `const SCHOOL_LIST_URL = "/assets/school-list.tsv?v=${hash}";`);
   fs.writeFileSync(appPath, updated, "utf8");
 
   console.log(`${OUT} — 학교 ${rows.length}개, ${(fs.statSync(OUT).size / 1024).toFixed(1)}KB`);
   console.log(`  급별 ${levels.length}종 · 시도 ${regions.length}종`);
-  console.log(`  app.js의 SCHOOL_LIST_URL을 ?v=${hash} 로 갱신했습니다.`);
+  console.log(`  schoolListSearch.js의 SCHOOL_LIST_URL을 ?v=${hash} 로 갱신했습니다.`);
 })().catch((e) => { console.error(e.message); process.exit(1); });

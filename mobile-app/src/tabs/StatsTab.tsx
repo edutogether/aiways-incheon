@@ -49,7 +49,7 @@ export function StatsTab({ hidden, minHeight, stats, holdCount, signup, ranking,
             <input type="text" id="classSchoolInput" placeholder="학교 이름 검색" autoComplete="off" className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
                    value={school.query}
                    onChange={(event) => school.onQueryChange(event.target.value)}
-                   onBlur={() => { school.onBlur(); interimClass.sync(); }} />
+                   onFocus={school.onFocus} onBlur={() => { school.onBlur(); interimClass.sync(); }} />
             <input type="hidden" id="classSchoolCode" value={school.selection?.schoolId ?? ""} />
             <div id="classSchoolResults" className={`${school.results ? "" : "hidden "}absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-20 max-h-40 overflow-y-auto text-xs`}>
               {school.results?.length === 0 && <div className="px-3 py-2 text-slate-400">검색 결과가 없어요.</div>}

@@ -8,7 +8,7 @@
 // 목록이 통째로 비었다 다시 채워졌다. 화면에는 "검색 결과가 없어요"가 번갈아 떴다.
 // Bumm님이 "한 글자씩 치고 좀 쉬어야 한다"고 하신 것이 이것이다.
 //
-// 🔴 왜 여기(소스 추출)인가: `app.js`는 브라우저가 `<script>`로 읽는 즉시실행
+// 🔴 왜 여기(소스 추출)인가: `schoolListSearch.js`는 브라우저가 `<script>`로 읽는 즉시실행
 // 함수라 `require`할 수 없고, 실제 타건을 재는 Playwright는 **이 저장소에서 CI를
 // 돌지 않는다**. 그래서 소스에서 진짜 구현을 꺼내 이 자리에서 실행한다 -
 // 다시 구현해서 비교하면 "내가 쓴 것끼리 맞는지"를 보는 검사가 되어 버린다.
@@ -17,12 +17,12 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const APP = fs.readFileSync(path.resolve(__dirname, "..", "..", "app.js"), "utf8");
+const APP = fs.readFileSync(path.resolve(__dirname, "..", "..", "schoolListSearch.js"), "utf8");
 
 function cut(label, pattern) {
   const found = APP.match(pattern);
   // 🔴 못 찾으면 조용히 통과시키지 않는다(§21). 이름이 바뀌면 여기서 멈춰야 한다.
-  assert.ok(found, `app.js에서 ${label}을(를) 찾지 못했습니다 - 이름이 바뀌었다면 이 검사도 같이 고쳐야 합니다.`);
+  assert.ok(found, `schoolListSearch.js에서 ${label}을(를) 찾지 못했습니다 - 이름이 바뀌었다면 이 검사도 같이 고쳐야 합니다.`);
   return found[0];
 }
 

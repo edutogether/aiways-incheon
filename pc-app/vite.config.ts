@@ -42,6 +42,7 @@ const LEGACY_SCRIPTS = [
   "./classProfileStore.js",
   "./classroomSkillRegistry.js",
   "./aiRuntimeLoader.js",
+  "./schoolListSearch.js",
   "./app.js"
 ];
 

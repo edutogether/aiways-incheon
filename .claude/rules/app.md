@@ -672,6 +672,47 @@ package.json이 셋이다 — `functions/`(백엔드·테스트), 루트(Playwri
   밀린다**(scroll-snap이 비동기로 자리를 잡는다). `showSection()`이 스냅을 끄고
   정수 위치로 옮긴 뒤 실제로 멎었는지 확인한다 — 어긋나면 던진다
 
+## 🔴 CSP `img-src`에 `blob:`이 있어야 사진 분석이 돈다 (2026-09-11)
+
+PC "AI 판단"과 학생 앱의 사진 분석은 `URL.createObjectURL(file)`이 만든 **`blob:` 주소**를
+`<img>`에 넣고 `image.onload`에서 분석을 시작한다. `img-src`에 `blob:`이 없으면 브라우저가
+막고 **`onload`가 영영 안 불려 분석이 시작조차 안 된다.** 서버에는 아무것도 가지 않으므로
+**App Check 문제로 오진하기 쉽다.**
+
+🔴 **화면 문구가 원인을 가린다.** 사용자에게는 "사진을 불러오지 못했습니다. 다른 사진을
+선택해 주세요."로 보여서 **"내 사진이 이상한가 보다"** 로 읽힌다. 다른 사진을 골라도 똑같이
+실패한다. 차단 사실은 **콘솔에만** 남는다 — 내부 오류코드를 화면에 안 보여주는 규칙이
+여기서는 원인을 감추는 쪽으로 작용했다.
+
+2026-09-01 `2f90569`에서 CSP를 `<meta>`에서 `firebase.json`으로 옮길 때 빠져 열흘을 갔다.
+`functions/test/cspBlobImageContract.test.js`가 막는다 — **CSP 문자열을 외우지 않고**
+소스가 실제로 blob 이미지를 쓰는지 먼저 확인한 뒤 CSP가 허용하는지 본다.
+**CSP를 결함 상태로 되돌려 실제로 빨간불이 뜨는 것까지 확인했다.**
+
+**`a[download]`의 blob(CSV 내보내기)은 `img-src`와 무관하다** — 실측으로 확인했다. 두
+용도를 같이 묶어 판단하지 말 것.
+
+### 🔴 남은 것 — `[data-sorting-result]`가 저장소 어디에도 없다
+
+CSP를 고치자 사진 흐름이 비로소 끝까지 도달했고, 그러자 **전부터 있던 오류가 드러났다**:
+
+```
+TypeError: Cannot set properties of null (setting 'innerHTML')
+    at renderJudgementResult (app.js:4363)
+```
+
+`runThreeSecondJudgement`가 `$("[data-sorting-result]")`를 찾는데 **그 요소는
+`index.html`에도, 저장소 어느 파일에도 없다**(grep 0건). `container?.classList`는
+optional chaining인데 바로 다음 줄 `container.innerHTML`은 아니라서 던진다.
+
+**눈에 보이는 AI 모달은 정상이다** — 던지는 자리가 `setTimeout` 콜백 안이라 동기 흐름
+(`showDraftModal`, `supportingEvidencePromise` 등록)은 영향받지 않는다. 잃는 것은
+화면이 없어진 "3초 판단" 인라인 패널뿐이다.
+
+🔴 **그래도 사진마다 uncaught TypeError가 하나씩 쌓인다 — 진짜 오류를 가린다.**
+화면을 되살릴지(요소 추가) JS를 걷을지는 **화면에 관한 결정이라 Bumm님 몫**이다.
+세션이 임의로 정하지 않는다.
+
 ## 자주 틀리는 것
 - **App Check가 ENFORCED라 자동화 브라우저(Playwright 등)는 라이브에서 403 `App attestation failed`를 받는다. 이건 라이브 장애가 아니라 정상 동작이다.** reCAPTCHA Enterprise가 사람/봇 점수를 매기는데 자동화 브라우저는 `navigator.webdriver === true`라 낮은 점수를 받고 App Check가 그 토큰을 거부한다 — **헤드풀(`channel:"chrome"`)로 띄워도 똑같다. 헤드리스 여부가 아니라 자동화 여부가 감지된다.** 2026-09-09에 이 세션이 "라이브 다운"으로 오판해 보고했고, 같은 날 CLASSCADE도 같은 함정에 걸렸다. 라이브가 실제로 살아 있는지는 **사람이 실제 휴대폰으로 열어보는 것**이 유일하게 확실한 확인이다
 - **자동화로 App Check를 확인하려는 시도는 이미 해봤고, 이 저장소에서는 안 된다**(2026-09-09 실측). 다른 저장소가 찾은 방법(헤드풀 실제 크롬으로 토큰을 받아 본문 없는 요청을 보내고, 응답 코드가 `app_check_*`인지 `auth_missing`인지로 가른다)을 그대로 옮겨 봤다. **서버 쪽 전제는 성립한다** — `protectedActor.js`가 App Check를 가장 먼저 보고 본문 파싱은 그 뒤라, 코드로 가를 수 있다. 그런데 **클라이언트 쪽에서 토큰 자체가 안 나온다**(헤드풀 크롬에서도 `getAIWaysAppCheckHeaders()`가 null). 🔴 **대조군(예전부터 등록된 `firebaseapp.com`)도 같이 막혔으므로 설정 문제가 아니라 자동화의 한계다.** 검사는 `tests/appCheckLiveProbe.spec.js`에 남겨 뒀다(기본은 건너뜀, `AIWAYS_APPCHECK_PROBE=1`로 실행). reCAPTCHA 설정이 바뀌면 저절로 통과하게 되고, **대조군만 통과하고 정식 주소가 막히면 그때는 실패로 알려준다**

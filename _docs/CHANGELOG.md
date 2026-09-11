@@ -12,6 +12,39 @@
 
 ## 2026-09-11
 
+### 🔴 사진 분석이 **라이브에서 열흘째** 모든 사진에 실패하던 것을 고쳤다 — CSP가 blob 이미지를 막았다
+
+PC 대시보드의 "AI 판단"과 학생 앱의 사진 분석이 **어떤 사진을 넣어도** 실패했다.
+라이브에서 직접 받은 브라우저 메시지:
+
+```
+Loading the image 'blob:https://incheon.edutogether.kr/...' violates the following
+Content Security Policy directive: "img-src 'self' data: https:". The action has been blocked.
+```
+
+사진 미리보기는 `URL.createObjectURL(file)`이 만드는 `blob:` 주소인데 `img-src`에
+`blob:`이 없었다. 막히면 `image.onload`가 영영 안 불려 **분석이 시작조차 안 된다** —
+서버에는 아무것도 가지 않으므로 App Check 문제가 아니다.
+
+**`miniapp/3second.html`과 같은 뿌리다**: 2026-09-01 `2f90569`에서 CSP를 `<meta>`에서
+`firebase.json`으로 옮길 때 `blob:`이 빠졌다. 이 저장소 이력에 `blob:`이 CSP에 들어간
+적이 한 번도 없다.
+
+🔴 **왜 아무도 못 봤나 — 화면 문구가 원인을 가렸다.** 사용자에게는
+"사진을 불러오지 못했습니다. 다른 사진을 선택해 주세요."로 보여서 **"내 사진이
+이상한가 보다"** 로 읽힌다. 다른 사진을 골라도 똑같이 실패한다. 차단 사실은 콘솔에만 남는다.
+
+고친 것: 메인 CSP `img-src`에 `blob:` 추가(`'self' data: blob: https:`). miniapp CSP는
+그대로 뒀다 — 거기서는 `createObjectURL`을 쓰지 않는다(확인: 0건).
+검사 `functions/test/cspBlobImageContract.test.js`를 같이 붙였다.
+
+### 학교 검색 디바운스가 로컬 검색에도 걸려 300ms 늦던 것
+
+전국 목록을 브라우저에 굳혀 필터가 0.4~1.5ms에 끝나는데, 서버를 부르던 시절의
+**300ms 디바운스가 로컬 경로에도 그대로 남아** 타자를 멈춘 뒤 300ms를 더 기다렸다
+(실측 427ms). 목록이 있으면 즉시 돌리고(실측 **49~85ms**, 대부분 타건 왕복),
+아직 없어 서버로 떨어지는 경로에서만 300ms를 유지한다.
+
 ### `miniapp/3second.html`(7차시 Vibe Coding 체험)이 **열흘 동안 죽어 있던 것**을 되살렸다
 
 **2026-09-01 `2f90569`(GitHub Pages → Firebase Hosting)부터다.** 그 전까지 CSP는

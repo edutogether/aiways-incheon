@@ -28,7 +28,11 @@ const OUT_DIR = resolve(REPO_ROOT, "mobile");
 //
 // public/에 두면 Vite가 손대지 않고 산출물로 그대로 복사한다. 해시가
 // 정말 같은지는 reactShell.spec.js가 매번 대조한다.
-const VERBATIM_STYLESHEETS = ["tailwind.generated.css", "mobile.css"];
+const VERBATIM_STYLESHEETS = ["tailwind.generated.css", "mobile.css", "signupModal.css"];
+
+// 루트에 있는 공용 스타일시트. PC와 **같은 파일 하나**를 쓴다(학년·반 드롭다운).
+// 산출물이 /mobile/ 에 있으므로 한 단계 위를 가리킨다 - 공유 스크립트와 같은 방식.
+const SHARED_STYLESHEETS = ["../classPicker.css"];
 
 // 상위 폴더의 공유 스크립트는 PC 앱과 같이 쓰는 것이라 이번 전환에서
 // 건드리지 않고, 지금처럼 전역(window.AIWays*)으로 읽는다.
@@ -40,6 +44,10 @@ const LEGACY_SCRIPTS = [
   "../edu2gBetaClient.js",
   // 학교 검색을 브라우저 안에서 한다(PC와 같은 구현 한 벌).
   "../schoolListSearch.js",
+  // 학년·반 드롭다운. PC와 같은 구현 한 벌.
+  "../classPicker.js",
+  // 참여 학교의 실제 학급 수(NEIS). 없으면 없는 반까지 고를 수 있게 된다.
+  "../schoolClassCounts.js",
   // 인증 게이트는 **일부러 옮기지 않았다.** App Check 실패 화면과 재시도가
   // 들어 있고 리액트 밖의 #authGate를 다시 그리는 구조라 화면 이식과 성격이
   // 다르다. 같이 건드리면 문제가 났을 때 전환 때문인지 게이트 때문인지
@@ -73,6 +81,7 @@ function aiwaysLegacyAssets(): Plugin {
 
         const injected = [
           ...VERBATIM_STYLESHEETS.map((href) => `<link rel="stylesheet" href="./${href}" />`),
+          ...SHARED_STYLESHEETS.map((href) => `<link rel="stylesheet" href="${href}" />`),
           ...LEGACY_SCRIPTS.map((src) => `<script defer src="${src}"></script>`),
           ...viteTags
         ].map((tag) => `    ${tag}`).join("\n");

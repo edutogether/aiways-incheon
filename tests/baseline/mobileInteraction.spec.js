@@ -155,6 +155,11 @@ for (const vp of VIEWPORTS) {
       await capture(page, vp.name, "통계-실천기록");
 
       // 담임 모드: 입력칸이 통째로 바뀌고 인사 문구가 새로 뜬다.
+      // 🔴 2026-09-11부터 가입 입력은 **모달 안**에 있다(지시 Bumm - PC 모달과 같게).
+      //    먼저 열어야 입력칸이 화면에 있다.
+      await page.locator("#signupOpenButton").click();
+      await page.locator("#signupModal[open]").waitFor();
+      await capture(page, vp.name, "통계-가입모달");
       await page.locator("#signupRoleHomeroomBtn").click();
       await page.locator("#signupHomeroomNameInput").fill("홍길동");
       await capture(page, vp.name, "통계-담임가입");

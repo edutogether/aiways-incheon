@@ -38,9 +38,14 @@ test("공유 전역 스크립트가 앱 번들보다 먼저 실행된다", async
     edu2gClient: typeof window.AIWaysEdu2gClient,
     // 학교 검색은 PC와 같은 구현 한 벌을 쓴다. 빠지면 학생 앱만 서버 검색으로
     // 조용히 되돌아가므로(화면은 그대로라 안 보인다) 여기서 못박는다.
-    schoolList: typeof window.AIWaysSchoolList
+    schoolList: typeof window.AIWaysSchoolList,
+    // 학년·반 드롭다운도 PC와 같은 한 벌. 빠지면 기본 선택 상자로 돌아간다.
+    classPicker: typeof window.AIWaysClassPicker,
+    // 🔴 참여 학교의 실제 학급 수. 빠지면 **없는 반까지 고를 수 있게** 되고,
+    // 그 학생 기록은 아무 반에도 안 붙는다.
+    classCounts: typeof window.AIWaysSchoolClassCounts
   }));
-  expect(globals).toEqual({ appCheck: "object", betaAuth: "object", edu2gClient: "object", schoolList: "object" });
+  expect(globals).toEqual({ appCheck: "object", betaAuth: "object", edu2gClient: "object", schoolList: "object", classPicker: "object", classCounts: "object" });
 
   // 문서 순서도 같이 본다 - 위 확인은 "번들이 이미 다 돈 뒤"를 보는 것이라
   // 순서가 뒤집혀도 통과할 수 있다(되돌림 확인에서 실제로 그랬다).
@@ -53,9 +58,10 @@ test("공유 전역 스크립트가 앱 번들보다 먼저 실행된다", async
   // 저절로 통과한다 - 순서를 지켰기 때문이 아니라 비교할 것이 없어서다
   // (COMMON_STANDARDS §21). 실제로 있는지 먼저 못박는다.
   expect(lastLegacyAt, "공유 스크립트가 하나도 없다").toBeGreaterThan(-1);
-  // 앱 번들보다 먼저 와야 하는 <script defer> 다섯: 공유 넷(AppCheck/BetaAuth/
-  // Edu2gClient/SchoolList) + 인증 게이트. 개수를 못박아 두면 하나가 조용히 빠지는 것도 잡힌다.
-  expect(order.filter((src) => !src.includes("/bundle/")).length, "먼저 로드돼야 할 스크립트 개수가 달라졌다").toBe(5);
+  // 앱 번들보다 먼저 와야 하는 <script defer> 일곱: PC와 같이 쓰는 여섯
+  // (AppCheck/BetaAuth/Edu2gClient/SchoolList/ClassPicker/SchoolClassCounts) +
+  // 인증 게이트. 개수를 못박아 두면 하나가 조용히 빠지는 것도 잡힌다.
+  expect(order.filter((src) => !src.includes("/bundle/")).length, "먼저 로드돼야 할 스크립트 개수가 달라졌다").toBe(7);
   expect(bundleAt, "앱 번들이 공유 스크립트보다 앞에 있다").toBeGreaterThan(lastLegacyAt);
 });
 

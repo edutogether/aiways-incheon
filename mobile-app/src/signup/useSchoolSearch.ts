@@ -39,6 +39,8 @@ export function useSchoolSearch() {
   const selectedLabel = useRef("");
   const debounce = useRef<number | null>(null);
   const blurTimer = useRef<number | null>(null);
+  // 목록이 늦게 도착했을 때 "지금 화면에 있는 글자"로 다시 거르기 위해 들고 있는다.
+  const latestQuery = useRef("");
 
   useEffect(() => () => {
     if (debounce.current !== null) window.clearTimeout(debounce.current);
@@ -54,7 +56,22 @@ export function useSchoolSearch() {
   const onQueryChange = useCallback((value: string) => {
     // 포커스 없이 값이 들어오는 경로(붙여넣기 등)에서도 시작되게 한다.
     // load()는 약속을 캐시하므로 여러 번 불러도 한 번만 받는다.
-    void schoolList()?.loadNow();
+    //
+    // 🔴 목록이 도착하면 **그때 화면에 있던 글자로 다시 한 번 거른다.** 없으면
+    // 첫 글자가 서버로 갔다가 실패했을 때 "검색하지 못했어요"가 그대로 남는다 -
+    // 목록은 몇백 ms 뒤에 도착하는데 그것을 쓰지 못하고 버리는 셈이다.
+    void schoolList()?.loadNow()?.then(() => {
+      const latest = latestQuery.current.trim();
+      if (latest.length < MIN_QUERY_LENGTH) return;
+      const hits = schoolList()?.search(latest);
+      if (!hits) return;
+      // 🔴 기다리고 있던 서버 호출을 **취소한다.** 안 그러면 300ms 뒤에 온
+      //    서버 응답(로컬에서는 실패)이 방금 그린 목록을 덮어쓴다.
+      if (debounce.current !== null) { window.clearTimeout(debounce.current); debounce.current = null; }
+      setError(null);
+      setResults(hits.slice(0, MAX_RESULTS));
+    });
+    latestQuery.current = value;
     setQuery(value);
     // 고른 뒤에 글자를 고치면 그 선택은 무효다 - 코드를 비워서 "고르지 않은
     // 상태"로 되돌린다.

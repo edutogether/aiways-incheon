@@ -1,0 +1,91 @@
+/* 학생 앱 가입 모달 (2026-09-11, 지시 Bumm - "PC 거 그냥 사이즈만 줄여서 고대로").
+ *
+ * 🔴 PC의 학교 선택 모달(`#dashboardSchoolModal`, styles/cb3a.css)이 기준이다.
+ * 같은 변수 이름·같은 값·같은 구성(동그란 아이콘 → 굵은 제목 → 입력칸 → 알약 버튼)을
+ * 쓰고, 폰 화면에 맞춰 크기만 줄인다. 임의로 개선하지 않는다.
+ *
+ * 🔴 학년·반 드롭다운은 루트의 classPicker.css가 그린다(PC와 같은 파일 하나).
+ * 그 파일이 쓰는 `--ssm-*` 변수를 여기서 모달에 심어 주므로, 모양이 PC와 같아진다.
+ */
+#signupModal {
+  --ssm-ink: #12181f; --ssm-muted: #5b6572; --ssm-line: #e7eaee; --ssm-bg: #ffffff;
+  --ssm-accent: #2b6cf6; --ssm-accent-soft: #eaf1ff;
+  inline-size: min(100% - 1.5rem, 22rem);
+  padding: 0;
+  overflow: visible;
+  position: relative;
+  background: var(--ssm-bg);
+  color: var(--ssm-ink);
+  border: none;
+  border-radius: 1.4rem;
+  box-shadow: 0 30px 70px rgb(10 20 35 / 30%), 0 2px 8px rgb(10 20 35 / 10%);
+}
+#signupModal::backdrop { background: rgb(6 12 22 / 66%); }
+
+.signup-modal-body { overflow: visible; padding: 1.9rem 1.4rem 1.5rem; text-align: center; }
+
+.signup-modal-close {
+  position: absolute; inset-block-start: .8rem; inset-inline-end: .9rem; z-index: 2;
+  inline-size: 2rem; block-size: 2rem; padding: 0;
+  background: none; border: none; color: var(--ssm-muted); font-size: 1.3rem; line-height: 1; opacity: .7; cursor: pointer;
+}
+.signup-modal-close:hover { opacity: 1; color: var(--ssm-ink); }
+
+.signup-modal-icon {
+  display: grid; place-items: center; inline-size: 3rem; block-size: 3rem;
+  margin: 0 auto .7rem; border-radius: 50%;
+  background: var(--ssm-accent-soft); font-size: 1.4rem;
+}
+.signup-modal-title { color: var(--ssm-ink); margin: 0 0 1.1rem; font-size: 1.15rem; line-height: 1.32; font-weight: 800; }
+
+/* 안내문 - PC 모달에는 없지만 학생 앱은 "다시 못 바꾼다"를 반드시 알려야 한다.
+   (2026-08 이중 확인창과 같은 취지라 지우지 않는다.) */
+.signup-modal-note { margin: -.6rem 0 1.1rem; color: var(--ssm-muted); font-size: .76rem; line-height: 1.5; }
+
+/* 입력칸 - PC의 .school-search-row input과 같은 언어(알약, 연회색 바탕). */
+.signup-field {
+  inline-size: 100%; padding: .7rem .95rem; font-size: .88rem;
+  background: #f4f6f9; color: var(--ssm-ink);
+  border: 1.5px solid transparent; border-radius: 999px;
+  transition: border-color .15s ease, background .15s ease;
+}
+.signup-field::placeholder { color: color-mix(in srgb, var(--ssm-muted) 70%, transparent); }
+.signup-field:focus { outline: none; background: var(--ssm-bg); border-color: var(--ssm-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ssm-accent) 14%, transparent); }
+
+.signup-modal-rows { display: grid; gap: .55rem; text-align: start; }
+.signup-modal-pair { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; }
+.signup-modal-pair > * { min-inline-size: 0; }
+
+/* 가입 유형(담임/학생) - PC에는 없는 단계라 같은 색만 빌려 쓴다. */
+.signup-role-group { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; margin-block-end: .9rem; }
+.signup-role-group button {
+  padding: .6rem; border-radius: 999px; border: 1.5px solid var(--ssm-line);
+  background: var(--ssm-bg); color: var(--ssm-accent); font-weight: 800; font-size: .85rem; cursor: pointer;
+}
+.signup-role-group button[aria-pressed="true"] { background: var(--ssm-accent); border-color: var(--ssm-accent); color: #fff; }
+
+/* 알약 버튼 - PC의 .class-picker-confirm과 같다. */
+.signup-modal-submit {
+  display: block; inline-size: 100%; margin-block-start: 1.1rem; padding: .8rem;
+  border-radius: 999px; border: none; background: var(--ssm-accent); color: #fff;
+  font-weight: 800; font-size: .92rem; cursor: pointer;
+}
+.signup-modal-submit:disabled { opacity: .6; cursor: default; }
+.signup-modal-status { margin-block-start: .8rem; color: var(--ssm-muted); font-size: .78rem; min-block-size: 1.1em; }
+
+/* 검색 결과 - PC의 #dashboardSchoolResults와 같은 모양. */
+.signup-school-results {
+  position: absolute; inset-inline: 0; z-index: 20; margin-block-start: .4rem;
+  max-block-size: 12rem; overflow-y: auto; text-align: start;
+  background: var(--ssm-bg); border: 1px solid var(--ssm-line); border-radius: .8rem;
+  box-shadow: 0 16px 40px rgb(10 20 35 / 16%);
+}
+.signup-school-results button { display: block; inline-size: 100%; padding: .55rem .7rem; text-align: start; background: none; border: none; cursor: pointer; color: var(--ssm-ink); }
+.signup-school-results button + button { border-block-start: 1px solid var(--ssm-line); }
+.signup-school-results button:hover { background: var(--ssm-accent-soft); }
+.signup-school-results .name { display: block; font-weight: 700; font-size: .84rem; }
+.signup-school-results .where { display: block; margin-block-start: .1rem; color: var(--ssm-muted); font-size: .72rem; }
+.signup-school-results .notice { padding: .55rem .7rem; font-size: .78rem; color: var(--ssm-muted); }
+
+/* 모달을 여는 카드 - 통계 탭에 남는 입구. */
+.signup-open-card { display: grid; gap: .5rem; }

@@ -25,7 +25,7 @@ const OUT_DIR = resolve(REPO_ROOT, "pc-next");
 //
 // 🔴 S5에서 산출물이 저장소 루트로 갈 때는 이 복사를 끈다. 그때는 원본이 이미
 // 그 자리에 있고, 복사하면 원본을 제 자신으로 덮어쓰게 된다.
-const VERBATIM_STYLESHEETS = ["style.css", "styles/cb3a.css"];
+const VERBATIM_STYLESHEETS = ["style.css", "styles/cb3a.css", "classPicker.css"];
 
 // 아직 전환하지 않은 고전 스크립트. S3~S4에서 하나씩 TS로 옮기며 이 목록에서
 // 뺀다. 순서는 원본 index.html과 **같아야 한다** — 서로 전역으로 의존한다.

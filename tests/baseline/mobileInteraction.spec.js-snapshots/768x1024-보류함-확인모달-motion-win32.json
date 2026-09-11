@@ -887,6 +887,54 @@
     "animation-iteration-count": "1",
     "transform": "none"
   },
+  "#signupOpenButton": {
+    "transition-property": "all",
+    "transition-duration": "0.15s",
+    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
+  },
+  "#signupStatus": {
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
+  },
+  "#signupModal": {
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
+  },
+  "button:×": {
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
+  },
   "#signupRoleGroup": {
     "transition-property": "all",
     "transition-duration": "0s",
@@ -901,8 +949,8 @@
   },
   "#signupRoleHomeroomBtn": {
     "transition-property": "all",
-    "transition-duration": "0.15s",
-    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
     "transition-delay": "0s",
     "animation-name": "none",
     "animation-duration": "0s",
@@ -913,8 +961,8 @@
   },
   "#signupRoleStudentBtn": {
     "transition-property": "all",
-    "transition-duration": "0.15s",
-    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
     "transition-delay": "0s",
     "animation-name": "none",
     "animation-duration": "0s",
@@ -924,10 +972,10 @@
     "transform": "none"
   },
   "#signupSchoolInput": {
-    "transition-property": "all",
-    "transition-duration": "0s",
-    "transition-timing-function": "ease",
-    "transition-delay": "0s",
+    "transition-property": "border-color, background",
+    "transition-duration": "0.15s, 0.15s",
+    "transition-timing-function": "ease, ease",
+    "transition-delay": "0s, 0s",
     "animation-name": "none",
     "animation-duration": "0s",
     "animation-timing-function": "ease",
@@ -971,7 +1019,55 @@
     "animation-iteration-count": "1",
     "transform": "none"
   },
+  "#aiways-picker-1-button": {
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
+  },
+  "#aiways-picker-1-list": {
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
+  },
   "#signupClassInput": {
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
+  },
+  "#aiways-picker-2-button": {
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
+  },
+  "#aiways-picker-2-list": {
     "transition-property": "all",
     "transition-duration": "0s",
     "transition-timing-function": "ease",
@@ -996,10 +1092,10 @@
     "transform": "none"
   },
   "#signupNumberInput": {
-    "transition-property": "all",
-    "transition-duration": "0s",
-    "transition-timing-function": "ease",
-    "transition-delay": "0s",
+    "transition-property": "border-color, background",
+    "transition-duration": "0.15s, 0.15s",
+    "transition-timing-function": "ease, ease",
+    "transition-delay": "0s, 0s",
     "animation-name": "none",
     "animation-duration": "0s",
     "animation-timing-function": "ease",
@@ -1008,10 +1104,10 @@
     "transform": "none"
   },
   "#signupNameInput": {
-    "transition-property": "all",
-    "transition-duration": "0s",
-    "transition-timing-function": "ease",
-    "transition-delay": "0s",
+    "transition-property": "border-color, background",
+    "transition-duration": "0.15s, 0.15s",
+    "transition-timing-function": "ease, ease",
+    "transition-delay": "0s, 0s",
     "animation-name": "none",
     "animation-duration": "0s",
     "animation-timing-function": "ease",
@@ -1032,10 +1128,10 @@
     "transform": "none"
   },
   "#signupHomeroomNameInput": {
-    "transition-property": "all",
-    "transition-duration": "0s",
-    "transition-timing-function": "ease",
-    "transition-delay": "0s",
+    "transition-property": "border-color, background",
+    "transition-duration": "0.15s, 0.15s",
+    "transition-timing-function": "ease, ease",
+    "transition-delay": "0s, 0s",
     "animation-name": "none",
     "animation-duration": "0s",
     "animation-timing-function": "ease",
@@ -1056,6 +1152,18 @@
     "transform": "none"
   },
   "#signupTeacherCodeInput": {
+    "transition-property": "border-color, background",
+    "transition-duration": "0.15s, 0.15s",
+    "transition-timing-function": "ease, ease",
+    "transition-delay": "0s, 0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
+  },
+  "#signupSubmitButton": {
     "transition-property": "all",
     "transition-duration": "0s",
     "transition-timing-function": "ease",
@@ -1067,19 +1175,7 @@
     "animation-iteration-count": "1",
     "transform": "none"
   },
-  "#signupSubmitButton": {
-    "transition-property": "all",
-    "transition-duration": "0.15s",
-    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
-    "transition-delay": "0s",
-    "animation-name": "none",
-    "animation-duration": "0s",
-    "animation-timing-function": "ease",
-    "animation-delay": "0s",
-    "animation-iteration-count": "1",
-    "transform": "none"
-  },
-  "#signupStatus": {
+  "#signupModalStatus": {
     "transition-property": "all",
     "transition-duration": "0s",
     "transition-timing-function": "ease",

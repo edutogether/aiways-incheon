@@ -1942,30 +1942,8 @@ html[data-tier="phone"] .phone-shell-frame {
 .class-picker-selects { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; inline-size: 100%; max-inline-size: 18.5rem; margin: 1.3rem auto 0; }
 .class-picker-selects select { min-inline-size: 7rem; padding: .65rem .9rem; border-radius: .7rem; border: 1.5px solid var(--ssm-line); background: var(--ssm-bg); color: var(--ssm-ink); font-weight: 700; font-size: .92rem; text-align: center; cursor: pointer; }
 .class-picker-selects select:focus { outline: none; border-color: var(--ssm-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ssm-accent) 14%, transparent); }
-/* 학년·반 드롭다운 (2026-09-11, 지시 Bumm - "운영체제 기본 선택 상자라 촌스럽다").
-   classPicker.js가 <select>를 감싸 만든다. 값은 그대로 <select>가 갖고 있고
-   여기서는 보이는 껍데기만 그린다. 디자인 언어는 위 .class-picker-selects select와 같다. */
-/* 🔴 min-inline-size:0 이 없으면 그리드 칸이 글자의 min-content 폭까지 벌어져
-   말줄임이 안 듣고 상자가 모달 밖으로 나간다(2026-09-11에 실제로 그랬다). */
-.aiways-picker { position: relative; display: block; min-inline-size: 0; }
-/* 🔴 화면에서만 감춘다. display:none으로 두면 폼 값·포커스 동작이 달라진다. */
-.aiways-picker-native { position: absolute; inline-size: 1px; block-size: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
-.aiways-picker-button { display: flex; align-items: center; justify-content: space-between; gap: .5rem; inline-size: 100%; padding: .65rem .9rem; border-radius: .7rem; border: 1.5px solid var(--ssm-line); background: var(--ssm-bg); color: var(--ssm-ink); font: inherit; font-weight: 700; font-size: .92rem; cursor: pointer; text-align: start; }
-.aiways-picker-button:focus-visible { outline: none; border-color: var(--ssm-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ssm-accent) 14%, transparent); }
-.aiways-picker.is-open .aiways-picker-button { border-color: var(--ssm-accent); }
-.aiways-picker.is-placeholder .aiways-picker-button { color: var(--ssm-muted, #5b6572); font-weight: 600; }
-.aiways-picker.is-disabled .aiways-picker-button { cursor: not-allowed; opacity: .75; }
-/* 긴 안내문이 상자를 밀고 나가던 것 - 한 줄로 줄이고 말줄임한다. */
-.aiways-picker-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.aiways-picker-caret { flex: none; inline-size: .55rem; block-size: .55rem; border-inline-end: 2px solid currentColor; border-block-end: 2px solid currentColor; transform: rotate(45deg) translate(-2px, -2px); transition: transform .18s ease; }
-.aiways-picker.is-open .aiways-picker-caret { transform: rotate(225deg) translate(-2px, -2px); }
-.aiways-picker-list { position: absolute; inset-inline: 0; inset-block-start: calc(100% + .35rem); z-index: 30; max-block-size: 13rem; overflow-y: auto; margin: 0; padding: .3rem; list-style: none; border-radius: .8rem; border: 1.5px solid var(--ssm-line); background: var(--ssm-bg); box-shadow: 0 14px 34px rgb(15 23 42 / 18%); }
-.aiways-picker.is-upward .aiways-picker-list { inset-block-start: auto; inset-block-end: calc(100% + .35rem); }
-.aiways-picker-option { padding: .5rem .7rem; border-radius: .55rem; font-weight: 700; font-size: .9rem; color: var(--ssm-ink); cursor: pointer; }
-.aiways-picker-option.is-active { background: var(--ssm-accent-soft); color: var(--ssm-accent); }
-.aiways-picker-option[aria-selected="true"] { background: var(--ssm-accent); color: #fff; }
-.aiways-picker-option.is-hint { cursor: default; color: var(--ssm-muted, #5b6572); font-weight: 600; background: none; }
-@media (prefers-reduced-motion: reduce) { .aiways-picker-caret { transition: none; } }
+/* 학년·반 드롭다운의 모양은 루트의 classPicker.css에 있다 - 학생 앱과 같은
+   파일 하나를 쓰기 위해서다(index.html이 이 파일보다 먼저 읽는다). */
 
 .class-picker-confirm { display: block; inline-size: 100%; max-inline-size: 18.5rem; margin: 1.1rem auto 0; padding: .8rem; border-radius: 999px; border: none; background: var(--ssm-accent); color: #fff; font-weight: 800; font-size: .95rem; cursor: pointer; }
 .class-picker-confirm:hover { background: color-mix(in srgb, var(--ssm-accent) 88%, black); }

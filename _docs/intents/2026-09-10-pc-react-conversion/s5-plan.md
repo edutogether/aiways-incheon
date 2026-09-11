@@ -335,3 +335,24 @@ Bumm님이 세신 것과 맞는다.
 - **CSS 정리는 S5에 섞지 않는다.** S5가 끝난 **직후** 별도 intent로 세운다 —
   그때는 이번 기준선이 그대로 증명 도구가 된다.
 - **`admin.html`·`mobile/`·`miniapp/`은 이번 범위가 아니다.**
+
+## 10. 🔴 S5 완료 후 정리 — **임시로 연 문을 반드시 닫는다** (2026-09-11 추가)
+
+전환본을 라이브와 같은 조건에서 확인하려고 **임시로 연 것이 넷**이다. 잊으면
+**임시가 영구가 된다.** 파일·위치까지 적어 둔다 — 나중에 못 찾으면 안 닫힌다.
+
+| # | 무엇 | 어디를 고치나 |
+|---|---|---|
+| 1 | **reCAPTCHA 허용 도메인에서 채널 두 개 제거** | Google Cloud 콘솔 → reCAPTCHA Enterprise → 키 `6Len12ktAAAAAE6AbKWEIFMn5tb1-ZYiMVKmwui6`(AI Ways Incheon Web) → 허용 도메인에서 `ai-ways-incheon--pc-s5-review-5qopjkzi.web.app` · `ai-ways-incheon--pc-s5-control-4ta1xr3z.web.app` 삭제. 🔴 **남겨야 하는 넷**: `edutogether.github.io` · `ai-ways-incheon.web.app` · `ai-ways-incheon.firebaseapp.com` · `incheon.edutogether.kr`. `allowAllDomains: false`와 `integrationType: SCORE`는 건드리지 않는다 |
+| 2 | **프리뷰 채널 CORS 정규식 제거** | `functions/lib/httpGuard.js` — `PREVIEW_CHANNEL_ORIGIN` 상수(`/^https:\/\/ai-ways-incheon--[a-z0-9-]+\.web\.app$/`)와 `isAllowedOrigin()`의 그 항, 그리고 `functions/test/httpGuard.test.js`의 `"isAllowedOrigin accepts this project's Hosting preview channels…"` 테스트를 **같이** 지운다 |
+| 3 | **프리뷰 채널 전부 삭제** | `firebase hosting:channel:list --project ai-ways-incheon`로 확인 후 `firebase hosting:channel:delete <이름> --project ai-ways-incheon`. 2026-09-11에 만든 것: `pc-s5-review` · `pc-s5-control` · `cache-old` · `cache60` · `csp-probe` · `miniapp-fix`(뒤 넷은 짧은 만료라 자동으로 사라질 수 있다) |
+| 4 | **리뷰 채널 스테이징 스크립트 제거** | `scripts/stageReviewChannel.js` 삭제 + `functions/package.json`의 `check`에서 `node --check ../scripts/stageReviewChannel.js` 제거. 🔴 **`scripts/checkMiniappCsp.js`는 남긴다** — 그건 CSP 해시 게이트라 S5와 무관하다 |
+
+🔴 **순서**: 2·4(코드)를 먼저 커밋해 배포한 뒤 1·3(콘솔·채널)을 닫는다. 반대로 하면
+채널이 사라진 뒤에도 코드에 규정이 남아 "왜 있는지 모르는 정규식"이 된다.
+
+**왜 열었는지**(지우기 전에 읽을 것): 로컬 정적 서버와 미등록 프리뷰 채널에서는
+App Check가 통하지 않아 **앱이 라이브가 절대 타지 않는 경로**(reCAPTCHA 재시도)를
+탄다. 그 위에서 잰 성능·동작은 앱의 것이 아니다 — 2026-09-11에 실측으로 확인했다
+(채널 `recaptcha/enter` 중단 **8회** vs 라이브 **1회**, App Check 도달 **0건** vs **1건**).
+도메인을 등록하자 **세 곳이 완전히 같아졌다**(중단 1회 · App Check 도달 1건).

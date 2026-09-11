@@ -57,13 +57,31 @@ async function checkHostingHeaders(base) {
 //
 // 🔴 학생 앱(mobile/)을 반드시 같이 본다 - 제일 중요한 화면인데 규칙에서 빠지면
 // 그 화면만 옛 것을 오래 쓰게 된다.
-const HTML_PATHS = ["/", "/index.html", "/mobile/index.html", "/admin.html", "/miniapp/3second.html"];
+//
+// 🔴 **헤더 규칙은 "실제로 서빙되는 파일"이 아니라 "브라우저가 요청한 경로"에 걸린다**
+// (2026-09-11, Voice Cinema가 org 전체에서 찾아낸 함정을 이 저장소에서 실측 확인).
+// `/mobile/`은 `index.html`을 서빙하는데도 **`**/*.html`에 안 걸린다** - 주소가
+// `.html`로 안 끝나기 때문이다. 실측: `/mobile/index.html`은 60초인데 `/mobile/`은
+// **3600초**였다. 그 주소가 학생 앱이다. 같은 이유로 이름에 해시가 없는 `/app.js`도
+// 3600초였다 - 고친 것이 최대 한 시간 안 닿았다.
+//
+// 지금은 `firebase.json`이 `**`에 60초를 기본으로 깔고, 이름에 해시가 든 것만
+// (`**/bundle/**`, `/assets/school-list.tsv`) 뒤에서 1년으로 덮어쓴다.
+// **폴더로 끝나는 주소와 해시 없는 정적 파일을 여기 같이 넣어 두는 이유**가 그것이다 -
+// 폴더를 새로 만들 때마다 같은 일이 난다.
+const HTML_PATHS = ["/", "/index.html", "/mobile/", "/mobile/index.html", "/admin.html",
+  "/miniapp/3second.html", "/app.js", "/schoolListSearch.js", "/classPicker.js", "/styles/cb3a.css"];
 // 🔴 상한을 못박는다. 값이 커지면(예: 3600) 되돌리기가 사용자에게 안 닿는다.
 const MAX_HTML_AGE = 300;
 
+// 이름에 내용 해시가 든 것은 반대로 **길게 굳어 있어야** 한다. 짧아지면 학교
+// 와이파이에서 236KB 번들을 1분마다 다시 받는다.
+const LONG_CACHE_PATHS = ["/assets/school-list.tsv"];
+const MIN_LONG_AGE = 86400;
+
 async function checkHtmlNotCached(base) {
   // 대상이 줄면 조용히 통과한다 - 고정 하한으로 못박는다(§21).
-  const MIN_HTML_PATHS = 5;
+  const MIN_HTML_PATHS = 10;
   if (HTML_PATHS.length < MIN_HTML_PATHS) {
     throw new Error(`HTML 캐시 검사 대상이 ${HTML_PATHS.length}개뿐입니다(${MIN_HTML_PATHS}개 이상이어야 합니다).`);
   }
@@ -81,7 +99,18 @@ async function checkHtmlNotCached(base) {
       throw new Error(`${base}${path}의 Cache-Control이 "${cache}"입니다 - max-age가 ${MAX_HTML_AGE}초를 넘습니다. 배포를 되돌려도 그만큼 사용자에게 안 닿습니다.`);
     }
   }
-  console.log(`OK  ${base}: HTML ${HTML_PATHS.length}개 전부 짧은 캐시(max-age<=${MAX_HTML_AGE})`);
+  console.log(`OK  ${base}: 짧게 캐시돼야 할 ${HTML_PATHS.length}개 전부 max-age<=${MAX_HTML_AGE}`);
+
+  for (const path of LONG_CACHE_PATHS) {
+    const res = await fetch(`${base}${path}`);
+    if (res.status !== 200) throw new Error(`${base}${path}이 200이 아님 (${res.status})`);
+    const cache = String(res.headers.get("cache-control") || "");
+    const age = /max-age=(\d+)/.exec(cache);
+    if (!age || Number(age[1]) < MIN_LONG_AGE) {
+      throw new Error(`${base}${path}의 Cache-Control이 "${cache}"입니다 - 이 파일은 이름에 내용 해시가 있어 길게 굳어 있어야 합니다. 짧아지면 12,672개 학교 목록을 매번 다시 받습니다.`);
+    }
+  }
+  console.log(`OK  ${base}: 길게 굳어야 할 ${LONG_CACHE_PATHS.length}개 전부 max-age>=${MIN_LONG_AGE}`);
 }
 
 async function main() {

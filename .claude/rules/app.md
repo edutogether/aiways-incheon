@@ -953,6 +953,50 @@ Bumm님이 보내주신 콘솔 오류의 CSP 허용목록에 **`ic.getunicorn.or
 환경과 다를 수 있고, **반대로 거기서 안 보이는 오류가 학생에게는 있을 수도 있다.**
 그래서 콘솔 제보는 **환경을 같이 물어야** 판단할 수 있다.
 
+## 없어진 화면을 가리키는 선택자 목록 (2026-09-11 전수 조사)
+
+app.js가 찾지만 **마크업·CSS 어디에도 없는** 선택자를 전수로 뽑고, 🔴 **라이브에서 실제로
+세어** "없어진 것"과 "실행 중에 만들어지는 것"을 갈랐다. 마크업에 없다고 죽은 것이 아니다 —
+**`#rankingModal`은 `ensureRankingModal()`이 만들어 살아 있다.**
+
+**걷어낸 것**(2026-09-11): `[data-sorting-result]` `[data-quick-item]` — 3초 판단 패널.
+🔴 이것만 **던지고 있었다**(`container.innerHTML`에 optional chaining이 없었다). 사진마다
+`TypeError`가 쌓여 진짜 오류를 가렸다.
+
+**남겨 둔 것 11개** — 🔴 **성격이 다르다. 전부 살아 있는 함수 안의 방어적 조회이고, 전부
+막혀 있어 조용히 아무 일도 안 한다:**
+
+| 선택자 | 어디 | 어떻게 막혀 있나 |
+|---|---|---|
+| `[data-landfill-primary-value]` 외 3 | `updateLandfillDonuts` (**살아 있음** — 도넛은 실제로 그려진다) | `if (primaryValue)` … |
+| `[data-panel]` | `renderSortingStats`, `handleImage` | `$$`가 빈 배열 → `forEach` 무동작 |
+| `#sortingTimeline` | `renderSortingStats` | `if (!timeline) return;` |
+| `#holdList` | 두 곳 | `if (!list) return;` |
+| `#sortingHoldCount` `#manualHoldEmojiPreview` `#manualHoldInput` | `holdCandidateFor` | `if (count)` / `if (preview && inputValue)` / `?.value` |
+| `#quizProgress` `#quizResult` | `handleImage`의 탭 배선 | `?.textContent` / `if (result)` |
+
+**실측**: 3초 판단 패널을 걷어낸 뒤 사진을 넣으면 `pageerror` **0건**이다 — 이 11개는
+런타임 비용도, 오류도 내지 않는다.
+
+🔴 **그래서 이것들을 지우는 것은 "살아 있는 함수 안을 수술하는 일"이고 얻는 것은 정돈뿐이다.**
+지울 때는 **성격이 같은 것끼리 묶어 따로 커밋하고**, 라이브를 대조군으로 동작이 글자까지
+같은 것과 화면 기준선이 안 바뀌는 것을 매번 확인한다.
+
+## 🔴 오늘 게이트가 세션을 네 번 멈춰 세웠다 (2026-09-11)
+
+*"이 검사 번거로운데 빼자"* 는 말이 나올 때의 답으로 적어 둔다.
+
+1. **`checkMiniappCsp.js`** — 스플래시 인라인 스크립트를 고치자 CSP 해시가 어긋났다.
+   그대로 나갔으면 브라우저가 조용히 막아 스플래시가 5초 타임아웃까지 안 걷혔다.
+2. **`checkMiniappCsp.js`** (두 번째) — `?`·`!` 앞 공백을 넣자 `miniapp/3second.html`의
+   인라인 스크립트까지 바뀌어 해시가 어긋났다.
+3. **`node --check`** — 죽은 코드를 걷어내다 **잘라낼 끝 경계를 다음 함수의 머리로 잡아
+   그 함수 이름을 반쯤 먹었다.** 바로 잡혀서 되돌렸다.
+4. **`postDeploySmoke.js`** — `/mobile/`이 아직 `max-age=3600`이라고 배포를 실패시켰다.
+   설정은 맞았고 옛 응답이 엣지에 남은 것이었지만, **그 구멍을 처음 찾아낸 것도 이 검사**다.
+
+**넷 다 "화면에는 아무 표시도 안 나는" 종류였다.**
+
 ## 자주 틀리는 것
 - **App Check가 ENFORCED라 자동화 브라우저(Playwright 등)는 라이브에서 403 `App attestation failed`를 받는다. 이건 라이브 장애가 아니라 정상 동작이다.** reCAPTCHA Enterprise가 사람/봇 점수를 매기는데 자동화 브라우저는 `navigator.webdriver === true`라 낮은 점수를 받고 App Check가 그 토큰을 거부한다 — **헤드풀(`channel:"chrome"`)로 띄워도 똑같다. 헤드리스 여부가 아니라 자동화 여부가 감지된다.** 2026-09-09에 이 세션이 "라이브 다운"으로 오판해 보고했고, 같은 날 CLASSCADE도 같은 함정에 걸렸다. 라이브가 실제로 살아 있는지는 **사람이 실제 휴대폰으로 열어보는 것**이 유일하게 확실한 확인이다
 - **자동화로 App Check를 확인하려는 시도는 이미 해봤고, 이 저장소에서는 안 된다**(2026-09-09 실측). 다른 저장소가 찾은 방법(헤드풀 실제 크롬으로 토큰을 받아 본문 없는 요청을 보내고, 응답 코드가 `app_check_*`인지 `auth_missing`인지로 가른다)을 그대로 옮겨 봤다. **서버 쪽 전제는 성립한다** — `protectedActor.js`가 App Check를 가장 먼저 보고 본문 파싱은 그 뒤라, 코드로 가를 수 있다. 그런데 **클라이언트 쪽에서 토큰 자체가 안 나온다**(헤드풀 크롬에서도 `getAIWaysAppCheckHeaders()`가 null). 🔴 **대조군(예전부터 등록된 `firebaseapp.com`)도 같이 막혔으므로 설정 문제가 아니라 자동화의 한계다.** 검사는 `tests/appCheckLiveProbe.spec.js`에 남겨 뒀다(기본은 건너뜀, `AIWAYS_APPCHECK_PROBE=1`로 실행). reCAPTCHA 설정이 바뀌면 저절로 통과하게 되고, **대조군만 통과하고 정식 주소가 막히면 그때는 실패로 알려준다**

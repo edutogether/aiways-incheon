@@ -1294,6 +1294,25 @@
     else modal.setAttribute("open", "");
     showClassStep({ schoolCode: schoolId, schoolName: schoolName || schoolId });
   }
+  // 스플래시가 **페이드를 시작할 때** 한 번 부른다 (2026-09-11).
+  //
+  // `index.html`의 인라인 스크립트가 걷을 때 `el.style.opacity = "0"`을 먼저 넣고
+  // 470ms 뒤에 `display:none`으로 간다. 그 **첫 순간**을 잡아야 스플래시가 사라지는
+  // 것과 모달이 나타나는 것이 겹쳐 "함께 등장"으로 보인다.
+  //
+  // 🔴 스플래시가 어떤 이유로도 안 걷히면 모달이 영영 안 열린다 - 그러면 학교를
+  // 고를 방법이 사라진다. 상한(5초)보다 넉넉한 7초 뒤에는 그냥 연다.
+  function afterBootSplashStartsFading(run) {
+    const el = document.getElementById("bootSplash");
+    if (!el) { run(); return; }
+    let fired = false;
+    const fire = () => { if (fired) return; fired = true; window.clearInterval(timer); window.clearTimeout(guard); run(); };
+    const fading = () => el.style.opacity === "0" || getComputedStyle(el).display === "none";
+    if (fading()) { run(); return; }
+    const timer = window.setInterval(() => { if (fading()) fire(); }, 50);
+    const guard = window.setTimeout(fire, 7000);
+  }
+
   // ── 전국 학교 목록을 브라우저에서 검색한다 (2026-09-11, 지시 Bumm)
   //
   // 왜: 타자마다 서버를 거쳐 느렸다(실측 콜드 1.89초 / 웜 0.16초). 목록을
@@ -1453,7 +1472,17 @@
     // 단계를 직접 여니까, 그 안의 뒤로가기가 죽어있으면 안 된다) - 위
     // 리스너들은 그래서 이 검사보다 앞에 둔다.
     if (resolveDashboardSchoolId()) return;
-    openDashboardSchoolModal();
+    // 🔴 스플래시가 걷히기 시작할 때까지 모달을 열지 않는다 (2026-09-11).
+    //
+    // `<dialog>.showModal()`은 **네이티브 top-layer**라 스플래시의 `z-index:9999`로는
+    // 절대 못 이긴다. 그래서 예전에는 모달이 **64ms에 열려 스플래시를 통째로 덮었고**,
+    // 사용자가 실제로 본 스플래시는 **29ms뿐**이었다. 화면에는 "어두운 배경 + 흰 모달"만
+    // 보이고 대시보드는 2.8초 뒤 스플래시가 걷힐 때 블러 뒤로 뒤늦게 나타났다 —
+    // Bumm님이 "메인이 2초 죽었다가 뒤늦게 나온다"고 하신 것이 이것이다.
+    //
+    // 스플래시가 **페이드를 시작하는 순간**에 열어야 대시보드와 모달이 같이 드러난다.
+    // 다 걷힌 뒤(`display:none`)에 열면 대시보드만 보였다가 모달이 튀어나온다.
+    afterBootSplashStartsFading(openDashboardSchoolModal);
     const client = window.AIWaysEdu2gClient;
     let debounceTimer = 0;
     let searchToken = 0;

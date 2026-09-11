@@ -264,6 +264,35 @@ export async function openApp(page, target = TARGET) {
   //
   // 실제 학생도 탭을 몇 번 옮기면 **같은 최종값(1275px)에 도달한다**(실측).
   // 그 수렴한 상태에서 재면 순서에 상관없이 항상 같은 값이 된다.
+  // 🔴 **가입 모달을 먼저 닫는다**(2026-09-11).
+  //
+  // 저장된 프로필이 없는 기기는 스플래시가 걷힐 때 가입 모달이 **저절로 뜬다**
+  // (지시 Bumm - PC 학교 선택 모달과 같은 동선). 자동화에는 저장된 프로필이
+  // 없으므로 100% 뜨고, `<dialog>`는 **네이티브 top-layer**라 그 아래의 모든
+  // 조작을 가로막는다 — 실제로 판단 탭 자동완성이 통째로 안 뜨는 스냅샷이
+  // 찍힐 뻔했다(`#search-suggestions`가 [0,0,0,0]이 됐다).
+  //
+  // 모달 자체를 찍는 것은 `mobileInteraction.spec.js`가 따로 한다.
+  // 🔴 한 번만 닫으면 안 된다 - 모달은 게이트가 걷히기 **시작한 뒤** 한 프레임쯤
+  //    지나서 열리므로, 먼저 닫으면 그 뒤에 다시 열린다. 열릴 때까지 기다렸다 닫고,
+  //    안 열리면(이미 가입된 상태 등) 그냥 넘어간다.
+  await page.waitForFunction(() => !!document.querySelector("#signupModal[open]"), null, { timeout: 4000 })
+    .catch(() => {});
+  // 🔴 `dialog.close()`를 직접 부르면 안 된다. 리액트는 여전히 "열림"으로 알고 있어서
+  //    다음 렌더에 **다시 연다**(실제로 그렇게 돼서 `<html> intercepts pointer events`로
+  //    모든 클릭이 막혔다). **사용자와 같은 길(✕)로 닫아야** 상태까지 닫힌다.
+  //
+  // 🔴 한 번 닫는 것으로는 부족하다. 하네스가 닫는 시점과 모달이 열리는 시점이
+  //    어긋나면(가짜 시계·렌더 타이밍) 닫은 **뒤에** 열린다. 그래서 잠깐 동안
+  //    "열려 있으면 닫는다"를 반복하고, **닫힌 채로 남아 있는 것까지** 확인한다.
+  await page.evaluate(async () => {
+    const close = () => document.querySelector("#signupModal .signup-modal-close")?.click();
+    for (let i = 0; i < 30; i += 1) {
+      if (document.querySelector("#signupModal[open]")) close();
+      await new Promise((r) => setTimeout(r, 100));
+    }
+  });
+  await page.waitForFunction(() => !document.querySelector("#signupModal[open]"), null, { timeout: 4000 });
   await page.evaluate(async () => {
     const buttons = [...document.querySelectorAll("#appRoot nav button, nav button")];
     for (const button of buttons) {

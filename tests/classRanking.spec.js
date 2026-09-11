@@ -51,6 +51,17 @@ async function openStats(page) {
   await page.waitForTimeout(3500);
   // 자동화는 App Check를 못 지나가 인증 띠가 100% 뜬다 - 화면을 밀어내므로 떼어낸다.
   await page.evaluate(() => { document.getElementById("authGate")?.remove(); });
+  // 🔴 저장된 프로필이 없으면 가입 모달이 **저절로 뜬다**(2026-09-11, 지시 Bumm).
+  //    `<dialog>`는 네이티브 top-layer라 그 아래 클릭이 전부 막힌다 - 사용자와 같은
+  //    길(닫기 버튼)로 닫는다. `dialog.close()`를 직접 부르면 리액트가 다시 연다.
+  await page.evaluate(async () => {
+    for (let i = 0; i < 30; i += 1) {
+      if (document.querySelector("#signupModal[open]")) {
+        document.querySelector("#signupModal .signup-modal-close")?.click();
+      }
+      await new Promise((r) => setTimeout(r, 100));
+    }
+  });
   await page.locator("button, a").filter({ hasText: /현황|통계|기록/ }).first().click();
   await page.waitForTimeout(500);
 }

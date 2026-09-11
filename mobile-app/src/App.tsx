@@ -75,9 +75,10 @@ export function App() {
   }, [judge.result, practice, showToast, signup.registeredSchoolId]);
 
   const goToSignup = useCallback(() => {
+    // 🔴 입력칸은 이제 **모달 안에만** 있다. 통계 탭으로 옮겨 포커스를 주던 예전
+    //    방식은 이제 아무것도 못 찾는다 - 입구 버튼을 눌러 모달을 연다.
     setActiveTab("tab-stats");
-    // 탭이 그려진 뒤에 포커스를 줘야 한다.
-    window.setTimeout(() => document.getElementById("signupSchoolInput")?.focus(), 0);
+    window.setTimeout(() => document.getElementById("signupOpenButton")?.click(), 0);
   }, []);
 
   return (

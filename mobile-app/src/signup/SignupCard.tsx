@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { useSignup } from "./useSignup";
 import { edu2gClient } from "../legacy/globals";
 import { SignupModal } from "./SignupModal";
 import { ClassSelect, classesFor } from "./ClassSelect";
+import { useAfterSplashFades } from "./useAfterSplashFades";
 
 const GRADES = [1, 2, 3, 4, 5, 6].map((n) => ({ value: String(n), text: `${n}학년` }));
 
@@ -17,6 +18,16 @@ export function SignupCard({ signup }: { signup: ReturnType<typeof useSignup> })
   const { state } = signup;
   // 🔴 훅은 조건부 return보다 **위**에 있어야 한다(리액트 규칙).
   const [open, setOpen] = useState(false);
+  // 🔴 저장된 프로필이 없는 기기는 **처음 열 때 모달이 저절로 뜬다**(지시 Bumm).
+  //    PC가 학교 선택 모달을 띄우는 것과 같은 동선·같은 타이밍이다:
+  //    스플래시가 걷히기 시작하는 순간에 화면과 함께 등장한다.
+  //    가입이 끝난 기기(`locked`)에서는 뜨지 않는다.
+  const [autoOpened, setAutoOpened] = useState(false);
+  const openOnce = useCallback(() => {
+    // 그 사이에 사용자가 직접 열었거나 닫았으면 건드리지 않는다.
+    setAutoOpened((already) => { if (!already) setOpen(true); return true; });
+  }, []);
+  useAfterSplashFades(state.kind === "form" && !autoOpened, openOnce);
   const chosenSchool = signup.school.selection?.schoolId ?? "";
   const classOptions = useMemo(() => {
     const total = classesFor(chosenSchool, signup.grade);
@@ -89,15 +100,14 @@ export function SignupCard({ signup }: { signup: ReturnType<typeof useSignup> })
 
   return (
     <>
-      {/* 모달을 여는 입구. 통계 탭에 남는다 - 눌러야 뜨는 화면이라 입구가 없으면
-          가입할 방법이 사라진다. */}
-      <div id="signupCard" className="bg-blue-50 border border-blue-100 rounded-2xl p-4 space-y-2.5">
-        <div className="flex items-center gap-1.5 text-xs font-bold text-blue-800">
-          <span>🎓</span><span>정식 가입하기</span>
-        </div>
-        <p className="text-[10px] text-blue-600 leading-snug">한 번만 가입하면 이 기기에 영구히 저장돼요(다시 못 바꿔요). 가입하면 우리반 순위·통계에 내 기록이 정확히 반영됩니다. 안 해도 판단/퀴즈는 그대로 쓸 수 있어요.</p>
-        <button id="signupOpenButton" type="button" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 rounded-xl transition-all" onClick={() => setOpen(true)}>가입하기</button>
-        <p id="signupStatus" className="text-[10px] font-semibold text-blue-500">{signup.status}</p>
+      {/* 🔴 **입력칸은 모달 안에만 있다**(지시 Bumm - "양식을 화면에 박아 넣지 말라").
+          여기 남는 것은 **다시 여는 길** 하나뿐이다 - 모달을 닫은 뒤 이것마저 없으면
+          가입할 방법이 사라진다. PC가 ⚙ 설정에 "학년반 다시 설정하기"를 두는 자리와 같은 역할. */}
+      <div id="signupCard" className="bg-blue-50 border border-blue-100 rounded-2xl p-3 flex items-center justify-between gap-2">
+        <span className="flex items-center gap-1.5 text-xs font-bold text-blue-800">
+          <span>🎓</span><span>아직 가입하지 않았어요</span>
+        </span>
+        <button id="signupOpenButton" type="button" className="flex-none bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3 py-2 rounded-xl transition-all" onClick={() => setOpen(true)}>가입하기</button>
       </div>
 
       <SignupModal open={open} onClose={() => setOpen(false)} icon="🎓" title="가입 정보를 입력해주세요.">

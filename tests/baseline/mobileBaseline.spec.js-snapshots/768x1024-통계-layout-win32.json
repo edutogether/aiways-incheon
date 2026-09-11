@@ -4,12 +4,12 @@
       24,
       24,
       720,
-      1300
+      1215
     ],
     "display": "flex",
     "position": "static",
     "width": "720px",
-    "height": "1299.5px",
+    "height": "1214.5px",
     "margin": "0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -1732,12 +1732,12 @@
       153,
       254,
       462,
-      967
+      882
     ],
     "display": "block",
     "position": "static",
     "width": "462px",
-    "height": "967px",
+    "height": "882px",
     "margin": "24px 0px 0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -1764,14 +1764,14 @@
       153,
       254,
       462,
-      144
+      58
     ],
-    "display": "block",
+    "display": "flex",
     "position": "static",
     "width": "462px",
-    "height": "143.5px",
+    "height": "58px",
     "margin": "0px",
-    "padding": "16px",
+    "padding": "12px",
     "font-family": "Pretendard, sans-serif",
     "font-size": "16px",
     "font-weight": "400",
@@ -1783,9 +1783,9 @@
     "border-radius": "16px",
     "box-shadow": "none",
     "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
+    "justify-content": "space-between",
+    "align-items": "center",
+    "gap": "8px",
     "grid-template-columns": "none",
     "opacity": "1",
     "overflow": "visible",
@@ -1793,17 +1793,17 @@
   },
   "#signupOpenButton": {
     "_box": [
-      170,
-      334,
-      428,
-      36
+      537,
+      267,
+      65,
+      32
     ],
-    "display": "inline-block",
+    "display": "block",
     "position": "static",
-    "width": "428px",
-    "height": "36px",
-    "margin": "10px 0px 0px",
-    "padding": "10px 0px",
+    "width": "65.4844px",
+    "height": "32px",
+    "margin": "0px",
+    "padding": "8px 12px",
     "font-family": "Pretendard, sans-serif",
     "font-size": "12px",
     "font-weight": "700",
@@ -1813,38 +1813,6 @@
     "background-color": "rgb(37, 99, 235)",
     "border": "0px solid rgb(229, 231, 235)",
     "border-radius": "12px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "visible",
-    "z-index": "auto"
-  },
-  "#signupStatus": {
-    "_box": [
-      170,
-      380,
-      428,
-      0
-    ],
-    "display": "block",
-    "position": "static",
-    "width": "428px",
-    "height": "0px",
-    "margin": "10px 0px 0px",
-    "padding": "0px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "10px",
-    "font-weight": "600",
-    "line-height": "15px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgba(0, 0, 0, 0)",
-    "border": "0px solid rgb(229, 231, 235)",
-    "border-radius": "0px",
     "box-shadow": "none",
     "flex-direction": "row",
     "justify-content": "normal",
@@ -2594,7 +2562,7 @@
   "#classRankingCard": {
     "_box": [
       153,
-      417,
+      332,
       462,
       174
     ],
@@ -2626,7 +2594,7 @@
   "#classRankingRefreshBtn": {
     "_box": [
       547,
-      435,
+      349,
       51,
       15
     ],
@@ -2658,7 +2626,7 @@
   "#classRankingStatus": {
     "_box": [
       170,
-      460,
+      375,
       428,
       14
     ],
@@ -2690,7 +2658,7 @@
   "#classRankingEmpty": {
     "_box": [
       170,
-      484,
+      398,
       428,
       81
     ],
@@ -2722,7 +2690,7 @@
   "#classRankingList": {
     "_box": [
       170,
-      574,
+      489,
       428,
       0
     ],
@@ -2754,7 +2722,7 @@
   "#stat-count": {
     "_box": [
       166,
-      738,
+      653,
       121,
       32
     ],
@@ -2786,7 +2754,7 @@
   "#stat-carbon": {
     "_box": [
       323,
-      738,
+      653,
       121,
       32
     ],
@@ -2818,7 +2786,7 @@
   "#stat-hold": {
     "_box": [
       481,
-      738,
+      653,
       121,
       32
     ],
@@ -2850,7 +2818,7 @@
   "#resetStatsBtn": {
     "_box": [
       517,
-      803,
+      718,
       98,
       28
     ],
@@ -2882,7 +2850,7 @@
   "#practice-logs-container": {
     "_box": [
       153,
-      839,
+      754,
       462,
       190
     ],
@@ -2914,7 +2882,7 @@
   "#no-logs-msg": {
     "_box": [
       153,
-      839,
+      754,
       462,
       99
     ],

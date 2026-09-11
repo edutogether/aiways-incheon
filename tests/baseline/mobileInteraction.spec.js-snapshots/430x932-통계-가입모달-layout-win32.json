@@ -4,12 +4,12 @@
       12,
       12,
       406,
-      1288
+      1202
     ],
     "display": "flex",
     "position": "static",
     "width": "406px",
-    "height": "1288px",
+    "height": "1202px",
     "margin": "0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -2308,12 +2308,12 @@
       29,
       226,
       372,
-      979
+      893
     ],
     "display": "block",
     "position": "static",
     "width": "372px",
-    "height": "979px",
+    "height": "893px",
     "margin": "24px 0px 0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -2340,14 +2340,14 @@
       29,
       226,
       372,
-      144
+      58
     ],
-    "display": "block",
+    "display": "flex",
     "position": "static",
     "width": "372px",
-    "height": "143.5px",
+    "height": "58px",
     "margin": "0px",
-    "padding": "16px",
+    "padding": "12px",
     "font-family": "Pretendard, sans-serif",
     "font-size": "16px",
     "font-weight": "400",
@@ -2359,9 +2359,9 @@
     "border-radius": "16px",
     "box-shadow": "none",
     "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
+    "justify-content": "space-between",
+    "align-items": "center",
+    "gap": "8px",
     "grid-template-columns": "none",
     "opacity": "1",
     "overflow": "visible",
@@ -2369,17 +2369,17 @@
   },
   "#signupOpenButton": {
     "_box": [
-      46,
-      307,
-      338,
-      36
+      323,
+      239,
+      65,
+      32
     ],
-    "display": "inline-block",
+    "display": "block",
     "position": "static",
-    "width": "338px",
-    "height": "36px",
-    "margin": "10px 0px 0px",
-    "padding": "10px 0px",
+    "width": "65.4844px",
+    "height": "32px",
+    "margin": "0px",
+    "padding": "8px 12px",
     "font-family": "Pretendard, sans-serif",
     "font-size": "12px",
     "font-weight": "700",
@@ -2389,38 +2389,6 @@
     "background-color": "rgb(37, 99, 235)",
     "border": "0px solid rgb(229, 231, 235)",
     "border-radius": "12px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "visible",
-    "z-index": "auto"
-  },
-  "#signupStatus": {
-    "_box": [
-      46,
-      353,
-      338,
-      0
-    ],
-    "display": "block",
-    "position": "static",
-    "width": "338px",
-    "height": "0px",
-    "margin": "10px 0px 0px",
-    "padding": "0px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "10px",
-    "font-weight": "600",
-    "line-height": "15px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgba(0, 0, 0, 0)",
-    "border": "0px solid rgb(229, 231, 235)",
-    "border-radius": "0px",
     "box-shadow": "none",
     "flex-direction": "row",
     "justify-content": "normal",
@@ -3170,7 +3138,7 @@
   "#classRankingCard": {
     "_box": [
       29,
-      390,
+      304,
       372,
       174
     ],
@@ -3202,7 +3170,7 @@
   "#classRankingRefreshBtn": {
     "_box": [
       333,
-      407,
+      322,
       51,
       15
     ],
@@ -3234,7 +3202,7 @@
   "#classRankingStatus": {
     "_box": [
       46,
-      433,
+      347,
       338,
       14
     ],
@@ -3266,7 +3234,7 @@
   "#classRankingEmpty": {
     "_box": [
       46,
-      456,
+      371,
       338,
       81
     ],
@@ -3298,7 +3266,7 @@
   "#classRankingList": {
     "_box": [
       46,
-      547,
+      461,
       338,
       0
     ],
@@ -3330,7 +3298,7 @@
   "#stat-count": {
     "_box": [
       42,
-      707,
+      621,
       91,
       28
     ],
@@ -3362,7 +3330,7 @@
   "#stat-carbon": {
     "_box": [
       169,
-      707,
+      621,
       91,
       28
     ],
@@ -3394,7 +3362,7 @@
   "#stat-hold": {
     "_box": [
       297,
-      707,
+      621,
       91,
       28
     ],
@@ -3426,7 +3394,7 @@
   "#resetStatsBtn": {
     "_box": [
       303,
-      768,
+      682,
       98,
       28
     ],
@@ -3458,7 +3426,7 @@
   "#practice-logs-container": {
     "_box": [
       29,
-      804,
+      718,
       372,
       190
     ],
@@ -3522,7 +3490,7 @@
   "div:종이류 📄 종이/신문": {
     "_box": [
       29,
-      812,
+      726,
       372,
       58
     ],
@@ -3554,7 +3522,7 @@
   "span:종이류": {
     "_box": [
       42,
-      831,
+      745,
       35,
       20
     ],
@@ -3586,7 +3554,7 @@
   "span:📄 종이/신문/책자": {
     "_box": [
       85,
-      833,
+      747,
       90,
       16
     ],
@@ -3618,7 +3586,7 @@
   "span:-12.5g CO₂": {
     "_box": [
       325,
-      825,
+      739,
       63,
       16
     ],
@@ -3650,7 +3618,7 @@
   "span:오전 09:12:03": {
     "_box": [
       325,
-      841,
+      755,
       63,
       16
     ],
@@ -3682,7 +3650,7 @@
   "div:플라스틱 🥤 페트병 ": {
     "_box": [
       29,
-      878,
+      792,
       372,
       58
     ],
@@ -3714,7 +3682,7 @@
   "span:플라스틱": {
     "_box": [
       42,
-      897,
+      811,
       43,
       20
     ],
@@ -3746,7 +3714,7 @@
   "span:🥤 페트병": {
     "_box": [
       93,
-      899,
+      813,
       50,
       16
     ],
@@ -3778,7 +3746,7 @@
   "span:-17g CO₂": {
     "_box": [
       334,
-      891,
+      805,
       54,
       16
     ],
@@ -3810,7 +3778,7 @@
   "span:오전 09:08:41": {
     "_box": [
       334,
-      907,
+      821,
       54,
       16
     ],
@@ -3842,7 +3810,7 @@
   "div:금속캔 🥫 캔 -12": {
     "_box": [
       29,
-      944,
+      858,
       372,
       58
     ],
@@ -3874,7 +3842,7 @@
   "span:금속캔": {
     "_box": [
       42,
-      963,
+      877,
       35,
       20
     ],
@@ -3906,7 +3874,7 @@
   "span:🥫 캔": {
     "_box": [
       85,
-      965,
+      879,
       30,
       16
     ],
@@ -3938,7 +3906,7 @@
   "span:-12g CO₂": {
     "_box": [
       336,
-      957,
+      871,
       52,
       16
     ],
@@ -3970,7 +3938,7 @@
   "span:오전 09:01:19": {
     "_box": [
       336,
-      973,
+      887,
       52,
       16
     ],

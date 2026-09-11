@@ -155,8 +155,9 @@ for (const vp of VIEWPORTS) {
       await capture(page, vp.name, "통계-실천기록");
 
       // 담임 모드: 입력칸이 통째로 바뀌고 인사 문구가 새로 뜬다.
-      // 🔴 2026-09-11부터 가입 입력은 **모달 안**에 있다(지시 Bumm - PC 모달과 같게).
-      //    먼저 열어야 입력칸이 화면에 있다.
+      // 🔴 2026-09-11부터 가입 입력은 **모달 안**에 있고, 저장된 프로필이 없는 기기에서는
+      //    스플래시가 걷힐 때 **저절로 열린다**(지시 Bumm - PC 학교 선택 모달과 같은 동선).
+      //    하네스(openApp)가 다른 탭을 찍기 위해 그것을 닫아 두므로, 여기서는 입구로 다시 연다.
       await page.locator("#signupOpenButton").click();
       await page.locator("#signupModal[open]").waitFor();
       await capture(page, vp.name, "통계-가입모달");

@@ -85,8 +85,14 @@ async function checkHtmlNotCached(base) {
   if (HTML_PATHS.length < MIN_HTML_PATHS) {
     throw new Error(`HTML 캐시 검사 대상이 ${HTML_PATHS.length}개뿐입니다(${MIN_HTML_PATHS}개 이상이어야 합니다).`);
   }
+  // 🔴 캐시를 우회해서 **지금 설정이 무엇을 내보내는지**를 본다.
+  //    캐시 시간을 줄이는 배포 직후에는 **옛 응답이 그 옛 시간만큼 엣지에 남는다** -
+  //    3600초짜리를 60초로 줄인 날, 배포 3초 뒤에 읽으면 아직 3600초가 온다
+  //    (2026-09-11에 실제로 그렇게 CI가 빨간불이 됐고, 설정은 맞았다).
+  //    쿼리는 경로 매칭을 바꾸지 않으므로 규칙은 그대로 걸린다.
+  const bust = () => `smoke=${Date.now()}`;
   for (const path of HTML_PATHS) {
-    const res = await fetch(`${base}${path}`);
+    const res = await fetch(`${base}${path}${path.includes("?") ? "&" : "?"}${bust()}`);
     if (res.status !== 200) throw new Error(`${base}${path}이 200이 아님 (${res.status})`);
     const cache = String(res.headers.get("cache-control") || "");
     const age = /max-age=(\d+)/.exec(cache);
@@ -102,7 +108,7 @@ async function checkHtmlNotCached(base) {
   console.log(`OK  ${base}: 짧게 캐시돼야 할 ${HTML_PATHS.length}개 전부 max-age<=${MAX_HTML_AGE}`);
 
   for (const path of LONG_CACHE_PATHS) {
-    const res = await fetch(`${base}${path}`);
+    const res = await fetch(`${base}${path}${path.includes("?") ? "&" : "?"}${bust()}`);
     if (res.status !== 200) throw new Error(`${base}${path}이 200이 아님 (${res.status})`);
     const cache = String(res.headers.get("cache-control") || "");
     const age = /max-age=(\d+)/.exec(cache);

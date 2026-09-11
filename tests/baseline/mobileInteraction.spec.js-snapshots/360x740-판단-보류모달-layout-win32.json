@@ -2,14 +2,14 @@
   "#appRoot": {
     "_box": [
       12,
-      -623,
+      -523,
       336,
-      1351
+      1251
     ],
     "display": "flex",
     "position": "static",
     "width": "336px",
-    "height": "1351px",
+    "height": "1251px",
     "margin": "0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -34,7 +34,7 @@
   "button:🔍 판단": {
     "_box": [
       35,
-      -475,
+      -375,
       70,
       37
     ],
@@ -66,7 +66,7 @@
   "button:🎮 퀴즈": {
     "_box": [
       109,
-      -475,
+      -375,
       70,
       37
     ],
@@ -98,7 +98,7 @@
   "button:🌱 통계": {
     "_box": [
       182,
-      -475,
+      -375,
       70,
       37
     ],
@@ -130,7 +130,7 @@
   "button:❓ 보류함": {
     "_box": [
       256,
-      -475,
+      -375,
       70,
       37
     ],
@@ -162,14 +162,14 @@
   "#tab-judge": {
     "_box": [
       29,
-      -409,
+      -309,
       302,
-      1042
+      942
     ],
     "display": "block",
     "position": "static",
     "width": "302px",
-    "height": "1042px",
+    "height": "942px",
     "margin": "24px 0px 0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -194,7 +194,7 @@
   "#signupBanner": {
     "_box": [
       29,
-      -409,
+      -309,
       302,
       126
     ],
@@ -226,7 +226,7 @@
   "#signupBannerGoBtn": {
     "_box": [
       45,
-      -331,
+      -231,
       207,
       32
     ],
@@ -258,7 +258,7 @@
   "#signupBannerDismissBtn": {
     "_box": [
       260,
-      -331,
+      -231,
       55,
       32
     ],
@@ -290,7 +290,7 @@
   "#judge-stat-count": {
     "_box": [
       44,
-      -188,
+      -88,
       85,
       28
     ],
@@ -322,7 +322,7 @@
   "#judge-stat-carbon": {
     "_box": [
       137,
-      -188,
+      -88,
       85,
       28
     ],
@@ -354,7 +354,7 @@
   "#judge-stat-hold": {
     "_box": [
       231,
-      -188,
+      -88,
       85,
       28
     ],
@@ -418,7 +418,7 @@
   "#photoTriggerBtn": {
     "_box": [
       29,
-      -83,
+      17,
       302,
       60
     ],
@@ -450,7 +450,7 @@
   "#searchEmojiIcon": {
     "_box": [
       45,
-      35,
+      135,
       25,
       18
     ],
@@ -482,7 +482,7 @@
   "#searchInput": {
     "_box": [
       29,
-      21,
+      121,
       302,
       46
     ],
@@ -514,7 +514,7 @@
   "#searchTriggerBtn": {
     "_box": [
       297,
-      35,
+      135,
       20,
       20
     ],
@@ -962,7 +962,7 @@
   "#quickSelectGrid": {
     "_box": [
       29,
-      81,
+      181,
       302,
       318
     ],
@@ -994,7 +994,7 @@
   "button:🥛우유갑종이팩류 검토": {
     "_box": [
       29,
-      81,
+      181,
       70,
       111
     ],
@@ -1026,7 +1026,7 @@
   "button:📦택배상자종이류 검토": {
     "_box": [
       107,
-      81,
+      181,
       70,
       111
     ],
@@ -1058,7 +1058,7 @@
   "button:🥤플라스틱컵플라스틱류": {
     "_box": [
       184,
-      81,
+      181,
       70,
       111
     ],
@@ -1090,7 +1090,7 @@
   "button:🍜컵라면 용기재질·오": {
     "_box": [
       262,
-      81,
+      181,
       70,
       111
     ],
@@ -1122,7 +1122,7 @@
   "button:🍪과자 봉지비닐류 또": {
     "_box": [
       29,
-      200,
+      300,
       70,
       96
     ],
@@ -1154,7 +1154,7 @@
   "button:🥫캔류캔류 검토": {
     "_box": [
       107,
-      200,
+      300,
       70,
       96
     ],
@@ -1186,7 +1186,7 @@
   "button:🧴페트병플라스틱류 검": {
     "_box": [
       184,
-      200,
+      300,
       70,
       96
     ],
@@ -1218,7 +1218,7 @@
   "button:🍾유리병유리류 검토": {
     "_box": [
       262,
-      200,
+      300,
       70,
       96
     ],
@@ -1250,7 +1250,7 @@
   "button:☕종이컵종이류 확정 금": {
     "_box": [
       29,
-      303,
+      403,
       70,
       96
     ],
@@ -1282,7 +1282,7 @@
   "button:🛍️비닐 봉투비닐류 ": {
     "_box": [
       107,
-      303,
+      403,
       70,
       96
     ],
@@ -1314,7 +1314,7 @@
   "button:🧾영수증일반폐기물 검": {
     "_box": [
       184,
-      303,
+      403,
       70,
       96
     ],
@@ -1346,7 +1346,7 @@
   "button:🔋건전지폐건전지 전용": {
     "_box": [
       262,
-      303,
+      403,
       70,
       96
     ],
@@ -1378,7 +1378,7 @@
   "#holdQuickBtn": {
     "_box": [
       29,
-      409,
+      509,
       302,
       54
     ],
@@ -2342,12 +2342,12 @@
       0,
       0
     ],
-    "display": "block",
+    "display": "flex",
     "position": "static",
     "width": "auto",
     "height": "auto",
     "margin": "0px",
-    "padding": "16px",
+    "padding": "12px",
     "font-family": "Pretendard, sans-serif",
     "font-size": "16px",
     "font-weight": "400",
@@ -2359,9 +2359,9 @@
     "border-radius": "16px",
     "box-shadow": "none",
     "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
+    "justify-content": "space-between",
+    "align-items": "center",
+    "gap": "8px",
     "grid-template-columns": "none",
     "opacity": "1",
     "overflow": "visible",
@@ -2374,12 +2374,12 @@
       0,
       0
     ],
-    "display": "inline-block",
+    "display": "block",
     "position": "static",
-    "width": "100%",
+    "width": "auto",
     "height": "auto",
-    "margin": "10px 0px 0px",
-    "padding": "10px 0px",
+    "margin": "0px",
+    "padding": "8px 12px",
     "font-family": "Pretendard, sans-serif",
     "font-size": "12px",
     "font-weight": "700",
@@ -2389,38 +2389,6 @@
     "background-color": "rgb(37, 99, 235)",
     "border": "0px solid rgb(229, 231, 235)",
     "border-radius": "12px",
-    "box-shadow": "none",
-    "flex-direction": "row",
-    "justify-content": "normal",
-    "align-items": "normal",
-    "gap": "normal",
-    "grid-template-columns": "none",
-    "opacity": "1",
-    "overflow": "visible",
-    "z-index": "auto"
-  },
-  "#signupStatus": {
-    "_box": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "display": "block",
-    "position": "static",
-    "width": "auto",
-    "height": "auto",
-    "margin": "10px 0px 0px",
-    "padding": "0px",
-    "font-family": "Pretendard, sans-serif",
-    "font-size": "10px",
-    "font-weight": "600",
-    "line-height": "15px",
-    "letter-spacing": "normal",
-    "color": "rgb(30, 41, 59)",
-    "background-color": "rgba(0, 0, 0, 0)",
-    "border": "0px solid rgb(229, 231, 235)",
-    "border-radius": "0px",
     "box-shadow": "none",
     "flex-direction": "row",
     "justify-content": "normal",

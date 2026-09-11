@@ -818,12 +818,18 @@
     <dialog class="ai-modal school-setup-modal" id="classCsvExportModal">
       <button class="close-btn" type="button" aria-label="닫기" data-close-class-csv-modal>×</button>
       <div class="modal-body">
-        <h2>내보낼 학년·반을 골라주세요.</h2>
+        <h2>우리 반 기록을 내보냅니다.</h2>
+        <!-- 🔴 아래 두 상자는 **고르는 자리가 아니라 확인하는 자리**다. 인증된
+             선생님의 반만 내보낼 수 있어서 값이 하나로 정해져 있고, 실제로
+             내보내는 값도 상자가 아니라 교사 인증 응답에서 온다(app.js의
+             openClassCsvExportModal). 예전 제목이 "골라주세요"여서 고를 수
+             없는데 고르라고 하는 화면이었다(2026-09-11 고침, 지시 팀장). -->
+        <p class="class-picker-note">인증하신 반만 내보낼 수 있어요. 아래에서 확인해 주세요.</p>
         <div class="class-picker-selects">
           <select id="classCsvGradeSelect" aria-label="학년" data-aiways-picker></select>
           <select id="classCsvClassNumSelect" aria-label="반" data-aiways-picker></select>
         </div>
-        <button type="button" id="classCsvExportConfirmBtn" class="class-picker-confirm">CSV로 내보내기</button>
+        <button type="button" id="classCsvExportConfirmBtn" class="class-picker-confirm">이 반 기록 CSV로 내보내기</button>
         <p id="classCsvExportStatus" class="save-state" role="status" aria-live="polite"></p>
       </div>
     </dialog>

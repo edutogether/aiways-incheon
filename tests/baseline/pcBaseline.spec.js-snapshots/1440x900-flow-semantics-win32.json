@@ -223,7 +223,7 @@
     "aiways-picker-3-button:  | {\"type\":\"button\",\"aria-haspopup\":\"listbox\",\"aria-expanded\":\"false\",\"aria-controls\":\"aiways-picker-3-list\",\"aria-label\":\"학년\"}",
     "aiways-picker-4-button:  | {\"type\":\"button\",\"aria-haspopup\":\"listbox\",\"aria-expanded\":\"false\",\"aria-controls\":\"aiways-picker-4-list\",\"aria-label\":\"반\"}",
     "cancelDecision: 취소 | {\"type\":\"button\"}",
-    "classCsvExportConfirmBtn: CSV로 내보내기 | {\"type\":\"button\"}",
+    "classCsvExportConfirmBtn: 이 반 기록 CSV로 내보내기 | {\"type\":\"button\"}",
     "classProfileChangeButton: 다른 반으로 연결 | {\"type\":\"button\"}",
     "classProfileClearButton: 반 연결 해제 | {\"type\":\"button\"}",
     "classroomSeedSkillButton: AI Ways Seed 분리수거 Skill  | {\"type\":\"button\"}",

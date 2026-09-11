@@ -30,3 +30,8 @@
 .aiways-picker-option.is-hint { cursor: default; color: var(--ssm-muted, #5b6572); font-weight: 600; background: none; }
 
 @media (prefers-reduced-motion: reduce) { .aiways-picker-caret { transition: none; } }
+
+/* 🔴 비활성 상자에는 화살표를 안 그린다 (2026-09-11, 지시 팀장).
+   고를 수 없는데 화살표가 달려 있으면 "눌리는 것"처럼 보인다 - CSV 내보내기
+   모달의 학년·반이 그 경우다(인증된 반이 하나로 정해져 있어 확인용으로만 있다). */
+.aiways-picker.is-disabled .aiways-picker-caret { display: none; }

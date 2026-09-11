@@ -1546,6 +1546,11 @@
     }
     input.addEventListener("input", () => {
       clearTimeout(debounceTimer);
+      // 🔴 디바운스는 "타자마다 서버를 부르지 않기 위한" 장치다. 목록이 이미
+      // 브라우저에 있으면 필터가 0.4~1.5ms에 끝나므로 300ms를 기다릴 이유가
+      // 없고, 기다리면 "타자 치는 대로 좁혀진다"가 성립하지 않는다.
+      // 목록이 아직 없을 때(=서버 폴백)만 원래대로 300ms를 둔다.
+      if (schoolListData) { runSearch(input.value); return; }
       debounceTimer = window.setTimeout(() => runSearch(input.value), 300);
     });
     searchBtn?.addEventListener("click", () => { clearTimeout(debounceTimer); runSearch(input.value); });

@@ -1342,6 +1342,31 @@
     }
     return out;
   }
+  // 한글을 자모 단위로 푼다 - 조합 중인 글자까지 맞춰보기 위해서다.
+  //
+  // 🔴 왜 필요한가: 한글은 자모를 하나씩 치면서 글자가 완성된다. "인천서흥"을
+  // 치는 동안 입력칸을 거치는 값은 인 → 인ㅊ → 인처 → 인천 → 인천ㅅ → 인천서 →
+  // 인천서ㅎ → 인천서흐 → 인천서흥 이다. 글자 그대로 비교하면 이 중 **절반이 0건**이
+  // 되어 목록이 통째로 비었다 다시 채워진다 - Bumm님이 "한 글자씩 치고 좀 쉬어야
+  // 한다"고 하신 것이 정확히 그것이다. 자모로 풀어 비교하면 모든 중간 상태가
+  // 앞부분 일치로 남는다.
+  //
+  // 복합 중성(ㅘ=ㅗㅏ)과 복합 종성(ㄳ=ㄱㅅ)은 **두 번 쳐서 만드는 글자**라 같이 푼다.
+  // ㄲ·ㅆ처럼 시프트 한 번으로 치는 것은 풀지 않는다.
+  const HANGUL_JUNG = ["ㅏ", "ㅐ", "ㅑ", "ㅒ", "ㅓ", "ㅔ", "ㅕ", "ㅖ", "ㅗ", "ㅗㅏ", "ㅗㅐ", "ㅗㅣ", "ㅛ", "ㅜ", "ㅜㅓ", "ㅜㅔ", "ㅜㅣ", "ㅠ", "ㅡ", "ㅡㅣ", "ㅣ"];
+  const HANGUL_JONG = ["", "ㄱ", "ㄲ", "ㄱㅅ", "ㄴ", "ㄴㅈ", "ㄴㅎ", "ㄷ", "ㄹ", "ㄹㄱ", "ㄹㅁ", "ㄹㅂ", "ㄹㅅ", "ㄹㅌ", "ㄹㅍ", "ㄹㅎ", "ㅁ", "ㅂ", "ㅂㅅ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
+  function toJamo(text) {
+    let out = "";
+    for (const ch of String(text)) {
+      const code = ch.charCodeAt(0);
+      if (code >= 0xac00 && code <= 0xd7a3) {
+        const n = code - 0xac00;
+        out += HANGUL_CHO[Math.floor(n / 588)] + HANGUL_JUNG[Math.floor((n % 588) / 28)] + HANGUL_JONG[n % 28];
+      } else out += ch;
+    }
+    return out;
+  }
+
   // 띄어쓰기를 무시하고 비교한다(교사코드 비교와 같은 방식).
   const squeeze = (text) => String(text || "").replace(/\s+/g, "");
 
@@ -1370,7 +1395,8 @@
     // 🔴 빈 목록을 "그냥 결과 없음"으로 쓰지 않는다 - 그러면 검색이 조용히
     // 죽는다(COMMON_STANDARDS §21). 못 읽었으면 폴백으로 보낸다.
     if (rows.length < 10000) throw new Error(`학교 목록이 ${rows.length}개뿐입니다.`);
-    return { rows, chosung: rows.map((row) => toChosung(row.schoolName)), squeezed: rows.map((row) => squeeze(row.schoolName)) };
+    const squeezed = rows.map((row) => squeeze(row.schoolName));
+    return { rows, chosung: squeezed.map(toChosung), squeezed, jamo: squeezed.map(toJamo) };
   }
 
   function loadSchoolList() {
@@ -1432,6 +1458,19 @@
         else if (cho.includes(query)) rank = 4;
       }
       if (rank >= 0) hits.push({ rank, length: name.length, school: rows[i] });
+    }
+    // 🔴 글자 그대로는 한 건도 없는 때만 자모로 다시 본다. 이미 결과가 나오던
+    // 질의의 동작은 한 글자도 안 바뀐다 - 조합 중이라 비어 보이던 자리만 채운다.
+    if (!hits.length && !isChosungQuery) {
+      const jamoQuery = toJamo(query);
+      const { jamo } = schoolListData;
+      for (let i = 0; i < rows.length; i += 1) {
+        const name = jamo[i];
+        let rank = -1;
+        if (name.startsWith(jamoQuery)) rank = 5;
+        else if (name.includes(jamoQuery)) rank = 6;
+        if (rank >= 0) hits.push({ rank, length: squeezed[i].length, school: rows[i] });
+      }
     }
     hits.sort((a, b) => a.rank - b.rank || a.length - b.length || a.school.schoolName.localeCompare(b.school.schoolName, "ko"));
     return hits.map((hit) => hit.school);

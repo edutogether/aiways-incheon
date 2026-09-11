@@ -65,16 +65,40 @@
     <script>
       (function () {
         var el = document.getElementById("bootSplash");
+        var MINIMUM_TURNS = 2;
+        var FALLBACK_PERIOD_MS = 1150;
         var done = false;
+        var waiting = false;
+        // 하한은 "몇 초"가 아니라 **막대 애니메이션 두 바퀴**다. 주기를 바꾸면
+        // 하한이 따라온다. 애니메이션을 못 찾으면 지금 주기(1.15s)로 셈한다.
+        function remainingMs() {
+          var list = (el.getAnimations ? el.getAnimations({ subtree: true }) : []) || [];
+          for (var i = 0; i < list.length; i += 1) {
+            var timing = list[i].effect && list[i].effect.getComputedTiming ? list[i].effect.getComputedTiming() : null;
+            if (!timing || typeof timing.duration !== "number" || !(timing.duration > 0)) continue;
+            return Math.max(0, timing.duration * MINIMUM_TURNS - (Number(list[i].currentTime) || 0));
+          }
+          return Math.max(0, FALLBACK_PERIOD_MS * MINIMUM_TURNS - (Date.now() - start));
+        }
         function hide() {
           if (done) return;
+          var wait = remainingMs();
+          if (wait > 0) {
+            if (waiting) return;
+            waiting = true;
+            window.setTimeout(function () { waiting = false; hide(); }, wait);
+            return;
+          }
           done = true;
           el.style.opacity = "0";
           el.style.pointerEvents = "none";
           window.setTimeout(function () { el.style.display = "none"; }, 470);
         }
+        var start = Date.now();
         window.__aiwaysHideBootSplash = hide;
         // Never let a failed boot leave the page trapped behind the splash.
+        // 상한은 하한과 목적이 달라 그대로 둔다 - 두 바퀴(2.3s)가 이 5초보다
+        // 짧으므로 서로 부딪히지 않는다.
         window.setTimeout(hide, 5000);
       })();
     </script>

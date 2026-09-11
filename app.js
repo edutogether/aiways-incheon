@@ -499,10 +499,6 @@
   let latestTopStudents = [];
   let sortingStats = { totalCount: 0, carbonReduction: 0, logs: [] };
   let sortingHoldItems = [];
-  let selectedSortingKey = "";
-  let sortingJudgementRequest = 0;
-  let sortingJudgementTimer = 0;
-  let currentSortingJudgement = null;
   let sortingDecisionHistory = [];
 
   const DEMO_SORTING_LOGS = [
@@ -4154,137 +4150,6 @@
     return matches.length ? matches.slice(0, 3) : ["hold"];
   }
 
-  function getJudgementResult(input, options = {}) {
-    const inputSource = options.source || input?.source || (typeof input === "string" ? "quick" : "search");
-    const source = {
-      quick: SORTING_INPUT_SOURCES.quick,
-      search: SORTING_INPUT_SOURCES.search,
-      correction: SORTING_INPUT_SOURCES.correction,
-      photo: options.candidateSource || "photo_hint",
-      initial: "quick_select",
-      future_gemini: "future_gemini"
-    }[inputSource] || inputSource;
-    const query = cleanText(options.query || input?.query || "");
-    const candidateKeys = Array.isArray(options.candidateKeys) && options.candidateKeys.length
-      ? options.candidateKeys
-      : (inputSource === "search" ? findJudgementKeys(query || input) : [judgementKeyFor(input)]);
-    const key = judgementKeyFor(options.key || candidateKeys[0]);
-    const item = sortingDbV2[key] || sortingDbV2.hold;
-    const candidateSource = options.candidateSource || source;
-    const isAmbiguous = item.objectType === "hold" || candidateKeys.length > 1;
-    const objectCandidateKeys = candidateKeys.length === 1 && key !== "hold" ? [...candidateKeys, "hold"] : candidateKeys;
-    const createdAt = new Date().toISOString();
-    return {
-      key,
-      item,
-      source,
-      provider: options.provider || candidateSource,
-      schemaVersion: options.schemaVersion || SORTING_VISION_SCHEMA_VERSION,
-      requestId: cleanText(options.requestId),
-      query,
-      selectedItemId: key,
-      objectCandidates: objectCandidateKeys.map((candidateKey, index) => {
-        const candidate = sortingDbV2[judgementKeyFor(candidateKey)] || sortingDbV2.hold;
-        return {
-          id: candidate.objectType,
-          itemId: judgementKeyFor(candidateKey),
-          label: index === 1 && candidate.objectType === "hold" && !isAmbiguous ? "추가 확인 필요" : candidate.label,
-          objectType: candidate.objectType,
-          confidence: index === 0 ? options.confidence || "reference" : "possible",
-          confidenceBand: index === 0 ? sortingVisionConfidence(options.confidenceBand) : "unknown",
-          source: index === 0 ? candidateSource : "search_rule"
-        };
-      }),
-      materialCandidates: item.materialCandidates.map((label, index) => ({ id: `${item.objectType}-material-${index + 1}`, label, confidence: index === 0 ? "medium" : "check" })),
-      disposalCandidates: item.disposalCandidates.slice(),
-      visibleCautions: item.visibleCautions.slice(),
-      checklist: item.checklist.map(check => ({ ...check, checked: false, status: "unknown" })),
-      primaryFlow: item.primaryFlow,
-      recommendation: { status: item.objectType === "hold" ? "hold_recommended" : "needs_user_check", primary: item.primaryFlow, reason: "사진과 이름만으로 오염·부속품·재질 표기·지역 기준을 확정할 수 없습니다." },
-      holdReasons: [...item.holdReasons],
-      isAmbiguous,
-      canRecord: false,
-      hold: { recommended: isAmbiguous, reasons: [...item.holdReasons] },
-      imageHints: options.imageHints || [],
-      liveGemini: options.liveGemini === true,
-      analysisCode: cleanText(options.analysisCode),
-      selectedCorrectionType: options.selectedCorrectionType || "",
-      createdAt,
-      timestamp: createdAt
-    };
-  }
-
-  function playJudgementScan(container, options = {}) {
-    if (!container) return;
-    selectedSortingKey = "";
-    container.classList.remove("is-empty", "is-result");
-    container.classList.add("is-scanning");
-    container.innerHTML = `<div class="judgement-scan"><strong>AI 판단 지원을 준비하는 중</strong><span class="quick-scan-meter" aria-hidden="true"><i></i></span><p>${escapeHtml(cleanText(options.label) || "선택한 물건")}의 재질·주의 요소·확인 항목을 정리하고 있습니다.</p></div>`;
-  }
-
-  function supportingEvidenceHtml(result) {
-    const evidence = Array.isArray(result?.supportingEvidence) ? result.supportingEvidence.filter(item => item?.status === "success") : [];
-    if (!evidence.length) return "";
-    const comparison = result.skillComparison || compareGeminiAndSkillEvidence("", evidence);
-    const rows = evidence.map(item => {
-      const top = item.topPrediction;
-      const predictions = (item.predictions || []).map(prediction => `${escapeHtml(prediction.label)} ${Math.round(Number(prediction.confidence || 0) * 100)}%`).join(" · ");
-      return `<li><strong>${escapeHtml(item.skillName)} v${escapeHtml(String(item.version))}</strong><span>${escapeHtml(top?.label || "참고 결과 없음")} ${Math.round(Number(top?.confidence || 0) * 100)}%</span><small>Top-3: ${predictions}</small></li>`;
-    }).join("");
-    const signal = comparison.status === "AGREEMENT" || comparison.status === "CONFLICT" ? `<p class="skill-evidence-signal is-${comparison.status.toLowerCase()}">${escapeHtml(comparison.message)}</p>` : `<p class="skill-evidence-signal">${escapeHtml(comparison.message || "학생들이 학습한 보조 모델의 참고 결과입니다.")}</p>`;
-    return `<aside class="judgement-skill-evidence ${comparison.status === "CONFLICT" ? "is-caution" : ""}" aria-label="우리 반이 가르친 AI 참고"><strong>우리 반이 가르친 AI 참고</strong><span>학생들이 학습한 보조 모델의 참고 결과입니다.</span><ul>${rows}</ul>${signal}</aside>`;
-  }
-
-  function renderJudgementResult(result, container) {
-    const safeResult = result || getJudgementResult("hold");
-    const item = safeResult.item || sortingDbV2.hold;
-    const key = safeResult.key || "hold";
-    const buttons = $$("[data-quick-item]");
-    const completed = safeResult.checklist.filter(check => check.required).every(check => check.status === "done");
-    const needsHold = safeResult.hold.recommended || !completed;
-    const liveGemini = safeResult.liveGemini === true;
-    safeResult.canRecord = completed && !safeResult.hold.recommended;
-    const objectChips = safeResult.objectCandidates.map(candidate => `<span class="judgement-chip object"><b>${escapeHtml(candidate.label)}</b><em>${escapeHtml(candidate.source === "photo_hint" ? "사진 기반 참고 후보" : candidate.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : candidate.source === "future_gemini" ? "AI 사진 분석 참고 후보" : candidate.source === "user" ? "사용자 선택" : "검색 후보")}</em></span>`).join("");
-    const materialChips = safeResult.materialCandidates.map(candidate => `<span class="judgement-chip material">${escapeHtml(candidate.label)}</span>`).join("");
-    const correctionButtons = [["pet-bottle", "병"], ["plastic-cup", "컵"], ["tape-box", "박스"], ["snack-wrapper", "봉지"], ["paper-cup", "종이"], ["can", "캔"], ["glass-bottle", "유리"], ["hold", "기타"]].map(([type, label]) => `<button type="button" data-judgement-correction="${type}" class="${safeResult.selectedCorrectionType === type ? "is-active" : ""}">${label}</button>`).join("");
-    const checklistHtml = safeResult.checklist.map(check => `<button type="button" class="judgement-check ${check.status === "done" ? "is-done" : ""}" data-judgement-check="${check.id}" aria-pressed="${check.status === "done"}"><span aria-hidden="true">${check.status === "done" ? "✓" : ""}</span>${escapeHtml(check.label)}</button>`).join("");
-    selectedSortingKey = key;
-    buttons.forEach(target => target.classList.toggle("is-active", target.dataset.quickItem === key));
-    container?.classList.remove("is-empty", "is-scanning");
-    container?.classList.add("is-result");
-    container?.classList.toggle("is-live-gemini", liveGemini);
-    currentSortingJudgement = safeResult;
-    container.innerHTML = `
-      <header class="judgement-result-head"><p>AI가 확인할 항목을 제안합니다.</p><strong>${item.emoji} ${escapeHtml(item.label)}</strong><span>최종 배출 판단은 사용자가 결정합니다.</span></header>
-      ${liveGemini ? `<aside class="judgement-gemini-live" aria-label="Google Gemini live analysis"><strong>Google Gemini 분석 결과</strong><span>AI 사진 분석 참고 후보 · Live 분석 · Firebase Functions 연결</span><small>분석 엔진: Google Gemini · 서버 연결: Firebase Functions · 결과 출처: future_gemini · 최종 판단: 사용자</small></aside>` : ""}
-      ${supportingEvidenceHtml(safeResult)}
-      <p class="judgement-action-status" data-judgement-action-status role="status" aria-live="polite">${safeResult.analysisCode ? "AI 분석을 사용할 수 없어 직접 선택 모드로 전환했습니다." : ""}</p>
-      <details class="judgement-details judgement-candidate-block" open><summary>물체 후보</summary><div class="judgement-chip-row">${objectChips}</div></details>
-      <details class="judgement-details judgement-candidate-block" open><summary>재질 후보</summary><div class="judgement-chip-row">${materialChips}</div></details>
-      ${safeResult.imageHints.length ? `<p class="judgement-image-hint">${escapeHtml(safeResult.imageHints.join(" · "))}</p>` : ""}
-      <details class="judgement-details judgement-cautions"><summary>보이는 주의 요소</summary><ul>${safeResult.visibleCautions.map(caution => `<li>${escapeHtml(caution)}</li>`).join("")}</ul></details>
-      <section class="judgement-checklist"><h4>배출 전 체크리스트</h4><div>${checklistHtml}</div></section>
-      <section class="judgement-recommendation ${completed ? "is-ready" : "is-hold"}"><strong>${completed ? "잘했어요. 배출 준비가 완료됐습니다." : needsHold ? "지금 확정하지 않아도 됩니다. 확인이 필요한 물건으로 보류함에 저장할까요 ?" : "확인 항목을 마친 뒤 사용자가 최종 판단합니다."}</strong><span>${escapeHtml(item.primaryFlow)}</span></section>
-      <section class="judgement-corrections"><span>AI가 항목을 잘못 읽었다면 바로 고쳐 주세요.</span><div>${correctionButtons}</div></section>
-      <div class="quick-action-row judgement-actions"><button type="button" data-judgement-action="record" ${completed && !safeResult.hold.recommended ? "" : "disabled"}>배출 기록 남기기</button><button type="button" data-judgement-action="decide" ${completed ? "" : "disabled"}>확인 후 결정하기</button><button type="button" data-judgement-action="hold">보류함에 저장</button><button type="button" data-next-sorting-item>다음 물건</button></div>`;
-    const holdAction = container?.querySelector('[data-judgement-action="hold"]');
-    if (holdAction) holdAction.disabled = !needsHold;
-  }
-
-  function runThreeSecondJudgement(input, options = {}) {
-    const container = options.container || $("[data-sorting-result]");
-    const result = getJudgementResult(input, options);
-    const request = ++sortingJudgementRequest;
-    if (sortingJudgementTimer) window.clearTimeout(sortingJudgementTimer);
-
-    playJudgementScan(container, { label: result.item?.label });
-    sortingJudgementTimer = window.setTimeout(() => {
-      if (request !== sortingJudgementRequest) return;
-      sortingJudgementTimer = 0;
-      renderJudgementResult(result, container);
-    }, options.delay ?? 1080);
-  }
-
   function chooseDraftFromLabel(label, confidence) {
     const normalized = cleanText(label).toLowerCase();
 
@@ -4543,7 +4408,9 @@
     const draft = await classifyImage(image, {
       imageMetadata: { mimeType: file.type, width: image.naturalWidth, height: image.naturalHeight, byteLength: file.size },
       idempotencyKey: activeSortingVisionIdempotencyKey,
-      userContext: { selectedCorrectionType: currentSortingJudgement?.selectedCorrectionType || "" }
+      // 🔴 이 값을 바꾸는 길은 없어진 패널의 보정 버튼뿐이었고 리스너도 없었다 -
+      // 즉 지금까지도 항상 빈 값이었다. 패널을 걷어내며 상수로 고정한다.
+      userContext: { selectedCorrectionType: "" }
     });
     if (session !== modalSession) return;
     currentAnalysisDraft = draft;
@@ -4559,28 +4426,6 @@
     };
 
     showDraftModal(currentDraft, draft.guidance);
-    runThreeSecondJudgement({ key: draft.judgementKey }, {
-      source: "photo",
-      candidateSource: draft.source || "photo_hint",
-      provider: draft.provider || "fallback_rule",
-      schemaVersion: draft.requestMetadata?.schemaVersion,
-      requestId: draft.requestMetadata?.requestId,
-      confidenceBand: draft.confidenceBand,
-      candidateKeys: draft.hints?.map(hint => hint.itemId).filter(Boolean),
-      confidence: draft.confidence,
-      imageHints: draft.hints.map(hint => `${hint.source === "tm_hint" ? "우리 학교 학습 모델 참고 후보" : hint.source === "future_gemini" ? "AI 사진 분석 참고 후보" : "사진 기반 참고 후보"}: ${hint.label}`),
-      liveGemini: draft.liveGemini,
-      analysisCode: draft.analysisCode,
-      delay: 0
-    });
-    draft.supportingEvidencePromise?.then(payload => {
-      if (session !== modalSession || !currentSortingJudgement) return;
-      const currentRequestId = cleanText(currentSortingJudgement.requestId);
-      if (currentRequestId && currentRequestId !== cleanText(draft.requestMetadata?.requestId)) return;
-      const supportingEvidence = Array.isArray(payload?.evidence) ? payload.evidence : [];
-      if (!supportingEvidence.some(item => item?.status === "success")) return;
-      renderJudgementResult({ ...currentSortingJudgement, supportingEvidence, skillEvidenceContext: payload.context, skillComparison: payload.comparison }, $("[data-sorting-result]"));
-    });
   }
 
   async function handleImage(file) {

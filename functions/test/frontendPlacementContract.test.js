@@ -30,7 +30,9 @@ test("major content remains in its original section", () => {
 });
 
 test("event hooks, fixed copy and Stage 8 authentication UI stay unchanged", () => {
-  ["cameraInput", "uploadInput", "aiModal", "data-upload", "data-tab", "data-judgement-action", "data-final-category"].forEach((value) => assert.ok((html + app).includes(value), value));
+  // 🔴 `data-judgement-action`을 뺐다 - 없어진 3초 판단 패널의 버튼이고, 리스너도 없어
+//    누를 수 있는 사람이 애초에 없었다(2026-09-11 걷어냄, 결정 Bumm).
+["cameraInput", "uploadInput", "aiModal", "data-upload", "data-tab", "data-final-category"].forEach((value) => assert.ok((html + app).includes(value), value));
   ["AI가 먼저 제안하고, 사람이 최종 판단하다", "수업 설계 기획안"].forEach((copy) => assert.ok(html.includes(copy), copy));
   assert.doesNotMatch(html, /(?:stage\s*8|authentication|로그인|회원가입)/i);
 });

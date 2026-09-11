@@ -183,6 +183,46 @@ test("첫 방문 순서 — 스플래시 → 메인+모달 같이 → 모달 해
   await ctx.close();
 });
 
+test("애니메이션이 멈춰 있어도 상한이 스플래시를 걷어낸다", async ({ browser }) => {
+  test.setTimeout(300000);
+  // 🔴 2026-09-11에 실제로 이렇게 깨져 있었다. 하한은 막대 애니메이션의
+  //    `currentTime`으로 계산하는데, hide()가 그 값이 0이 될 때까지 **자기를
+  //    다시 부르는** 구조였다. 애니메이션이 안 흐르면 그 값이 영원히 줄지 않아
+  //    hide()가 무한히 자기를 부르고, **상한(5초)마저 같은 루프로 들어가**
+  //    스플래시가 영영 안 걷혔다.
+  //
+  //    애니메이션이 안 흐르는 실제 상황: **탭이 백그라운드로 내려가면** 브라우저가
+  //    애니메이션을 멈춘다. 학생이 부팅 중에 다른 앱을 보다 돌아오면 스플래시에
+  //    갇힌다. 모션 최소화 설정, 테스트의 가짜 시계도 같다.
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  await ctx.addInitScript(WATCH_BOOT_SPLASH);
+  // 화면에 붙는 애니메이션을 전부 멈춘 채로 시작한다 - currentTime이 안 흐른다.
+  await ctx.addInitScript(() => {
+    const freeze = () => {
+      const list = document.getAnimations ? document.getAnimations() : [];
+      list.forEach((a) => { try { a.pause(); a.currentTime = 0; } catch { /* 멈출 수 없는 것은 둔다 */ } });
+      return list.length;
+    };
+    let frozen = 0;
+    const timer = setInterval(() => { frozen = Math.max(frozen, freeze()); }, 30);
+    setTimeout(() => clearInterval(timer), 9000);
+    Object.defineProperty(window, "__frozenCount", { get: () => frozen });
+  });
+  const page = await ctx.newPage();
+  await page.goto(`${BASE}/index.html`, { waitUntil: "commit", timeout: 120000 });
+  await page.waitForTimeout(9000);
+  const timeline = await page.evaluate(() => window.__tl);
+  const frozen = await page.evaluate(() => window.__frozenCount);
+  // 🔴 하한을 고정값으로 못박는다 - 멈출 애니메이션이 하나도 없었다면 이 검사는
+  //    아무것도 확인하지 않은 것이다(COMMON_STANDARDS §21).
+  expect(frozen, "멈춘 애니메이션이 0개입니다 - 이 검사가 아무것도 확인하지 않았습니다.").toBeGreaterThan(0);
+  const hidden = timeline.find((entry) => entry[1].startsWith("투명") || entry[1].startsWith("none"));
+  console.log(`    애니메이션 ${frozen}개 멈춤 → ${hidden ? hidden[0] + "ms에 걷힘" : "🔴 안 걷힘"}`);
+  expect(hidden, "애니메이션이 멈춰 있으니 스플래시가 영영 안 걷힙니다 - 상한이 하한 계산을 거치고 있습니다.").toBeTruthy();
+  expect(hidden[0], `${hidden[0]}ms에 걷혔습니다 - 상한 5초 안팎이어야 합니다.`).toBeLessThan(7000);
+  await ctx.close();
+});
+
 test("부팅이 실패해도 상한(5초)이 스플래시를 걷어낸다", async ({ browser }) => {
   test.setTimeout(300000);
   // 🔴 하한을 넣다가 상한을 깨뜨리면 **장애 때 화면이 영영 안 걷힌다.**

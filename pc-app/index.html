@@ -80,9 +80,15 @@
           }
           return Math.max(0, FALLBACK_PERIOD_MS * MINIMUM_TURNS - (Date.now() - start));
         }
-        function hide() {
+        // 🔴 force는 상한(5초)이 쓴다. 상한은 하한 계산을 **거치지 않아야** 한다 -
+        // 애니메이션 `currentTime`이 안 흐르는 상황(탭이 백그라운드로 내려가
+        // 애니메이션이 멈춘 경우, 모션 최소화, 테스트의 가짜 시계)에서는
+        // remainingMs()가 영원히 줄지 않아 hide()가 자기를 계속 다시 부른다.
+        // 그러면 "부팅이 실패해도 화면이 갇히지 않게" 하려고 둔 상한마저 같은
+        // 루프로 들어가 **스플래시가 영영 안 걷힌다.**
+        function hide(force) {
           if (done) return;
-          var wait = remainingMs();
+          var wait = force ? 0 : remainingMs();
           if (wait > 0) {
             if (waiting) return;
             waiting = true;
@@ -98,8 +104,8 @@
         window.__aiwaysHideBootSplash = hide;
         // Never let a failed boot leave the page trapped behind the splash.
         // 상한은 하한과 목적이 달라 그대로 둔다 - 두 바퀴(2.3s)가 이 5초보다
-        // 짧으므로 서로 부딪히지 않는다.
-        window.setTimeout(hide, 5000);
+        // 짧으므로 서로 부딪히지 않는다. 🔴 **무조건** 걷어내야 하므로 force로 부른다.
+        window.setTimeout(function () { hide(true); }, 5000);
       })();
     </script>
     <script type="module" src="/src/main.tsx"></script>

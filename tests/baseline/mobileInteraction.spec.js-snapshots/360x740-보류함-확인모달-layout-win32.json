@@ -4,12 +4,12 @@
       12,
       12,
       336,
-      1487
+      1577
     ],
     "display": "flex",
     "position": "static",
     "width": "336px",
-    "height": "1486.88px",
+    "height": "1576.88px",
     "margin": "0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -3487,6 +3487,38 @@
     "overflow": "visible",
     "z-index": "auto"
   },
+  "#classRankingEmpty": {
+    "_box": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "display": "block",
+    "position": "static",
+    "width": "auto",
+    "height": "auto",
+    "margin": "10px 0px 0px",
+    "padding": "16px 12px",
+    "font-family": "Pretendard, sans-serif",
+    "font-size": "16px",
+    "font-weight": "400",
+    "line-height": "24px",
+    "letter-spacing": "normal",
+    "color": "rgb(30, 41, 59)",
+    "background-color": "rgba(255, 255, 255, 0.7)",
+    "border": "0px solid rgb(229, 231, 235)",
+    "border-radius": "12px",
+    "box-shadow": "none",
+    "flex-direction": "row",
+    "justify-content": "normal",
+    "align-items": "normal",
+    "gap": "normal",
+    "grid-template-columns": "none",
+    "opacity": "1",
+    "overflow": "visible",
+    "z-index": "auto"
+  },
   "#classRankingList": {
     "_box": [
       0,
@@ -4196,12 +4228,12 @@
       29,
       226,
       302,
-      1143
+      1233
     ],
     "display": "block",
     "position": "static",
     "width": "302px",
-    "height": "1143px",
+    "height": "1233px",
     "margin": "24px 0px 0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",

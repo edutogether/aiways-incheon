@@ -4,12 +4,12 @@
       12,
       12,
       366,
-      1487
+      1577
     ],
     "display": "flex",
     "position": "static",
     "width": "366px",
-    "height": "1486.88px",
+    "height": "1576.88px",
     "margin": "0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -2308,12 +2308,12 @@
       29,
       226,
       332,
-      1143
+      1233
     ],
     "display": "block",
     "position": "static",
     "width": "332px",
-    "height": "1143px",
+    "height": "1233px",
     "margin": "24px 0px 0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -3396,12 +3396,12 @@
       29,
       595,
       332,
-      84
+      174
     ],
     "display": "block",
     "position": "static",
     "width": "332px",
-    "height": "83.75px",
+    "height": "174.25px",
     "margin": "20px 0px 0px",
     "padding": "16px",
     "font-family": "Pretendard, sans-serif",
@@ -3487,10 +3487,42 @@
     "overflow": "visible",
     "z-index": "auto"
   },
-  "#classRankingList": {
+  "#classRankingEmpty": {
     "_box": [
       46,
       662,
+      298,
+      81
+    ],
+    "display": "block",
+    "position": "static",
+    "width": "298px",
+    "height": "80.5px",
+    "margin": "10px 0px 0px",
+    "padding": "16px 12px",
+    "font-family": "Pretendard, sans-serif",
+    "font-size": "16px",
+    "font-weight": "400",
+    "line-height": "24px",
+    "letter-spacing": "normal",
+    "color": "rgb(30, 41, 59)",
+    "background-color": "rgba(255, 255, 255, 0.7)",
+    "border": "0px solid rgb(229, 231, 235)",
+    "border-radius": "12px",
+    "box-shadow": "none",
+    "flex-direction": "row",
+    "justify-content": "normal",
+    "align-items": "normal",
+    "gap": "normal",
+    "grid-template-columns": "none",
+    "opacity": "1",
+    "overflow": "visible",
+    "z-index": "auto"
+  },
+  "#classRankingList": {
+    "_box": [
+      46,
+      752,
       298,
       0
     ],
@@ -3522,7 +3554,7 @@
   "#stat-count": {
     "_box": [
       42,
-      837,
+      928,
       78,
       28
     ],
@@ -3554,7 +3586,7 @@
   "#stat-carbon": {
     "_box": [
       156,
-      851,
+      942,
       78,
       28
     ],
@@ -3586,7 +3618,7 @@
   "#stat-hold": {
     "_box": [
       270,
-      837,
+      928,
       78,
       28
     ],
@@ -3618,7 +3650,7 @@
   "#resetStatsBtn": {
     "_box": [
       263,
-      912,
+      1003,
       98,
       28
     ],
@@ -3650,7 +3682,7 @@
   "#practice-logs-container": {
     "_box": [
       29,
-      948,
+      1039,
       332,
       190
     ],
@@ -3714,7 +3746,7 @@
   "div:종이류 📄 종이/신문": {
     "_box": [
       29,
-      956,
+      1047,
       332,
       58
     ],
@@ -3746,7 +3778,7 @@
   "span:종이류": {
     "_box": [
       42,
-      975,
+      1066,
       35,
       20
     ],
@@ -3778,7 +3810,7 @@
   "span:📄 종이/신문/책자": {
     "_box": [
       85,
-      977,
+      1068,
       90,
       16
     ],
@@ -3810,7 +3842,7 @@
   "span:-12.5g CO₂": {
     "_box": [
       285,
-      969,
+      1060,
       63,
       16
     ],
@@ -3842,7 +3874,7 @@
   "span:오전 09:12:03": {
     "_box": [
       285,
-      985,
+      1076,
       63,
       16
     ],
@@ -3874,7 +3906,7 @@
   "div:플라스틱 🥤 페트병 ": {
     "_box": [
       29,
-      1022,
+      1113,
       332,
       58
     ],
@@ -3906,7 +3938,7 @@
   "span:플라스틱": {
     "_box": [
       42,
-      1041,
+      1132,
       43,
       20
     ],
@@ -3938,7 +3970,7 @@
   "span:🥤 페트병": {
     "_box": [
       93,
-      1043,
+      1134,
       50,
       16
     ],
@@ -3970,7 +4002,7 @@
   "span:-17g CO₂": {
     "_box": [
       294,
-      1035,
+      1126,
       54,
       16
     ],
@@ -4002,7 +4034,7 @@
   "span:오전 09:08:41": {
     "_box": [
       294,
-      1051,
+      1142,
       54,
       16
     ],
@@ -4034,7 +4066,7 @@
   "div:금속캔 🥫 캔 -12": {
     "_box": [
       29,
-      1088,
+      1179,
       332,
       58
     ],
@@ -4066,7 +4098,7 @@
   "span:금속캔": {
     "_box": [
       42,
-      1107,
+      1198,
       35,
       20
     ],
@@ -4098,7 +4130,7 @@
   "span:🥫 캔": {
     "_box": [
       85,
-      1109,
+      1200,
       30,
       16
     ],
@@ -4130,7 +4162,7 @@
   "span:-12g CO₂": {
     "_box": [
       296,
-      1101,
+      1192,
       52,
       16
     ],
@@ -4162,7 +4194,7 @@
   "span:오전 09:01:19": {
     "_box": [
       296,
-      1117,
+      1208,
       52,
       16
     ],

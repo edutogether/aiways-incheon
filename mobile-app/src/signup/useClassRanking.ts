@@ -16,9 +16,16 @@ export interface ClassRankingRow {
 
 const NOT_CONNECTED = "학교/반을 연결하면 우리 반 순위가 표시돼요.";
 
-export function useClassRanking(registeredSchoolId: () => string) {
+// 🔴 어디에서 학년·반을 가져오는지가 이 화면의 전부다. 2026-09-11에 실제로
+// **가입을 마친 학생에게 랭킹이 영영 안 떴다** - 학년·반을 `classContext`
+// (임시 입력 카드가 쓰는 값)에서만 읽었는데, 가입 흐름은 그 값을 쓰지 않기
+// 때문이다. 가입한 학생은 서버에 학년·반이 있는데도 화면은 "학교/반을
+// 연결하면…"에 멈춰 있었고, 새로고침을 눌러도 **서버를 부르지도 않았다.**
+// 그래서 이제 **가입 프로필을 먼저 보고**, 없을 때만 임시 입력으로 떨어진다.
+export function useClassRanking(registeredSchoolId: () => string, registeredClass?: () => { grade: string; classNum: string } | null) {
   const [rows, setRows] = useState<ClassRankingRow[]>([]);
   const [grade, setGrade] = useState("");
+  const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(NOT_CONNECTED);
 
   const load = useCallback(async () => {
@@ -28,17 +35,20 @@ export function useClassRanking(registeredSchoolId: () => string) {
       return;
     }
     const context = loadClassContext();
+    const mine = registeredClass?.() ?? null;
     const schoolId = registeredSchoolId() || context?.schoolId || "";
-    const currentGrade = context?.grade ?? "";
-    const classNum = context?.classNum ?? "";
+    const currentGrade = mine?.grade || context?.grade || "";
+    const classNum = mine?.classNum || context?.classNum || "";
     if (!schoolId || !currentGrade) {
       setStatus(NOT_CONNECTED);
       return;
     }
+    setLoading(true);
     setStatus("불러오는 중입니다...");
     setRows([]);
     setGrade(currentGrade);
     const result = await client.getClassRanking({ schoolId, grade: currentGrade, classNum });
+    setLoading(false);
     if (!result.ok) {
       setStatus(client.errorMessageFor?.(result.code ?? "") || "랭킹을 불러오지 못했어요. 다시 시도해 주세요.");
       return;
@@ -50,7 +60,7 @@ export function useClassRanking(registeredSchoolId: () => string) {
     }
     setStatus("우리 반은 굵게 표시돼요.");
     setRows(classes);
-  }, [registeredSchoolId]);
+  }, [registeredSchoolId, registeredClass]);
 
-  return { rows, grade, status, load };
+  return { rows, grade, status, loading, load };
 }

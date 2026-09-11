@@ -89,3 +89,11 @@
 
 /* 모달을 여는 카드 - 통계 탭에 남는 입구. */
 .signup-open-card { display: grid; gap: .5rem; }
+
+/* 반별 랭킹을 불러오는 동안 자리를 잡아 두고 반짝인다 (2026-09-11, 지시 Bumm -
+   "아무리 없어도 애니메이션은 있어야지, PC처럼"). 화면이 텅 비면 눌렀는데
+   아무 일도 안 일어난 것처럼 보인다. */
+.ranking-skeleton-bar { display: block; block-size: .7rem; border-radius: 999px; background: #e7eaee; }
+.ranking-skeleton { animation: aiwaysRankingPulse 1.15s ease-in-out infinite; }
+@keyframes aiwaysRankingPulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .ranking-skeleton { animation: none; } }

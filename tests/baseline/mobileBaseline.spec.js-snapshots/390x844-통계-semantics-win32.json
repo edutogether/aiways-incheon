@@ -11,6 +11,7 @@
     "classGradeInput",
     "classNumInput",
     "classRankingCard",
+    "classRankingEmpty",
     "classRankingList",
     "classRankingRefreshBtn",
     "classRankingStatus",

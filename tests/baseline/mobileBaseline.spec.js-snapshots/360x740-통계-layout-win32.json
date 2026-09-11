@@ -4,12 +4,12 @@
       12,
       12,
       336,
-      1487
+      1577
     ],
     "display": "flex",
     "position": "static",
     "width": "336px",
-    "height": "1486.88px",
+    "height": "1576.88px",
     "margin": "0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -1732,12 +1732,12 @@
       29,
       226,
       302,
-      1143
+      1233
     ],
     "display": "block",
     "position": "static",
     "width": "302px",
-    "height": "1143px",
+    "height": "1233px",
     "margin": "24px 0px 0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -2820,12 +2820,12 @@
       29,
       595,
       302,
-      84
+      174
     ],
     "display": "block",
     "position": "static",
     "width": "302px",
-    "height": "83.75px",
+    "height": "174.25px",
     "margin": "20px 0px 0px",
     "padding": "16px",
     "font-family": "Pretendard, sans-serif",
@@ -2911,10 +2911,42 @@
     "overflow": "visible",
     "z-index": "auto"
   },
-  "#classRankingList": {
+  "#classRankingEmpty": {
     "_box": [
       46,
       662,
+      268,
+      81
+    ],
+    "display": "block",
+    "position": "static",
+    "width": "268px",
+    "height": "80.5px",
+    "margin": "10px 0px 0px",
+    "padding": "16px 12px",
+    "font-family": "Pretendard, sans-serif",
+    "font-size": "16px",
+    "font-weight": "400",
+    "line-height": "24px",
+    "letter-spacing": "normal",
+    "color": "rgb(30, 41, 59)",
+    "background-color": "rgba(255, 255, 255, 0.7)",
+    "border": "0px solid rgb(229, 231, 235)",
+    "border-radius": "12px",
+    "box-shadow": "none",
+    "flex-direction": "row",
+    "justify-content": "normal",
+    "align-items": "normal",
+    "gap": "normal",
+    "grid-template-columns": "none",
+    "opacity": "1",
+    "overflow": "visible",
+    "z-index": "auto"
+  },
+  "#classRankingList": {
+    "_box": [
+      46,
+      752,
       268,
       0
     ],
@@ -2946,7 +2978,7 @@
   "#stat-count": {
     "_box": [
       42,
-      851,
+      942,
       68,
       28
     ],
@@ -2978,7 +3010,7 @@
   "#stat-carbon": {
     "_box": [
       146,
-      851,
+      942,
       68,
       28
     ],
@@ -3010,7 +3042,7 @@
   "#stat-hold": {
     "_box": [
       250,
-      837,
+      928,
       68,
       28
     ],
@@ -3042,7 +3074,7 @@
   "#resetStatsBtn": {
     "_box": [
       233,
-      912,
+      1003,
       98,
       28
     ],
@@ -3074,7 +3106,7 @@
   "#practice-logs-container": {
     "_box": [
       29,
-      948,
+      1039,
       302,
       190
     ],
@@ -3106,7 +3138,7 @@
   "#no-logs-msg": {
     "_box": [
       29,
-      948,
+      1039,
       302,
       99
     ],

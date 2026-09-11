@@ -41,7 +41,14 @@ export function App() {
   });
 
   const registeredSchoolId = useCallback(() => signup.registeredSchoolId, [signup.registeredSchoolId]);
-  const ranking = useClassRanking(registeredSchoolId);
+  // 🔴 가입을 마친 학생의 학년·반은 **서버가 준 프로필**에 있다. 이것을 안 주면
+  //    랭킹이 임시 입력 카드에만 기대게 되어, 가입한 학생에게는 영영 안 뜬다.
+  const registeredClass = useCallback(
+    () => (signup.state.kind === "locked"
+      ? { grade: signup.state.profile.grade, classNum: signup.state.profile.classNum }
+      : null),
+    [signup.state]);
+  const ranking = useClassRanking(registeredSchoolId, registeredClass);
   const interimClass = useInterimClass();
   const hold = useHoldBox({ showToast, registeredSchoolId });
   const quiz = useQuiz();

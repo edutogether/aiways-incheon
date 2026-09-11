@@ -78,6 +78,25 @@ export function StatsTab({ hidden, minHeight, stats, holdCount, signup, ranking,
           <button id="classRankingRefreshBtn" type="button" className="text-[10px] font-bold text-indigo-500 hover:text-indigo-700" onClick={() => void ranking.load()}>새로고침 🔄</button>
         </div>
         <p id="classRankingStatus" className="text-[10px] text-indigo-500 leading-snug">{ranking.status}</p>
+        {/* 🔴 비어 있어도 화면이 비지 않게 한다(지시 Bumm - "아무리 없어도
+            애니메이션은 있어야지, PC처럼"). 불러오는 중에는 자리를 잡아 두고
+            반짝이게 하고, 결과가 없으면 왜 없는지를 그 자리에 남긴다. */}
+        {ranking.loading && (
+          <ol id="classRankingSkeleton" className="space-y-1.5" aria-hidden="true">
+            {[0, 1, 2].map((n) => (
+              <li key={n} className="ranking-skeleton flex items-center justify-between rounded-xl px-3 py-2 text-xs bg-white">
+                <span className="ranking-skeleton-bar" style={{ width: "58%" }} />
+                <span className="ranking-skeleton-bar" style={{ width: "18%" }} />
+              </li>
+            ))}
+          </ol>
+        )}
+        {!ranking.loading && !ranking.rows.length && (
+          <div id="classRankingEmpty" className="rounded-xl bg-white/70 px-3 py-4 text-center">
+            <span className="block text-2xl" aria-hidden="true">🏅</span>
+            <span className="block text-[11px] font-semibold text-indigo-700 mt-1">아직 보여줄 순위가 없어요.</span>
+          </div>
+        )}
         <ol id="classRankingList" className="space-y-1.5">
           {ranking.rows.map((row) => (
             <li key={row.classNum} className={`flex items-center justify-between rounded-xl px-3 py-2 text-xs ${row.isMine ? "bg-indigo-600 text-white font-bold" : "bg-white text-slate-600 font-semibold"}`}>

@@ -2,14 +2,14 @@
   "#appRoot": {
     "_box": [
       12,
-      -489,
+      -578,
       406,
-      1409
+      1499
     ],
     "display": "flex",
     "position": "static",
     "width": "406px",
-    "height": "1408.88px",
+    "height": "1498.88px",
     "margin": "0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -34,7 +34,7 @@
   "button:🔍 판단": {
     "_box": [
       35,
-      -341,
+      -430,
       87,
       37
     ],
@@ -66,7 +66,7 @@
   "button:🎮 퀴즈": {
     "_box": [
       126,
-      -341,
+      -430,
       87,
       37
     ],
@@ -98,7 +98,7 @@
   "button:🌱 통계": {
     "_box": [
       217,
-      -341,
+      -430,
       87,
       37
     ],
@@ -130,7 +130,7 @@
   "button:❓ 보류함": {
     "_box": [
       308,
-      -341,
+      -430,
       87,
       37
     ],
@@ -162,14 +162,14 @@
   "#tab-judge": {
     "_box": [
       29,
-      -275,
+      -364,
       372,
-      1065
+      1155
     ],
     "display": "block",
     "position": "static",
     "width": "372px",
-    "height": "1065px",
+    "height": "1155px",
     "margin": "24px 0px 0px",
     "padding": "0px",
     "font-family": "Pretendard, sans-serif",
@@ -194,7 +194,7 @@
   "#signupBanner": {
     "_box": [
       29,
-      -275,
+      -364,
       372,
       126
     ],
@@ -226,7 +226,7 @@
   "#signupBannerGoBtn": {
     "_box": [
       45,
-      -197,
+      -286,
       277,
       32
     ],
@@ -258,7 +258,7 @@
   "#signupBannerDismissBtn": {
     "_box": [
       330,
-      -197,
+      -286,
       55,
       32
     ],
@@ -290,7 +290,7 @@
   "#judge-stat-count": {
     "_box": [
       44,
-      -54,
+      -143,
       109,
       28
     ],
@@ -322,7 +322,7 @@
   "#judge-stat-carbon": {
     "_box": [
       161,
-      -54,
+      -143,
       109,
       28
     ],
@@ -354,7 +354,7 @@
   "#judge-stat-hold": {
     "_box": [
       277,
-      -54,
+      -143,
       109,
       28
     ],
@@ -418,7 +418,7 @@
   "#photoTriggerBtn": {
     "_box": [
       29,
-      51,
+      -38,
       372,
       60
     ],
@@ -450,7 +450,7 @@
   "#searchEmojiIcon": {
     "_box": [
       45,
-      169,
+      80,
       25,
       18
     ],
@@ -482,7 +482,7 @@
   "#searchInput": {
     "_box": [
       29,
-      155,
+      66,
       372,
       46
     ],
@@ -514,7 +514,7 @@
   "#searchTriggerBtn": {
     "_box": [
       367,
-      169,
+      80,
       20,
       20
     ],
@@ -962,7 +962,7 @@
   "#quickSelectGrid": {
     "_box": [
       29,
-      215,
+      126,
       372,
       303
     ],
@@ -994,7 +994,7 @@
   "button:🥛우유갑종이팩류 검토": {
     "_box": [
       29,
-      215,
+      126,
       87,
       96
     ],
@@ -1026,7 +1026,7 @@
   "button:📦택배상자종이류 검토": {
     "_box": [
       124,
-      215,
+      126,
       87,
       96
     ],
@@ -1058,7 +1058,7 @@
   "button:🥤플라스틱컵플라스틱류": {
     "_box": [
       219,
-      215,
+      126,
       87,
       96
     ],
@@ -1090,7 +1090,7 @@
   "button:🍜컵라면 용기재질·오": {
     "_box": [
       314,
-      215,
+      126,
       87,
       96
     ],
@@ -1122,7 +1122,7 @@
   "button:🍪과자 봉지비닐류 또": {
     "_box": [
       29,
-      319,
+      230,
       87,
       96
     ],
@@ -1154,7 +1154,7 @@
   "button:🥫캔류캔류 검토": {
     "_box": [
       124,
-      319,
+      230,
       87,
       96
     ],
@@ -1186,7 +1186,7 @@
   "button:🧴페트병플라스틱류 검": {
     "_box": [
       219,
-      319,
+      230,
       87,
       96
     ],
@@ -1218,7 +1218,7 @@
   "button:🍾유리병유리류 검토": {
     "_box": [
       314,
-      319,
+      230,
       87,
       96
     ],
@@ -1250,7 +1250,7 @@
   "button:☕종이컵종이류 확정 금": {
     "_box": [
       29,
-      422,
+      333,
       87,
       96
     ],
@@ -1282,7 +1282,7 @@
   "button:🛍️비닐 봉투비닐류 ": {
     "_box": [
       124,
-      422,
+      333,
       87,
       96
     ],
@@ -1314,7 +1314,7 @@
   "button:🧾영수증일반폐기물 검": {
     "_box": [
       219,
-      422,
+      333,
       87,
       96
     ],
@@ -1346,7 +1346,7 @@
   "button:🔋건전지폐건전지 전용": {
     "_box": [
       314,
-      422,
+      333,
       87,
       96
     ],
@@ -1378,7 +1378,7 @@
   "#holdQuickBtn": {
     "_box": [
       29,
-      528,
+      439,
       372,
       54
     ],
@@ -3477,6 +3477,38 @@
     "background-color": "rgba(0, 0, 0, 0)",
     "border": "0px solid rgb(229, 231, 235)",
     "border-radius": "0px",
+    "box-shadow": "none",
+    "flex-direction": "row",
+    "justify-content": "normal",
+    "align-items": "normal",
+    "gap": "normal",
+    "grid-template-columns": "none",
+    "opacity": "1",
+    "overflow": "visible",
+    "z-index": "auto"
+  },
+  "#classRankingEmpty": {
+    "_box": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "display": "block",
+    "position": "static",
+    "width": "auto",
+    "height": "auto",
+    "margin": "10px 0px 0px",
+    "padding": "16px 12px",
+    "font-family": "Pretendard, sans-serif",
+    "font-size": "16px",
+    "font-weight": "400",
+    "line-height": "24px",
+    "letter-spacing": "normal",
+    "color": "rgb(30, 41, 59)",
+    "background-color": "rgba(255, 255, 255, 0.7)",
+    "border": "0px solid rgb(229, 231, 235)",
+    "border-radius": "12px",
     "box-shadow": "none",
     "flex-direction": "row",
     "justify-content": "normal",

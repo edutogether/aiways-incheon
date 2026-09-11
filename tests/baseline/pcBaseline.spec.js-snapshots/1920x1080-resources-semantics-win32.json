@@ -1,6 +1,10 @@
 {
   "ids": [
     "aiModal",
+    "aiways-picker-1-button",
+    "aiways-picker-1-list",
+    "aiways-picker-2-button",
+    "aiways-picker-2-list",
     "bootSplash",
     "cameraInput",
     "cancelDecision",
@@ -210,6 +214,8 @@
     "(무id): 📋 우리 반 학생 관리 | {\"type\":\"button\"}",
     "(무id): 📥 내 기록 CSV로 저장 | {\"type\":\"button\"}",
     "(무id): 🔄 모두 초기화하기 | {\"type\":\"button\"}",
+    "aiways-picker-1-button:  | {\"type\":\"button\",\"aria-haspopup\":\"listbox\",\"aria-expanded\":\"false\",\"aria-controls\":\"aiways-picker-1-list\",\"aria-label\":\"학년\"}",
+    "aiways-picker-2-button:  | {\"type\":\"button\",\"aria-haspopup\":\"listbox\",\"aria-expanded\":\"false\",\"aria-controls\":\"aiways-picker-2-list\",\"aria-label\":\"반\"}",
     "cancelDecision: 취소 | {\"type\":\"button\"}",
     "classCsvExportConfirmBtn: CSV로 내보내기 | {\"type\":\"button\"}",
     "classProfileChangeButton: 다른 반으로 연결 | {\"type\":\"button\"}",

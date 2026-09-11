@@ -1214,7 +1214,9 @@
     gradeSelect.replaceChildren();
     const gradePlaceholder = document.createElement("option");
     gradePlaceholder.value = "";
-    gradePlaceholder.textContent = "학년을 먼저 선택해주세요";
+    // 🔴 상자 한 칸이 모달의 절반이라 긴 문구가 말줄임으로 잘린다. 학년 칸은
+    // "무엇을 고르는 칸인지"만 말하면 된다(반 칸이 "학년 먼저"를 안내한다).
+    gradePlaceholder.textContent = "학년 선택";
     gradeSelect.append(gradePlaceholder);
     for (let g = 1; g <= 6; g += 1) {
       const option = document.createElement("option");
@@ -1230,7 +1232,7 @@
       if (!chosenGrade) {
         const hint = document.createElement("option");
         hint.value = "";
-        hint.textContent = "학년을 먼저 선택해주세요";
+        hint.textContent = "학년 먼저 선택";
         classNumSelect.append(hint);
         classNumSelect.disabled = true;
         return;
@@ -1240,7 +1242,7 @@
       if (chosenGrade !== config.grade) {
         const none = document.createElement("option");
         none.value = "";
-        none.textContent = `${chosenGrade}학년은 서비스 준비중이에요`;
+        none.textContent = `${chosenGrade}학년 준비중`;
         classNumSelect.append(none);
         classNumSelect.disabled = true;
         return;

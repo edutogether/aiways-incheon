@@ -2267,7 +2267,55 @@
     "animation-iteration-count": "1",
     "transform": "none"
   },
+  "#aiways-picker-1-button": {
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
+  },
+  "#aiways-picker-1-list": {
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
+  },
   "#dashboardClassNumSelect": {
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
+  },
+  "#aiways-picker-2-button": {
+    "transition-property": "all",
+    "transition-duration": "0s",
+    "transition-timing-function": "ease",
+    "transition-delay": "0s",
+    "animation-name": "none",
+    "animation-duration": "0s",
+    "animation-timing-function": "ease",
+    "animation-delay": "0s",
+    "animation-iteration-count": "1",
+    "transform": "none"
+  },
+  "#aiways-picker-2-list": {
     "transition-property": "all",
     "transition-duration": "0s",
     "transition-timing-function": "ease",

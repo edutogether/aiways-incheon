@@ -28,7 +28,7 @@ const VERBATIM = ["style.css", "styles/cb3a.css"];
 const LEGACY_SCRIPTS = [
   "deviceTier.js", "firebaseAppCheck.js", "firebaseBetaAuth.js", "edu2gBetaClient.js",
   "dashboardRealtime.js", "responsiveNavigation.js", "classProfileStore.js",
-  "classroomSkillRegistry.js", "aiRuntimeLoader.js", "schoolListSearch.js", "app.js"
+  "classroomSkillRegistry.js", "aiRuntimeLoader.js", "classPicker.js", "schoolListSearch.js", "app.js"
 ];
 
 function builtHtml() {

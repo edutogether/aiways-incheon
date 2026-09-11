@@ -42,6 +42,7 @@
     <script defer src="./classProfileStore.js"></script>
     <script defer src="./classroomSkillRegistry.js"></script>
     <script defer src="./aiRuntimeLoader.js"></script>
+    <script defer src="./classPicker.js"></script>
     <script defer src="./schoolListSearch.js"></script>
     <script defer src="./app.js"></script>
   </head>
@@ -777,8 +778,8 @@
           </div>
           <h2>학년 반을 입력해주세요.</h2>
           <div class="class-picker-selects">
-            <select id="dashboardGradeSelect" aria-label="학년"></select>
-            <select id="dashboardClassNumSelect" aria-label="반"></select>
+            <select id="dashboardGradeSelect" aria-label="학년" data-aiways-picker></select>
+            <select id="dashboardClassNumSelect" aria-label="반" data-aiways-picker></select>
           </div>
           <button type="button" id="dashboardClassConfirmBtn" class="class-picker-confirm">확인</button>
         </div>
